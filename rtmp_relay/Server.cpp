@@ -21,10 +21,9 @@ Server::~Server()
     if (_socket > 0) close(_socket);
 }
 
-bool Server::init(uint16_t port, const std::vector<std::string>& pushUrls)
+bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 {
     _port = port;
-    _pushUrls = pushUrls;
     
     _socket = socket(AF_INET, SOCK_STREAM, 0);
     
@@ -65,7 +64,15 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushUrls)
     
     std::cout << "Server listening on port " << _port << std::endl;
     
-    // TODO: read incoming data and push to outgoing
+    for (const std::string address : pushAddresses)
+    {
+        std::unique_ptr<Output> output(new Output());
+        
+        if (output->init(address))
+        {
+            
+        }
+    }
     
     return true;
 }

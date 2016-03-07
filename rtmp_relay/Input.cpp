@@ -22,7 +22,7 @@ Input::~Input()
 
 bool Input::init(int serverSocket)
 {
-    struct sockaddr_in address;
+    sockaddr_in address;
     socklen_t addressLength;
     
     _socket = accept(serverSocket, reinterpret_cast<sockaddr*>(&address), &addressLength);

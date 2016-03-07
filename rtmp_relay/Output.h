@@ -13,7 +13,7 @@ public:
     Output();
     ~Output();
     
-    bool init(const std::string& url);
+    bool init(const std::string& address);
     
     int getSocket() const { return _socket; }
     

@@ -28,7 +28,6 @@ private:
     
     int _socket = 0;
     
-    std::vector<std::string> _pushUrls;
     std::vector<std::unique_ptr<Output>> _outputs;
     
     std::vector<pollfd> _pollFds;
