@@ -19,7 +19,7 @@ public:
     Server();
     ~Server();
     
-    bool init(uint16_t port, const std::vector<std::string>& pushUrls);
+    bool init(uint16_t port, const std::vector<std::string>& pushAddresses);
     
     void update();
     

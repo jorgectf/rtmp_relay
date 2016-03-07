@@ -17,11 +17,11 @@ Relay::Relay()
     
 }
 
-bool Relay::init()
+bool Relay::init(const std::string& config)
 {
     char TEMP_BUFFER[65536];
     
-    std::unique_ptr<FILE, std::function<void(FILE*)>> file(fopen("/Users/elviss/Projects/rtmp_relay/config.json", "r"), std::fclose);
+    std::unique_ptr<FILE, std::function<void(FILE*)>> file(fopen(config.c_str(), "r"), std::fclose);
     
     if (!file)
     {
@@ -46,7 +46,7 @@ bool Relay::init()
     {
         const rapidjson::Value& serverObject = serversArray[serverIndex];
         
-        std::vector<std::string> pushUrls;
+        std::vector<std::string> pushAddresses;
         
         const rapidjson::Value& pushArray = serverObject["push"];
         
@@ -54,12 +54,12 @@ bool Relay::init()
         {
             const rapidjson::Value& pushObject = pushArray[pushIndex];
             
-            pushUrls.push_back(pushObject.GetString());
+            pushAddresses.push_back(pushObject.GetString());
         }
         
         std::unique_ptr<Server> server(new Server());
         
-        if (server->init(serverObject["port"].GetInt(), pushUrls))
+        if (server->init(serverObject["port"].GetInt(), pushAddresses))
         {
             _servers.push_back(std::move(server));
         }

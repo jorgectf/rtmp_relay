@@ -70,6 +70,11 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
         
         if (output->init(address))
         {
+            pollfd pollFd;
+            pollFd.fd = output->getSocket();
+            pollFd.events = POLLOUT;
+            _pollFds.push_back(pollFd);
+            
             _outputs.push_back(std::move(output));
         }
     }
@@ -110,24 +115,34 @@ void Server::update()
                 std::vector<char> packet;
                 
                 // Failed to find input
-                if (inputIterator == _inputs.end())
+                if (inputIterator != _inputs.end())
                 {
-                    i = _pollFds.erase(i);
-                    continue;
+                    if ((*inputIterator)->readPacket(packet))
+                    {
+                        // packet
+                        std::cout << "Got packet!" << std::endl;
+                    }
+                    else if ((*inputIterator)->isClosed())
+                    {
+                        std::cout << "Client disconnected" << std::endl;
+                        
+                        _inputs.erase(inputIterator);
+                        i = _pollFds.erase(i);
+                        continue;
+                    }
                 }
-                else if ((*inputIterator)->readPacket(packet))
-                {
-                    // packet
-                    std::cout << "Got packet!" << std::endl;
-                }
-                else if ((*inputIterator)->isClosed())
-                {
-                    std::cout << "Client disconnected" << std::endl;
-                    
-                    _inputs.erase(inputIterator);
-                    i = _pollFds.erase(i);
-                    continue;
-                }
+            }
+        }
+        else if (pollFd.revents & POLLOUT)
+        {
+            std::vector<std::unique_ptr<Output>>::iterator outputIterator =
+            std::find_if(_outputs.begin(), _outputs.end(), [pollFd](const std::unique_ptr<Output>& output) { return output->getSocket() == pollFd.fd; });
+            
+            if (outputIterator != _outputs.end())
+            {
+                (*outputIterator)->connected();
+                i = _pollFds.erase(i);
+                continue;
             }
         }
 

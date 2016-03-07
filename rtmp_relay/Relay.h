@@ -15,7 +15,7 @@ public:
     Relay();
     ~Relay();
     
-    bool init();
+    bool init(const std::string& config);
     
     void run();
     

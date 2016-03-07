@@ -72,3 +72,20 @@ bool Output::init(const std::string& address)
     
     return true;
 }
+
+void Output::connected()
+{
+    std::cout << "Connected" << std::endl;
+    _connected = true;
+}
+
+bool Output::sendPacket(const std::vector<char>& packet)
+{
+    if (send(_socket, packet.data(), packet.size(), 0) < 0)
+    {
+        std::cerr << "Failed to send data" << std::endl;
+        return false;
+    }
+    
+    return true;
+}
