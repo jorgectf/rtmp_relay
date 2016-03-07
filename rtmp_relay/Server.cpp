@@ -121,6 +121,11 @@ void Server::update()
                     {
                         // packet
                         std::cout << "Got packet!" << std::endl;
+                        
+                        for (const std::unique_ptr<Output>& output : _outputs)
+                        {
+                            output->sendPacket(packet);
+                        }
                     }
                     else if ((*inputIterator)->isClosed())
                     {

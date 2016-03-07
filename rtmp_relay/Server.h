@@ -28,8 +28,8 @@ private:
     
     int _socket = 0;
     
-    std::vector<std::unique_ptr<Output>> _outputs;
-    
     std::vector<pollfd> _pollFds;
+    
+    std::vector<std::unique_ptr<Output>> _outputs;
     std::vector<std::unique_ptr<Input>> _inputs;
 };

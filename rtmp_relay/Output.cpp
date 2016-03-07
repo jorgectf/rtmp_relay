@@ -83,8 +83,11 @@ bool Output::sendPacket(const std::vector<char>& packet)
 {
     if (send(_socket, packet.data(), packet.size(), 0) < 0)
     {
-        std::cerr << "Failed to send data" << std::endl;
-        return false;
+        if (errno != EAGAIN && errno != EWOULDBLOCK)
+        {
+            std::cerr << "Failed to send data" << std::endl;
+            return false;
+        }
     }
     
     return true;
