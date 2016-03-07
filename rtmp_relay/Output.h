@@ -4,7 +4,9 @@
 
 #pragma once
 
-class Output
+#include "Noncopyable.h"
+
+class Output: public Noncopyable
 {
 public:
     Output();

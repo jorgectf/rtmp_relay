@@ -94,4 +94,20 @@ void Server::update()
             _inputs.push_back(std::move(input));
         }
     }
+    
+    for (std::vector<std::unique_ptr<Input>>::iterator i = _inputs.begin(); i != _inputs.end();)
+    {
+        if (FD_ISSET((*i)->getSocket(), &readSet))
+        {
+            if (!(*i)->readData())
+            {
+                // Failed to read from socket, disconnect it
+                i = _inputs.erase(i);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
 }
