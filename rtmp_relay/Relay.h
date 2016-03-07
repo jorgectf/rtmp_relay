@@ -15,8 +15,10 @@ public:
     Relay();
     ~Relay();
     
+    bool init();
+    
     void run();
     
 private:
-    std::vector<Server*> _servers;
+    std::vector<std::unique_ptr<Server>> _servers;
 };
