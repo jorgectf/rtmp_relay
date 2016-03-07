@@ -2,6 +2,7 @@
 //  rtmp_relay
 //
 
+#include <queue>
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -25,6 +26,12 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushUrls)
     _pushUrls = pushUrls;
     
     _socket = socket(AF_INET, SOCK_STREAM, 0);
+    
+    pollfd pollFd;
+    pollFd.fd = _socket;
+    pollFd.events = POLLIN;
+    pollFd.revents = 0;
+    _pollFds.push_back(pollFd);
     
     if (_socket < 0)
     {
@@ -59,55 +66,68 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushUrls)
 
 void Server::update()
 {
-    fd_set readSet;
-    FD_ZERO(&readSet);
-    FD_SET(_socket, &readSet);
-    
-    timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
-    
-    int maxSocket = _socket + 1;
-    
-    for (const std::unique_ptr<Input>& input : _inputs)
+    if (poll(_pollFds.data(), static_cast<nfds_t>(_pollFds.size()), 0) < 0)
     {
-        FD_SET(input->getSocket(), &readSet);
-        
-        if (input->getSocket() > maxSocket)
-        {
-            maxSocket = input->getSocket();
-        }
-    }
-    
-    if (select(maxSocket + 1, &readSet, NULL, NULL, &timeout) < 0)
-    {
-        std::cerr << "Error occurred" << std::endl;
+        std::cerr << "Poll failed" << std::endl;
         return;
     }
     
-    if (FD_ISSET(_socket, &readSet))
-    {
-        std::unique_ptr<Input> input(new Input());
-        
-        if (input->init(_socket))
-        {
-            _inputs.push_back(std::move(input));
-        }
-    }
+    std::queue<std::unique_ptr<Input>> inputQueue;
     
-    for (std::vector<std::unique_ptr<Input>>::iterator i = _inputs.begin(); i != _inputs.end();)
+    for (std::vector<pollfd>::iterator i = _pollFds.begin(); i != _pollFds.end();)
     {
-        if (FD_ISSET((*i)->getSocket(), &readSet))
+        pollfd pollFd = (*i);
+        
+        if (pollFd.fd == _socket)
         {
-            if (!(*i)->readData())
+            if (pollFd.revents & POLLIN)
+            {
+                std::unique_ptr<Input> input(new Input());
+                
+                if (input->init(_socket))
+                {
+                    inputQueue.push(std::move(input));
+                }
+                
+                pollFd.revents = 0;
+            }
+            
+            ++i;
+        }
+        else
+        {
+            std::vector<std::unique_ptr<Input>>::iterator inputIterator =
+                std::find_if(_inputs.begin(), _inputs.end(), [pollFd](const std::unique_ptr<Input>& input) { return input->getSocket() == pollFd.fd; });
+            
+            // Failed to find input
+            if (inputIterator == _inputs.end())
+            {
+                i = _pollFds.erase(i);
+            }
+            else if (!(*inputIterator)->readData())
             {
                 // Failed to read from socket, disconnect it
-                i = _inputs.erase(i);
+                _inputs.erase(inputIterator);
+                i = _pollFds.erase(i);
             }
             else
             {
                 ++i;
             }
         }
+    }
+    
+    while (!inputQueue.empty())
+    {
+        std::unique_ptr<Input> input = std::move(inputQueue.front());
+        inputQueue.pop();
+        
+        pollfd pollFd;
+        pollFd.fd = input->getSocket();
+        pollFd.events = POLLIN;
+        pollFd.revents = 0;
+        _pollFds.push_back(pollFd);
+        
+        _inputs.push_back(std::move(input));
     }
 }

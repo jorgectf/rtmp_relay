@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <poll.h>
 #include "Noncopyable.h"
 #include "Output.h"
 #include "Input.h"
@@ -30,6 +31,6 @@ private:
     std::vector<std::string> _pushUrls;
     std::vector<std::unique_ptr<Output>> _outputs;
     
-    
+    std::vector<pollfd> _pollFds;
     std::vector<std::unique_ptr<Input>> _inputs;
 };

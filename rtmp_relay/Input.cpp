@@ -24,7 +24,7 @@ bool Input::init(int serverSocket)
     struct sockaddr_in address;
     socklen_t addressLength;
     
-    _socket = accept(_socket, reinterpret_cast<sockaddr*>(&address), &addressLength);
+    _socket = accept(serverSocket, reinterpret_cast<sockaddr*>(&address), &addressLength);
     
     if (_socket < 0)
     {
@@ -58,6 +58,7 @@ bool Input::readData()
         return false;
     }
     
+    std::cout << "Got data!" << std::endl;
     _dataSize += size;
     
     return true;
