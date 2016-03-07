@@ -4,6 +4,7 @@
 
 #include <netdb.h>
 #include <iostream>
+#include <unistd.h>
 #include "Output.h"
 #include "Utils.h"
 
