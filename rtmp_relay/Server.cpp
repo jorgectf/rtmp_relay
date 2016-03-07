@@ -118,6 +118,7 @@ void Server::update()
                 else if ((*inputIterator)->readPacket(packet))
                 {
                     // packet
+                    std::cout << "Got packet!" << std::endl;
                 }
                 else if ((*inputIterator)->isClosed())
                 {

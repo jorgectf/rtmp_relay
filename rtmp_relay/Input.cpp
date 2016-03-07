@@ -67,8 +67,15 @@ bool Input::readPacket(std::vector<char>& packet)
         return false;
     }
     
-    std::cout << "Got data!" << std::endl;
     _dataSize += size;
+    
+    if (_dataSize)
+    {
+        packet.resize(_dataSize);
+        std::copy(_data.begin(), _data.begin() + _dataSize, packet.begin());
+        _dataSize = 0;
+        return true;
+    }
     
     return false;
 }
