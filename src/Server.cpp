@@ -4,9 +4,11 @@
 
 #include <queue>
 #include <iostream>
+#include <algorithm>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <string.h>
 #include "Server.h"
 #include "Utils.h"
 
