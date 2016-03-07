@@ -41,12 +41,6 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
         return false;
     }
     
-    if (!setBlocking(_socket, false))
-    {
-        std::cerr << "Failed to set socket non-blocking" << std::endl;
-        return false;
-    }
-    
     sockaddr_in serverAddress;
     memset(&serverAddress, 0, sizeof(serverAddress));
     serverAddress.sin_family = AF_INET;

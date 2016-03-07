@@ -40,12 +40,6 @@ bool Input::init(int serverSocket)
         std::cout << "Client connected from " << static_cast<int>(ip[0]) << "." << static_cast<int>(ip[1]) << "." << static_cast<int>(ip[2]) << "." << static_cast<int>(ip[3]) << std::endl;
     }
     
-    if (!setBlocking(_socket, false))
-    {
-        std::cerr << "Failed to set socket non-blocking" << std::endl;
-        return false;
-    }
-    
     _data.resize(BUFFER_SIZE);
     
     return true;
