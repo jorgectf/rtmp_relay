@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "Server.h"
+#include "Utils.h"
 
 static const int WAITING_QUEUE_SIZE = 5;
 
@@ -30,12 +31,17 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushUrls)
     pollfd pollFd;
     pollFd.fd = _socket;
     pollFd.events = POLLIN;
-    pollFd.revents = 0;
     _pollFds.push_back(pollFd);
     
     if (_socket < 0)
     {
         std::cerr << "Failed to create server socket" << std::endl;
+        return false;
+    }
+    
+    if (!setBlocking(_socket, false))
+    {
+        std::cerr << "Failed to set socket non-blocking" << std::endl;
         return false;
     }
     
@@ -78,9 +84,9 @@ void Server::update()
     {
         pollfd pollFd = (*i);
         
-        if (pollFd.fd == _socket)
+        if (pollFd.revents & POLLIN)
         {
-            if (pollFd.revents & POLLIN)
+            if (pollFd.fd == _socket)
             {
                 std::unique_ptr<Input> input(new Input());
                 
@@ -89,31 +95,36 @@ void Server::update()
                     inputQueue.push(std::move(input));
                 }
                 
-                pollFd.revents = 0;
-            }
             
-            ++i;
-        }
-        else
-        {
-            std::vector<std::unique_ptr<Input>>::iterator inputIterator =
-                std::find_if(_inputs.begin(), _inputs.end(), [pollFd](const std::unique_ptr<Input>& input) { return input->getSocket() == pollFd.fd; });
-            
-            // Failed to find input
-            if (inputIterator == _inputs.end())
-            {
-                i = _pollFds.erase(i);
-            }
-            else if (!(*inputIterator)->readData())
-            {
-                // Failed to read from socket, disconnect it
-                _inputs.erase(inputIterator);
-                i = _pollFds.erase(i);
+                ++i;
             }
             else
             {
-                ++i;
+                std::vector<std::unique_ptr<Input>>::iterator inputIterator =
+                    std::find_if(_inputs.begin(), _inputs.end(), [pollFd](const std::unique_ptr<Input>& input) { return input->getSocket() == pollFd.fd; });
+                
+                // Failed to find input
+                if (inputIterator == _inputs.end())
+                {
+                    i = _pollFds.erase(i);
+                }
+                else if (!(*inputIterator)->readData())
+                {
+                    // Failed to read from socket, disconnect it
+                    _inputs.erase(inputIterator);
+                    i = _pollFds.erase(i);
+                    
+                    std::cout << "Client disconnected" << std::endl;
+                }
+                else
+                {
+                    ++i;
+                }
             }
+        }
+        else
+        {
+            ++i;
         }
     }
     
@@ -125,7 +136,6 @@ void Server::update()
         pollfd pollFd;
         pollFd.fd = input->getSocket();
         pollFd.events = POLLIN;
-        pollFd.revents = 0;
         _pollFds.push_back(pollFd);
         
         _inputs.push_back(std::move(input));

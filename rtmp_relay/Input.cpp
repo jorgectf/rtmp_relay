@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "Input.h"
+#include "Utils.h"
 
 static const uint32_t BUFFER_SIZE = 65536;
 
@@ -36,6 +37,12 @@ bool Input::init(int serverSocket)
         unsigned char* ip = reinterpret_cast<unsigned char*>(&address.sin_addr.s_addr);
         
         std::cout << "Client connected from " << static_cast<int>(ip[0]) << "." << static_cast<int>(ip[1]) << "." << static_cast<int>(ip[2]) << "." << static_cast<int>(ip[3]) << std::endl;
+    }
+    
+    if (!setBlocking(_socket, false))
+    {
+        std::cerr << "Failed to set socket non-blocking" << std::endl;
+        return false;
     }
     
     _data.resize(BUFFER_SIZE);

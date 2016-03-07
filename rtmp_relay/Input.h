@@ -11,7 +11,7 @@ class Input: public Noncopyable
 {
 public:
     Input();
-    virtual ~Input();
+    ~Input();
     
     bool init(int serverSocket);
     
@@ -20,7 +20,7 @@ public:
     int getSocket() const { return _socket; }
     
 private:
-    int _socket;
+    int _socket = 0;
     
     std::vector<char> _data;
     uint32_t _dataSize = 0;
