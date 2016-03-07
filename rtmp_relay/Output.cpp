@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <iostream>
 #include "Output.h"
+#include "Utils.h"
 
 Output::Output()
 {
@@ -44,6 +45,12 @@ bool Output::init(const std::string& address)
         return false;
     }
     
+    if (!setBlocking(_socket, false))
+    {
+        std::cerr << "Failed to set socket non-blocking" << std::endl;
+        return false;
+    }
+    
     struct sockaddr_in* addr = (struct sockaddr_in*)result->ai_addr;
     unsigned char* ip = (unsigned char*)&addr->sin_addr.s_addr;
     
@@ -51,9 +58,12 @@ bool Output::init(const std::string& address)
     
     if (connect(_socket, result->ai_addr, result->ai_addrlen) < 0)
     {
-        std::cerr << "Connection failed" << std::endl;
-        freeaddrinfo(result);
-        return false;
+        if (errno != EINPROGRESS)
+        {
+            std::cerr << "Connection failed" << std::endl;
+            freeaddrinfo(result);
+            return false;
+        }
     }
     
     freeaddrinfo(result);

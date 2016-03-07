@@ -70,7 +70,7 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
         
         if (output->init(address))
         {
-            
+            _outputs.push_back(std::move(output));
         }
     }
     
@@ -101,38 +101,36 @@ void Server::update()
                 {
                     inputQueue.push(std::move(input));
                 }
-                
-            
-                ++i;
             }
             else
             {
                 std::vector<std::unique_ptr<Input>>::iterator inputIterator =
                     std::find_if(_inputs.begin(), _inputs.end(), [pollFd](const std::unique_ptr<Input>& input) { return input->getSocket() == pollFd.fd; });
                 
+                std::vector<char> packet;
+                
                 // Failed to find input
                 if (inputIterator == _inputs.end())
                 {
                     i = _pollFds.erase(i);
+                    continue;
                 }
-                else if (!(*inputIterator)->readData())
+                else if ((*inputIterator)->readPacket(packet))
                 {
-                    // Failed to read from socket, disconnect it
+                    // packet
+                }
+                else if ((*inputIterator)->isClosed())
+                {
+                    std::cout << "Client disconnected" << std::endl;
+                    
                     _inputs.erase(inputIterator);
                     i = _pollFds.erase(i);
-                    
-                    std::cout << "Client disconnected" << std::endl;
-                }
-                else
-                {
-                    ++i;
+                    continue;
                 }
             }
         }
-        else
-        {
-            ++i;
-        }
+
+        ++i;
     }
     
     while (!inputQueue.empty())

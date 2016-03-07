@@ -15,12 +15,15 @@ public:
     
     bool init(int serverSocket);
     
-    bool readData();
+    bool readPacket(std::vector<char>& packet);
+    
+    bool isClosed() const { return _closed; }
     
     int getSocket() const { return _socket; }
     
 private:
     int _socket = 0;
+    bool _closed = false;
     
     std::vector<char> _data;
     uint32_t _dataSize = 0;

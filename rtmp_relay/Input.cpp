@@ -50,23 +50,25 @@ bool Input::init(int serverSocket)
     return true;
 }
 
-bool Input::readData()
+bool Input::readPacket(std::vector<char>& packet)
 {
     ssize_t size = recv(_socket, _data.data() + _dataSize, _data.size() - _dataSize, 0);
     
     if (size < 0)
     {
         std::cerr << "Failed to read from socket" << std::endl;
+        _closed = true;
         return false;
     }
     else if (size == 0)
     {
         std::cerr << "Socket disconnected" << std::endl;
+        _closed = true;
         return false;
     }
     
     std::cout << "Got data!" << std::endl;
     _dataSize += size;
     
-    return true;
+    return false;
 }
