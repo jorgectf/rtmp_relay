@@ -120,11 +120,12 @@ void Server::update()
                     if ((*inputIterator)->readPacket(packet))
                     {
                         // packet
-                        std::cout << "Got packet!" << std::endl;
-                        
                         for (const std::unique_ptr<Output>& output : _outputs)
                         {
-                            output->sendPacket(packet);
+                            if (output->isConnected())
+                            {
+                                output->sendPacket(packet);
+                            }
                         }
                     }
                     else if ((*inputIterator)->isClosed())
