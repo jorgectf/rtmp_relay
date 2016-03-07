@@ -5,6 +5,7 @@
 #include <ctime>
 #include <memory>
 #include <functional>
+#include <iostream>
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/filereadstream.h>
 #include <rapidjson/document.h>
@@ -24,7 +25,7 @@ bool Relay::init()
     
     if (!file)
     {
-        fprintf(stderr, "Failed to open file\n");
+        std::cerr << "Failed to open file" << std::endl;
         return false;
     }
     
@@ -35,7 +36,7 @@ bool Relay::init()
     
     if (document.HasParseError())
     {
-        fprintf(stderr, "Failed to open file\n");
+        std::cerr << "Failed to open file" << std::endl;
         return false;
     }
     
@@ -56,9 +57,12 @@ bool Relay::init()
             pushUrls.push_back(pushObject.GetString());
         }
         
-        std::unique_ptr<Server> server(new Server(serverObject["port"].GetInt(), pushUrls));
+        std::unique_ptr<Server> server(new Server());
         
-        _servers.push_back(std::move(server));
+        if (server->init(serverObject["port"].GetInt(), pushUrls))
+        {
+            _servers.push_back(std::move(server));
+        }
     }
     
     return true;
