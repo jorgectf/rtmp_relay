@@ -24,7 +24,7 @@ bool Output::init(const std::string& address)
     size_t i = address.find(':');
     std::string portStr;
     
-    if (i != -1)
+    if (i != std::string::npos)
     {
         addressStr = address.substr(0, i);
         portStr = address.substr(i + 1);
