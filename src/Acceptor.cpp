@@ -19,15 +19,12 @@ Acceptor::Acceptor(Network& network, int socketFd):
 
 Acceptor::~Acceptor()
 {
-    for (int clientSocket : _clientSockets)
-    {
-        close(clientSocket);
-    }
+    
 }
 
 Acceptor::Acceptor(Acceptor&& other):
     Socket(std::move(other)),
-    _clientSockets(std::move(other._clientSockets))
+    _acceptCallback(std::move(other._acceptCallback))
 {
     other._port = 0;
 }
@@ -36,14 +33,14 @@ Acceptor& Acceptor::operator=(Acceptor&& other)
 {
     Socket::operator=(std::move(other));
     _port = other._port;
-    _clientSockets = std::move(other._clientSockets);
+    _acceptCallback = std::move(other._acceptCallback);
     
     other._port = 0;
     
     return *this;
 }
 
-bool Acceptor::startAccept(uint16_t port)
+bool Acceptor::startAccept(uint16_t port, const std::function<void(Socket socket)>& acceptCallback)
 {
     if (_socketFd < 0)
     {
@@ -82,6 +79,8 @@ bool Acceptor::startAccept(uint16_t port)
     std::cout << "Server listening on port " << _port << std::endl;
     _ready = true;
     
+    _acceptCallback = acceptCallback;
+    
     return true;
 }
 
@@ -103,6 +102,11 @@ bool Acceptor::read()
         std::cout << "Client connected from " << ipToString(address.sin_addr.s_addr) << std::endl;
         
         Socket socket(_network, socketFd);
+        
+        if (_acceptCallback)
+        {
+            _acceptCallback(std::move(socket));
+        }
     }
     
     return true;

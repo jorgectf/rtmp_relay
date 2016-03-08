@@ -5,10 +5,8 @@
 #include <iostream>
 #include "Input.h"
 
-static const uint32_t BUFFER_SIZE = 65536;
-
-Input::Input(Network& network):
-    _network(network), _socket(_network)
+Input::Input(Network& network, Socket socket):
+    _network(network), _socket(std::move(socket))
 {
     
 }
@@ -32,13 +30,6 @@ Input& Input::operator=(Input&& other)
     _data = std::move(other._data);
     
     return *this;
-}
-
-bool Input::init(int serverSocket)
-{
-    _data.resize(BUFFER_SIZE);
-    
-    return true;
 }
 
 void Input::update()

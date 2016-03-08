@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 #include "Socket.h"
 
 class Acceptor: Socket
@@ -17,12 +18,12 @@ public:
     Acceptor(Acceptor&& other);
     Acceptor& operator=(Acceptor&& other);
     
-    bool startAccept(uint16_t port);
+    bool startAccept(uint16_t port, const std::function<void(Socket socket)>& acceptCallback);
     
 protected:
     virtual bool read();
     
     uint16_t _port = 0;
     
-    std::vector<int> _clientSockets;
+    std::function<void(Socket socket)> _acceptCallback;
 };

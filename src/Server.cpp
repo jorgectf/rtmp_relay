@@ -42,7 +42,7 @@ Server& Server::operator=(Server&& other)
 
 bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 {
-    _socket.startAccept(port);
+    _socket.startAccept(port, std::bind(&Server::handleAccept, this, std::placeholders::_1));
     
     for (const std::string address : pushAddresses)
     {
@@ -68,4 +68,10 @@ void Server::update()
     {
         input.update();
     }
+}
+
+void Server::handleAccept(Socket socket)
+{
+    Input input(_network, std::move(socket));
+    _inputs.push_back(std::move(input));
 }

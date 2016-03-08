@@ -11,7 +11,7 @@ class Input
 {
 public:
     Input() = default;
-    Input(Network& network);
+    Input(Network& network, Socket socket);
     ~Input();
     
     Input(const Input&) = delete;
@@ -20,7 +20,6 @@ public:
     Input(Input&& other);
     Input& operator=(Input&& other);
     
-    bool init(int serverSocket);
     void update();
     
     bool getPacket(std::vector<char>& packet);

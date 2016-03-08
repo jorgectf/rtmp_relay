@@ -26,6 +26,10 @@ Socket::Socket(Network& network, int socketFd):
             std::cerr << "Failed to create socket, error: " << error << std::endl;
         }
     }
+    else
+    {
+        _ready = true;
+    }
     
     _network.addSocket(*this);
 }

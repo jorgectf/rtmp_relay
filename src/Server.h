@@ -30,7 +30,9 @@ public:
     
     void update();
     
-private:
+protected:
+    void handleAccept(Socket socket);
+    
     Network& _network;
     Acceptor _socket;
     
