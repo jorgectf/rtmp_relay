@@ -27,7 +27,7 @@ public:
     
     bool send(std::vector<char> buffer);
     
-    int getSocket() const { return _socket; }
+    int getSocketFd() const { return _socketFd; }
     
     bool isBlocking() const { return _blocking; }
     bool setBlocking(bool blocking);
@@ -41,7 +41,7 @@ protected:
     
     Network& _network;
     
-    int _socket = 0;
+    int _socketFd = 0;
     
     std::vector<char> _data;
     

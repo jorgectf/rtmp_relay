@@ -13,14 +13,14 @@
 
 static char TEMP_BUFFER[65536];
 
-Socket::Socket(Network& network, int sock):
-    _network(network), _socket(sock)
+Socket::Socket(Network& network, int socketFd):
+    _network(network), _socketFd(socketFd)
 {
-    if (_socket <= 0)
+    if (_socketFd <= 0)
     {
-        _socket = socket(AF_INET, SOCK_STREAM, 0);
+        _socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
-        if (_socket < 0)
+        if (_socketFd < 0)
         {
             int error = errno;
             std::cerr << "Failed to create socket, error: " << error << std::endl;
@@ -33,12 +33,24 @@ Socket::Socket(Network& network, int sock):
 Socket::~Socket()
 {
     _network.removeSocket(*this);
-    if (_socket > 0) close(_socket);
+    
+    if (_socketFd > 0)
+    {
+        if (close(_socketFd) < 0)
+        {
+            int error = errno;
+            std::cerr << "Failed to close socket, error: " << error << std::endl;
+        }
+        else
+        {
+            std::cout << "Socket closed" << std::endl;
+        }
+    }
 }
 
 Socket::Socket(Socket&& other):
     _network(other._network),
-    _socket(other._socket),
+    _socketFd(other._socketFd),
     _data(std::move(other._data)),
     _connecting(other._connecting),
     _ready(other._ready),
@@ -46,7 +58,7 @@ Socket::Socket(Socket&& other):
 {
     _network.addSocket(*this);
     
-    other._socket = 0;
+    other._socketFd = 0;
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
@@ -54,13 +66,13 @@ Socket::Socket(Socket&& other):
 
 Socket& Socket::operator=(Socket&& other)
 {
-    _socket = other._socket;
+    _socketFd = other._socketFd;
     _data = std::move(other._data);
     _connecting = other._connecting;
     _ready = other._ready;
     _blocking = other._blocking;
     
-    other._socket = 0;
+    other._socketFd = 0;
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
@@ -106,11 +118,11 @@ bool Socket::connect(const std::string& address, uint16_t port)
 
 bool Socket::connect(uint32_t ipAddress, uint16_t port)
 {
-    if (_socket <= 0)
+    if (_socketFd <= 0)
     {
-        _socket = socket(AF_INET, SOCK_STREAM, 0);
+        _socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
-        if (_socket < 0)
+        if (_socketFd < 0)
         {
             int error = errno;
             std::cerr << "Failed to create socket, error: " << error << std::endl;
@@ -126,7 +138,7 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = ipAddress;
     
-    if (::connect(_socket, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0)
+    if (::connect(_socketFd, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0)
     {
         if (errno == EINPROGRESS)
         {
@@ -152,16 +164,16 @@ bool Socket::setBlocking(bool blocking)
 {
 #ifdef WIN32
     unsigned long mode = blocking ? 0 : 1;
-    if (ioctlsocket(_socket, FIONBIO, &mode) != 0)
+    if (ioctlsocket(_socketFd, FIONBIO, &mode) != 0)
     {
         return false;
     }
 #else
-    int flags = fcntl(_socket, F_GETFL, 0);
+    int flags = fcntl(_socketFd, F_GETFL, 0);
     if (flags < 0) return false;
     flags = blocking ? (flags&~O_NONBLOCK) : (flags|O_NONBLOCK);
     
-    if (fcntl(_socket, F_SETFL, flags) != 0)
+    if (fcntl(_socketFd, F_SETFL, flags) != 0)
     {
         return false;
     }
@@ -174,7 +186,7 @@ bool Socket::setBlocking(bool blocking)
 
 bool Socket::send(std::vector<char> buffer)
 {
-    if (::send(_socket, buffer.data(), buffer.size(), 0) < 0)
+    if (::send(_socketFd, buffer.data(), buffer.size(), 0) < 0)
     {
         if (errno != EAGAIN && errno != EWOULDBLOCK)
         {
@@ -189,7 +201,7 @@ bool Socket::send(std::vector<char> buffer)
 
 bool Socket::read()
 {
-    ssize_t size = recv(_socket, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
+    ssize_t size = recv(_socketFd, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
     
     if (size < 0)
     {

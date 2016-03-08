@@ -45,11 +45,11 @@ Acceptor& Acceptor::operator=(Acceptor&& other)
 
 bool Acceptor::startAccept(uint16_t port)
 {
-    if (_socket <= 0)
+    if (_socketFd <= 0)
     {
-        _socket = socket(AF_INET, SOCK_STREAM, 0);
+        _socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
-        if (_socket < 0)
+        if (_socketFd < 0)
         {
             int error = errno;
             std::cerr << "Failed to create socket, error: " << error << std::endl;
@@ -65,14 +65,14 @@ bool Acceptor::startAccept(uint16_t port)
     serverAddress.sin_port = htons(port);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     
-    if (bind(_socket, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) < 0)
+    if (bind(_socketFd, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) < 0)
     {
         int error = errno;
         std::cerr << "Failed to bind server socket, error: " << error << std::endl;
         return false;
     }
     
-    if (listen(_socket, WAITING_QUEUE_SIZE) < 0)
+    if (listen(_socketFd, WAITING_QUEUE_SIZE) < 0)
     {
         int error = errno;
         std::cerr << "Failed to listen on port " << _port << ", error: " << error << std::endl;
@@ -90,9 +90,9 @@ bool Acceptor::read()
     sockaddr_in address;
     socklen_t addressLength;
     
-    int socket = ::accept(_socket, reinterpret_cast<sockaddr*>(&address), &addressLength);
+    int socketFd = ::accept(_socketFd, reinterpret_cast<sockaddr*>(&address), &addressLength);
     
-    if (_socket < 0)
+    if (_socketFd < 0)
     {
         int error = errno;
         std::cerr << "Failed to accept client, error: " << error << std::endl;
@@ -101,6 +101,8 @@ bool Acceptor::read()
     else
     {
         std::cout << "Client connected from " << ipToString(address.sin_addr.s_addr) << std::endl;
+        
+        Socket socket(_network, socketFd);
     }
     
     return true;

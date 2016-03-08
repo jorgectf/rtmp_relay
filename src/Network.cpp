@@ -30,7 +30,7 @@ bool Network::update()
             uint32_t i = static_cast<uint32_t>(pollFds.size());
             
             pollfd pollFd;
-            pollFd.fd = socket.get().getSocket();
+            pollFd.fd = socket.get().getSocketFd();
             pollFd.events = POLLIN | POLLOUT;
             
             pollFds.push_back(pollFd);

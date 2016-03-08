@@ -11,7 +11,6 @@
 class Network
 {
     friend Socket;
-    
 public:
     Network();
     
