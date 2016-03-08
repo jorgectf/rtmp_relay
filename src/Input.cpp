@@ -57,6 +57,14 @@ bool Input::getPacket(std::vector<char>& packet)
 void Input::handleRead(const std::vector<char>& data)
 {
     _data.insert(_data.end(), data.begin(), data.end());
+    
+    std::cout << "Got " << std::to_string(data.size()) << " bytes" << std::endl;
+    
+    if (_state == State::UNINITIALIZED)
+    {
+        _socket.send(data);
+        _state = State::VERSION_SENT;
+    }
 }
 
 void Input::handleClose()

@@ -10,6 +10,15 @@
 class Input
 {
 public:
+    enum class State
+    {
+        UNINITIALIZED = 0,
+        VERSION_SENT = 1,
+        ACK_SENT = 2,
+        HANDSHAKE_DONE = 3
+    };
+    
+    
     Input() = default;
     Input(Network& network, Socket socket);
     ~Input();
@@ -34,4 +43,6 @@ protected:
     Socket _socket;
     
     std::vector<char> _data;
+    
+    State _state = State::UNINITIALIZED;
 };
