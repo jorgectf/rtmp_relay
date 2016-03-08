@@ -19,6 +19,8 @@ Relay::Relay()
 
 bool Relay::init(const std::string& config)
 {
+    Socket socket(_network);
+    
     char TEMP_BUFFER[65536];
     
     std::unique_ptr<FILE, std::function<void(FILE*)>> file(fopen(config.c_str(), "r"), std::fclose);
@@ -57,7 +59,7 @@ bool Relay::init(const std::string& config)
             pushAddresses.push_back(pushObject.GetString());
         }
         
-        std::unique_ptr<Server> server(new Server());
+        std::unique_ptr<Server> server(new Server(_network));
         
         if (server->init(serverObject["port"].GetInt(), pushAddresses))
         {
@@ -79,6 +81,8 @@ void Relay::run()
     
     while (true)
     {
+        _network.update();
+        
         for (const std::unique_ptr<Server>& server : _servers)
         {
             server->update();

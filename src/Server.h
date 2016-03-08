@@ -10,13 +10,14 @@
 #include <memory>
 #include <poll.h>
 #include "Noncopyable.h"
+#include "Acceptor.h"
 #include "Output.h"
 #include "Input.h"
 
 class Server: public Noncopyable
 {
 public:
-    Server();
+    Server(Network& network);
     ~Server();
     
     bool init(uint16_t port, const std::vector<std::string>& pushAddresses);
@@ -24,11 +25,8 @@ public:
     void update();
     
 private:
-    uint16_t _port;
-    
-    int _socket = 0;
-    
-    std::vector<pollfd> _pollFds;
+    Network& _network;
+    Acceptor _socket;
     
     std::vector<std::unique_ptr<Output>> _outputs;
     std::vector<std::unique_ptr<Input>> _inputs;

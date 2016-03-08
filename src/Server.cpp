@@ -10,71 +10,28 @@
 #include <unistd.h>
 #include <string.h>
 #include "Server.h"
-#include "Utils.h"
 
-static const int WAITING_QUEUE_SIZE = 5;
-
-Server::Server()
+Server::Server(Network& network):
+    _network(network), _socket(network)
 {
     
 }
 
 Server::~Server()
 {
-    if (_socket > 0) close(_socket);
+    
 }
 
 bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 {
-    _port = port;
-    
-    _socket = socket(AF_INET, SOCK_STREAM, 0);
-    
-    pollfd pollFd;
-    pollFd.fd = _socket;
-    pollFd.events = POLLIN;
-    _pollFds.push_back(pollFd);
-    
-    if (_socket < 0)
-    {
-        int error = errno;
-        std::cerr << "Failed to create server socket, error: " << error << std::endl;
-        return false;
-    }
-    
-    sockaddr_in serverAddress;
-    memset(&serverAddress, 0, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(port);
-    serverAddress.sin_addr.s_addr = INADDR_ANY;
-    
-    if (bind(_socket, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) < 0)
-    {
-        int error = errno;
-        std::cerr << "Failed to bind server socket, error: " << error << std::endl;
-        return false;
-    }
-    
-    if (listen(_socket, WAITING_QUEUE_SIZE) < 0)
-    {
-        int error = errno;
-        std::cerr << "Failed to listen on port " << _port << ", error: " << error << std::endl;
-        return false;
-    }
-    
-    std::cout << "Server listening on port " << _port << std::endl;
+    _socket.startAccept(port);
     
     for (const std::string address : pushAddresses)
     {
-        std::unique_ptr<Output> output(new Output());
+        std::unique_ptr<Output> output(new Output(_network));
         
         if (output->init(address))
-        {
-            pollfd pollFd;
-            pollFd.fd = output->getSocket();
-            pollFd.events = POLLOUT;
-            _pollFds.push_back(pollFd);
-            
+        {            
             _outputs.push_back(std::move(output));
         }
     }
@@ -84,89 +41,13 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 
 void Server::update()
 {
-    if (poll(_pollFds.data(), static_cast<nfds_t>(_pollFds.size()), 0) < 0)
+    for (const std::unique_ptr<Output>& output : _outputs)
     {
-        int error = errno;
-        std::cerr << "Poll failed, error: " << error << std::endl;
-        return;
+        output->update();
     }
     
-    std::queue<std::unique_ptr<Input>> inputQueue;
-    
-    for (std::vector<pollfd>::iterator i = _pollFds.begin(); i != _pollFds.end();)
+    for (const std::unique_ptr<Input>& input : _inputs)
     {
-        pollfd pollFd = (*i);
-        
-        if (pollFd.revents & POLLIN)
-        {
-            if (pollFd.fd == _socket)
-            {
-                std::unique_ptr<Input> input(new Input());
-                
-                if (input->init(_socket))
-                {
-                    inputQueue.push(std::move(input));
-                }
-            }
-            else
-            {
-                std::vector<std::unique_ptr<Input>>::iterator inputIterator =
-                    std::find_if(_inputs.begin(), _inputs.end(), [pollFd](const std::unique_ptr<Input>& input) { return input->getSocket() == pollFd.fd; });
-                
-                
-                // Failed to find input
-                if (inputIterator != _inputs.end())
-                {
-                    if (!(*inputIterator)->read())
-                    {
-                        std::cout << "Client disconnected" << std::endl;
-                        
-                        _inputs.erase(inputIterator);
-                        i = _pollFds.erase(i);
-                        continue;
-                    }
-                    
-                    std::vector<char> packet;
-                    if ((*inputIterator)->getPacket(packet))
-                    {
-                        // packet
-                        for (const std::unique_ptr<Output>& output : _outputs)
-                        {
-                            if (output->isConnected())
-                            {
-                                output->sendPacket(packet);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if (pollFd.revents & POLLOUT)
-        {
-            std::vector<std::unique_ptr<Output>>::iterator outputIterator =
-            std::find_if(_outputs.begin(), _outputs.end(), [pollFd](const std::unique_ptr<Output>& output) { return output->getSocket() == pollFd.fd; });
-            
-            if (outputIterator != _outputs.end())
-            {
-                (*outputIterator)->connected();
-                i = _pollFds.erase(i);
-                continue;
-            }
-        }
-
-        ++i;
-    }
-    
-    while (!inputQueue.empty())
-    {
-        std::unique_ptr<Input> input = std::move(inputQueue.front());
-        inputQueue.pop();
-        
-        pollfd pollFd;
-        pollFd.fd = input->getSocket();
-        pollFd.events = POLLIN;
-        _pollFds.push_back(pollFd);
-        
-        _inputs.push_back(std::move(input));
+        input->update();
     }
 }

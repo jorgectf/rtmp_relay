@@ -7,6 +7,8 @@
 #include <vector>
 #include <memory>
 #include "Noncopyable.h"
+#include "Network.h"
+#include "Socket.h"
 
 class Server;
 
@@ -21,5 +23,6 @@ public:
     void run();
     
 private:
+    Network _network;
     std::vector<std::unique_ptr<Server>> _servers;
 };

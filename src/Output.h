@@ -7,22 +7,21 @@
 #include <string>
 #include <vector>
 #include "Noncopyable.h"
+#include "Socket.h"
 
 class Output: public Noncopyable
 {
 public:
-    Output();
+    Output(Network& network);
     ~Output();
     
     bool init(const std::string& address);
+    void update();
     void connected();
     
     bool sendPacket(const std::vector<char>& packet);
     
-    bool isConnected() const { return _connected; }
-    int getSocket() const { return _socket; }
-    
 private:
-    int _socket = 0;
-    bool _connected = false;
+    Network& _network;
+    Socket _socket;
 };
