@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include "Socket.h"
 #include "Network.h"
+#include "Utils.h"
 
 Socket::Socket(Network& network):
     _network(network), _data(65536)
@@ -69,9 +70,7 @@ bool Socket::connect(const std::string& address, uint16_t port)
 
 bool Socket::connect(uint32_t ipAddress, uint16_t port)
 {
-    unsigned char* ip = (unsigned char*)&ipAddress;
-    
-    std::cout << "Connecting to " << static_cast<int>(ip[0]) << "." << static_cast<int>(ip[1]) << "." << static_cast<int>(ip[2]) << "." << static_cast<int>(ip[3]) << ":" << static_cast<int>(port) << std::endl;
+    std::cout << "Connecting to " << ipToString(ipAddress) << ":" << static_cast<int>(port) << std::endl;
     
     sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));

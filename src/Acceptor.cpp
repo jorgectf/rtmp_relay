@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include "Acceptor.h"
+#include "Utils.h"
 
 static const int WAITING_QUEUE_SIZE = 5;
 
@@ -78,9 +79,7 @@ bool Acceptor::read()
     }
     else
     {
-        unsigned char* ip = reinterpret_cast<unsigned char*>(&address.sin_addr.s_addr);
-        
-        std::cout << "Client connected from " << static_cast<int>(ip[0]) << "." << static_cast<int>(ip[1]) << "." << static_cast<int>(ip[2]) << "." << static_cast<int>(ip[3]) << std::endl;
+        std::cout << "Client connected from " << ipToString(address.sin_addr.s_addr) << std::endl;
     }
     
     return true;
