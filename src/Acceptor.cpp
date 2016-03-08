@@ -40,7 +40,7 @@ Acceptor& Acceptor::operator=(Acceptor&& other)
     return *this;
 }
 
-bool Acceptor::startAccept(uint16_t port, const std::function<void(Socket)>& acceptCallback)
+bool Acceptor::startAccept(uint16_t port)
 {
     if (_socketFd < 0)
     {
@@ -79,9 +79,12 @@ bool Acceptor::startAccept(uint16_t port, const std::function<void(Socket)>& acc
     std::cout << "Server listening on port " << _port << std::endl;
     _ready = true;
     
-    _acceptCallback = acceptCallback;
-    
     return true;
+}
+
+void Acceptor::setAcceptCallback(const std::function<void(Socket)>& acceptCallback)
+{
+    _acceptCallback = acceptCallback;
 }
 
 bool Acceptor::read()

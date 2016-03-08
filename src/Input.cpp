@@ -8,7 +8,9 @@
 Input::Input(Network& network, Socket socket):
     _network(network), _socket(std::move(socket))
 {
-    _socket.startRead(std::bind(&Input::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+    _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
+    _socket.setCloseCallback(std::bind(&Input::handleClose, this));
+    _socket.startRead();
 }
 
 Input::~Input()
@@ -21,13 +23,17 @@ Input::Input(Input&& other):
     _socket(std::move(other._socket)),
     _data(std::move(other._data))
 {
-    
+    _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
+    _socket.setCloseCallback(std::bind(&Input::handleClose, this));
 }
 
 Input& Input::operator=(Input&& other)
 {
     _socket = std::move(other._socket);
     _data = std::move(other._data);
+    
+    _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
+    _socket.setCloseCallback(std::bind(&Input::handleClose, this));
     
     return *this;
 }
@@ -48,14 +54,12 @@ bool Input::getPacket(std::vector<char>& packet)
     return false;
 }
 
-void Input::handleRead(const std::vector<char>& data, bool error)
+void Input::handleRead(const std::vector<char>& data)
 {
-    if (!error)
-    {
-        std::cout << "GOT DATA!" << std::endl;
-    }
-    else
-    {
-        std::cout << "DISCONNECT!" << std::endl;
-    }
+    std::cout << "GOT DATA!" << std::endl;
+}
+
+void Input::handleClose()
+{
+    std::cout << "DISCONNECT!" << std::endl;
 }

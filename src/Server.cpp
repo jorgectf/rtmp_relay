@@ -14,7 +14,7 @@
 Server::Server(Network& network):
     _network(network), _socket(network)
 {
-    
+    _socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
 
 Server::~Server()
@@ -28,7 +28,7 @@ Server::Server(Server&& other):
     _outputs(std::move(other._outputs)),
     _inputs(std::move(other._inputs))
 {
-
+    _socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
 
 Server& Server::operator=(Server&& other)
@@ -37,12 +37,14 @@ Server& Server::operator=(Server&& other)
     _outputs = std::move(other._outputs);
     _inputs = std::move(other._inputs);
     
+    _socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
+    
     return *this;
 }
 
 bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 {
-    _socket.startAccept(port, std::bind(&Server::handleAccept, this, std::placeholders::_1));
+    _socket.startAccept(port);
     
     for (const std::string address : pushAddresses)
     {
@@ -64,9 +66,17 @@ void Server::update()
         output.update();
     }
     
-    for (Input& input : _inputs)
+    for (std::vector<Input>::iterator inputIterator = _inputs.begin(); inputIterator != _inputs.end();)
     {
-        input.update();
+        if ((*inputIterator).isConnected())
+        {
+            (*inputIterator).update();
+            ++inputIterator;
+        }
+        else
+        {
+            inputIterator = _inputs.erase(inputIterator);
+        }
     }
 }
 

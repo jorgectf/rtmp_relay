@@ -19,8 +19,6 @@ Relay::Relay()
 
 bool Relay::init(const std::string& config)
 {
-    Socket socket(_network);
-    
     char TEMP_BUFFER[65536];
     
     std::unique_ptr<FILE, std::function<void(FILE*)>> file(fopen(config.c_str(), "r"), std::fclose);

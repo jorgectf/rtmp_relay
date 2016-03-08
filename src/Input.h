@@ -24,8 +24,11 @@ public:
     
     bool getPacket(std::vector<char>& packet);
     
+    bool isConnected() const { return _socket.isReady(); }
+    
 protected:
-    void handleRead(const std::vector<char>& data, bool error);
+    void handleRead(const std::vector<char>& data);
+    void handleClose();
     
     Network& _network;
     Socket _socket;

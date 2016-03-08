@@ -25,7 +25,9 @@ public:
     bool connect(const std::string& address, uint16_t port = 0);
     bool connect(uint32_t ipAddress, uint16_t port);
     
-    bool startRead(const std::function<void(const std::vector<char>&, bool)>& readCallback);
+    bool startRead();
+    void setReadCallback(const std::function<void(const std::vector<char>&)>& readCallback);
+    void setCloseCallback(const std::function<void()>& closeCallback);
     
     bool send(std::vector<char> buffer);
     
@@ -51,5 +53,6 @@ protected:
     bool _ready = false;
     bool _blocking = true;
     
-    std::function<void(const std::vector<char>&, bool)> _readCallback;
+    std::function<void(const std::vector<char>&)> _readCallback;
+    std::function<void()> _closeCallback;
 };

@@ -162,7 +162,7 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
     return true;
 }
 
-bool Socket::startRead(const std::function<void(const std::vector<char>&, bool)>& readCallback)
+bool Socket::startRead()
 {
     if (_socketFd < 0)
     {
@@ -171,9 +171,18 @@ bool Socket::startRead(const std::function<void(const std::vector<char>&, bool)>
     }
     
     _ready = true;
-    _readCallback = readCallback;
     
     return true;
+}
+
+void Socket::setReadCallback(const std::function<void(const std::vector<char>&)>& readCallback)
+{
+    _readCallback = readCallback;
+}
+
+void Socket::setCloseCallback(const std::function<void()>& closeCallback)
+{
+    _closeCallback = closeCallback;
 }
 
 bool Socket::setBlocking(bool blocking)
@@ -219,8 +228,6 @@ bool Socket::read()
 {
     ssize_t size = recv(_socketFd, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
     
-    bool error = false;
-    
     if (size < 0)
     {
         int error = errno;
@@ -235,20 +242,33 @@ bool Socket::read()
             std::cerr << "Failed to read from socket, error: " << error << std::endl;
         }
         
-        error = true;
+        _ready = false;
+        
+        if (_closeCallback)
+        {
+            _closeCallback();
+        }
+        
+        return false;
     }
     else if (size == 0)
     {
         std::cout << "Socket disconnected" << std::endl;
         _ready = false;
-        error = true;
+        
+        if (_closeCallback)
+        {
+            _closeCallback();
+        }
+        
+        return false;
     }
     
     _data.insert(_data.end(), TEMP_BUFFER, TEMP_BUFFER + size);
     
     if (_readCallback)
     {
-        _readCallback(_data, error);
+        _readCallback(_data);
     }
     
     _data.clear();
