@@ -8,7 +8,7 @@
 Input::Input(Network& network, Socket socket):
     _network(network), _socket(std::move(socket))
 {
-    
+    _socket.startRead(std::bind(&Input::handleRead, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 Input::~Input()
@@ -46,4 +46,16 @@ bool Input::getPacket(std::vector<char>& packet)
     }
     
     return false;
+}
+
+void Input::handleRead(const std::vector<char>& data, bool error)
+{
+    if (!error)
+    {
+        std::cout << "GOT DATA!" << std::endl;
+    }
+    else
+    {
+        std::cout << "DISCONNECT!" << std::endl;
+    }
 }

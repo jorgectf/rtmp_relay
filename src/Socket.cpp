@@ -26,10 +26,6 @@ Socket::Socket(Network& network, int socketFd):
             std::cerr << "Failed to create socket, error: " << error << std::endl;
         }
     }
-    else
-    {
-        _ready = true;
-    }
     
     _network.addSocket(*this);
 }
@@ -58,7 +54,8 @@ Socket::Socket(Socket&& other):
     _data(std::move(other._data)),
     _connecting(other._connecting),
     _ready(other._ready),
-    _blocking(other._blocking)
+    _blocking(other._blocking),
+    _readCallback(std::move(other._readCallback))
 {
     _network.addSocket(*this);
     
@@ -75,6 +72,7 @@ Socket& Socket::operator=(Socket&& other)
     _connecting = other._connecting;
     _ready = other._ready;
     _blocking = other._blocking;
+    _readCallback = std::move(other._readCallback);
     
     other._socketFd = -1;
     other._connecting = false;
@@ -164,6 +162,20 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
     return true;
 }
 
+bool Socket::startRead(const std::function<void(const std::vector<char>&, bool)>& readCallback)
+{
+    if (_socketFd < 0)
+    {
+        std::cerr << "Can not start reading, invalid socket" << std::endl;
+        return false;
+    }
+    
+    _ready = true;
+    _readCallback = readCallback;
+    
+    return true;
+}
+
 bool Socket::setBlocking(bool blocking)
 {
 #ifdef WIN32
@@ -207,6 +219,8 @@ bool Socket::read()
 {
     ssize_t size = recv(_socketFd, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
     
+    bool error = false;
+    
     if (size < 0)
     {
         int error = errno;
@@ -221,16 +235,23 @@ bool Socket::read()
             std::cerr << "Failed to read from socket, error: " << error << std::endl;
         }
         
-        return false;
+        error = true;
     }
     else if (size == 0)
     {
         std::cout << "Socket disconnected" << std::endl;
         _ready = false;
-        return false;
+        error = true;
     }
     
     _data.insert(_data.end(), TEMP_BUFFER, TEMP_BUFFER + size);
+    
+    if (_readCallback)
+    {
+        _readCallback(_data, error);
+    }
+    
+    _data.clear();
     
     return true;
 }

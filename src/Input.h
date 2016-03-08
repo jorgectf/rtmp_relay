@@ -24,7 +24,9 @@ public:
     
     bool getPacket(std::vector<char>& packet);
     
-private:
+protected:
+    void handleRead(const std::vector<char>& data, bool error);
+    
     Network& _network;
     Socket _socket;
     

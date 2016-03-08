@@ -40,7 +40,7 @@ Acceptor& Acceptor::operator=(Acceptor&& other)
     return *this;
 }
 
-bool Acceptor::startAccept(uint16_t port, const std::function<void(Socket socket)>& acceptCallback)
+bool Acceptor::startAccept(uint16_t port, const std::function<void(Socket)>& acceptCallback)
 {
     if (_socketFd < 0)
     {
