@@ -13,7 +13,7 @@ class Socket
     friend Network;
 public:
     Socket() = delete;
-    Socket(Network& network, int sock = 0);
+    Socket(Network& network, int socketFd = -1);
     virtual ~Socket();
     
     Socket(const Socket&) = delete;
@@ -41,7 +41,7 @@ protected:
     
     Network& _network;
     
-    int _socketFd = 0;
+    int _socketFd = -1;
     
     std::vector<char> _data;
     

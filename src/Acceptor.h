@@ -11,7 +11,7 @@ class Acceptor: Socket
 {
 public:
     Acceptor() = delete;
-    Acceptor(Network& network, int sock = 0);
+    Acceptor(Network& network, int socketFd = -1);
     virtual ~Acceptor();
     
     Acceptor(Acceptor&& other);

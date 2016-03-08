@@ -11,8 +11,8 @@
 
 static const int WAITING_QUEUE_SIZE = 5;
 
-Acceptor::Acceptor(Network& network, int sock):
-    Socket(network, sock)
+Acceptor::Acceptor(Network& network, int socketFd):
+    Socket(network, socketFd)
 {
 
 }
@@ -45,7 +45,7 @@ Acceptor& Acceptor::operator=(Acceptor&& other)
 
 bool Acceptor::startAccept(uint16_t port)
 {
-    if (_socketFd <= 0)
+    if (_socketFd < 0)
     {
         _socketFd = socket(AF_INET, SOCK_STREAM, 0);
         

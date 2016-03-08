@@ -16,7 +16,7 @@ static char TEMP_BUFFER[65536];
 Socket::Socket(Network& network, int socketFd):
     _network(network), _socketFd(socketFd)
 {
-    if (_socketFd <= 0)
+    if (_socketFd < 0)
     {
         _socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
@@ -58,7 +58,7 @@ Socket::Socket(Socket&& other):
 {
     _network.addSocket(*this);
     
-    other._socketFd = 0;
+    other._socketFd = -1;
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
@@ -72,7 +72,7 @@ Socket& Socket::operator=(Socket&& other)
     _ready = other._ready;
     _blocking = other._blocking;
     
-    other._socketFd = 0;
+    other._socketFd = -1;
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
@@ -118,7 +118,7 @@ bool Socket::connect(const std::string& address, uint16_t port)
 
 bool Socket::connect(uint32_t ipAddress, uint16_t port)
 {
-    if (_socketFd <= 0)
+    if (_socketFd < 0)
     {
         _socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
