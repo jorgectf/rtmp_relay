@@ -56,10 +56,10 @@ bool Input::getPacket(std::vector<char>& packet)
 
 void Input::handleRead(const std::vector<char>& data)
 {
-    std::cout << "GOT DATA!" << std::endl;
+    _data.insert(_data.end(), data.begin(), data.end());
 }
 
 void Input::handleClose()
 {
-    std::cout << "DISCONNECT!" << std::endl;
+    std::cout << "Input disconnect!" << std::endl;
 }
