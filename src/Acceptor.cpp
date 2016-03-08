@@ -11,32 +11,35 @@
 
 static const int WAITING_QUEUE_SIZE = 5;
 
-Acceptor::Acceptor(Network& network):
-    Socket(network)
+Acceptor::Acceptor(Network& network, int sock):
+    Socket(network, sock)
 {
 
 }
 
 Acceptor::~Acceptor()
 {
-    for (int sock : _sockets)
+    for (int clientSocket : _clientSockets)
     {
-        close(sock);
+        close(clientSocket);
     }
 }
 
 bool Acceptor::startAccept(uint16_t port)
 {
-    _port = port;
-    
-    _socket = socket(AF_INET, SOCK_STREAM, 0);
-    
-    if (_socket < 0)
+    if (_socket <= 0)
     {
-        int error = errno;
-        std::cerr << "Failed to create server socket, error: " << error << std::endl;
-        return false;
+        _socket = socket(AF_INET, SOCK_STREAM, 0);
+        
+        if (_socket < 0)
+        {
+            int error = errno;
+            std::cerr << "Failed to create socket, error: " << error << std::endl;
+            return false;
+        }
     }
+    
+    _port = port;
     
     sockaddr_in serverAddress;
     memset(&serverAddress, 0, sizeof(serverAddress));

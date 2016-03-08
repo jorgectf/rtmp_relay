@@ -10,7 +10,7 @@
 class Acceptor: Socket
 {
 public:
-    Acceptor(Network& network);
+    Acceptor(Network& network, int sock = 0);
     virtual ~Acceptor();
     
     bool startAccept(uint16_t port);
@@ -20,5 +20,5 @@ protected:
     
     uint16_t _port = 0;
     
-    std::vector<int> _sockets;
+    std::vector<int> _clientSockets;
 };

@@ -11,16 +11,18 @@
 #include "Network.h"
 #include "Utils.h"
 
-Socket::Socket(Network& network):
-    _network(network), _data(65536)
+Socket::Socket(Network& network, int sock):
+    _network(network), _data(65536), _socket(sock)
 {
-    _socket = socket(AF_INET, SOCK_STREAM, 0);
-    
-    if (_socket < 0)
+    if (_socket <= 0)
     {
-        int error = errno;
-        std::cerr << "Failed to create socket, error: " << error << std::endl;
-        //return false;
+        _socket = socket(AF_INET, SOCK_STREAM, 0);
+        
+        if (_socket < 0)
+        {
+            int error = errno;
+            std::cerr << "Failed to create socket, error: " << error << std::endl;
+        }
     }
     
     _network.addSocket(*this);
@@ -30,6 +32,42 @@ Socket::~Socket()
 {
     _network.removeSocket(*this);
     if (_socket > 0) close(_socket);
+}
+
+Socket::Socket(Socket&& other):
+    _network(other._network),
+    _data(other._data),
+    _dataSize(other._dataSize),
+    _socket(other._socket),
+    _connecting(other._connecting),
+    _ready(other._ready),
+    _blocking(other._blocking)
+{
+    _network.addSocket(*this);
+    
+    other._socket = 0;
+    other._dataSize = 0;
+    other._connecting = false;
+    other._ready = false;
+    other._blocking = true;
+}
+
+Socket& Socket::operator=(Socket&& other)
+{
+    _data = other._data;
+    _dataSize = other._dataSize;
+    _socket = other._socket;
+    _connecting = other._connecting;
+    _ready = other._ready;
+    _blocking = other._blocking;
+    
+    other._socket = 0;
+    other._dataSize = 0;
+    other._connecting = false;
+    other._ready = false;
+    other._blocking = true;
+    
+    return *this;
 }
 
 bool Socket::connect(const std::string& address, uint16_t port)
@@ -70,6 +108,18 @@ bool Socket::connect(const std::string& address, uint16_t port)
 
 bool Socket::connect(uint32_t ipAddress, uint16_t port)
 {
+    if (_socket <= 0)
+    {
+        _socket = socket(AF_INET, SOCK_STREAM, 0);
+        
+        if (_socket < 0)
+        {
+            int error = errno;
+            std::cerr << "Failed to create socket, error: " << error << std::endl;
+            return false;
+        }
+    }
+    
     std::cout << "Connecting to " << ipToString(ipAddress) << ":" << static_cast<int>(port) << std::endl;
     
     sockaddr_in addr;
@@ -104,13 +154,24 @@ bool Socket::setBlocking(bool blocking)
 {
 #ifdef WIN32
     unsigned long mode = blocking ? 0 : 1;
-    return (ioctlsocket(_socket, FIONBIO, &mode) == 0) ? true : false;
+    if (ioctlsocket(_socket, FIONBIO, &mode) != 0)
+    {
+        return false;
+    }
 #else
     int flags = fcntl(_socket, F_GETFL, 0);
     if (flags < 0) return false;
     flags = blocking ? (flags&~O_NONBLOCK) : (flags|O_NONBLOCK);
-    return (fcntl(_socket, F_SETFL, flags) == 0) ? true : false;
+    
+    if (fcntl(_socket, F_SETFL, flags) != 0)
+    {
+        return false;
+    }
 #endif
+    
+    _blocking = blocking;
+    
+    return true;
 }
 
 bool Socket::send(std::vector<char> buffer)
