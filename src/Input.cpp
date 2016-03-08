@@ -59,8 +59,7 @@ bool Input::readPacket(std::vector<char>& packet)
     }
     else if (size == 0)
     {
-        int error = errno;
-        std::cerr << "Socket disconnected, error: " << error << std::endl;
+        std::cout << "Socket disconnected" << std::endl;
         _closed = true;
         return false;
     }
