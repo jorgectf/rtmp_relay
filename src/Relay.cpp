@@ -59,9 +59,9 @@ bool Relay::init(const std::string& config)
             pushAddresses.push_back(pushObject.GetString());
         }
         
-        std::unique_ptr<Server> server(new Server(_network));
+        Server server(_network);
         
-        if (server->init(serverObject["port"].GetInt(), pushAddresses))
+        if (server.init(serverObject["port"].GetInt(), pushAddresses))
         {
             _servers.push_back(std::move(server));
         }
@@ -83,9 +83,9 @@ void Relay::run()
     {
         _network.update();
         
-        for (const std::unique_ptr<Server>& server : _servers)
+        for (Server& server : _servers)
         {
-            server->update();
+            server.update();
         }
         
         nanosleep(&sleepTime, nullptr);

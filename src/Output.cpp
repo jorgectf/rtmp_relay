@@ -17,6 +17,20 @@ Output::~Output()
     
 }
 
+Output::Output(Output&& other):
+    _network(other._network),
+    _socket(std::move(other._socket))
+{
+    
+}
+
+Output& Output::operator=(Output&& other)
+{
+    _socket = std::move(other._socket);
+    
+    return *this;
+}
+
 bool Output::init(const std::string& address)
 {
     if (!_socket.setBlocking(false))

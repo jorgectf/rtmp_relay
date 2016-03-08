@@ -9,16 +9,22 @@
 #include <vector>
 #include <memory>
 #include <poll.h>
-#include "Noncopyable.h"
 #include "Acceptor.h"
 #include "Output.h"
 #include "Input.h"
 
-class Server: public Noncopyable
+class Server
 {
 public:
+    Server() = default;
     Server(Network& network);
     ~Server();
+    
+    Server(const Server&) = delete;
+    Server& operator=(const Server&) = delete;
+    
+    Server(Server&& other);
+    Server& operator=(Server&& other);
     
     bool init(uint16_t port, const std::vector<std::string>& pushAddresses);
     
@@ -28,6 +34,6 @@ private:
     Network& _network;
     Acceptor _socket;
     
-    std::vector<std::unique_ptr<Output>> _outputs;
-    std::vector<std::unique_ptr<Input>> _inputs;
+    std::vector<Output> _outputs;
+    std::vector<Input> _inputs;
 };

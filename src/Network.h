@@ -6,15 +6,20 @@
 
 #include <vector>
 #include <memory>
-#include "Noncopyable.h"
 #include "Socket.h"
 
-class Network: public Noncopyable
+class Network
 {
     friend Socket;
     
 public:
     Network();
+    
+    Network(const Network&) = delete;
+    Network& operator=(const Network&) = delete;
+    
+    Network(Network&&) = delete;
+    Network& operator=(Network&&) = delete;
     
     bool update();
     

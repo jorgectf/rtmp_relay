@@ -12,6 +12,7 @@ class Socket
 {
     friend Network;
 public:
+    Socket() = delete;
     Socket(Network& network, int sock = 0);
     virtual ~Socket();
     
@@ -43,7 +44,6 @@ protected:
     int _socket = 0;
     
     std::vector<char> _data;
-    uint32_t _dataSize;
     
     bool _connecting = false;
     bool _ready = false;

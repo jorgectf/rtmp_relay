@@ -6,14 +6,20 @@
 
 #include <string>
 #include <vector>
-#include "Noncopyable.h"
 #include "Socket.h"
 
-class Output: public Noncopyable
+class Output
 {
 public:
+    Output() = default;
     Output(Network& network);
     ~Output();
+    
+    Output(const Output&) = delete;
+    Output& operator=(const Output&) = delete;
+    
+    Output(Output&& other);
+    Output& operator=(Output&& other);
     
     bool init(const std::string& address);
     void update();

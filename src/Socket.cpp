@@ -11,8 +11,10 @@
 #include "Network.h"
 #include "Utils.h"
 
+static char TEMP_BUFFER[65536];
+
 Socket::Socket(Network& network, int sock):
-    _network(network), _data(65536), _socket(sock)
+    _network(network), _socket(sock)
 {
     if (_socket <= 0)
     {
@@ -36,9 +38,8 @@ Socket::~Socket()
 
 Socket::Socket(Socket&& other):
     _network(other._network),
-    _data(other._data),
-    _dataSize(other._dataSize),
     _socket(other._socket),
+    _data(std::move(other._data)),
     _connecting(other._connecting),
     _ready(other._ready),
     _blocking(other._blocking)
@@ -46,7 +47,6 @@ Socket::Socket(Socket&& other):
     _network.addSocket(*this);
     
     other._socket = 0;
-    other._dataSize = 0;
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
@@ -54,15 +54,13 @@ Socket::Socket(Socket&& other):
 
 Socket& Socket::operator=(Socket&& other)
 {
-    _data = other._data;
-    _dataSize = other._dataSize;
     _socket = other._socket;
+    _data = std::move(other._data);
     _connecting = other._connecting;
     _ready = other._ready;
     _blocking = other._blocking;
     
     other._socket = 0;
-    other._dataSize = 0;
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
@@ -191,7 +189,7 @@ bool Socket::send(std::vector<char> buffer)
 
 bool Socket::read()
 {
-    ssize_t size = recv(_socket, _data.data() + _dataSize, _data.size() - _dataSize, 0);
+    ssize_t size = recv(_socket, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
     
     if (size < 0)
     {
@@ -216,7 +214,7 @@ bool Socket::read()
         return false;
     }
     
-    _dataSize += size;
+    _data.insert(_data.end(), TEMP_BUFFER, TEMP_BUFFER + size);
     
     return true;
 }

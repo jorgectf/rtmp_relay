@@ -22,15 +22,33 @@ Server::~Server()
     
 }
 
+Server::Server(Server&& other):
+    _network(other._network),
+    _socket(std::move(other._socket)),
+    _outputs(std::move(other._outputs)),
+    _inputs(std::move(other._inputs))
+{
+
+}
+
+Server& Server::operator=(Server&& other)
+{
+    _socket = std::move(other._socket);
+    _outputs = std::move(other._outputs);
+    _inputs = std::move(other._inputs);
+    
+    return *this;
+}
+
 bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 {
     _socket.startAccept(port);
     
     for (const std::string address : pushAddresses)
     {
-        std::unique_ptr<Output> output(new Output(_network));
+        Output output(_network);
         
-        if (output->init(address))
+        if (output.init(address))
         {            
             _outputs.push_back(std::move(output));
         }
@@ -41,13 +59,13 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 
 void Server::update()
 {
-    for (const std::unique_ptr<Output>& output : _outputs)
+    for (Output& output : _outputs)
     {
-        output->update();
+        output.update();
     }
     
-    for (const std::unique_ptr<Input>& input : _inputs)
+    for (Input& input : _inputs)
     {
-        input->update();
+        input.update();
     }
 }

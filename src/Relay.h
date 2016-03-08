@@ -6,17 +6,22 @@
 
 #include <vector>
 #include <memory>
-#include "Noncopyable.h"
 #include "Network.h"
 #include "Socket.h"
 
 class Server;
 
-class Relay: public Noncopyable
+class Relay
 {
 public:
     Relay();
     ~Relay();
+    
+    Relay(const Relay&) = delete;
+    Relay& operator=(const Relay&) = delete;
+    
+    Relay(Relay&&) = delete;
+    Relay& operator=(Relay&&) = delete;
     
     bool init(const std::string& config);
     
@@ -24,5 +29,5 @@ public:
     
 private:
     Network _network;
-    std::vector<std::unique_ptr<Server>> _servers;
+    std::vector<Server> _servers;
 };

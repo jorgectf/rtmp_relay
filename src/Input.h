@@ -5,14 +5,20 @@
 #pragma once
 
 #include <vector>
-#include "Noncopyable.h"
 #include "Socket.h"
 
-class Input: public Noncopyable
+class Input
 {
 public:
+    Input() = default;
     Input(Network& network);
     ~Input();
+    
+    Input(const Input&) = delete;
+    Input& operator=(const Input&) = delete;
+    
+    Input(Input&& other);
+    Input& operator=(Input&& other);
     
     bool init(int serverSocket);
     void update();
@@ -24,5 +30,4 @@ private:
     Socket _socket;
     
     std::vector<char> _data;
-    uint32_t _dataSize = 0;
 };

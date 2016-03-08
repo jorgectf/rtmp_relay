@@ -25,6 +25,24 @@ Acceptor::~Acceptor()
     }
 }
 
+Acceptor::Acceptor(Acceptor&& other):
+    Socket(std::move(other)),
+    _clientSockets(std::move(other._clientSockets))
+{
+    other._port = 0;
+}
+
+Acceptor& Acceptor::operator=(Acceptor&& other)
+{
+    Socket::operator=(std::move(other));
+    _port = other._port;
+    _clientSockets = std::move(other._clientSockets);
+    
+    other._port = 0;
+    
+    return *this;
+}
+
 bool Acceptor::startAccept(uint16_t port)
 {
     if (_socket <= 0)

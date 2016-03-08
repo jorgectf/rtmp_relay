@@ -18,6 +18,22 @@ Input::~Input()
     
 }
 
+Input::Input(Input&& other):
+    _network(other._network),
+    _socket(std::move(other._socket)),
+    _data(std::move(other._data))
+{
+    
+}
+
+Input& Input::operator=(Input&& other)
+{
+    _socket = std::move(other._socket);
+    _data = std::move(other._data);
+    
+    return *this;
+}
+
 bool Input::init(int serverSocket)
 {
     _data.resize(BUFFER_SIZE);
@@ -32,11 +48,9 @@ void Input::update()
 
 bool Input::getPacket(std::vector<char>& packet)
 {
-    if (_dataSize)
+    if (_data.size())
     {
-        packet.resize(_dataSize);
-        std::copy(_data.begin(), _data.begin() + _dataSize, packet.begin());
-        _dataSize = 0;
+        packet = _data;
         return true;
     }
     
