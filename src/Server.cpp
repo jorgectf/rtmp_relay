@@ -37,7 +37,8 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
     
     if (_socket < 0)
     {
-        std::cerr << "Failed to create server socket" << std::endl;
+        int error = errno;
+        std::cerr << "Failed to create server socket, error: " << error << std::endl;
         return false;
     }
     
@@ -49,13 +50,15 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
     
     if (bind(_socket, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) < 0)
     {
-        std::cerr << "Failed to bind server socket" << std::endl;
+        int error = errno;
+        std::cerr << "Failed to bind server socket, error: " << error << std::endl;
         return false;
     }
     
     if (listen(_socket, WAITING_QUEUE_SIZE) < 0)
     {
-        std::cerr << "Failed to listen on port " << _port << std::endl;
+        int error = errno;
+        std::cerr << "Failed to listen on port " << _port << ", error: " << error << std::endl;
         return false;
     }
     
@@ -83,7 +86,8 @@ void Server::update()
 {
     if (poll(_pollFds.data(), static_cast<nfds_t>(_pollFds.size()), 0) < 0)
     {
-        std::cerr << "Poll failed" << std::endl;
+        int error = errno;
+        std::cerr << "Poll failed, error: " << error << std::endl;
         return;
     }
     

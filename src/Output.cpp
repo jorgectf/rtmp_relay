@@ -33,7 +33,8 @@ bool Output::init(const std::string& address)
     addrinfo* result;
     if (getaddrinfo(addressStr.c_str(), portStr.empty() ? nullptr : portStr.c_str(), nullptr, &result) != 0)
     {
-        std::cerr << "Failed to get address info" << std::endl;
+        int error = errno;
+        std::cerr << "Failed to get address info, error: " << error << std::endl;
         return false;
     }
     
@@ -41,7 +42,8 @@ bool Output::init(const std::string& address)
     
     if (_socket < 0)
     {
-        std::cerr << "Failed to create socket" << std::endl;
+        int error = errno;
+        std::cerr << "Failed to create socket, error: " << error << std::endl;
         freeaddrinfo(result);
         return false;
     }
@@ -61,7 +63,8 @@ bool Output::init(const std::string& address)
     {
         if (errno != EINPROGRESS)
         {
-            std::cerr << "Connection failed" << std::endl;
+            int error = errno;
+            std::cerr << "Connection failed, error: " << error << std::endl;
             freeaddrinfo(result);
             return false;
         }
@@ -86,7 +89,8 @@ bool Output::sendPacket(const std::vector<char>& packet)
     {
         if (errno != EAGAIN && errno != EWOULDBLOCK)
         {
-            std::cerr << "Failed to send data" << std::endl;
+            int error = errno;
+            std::cerr << "Failed to send data, error: " << error << std::endl;
             return false;
         }
     }

@@ -30,7 +30,8 @@ bool Input::init(int serverSocket)
     
     if (_socket < 0)
     {
-        std::cerr << "Failed to accept client" << std::endl;
+        int error = errno;
+        std::cerr << "Failed to accept client, error: " << error << std::endl;
         return false;
     }
     else
@@ -51,13 +52,15 @@ bool Input::readPacket(std::vector<char>& packet)
     
     if (size < 0)
     {
-        std::cerr << "Failed to read from socket" << std::endl;
+        int error = errno;
+        std::cerr << "Failed to read from socket, error: " << error << std::endl;
         _closed = true;
         return false;
     }
     else if (size == 0)
     {
-        std::cerr << "Socket disconnected" << std::endl;
+        int error = errno;
+        std::cerr << "Socket disconnected, error: " << error << std::endl;
         _closed = true;
         return false;
     }
