@@ -15,9 +15,9 @@ public:
     
     bool init(int serverSocket);
     
-    bool readPacket(std::vector<char>& packet);
+    bool read();
     
-    bool isClosed() const { return _closed; }
+    bool getPacket(std::vector<char>& packet);
     
     int getSocket() const { return _socket; }
     

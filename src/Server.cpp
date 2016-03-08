@@ -113,12 +113,21 @@ void Server::update()
                 std::vector<std::unique_ptr<Input>>::iterator inputIterator =
                     std::find_if(_inputs.begin(), _inputs.end(), [pollFd](const std::unique_ptr<Input>& input) { return input->getSocket() == pollFd.fd; });
                 
-                std::vector<char> packet;
                 
                 // Failed to find input
                 if (inputIterator != _inputs.end())
                 {
-                    if ((*inputIterator)->readPacket(packet))
+                    if (!(*inputIterator)->read())
+                    {
+                        std::cout << "Client disconnected" << std::endl;
+                        
+                        _inputs.erase(inputIterator);
+                        i = _pollFds.erase(i);
+                        continue;
+                    }
+                    
+                    std::vector<char> packet;
+                    if ((*inputIterator)->getPacket(packet))
                     {
                         // packet
                         for (const std::unique_ptr<Output>& output : _outputs)
@@ -128,14 +137,6 @@ void Server::update()
                                 output->sendPacket(packet);
                             }
                         }
-                    }
-                    else if ((*inputIterator)->isClosed())
-                    {
-                        std::cout << "Client disconnected" << std::endl;
-                        
-                        _inputs.erase(inputIterator);
-                        i = _pollFds.erase(i);
-                        continue;
                     }
                 }
             }
