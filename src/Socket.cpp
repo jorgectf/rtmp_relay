@@ -135,18 +135,19 @@ bool Socket::read()
     
     if (size < 0)
     {
-        if (errno == ECONNREFUSED)
+        int error = errno;
+        
+        if (_connecting)
         {
-            std::cerr << "Connection refused" << std::endl;
+            std::cerr << "Connection failed, error: " << error << std::endl;
             _connecting = false;
-            return false;
         }
         else
         {
-            int error = errno;
             std::cerr << "Failed to read from socket, error: " << error << std::endl;
-            return false;
         }
+        
+        return false;
     }
     else if (size == 0)
     {
