@@ -70,13 +70,15 @@ void Input::handleRead(const std::vector<char>& data)
         {
             if (_data.size() >= sizeof(uint8_t))
             {
+                // C0
                 uint8_t version = static_cast<uint8_t>(_data[0]);
-                _data.erase(_data.begin(), _data.begin() + sizeof(uint8_t));
+                _data.erase(_data.begin(), _data.begin() + sizeof(version));
                 std::cout << "Got version " << version << std::endl;
                 
-                std::vector<char> versionData;
-                versionData.push_back(VERSION);
-                _socket.send(versionData);
+                // S0
+                std::vector<char> reply;
+                reply.push_back(VERSION);
+                _socket.send(reply);
                 
                 _state = State::VERSION_SENT;
             }
@@ -87,25 +89,39 @@ void Input::handleRead(const std::vector<char>& data)
         }
         else if (_state == State::VERSION_SENT)
         {
-            if (_data.size() >= sizeof(Ack))
+            if (_data.size() >= sizeof(Init))
             {
-                Ack* ack = (Ack*)&_data[0];
-                _data.erase(_data.begin(), _data.begin() + sizeof(Ack));
-                std::cout << "Got Ack, time: " << ack->time << ", zero: " << ack->zero << std::endl;
+                // C1
+                Init* init = (Init*)&_data[0];
+                _data.erase(_data.begin(), _data.begin() + sizeof(*init));
+                std::cout << "Got Init message, time: " << init->time << ", zero: " << init->zero << std::endl;
                 
-                Ack reply;
-                reply.time = 0;
-                reply.zero = 0;
+                // S1
+                Init replyInit;
+                replyInit.time = 0;
+                replyInit.zero = 0;
                 
-                for (size_t i = 0; i < sizeof(reply.randomBytes); ++i)
+                for (size_t i = 0; i < sizeof(replyInit.randomBytes); ++i)
                 {
-                    reply.randomBytes[i] = static_cast<uint8_t>(_generator() % 255);
+                    replyInit.randomBytes[i] = static_cast<uint8_t>(_generator() % 255);
                 }
                 
+                std::vector<char> reply;
+                reply.insert(reply.begin(),
+                             reinterpret_cast<char*>(&replyInit),
+                             reinterpret_cast<char*>(&replyInit) + sizeof(replyInit));
+                _socket.send(reply);
+                
+                // S2
+                Ack ack;
+                ack.time = init->time;
+                ack.time2 = static_cast<uint32_t>(time(nullptr));
+                memcpy(ack.randomBytes, replyInit.randomBytes, sizeof(replyInit.randomBytes));
+                
                 std::vector<char> ackData;
-                ackData.insert(ackData.begin(),
-                               reinterpret_cast<char*>(&reply),
-                               reinterpret_cast<char*>(&reply) + sizeof(reply));
+                ackData.insert(reply.begin(),
+                               reinterpret_cast<char*>(&ack),
+                               reinterpret_cast<char*>(&ack) + sizeof(ack));
                 _socket.send(ackData);
                 
                 _state = State::ACK_SENT;
@@ -117,7 +133,16 @@ void Input::handleRead(const std::vector<char>& data)
         }
         else  if (_state == State::ACK_SENT)
         {
-            break;
+            if (_data.size() > sizeof(Ack))
+            {
+                Ack* ack = (Ack*)&_data[0];
+                _data.erase(_data.begin(), _data.begin() + sizeof(*ack));
+                
+                std::cout << "Handshake done" << std::endl;
+                
+                _state = State::HANDSHAKE_DONE;
+                break;
+            }
         }
         else
         {

@@ -19,10 +19,17 @@ public:
         HANDSHAKE_DONE = 3
     };
     
-    struct Ack
+    struct Init
     {
         uint32_t time;
         uint32_t zero;
+        uint8_t randomBytes[1528];
+    };
+    
+    struct Ack
+    {
+        uint32_t time;
+        uint32_t time2;
         uint8_t randomBytes[1528];
     };
     
