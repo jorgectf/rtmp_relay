@@ -120,7 +120,7 @@ void Input::handleRead(const std::vector<char>& data)
                 memcpy(ack.randomBytes, replyInit.randomBytes, sizeof(replyInit.randomBytes));
                 
                 std::vector<char> ackData;
-                ackData.insert(reply.begin(),
+                ackData.insert(ackData.begin(),
                                reinterpret_cast<char*>(&ack),
                                reinterpret_cast<char*>(&ack) + sizeof(ack));
                 _socket.send(ackData);
