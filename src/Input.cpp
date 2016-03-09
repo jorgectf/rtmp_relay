@@ -48,7 +48,7 @@ void Input::update()
     
 }
 
-bool Input::getPacket(std::vector<char>& packet)
+bool Input::getPacket(std::vector<uint8_t>& packet)
 {
     if (_data.size())
     {
@@ -59,7 +59,7 @@ bool Input::getPacket(std::vector<char>& packet)
     return false;
 }
 
-void Input::handleRead(const std::vector<char>& data)
+void Input::handleRead(const std::vector<uint8_t>& data)
 {
     _data.insert(_data.end(), data.begin(), data.end());
     
@@ -77,7 +77,7 @@ void Input::handleRead(const std::vector<char>& data)
                 std::cout << "Got version " << version << std::endl;
                 
                 // S0
-                std::vector<char> reply;
+                std::vector<uint8_t> reply;
                 reply.push_back(VERSION);
                 _socket.send(reply);
                 
@@ -107,10 +107,10 @@ void Input::handleRead(const std::vector<char>& data)
                     replyInit.randomBytes[i] = static_cast<uint8_t>(_generator() % 255);
                 }
                 
-                std::vector<char> reply;
+                std::vector<uint8_t> reply;
                 reply.insert(reply.begin(),
-                             reinterpret_cast<char*>(&replyInit),
-                             reinterpret_cast<char*>(&replyInit) + sizeof(replyInit));
+                             reinterpret_cast<uint8_t*>(&replyInit),
+                             reinterpret_cast<uint8_t*>(&replyInit) + sizeof(replyInit));
                 _socket.send(reply);
                 
                 // S2
@@ -119,10 +119,10 @@ void Input::handleRead(const std::vector<char>& data)
                 ack.time2 = static_cast<uint32_t>(time(nullptr));
                 memcpy(ack.randomBytes, init->randomBytes, sizeof(init->randomBytes));
                 
-                std::vector<char> ackData;
+                std::vector<uint8_t> ackData;
                 ackData.insert(ackData.begin(),
-                               reinterpret_cast<char*>(&ack),
-                               reinterpret_cast<char*>(&ack) + sizeof(ack));
+                               reinterpret_cast<uint8_t*>(&ack),
+                               reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                 _socket.send(ackData);
                 
                 _state = State::ACK_SENT;

@@ -25,7 +25,7 @@ public:
     void update();
     void connected();
     
-    bool sendPacket(const std::vector<char>& packet);
+    bool sendPacket(const std::vector<uint8_t>& packet);
     
 private:
     Network& _network;

@@ -45,18 +45,18 @@ public:
     
     void update();
     
-    bool getPacket(std::vector<char>& packet);
+    bool getPacket(std::vector<uint8_t>& packet);
     
     bool isConnected() const { return _socket.isReady(); }
     
 protected:
-    void handleRead(const std::vector<char>& data);
+    void handleRead(const std::vector<uint8_t>& data);
     void handleClose();
     
     Network& _network;
     Socket _socket;
     
-    std::vector<char> _data;
+    std::vector<uint8_t> _data;
     
     State _state = State::UNINITIALIZED;
     

@@ -12,7 +12,7 @@
 #include "Network.h"
 #include "Utils.h"
 
-static char TEMP_BUFFER[65536];
+static uint8_t TEMP_BUFFER[65536];
 
 Socket::Socket(Network& network, int socketFd):
     _network(network), _socketFd(socketFd)
@@ -176,7 +176,7 @@ bool Socket::startRead()
     return true;
 }
 
-void Socket::setReadCallback(const std::function<void(const std::vector<char>&)>& readCallback)
+void Socket::setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& readCallback)
 {
     _readCallback = readCallback;
 }
@@ -210,7 +210,7 @@ bool Socket::setBlocking(bool blocking)
     return true;
 }
 
-bool Socket::send(std::vector<char> buffer)
+bool Socket::send(std::vector<uint8_t> buffer)
 {
     if (::send(_socketFd, buffer.data(), buffer.size(), 0) < 0)
     {

@@ -60,7 +60,7 @@ void Output::connected()
     //_connected = true;
 }
 
-bool Output::sendPacket(const std::vector<char>& packet)
+bool Output::sendPacket(const std::vector<uint8_t>& packet)
 {
     _socket.send(packet);
     

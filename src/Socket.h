@@ -27,10 +27,10 @@ public:
     bool connect(uint32_t ipAddress, uint16_t port);
     
     bool startRead();
-    void setReadCallback(const std::function<void(const std::vector<char>&)>& readCallback);
+    void setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& readCallback);
     void setCloseCallback(const std::function<void()>& closeCallback);
     
-    bool send(std::vector<char> buffer);
+    bool send(std::vector<uint8_t> buffer);
     
     int getSocketFd() const { return _socketFd; }
     
@@ -48,12 +48,12 @@ protected:
     
     int _socketFd = -1;
     
-    std::vector<char> _data;
+    std::vector<uint8_t> _data;
     
     bool _connecting = false;
     bool _ready = false;
     bool _blocking = true;
     
-    std::function<void(const std::vector<char>&)> _readCallback;
+    std::function<void(const std::vector<uint8_t>&)> _readCallback;
     std::function<void()> _closeCallback;
 };
