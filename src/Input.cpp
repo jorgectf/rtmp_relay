@@ -92,6 +92,10 @@ void Input::handleRead(const std::vector<char>& data)
                 
                 std::cout << "Got Ack, time: " << ack->time << ", zero: " << ack->zero << std::endl;
             }
+            else
+            {
+                break;
+            }
         }
         else
         {
