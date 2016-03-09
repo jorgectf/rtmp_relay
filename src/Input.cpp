@@ -142,6 +142,9 @@ void Input::handleRead(const std::vector<char>& data)
                 std::cout << "Handshake done" << std::endl;
                 
                 _state = State::HANDSHAKE_DONE;
+            }
+            else
+            {
                 break;
             }
         }
