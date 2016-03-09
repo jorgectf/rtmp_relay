@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <random>
 #include <vector>
 #include "Socket.h"
 
@@ -16,11 +17,6 @@ public:
         VERSION_SENT = 1,
         ACK_SENT = 2,
         HANDSHAKE_DONE = 3
-    };
-    
-    struct Version
-    {
-        uint8_t version;
     };
     
     struct Ack
@@ -56,4 +52,7 @@ protected:
     std::vector<char> _data;
     
     State _state = State::UNINITIALIZED;
+    
+    std::random_device _rd;
+    std::mt19937 _generator;
 };

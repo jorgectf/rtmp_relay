@@ -8,7 +8,7 @@
 static const uint8_t VERSION = 3;
 
 Input::Input(Network& network, Socket socket):
-    _network(network), _socket(std::move(socket))
+    _network(network), _socket(std::move(socket)), _generator(_rd())
 {
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -23,7 +23,8 @@ Input::~Input()
 Input::Input(Input&& other):
     _network(other._network),
     _socket(std::move(other._socket)),
-    _data(std::move(other._data))
+    _data(std::move(other._data)),
+    _generator(std::move(other._generator))
 {
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -33,6 +34,7 @@ Input& Input::operator=(Input&& other)
 {
     _socket = std::move(other._socket);
     _data = std::move(other._data);
+    _generator = std::move(other._generator);
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -66,11 +68,11 @@ void Input::handleRead(const std::vector<char>& data)
     {
         if (_state == State::UNINITIALIZED)
         {
-            if (_data.size() >= sizeof(Version))
+            if (_data.size() >= sizeof(uint8_t))
             {
-                Version* version = (Version*)&_data[0];
-                _data.erase(_data.begin(), _data.begin() + sizeof(Version));
-                std::cout << "Got version " << version->version << std::endl;
+                uint8_t version = static_cast<uint8_t>(_data[0]);
+                _data.erase(_data.begin(), _data.begin() + sizeof(uint8_t));
+                std::cout << "Got version " << version << std::endl;
                 
                 std::vector<char> versionData;
                 versionData.push_back(VERSION);
@@ -89,13 +91,33 @@ void Input::handleRead(const std::vector<char>& data)
             {
                 Ack* ack = (Ack*)&_data[0];
                 _data.erase(_data.begin(), _data.begin() + sizeof(Ack));
-                
                 std::cout << "Got Ack, time: " << ack->time << ", zero: " << ack->zero << std::endl;
+                
+                Ack reply;
+                reply.time = 0;
+                reply.zero = 0;
+                
+                for (int i = 0; i < sizeof(reply.randomBytes); ++i)
+                {
+                    reply.randomBytes[i] = static_cast<uint8_t>(_generator() % 255);
+                }
+                
+                std::vector<char> ackData;
+                ackData.insert(ackData.begin(),
+                               reinterpret_cast<char*>(&reply),
+                               reinterpret_cast<char*>(&reply + sizeof(reply)));
+                _socket.send(ackData);
+                
+                _state = State::ACK_SENT;
             }
             else
             {
                 break;
             }
+        }
+        else  if (_state == State::ACK_SENT)
+        {
+            break;
         }
         else
         {
