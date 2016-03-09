@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Input.h"
 
+static const uint8_t VERSION = 3;
+
 Input::Input(Network& network, Socket socket):
     _network(network), _socket(std::move(socket))
 {
@@ -60,10 +62,37 @@ void Input::handleRead(const std::vector<char>& data)
     
     std::cout << "Got " << std::to_string(data.size()) << " bytes" << std::endl;
     
-    if (_state == State::UNINITIALIZED)
+    while (true)
     {
-        _socket.send(data);
-        _state = State::VERSION_SENT;
+        if (_state == State::UNINITIALIZED)
+        {
+            if (_data.size() >= sizeof(Version))
+            {
+                Version* version = (Version*)&_data[0];
+                _data.erase(_data.begin(), _data.begin() + sizeof(Version));
+                std::cout << "Got version " << version->version << std::endl;
+                
+                std::vector<char> versionData;
+                versionData.push_back(VERSION);
+                _socket.send(versionData);
+                
+                _state = State::VERSION_SENT;
+            }
+            else
+            {
+                break;
+            }
+        }
+        else if (_state == State::VERSION_SENT)
+        {
+            if (_data.size() >= sizeof(Ack))
+            {
+                Ack* ack = (Ack*)&_data[0];
+                _data.erase(_data.begin(), _data.begin() + sizeof(Ack));
+                
+                std::cout << "Got Ack, time: " << ack->time << ", zero: " << ack->zero << std::endl;
+            }
+        }
     }
 }
 

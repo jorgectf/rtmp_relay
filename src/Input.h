@@ -18,6 +18,17 @@ public:
         HANDSHAKE_DONE = 3
     };
     
+    struct Version
+    {
+        uint8_t version;
+    };
+    
+    struct Ack
+    {
+        uint32_t time;
+        uint32_t zero;
+        uint8_t randomBytes[1528];
+    };
     
     Input() = default;
     Input(Network& network, Socket socket);
