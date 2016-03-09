@@ -105,7 +105,7 @@ void Input::handleRead(const std::vector<char>& data)
                 std::vector<char> ackData;
                 ackData.insert(ackData.begin(),
                                reinterpret_cast<char*>(&reply),
-                               reinterpret_cast<char*>(&reply + sizeof(reply)));
+                               reinterpret_cast<char*>(&reply) + sizeof(reply));
                 _socket.send(ackData);
                 
                 _state = State::ACK_SENT;
