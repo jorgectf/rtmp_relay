@@ -148,8 +148,9 @@ void Input::handleRead(const std::vector<char>& data)
                 break;
             }
         }
-        else
+        else if (_state == State::HANDSHAKE_DONE)
         {
+            // handle packets
             break;
         }
     }
