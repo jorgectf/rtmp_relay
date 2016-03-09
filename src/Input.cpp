@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cstring>
 #include "Input.h"
 
 static const uint8_t VERSION = 3;
