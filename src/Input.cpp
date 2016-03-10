@@ -117,7 +117,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 Ack ack;
                 ack.time = init->time;
                 ack.time2 = static_cast<uint32_t>(time(nullptr));
-                memcpy(ack.randomBytes, init->randomBytes, sizeof(init->randomBytes));
+                memcpy(ack.randomBytes, init->randomBytes, sizeof(ack.randomBytes));
                 
                 std::vector<uint8_t> ackData;
                 ackData.insert(ackData.begin(),
