@@ -72,7 +72,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
             if (_data.size() >= sizeof(uint8_t))
             {
                 // C0
-                uint8_t version = static_cast<uint8_t>(_data[0]);
+                uint8_t version = static_cast<uint8_t>(*_data.data());
                 _data.erase(_data.begin(), _data.begin() + sizeof(version));
                 std::cout << "Got version " << version << std::endl;
                 
@@ -93,13 +93,13 @@ void Input::handleRead(const std::vector<uint8_t>& data)
             if (_data.size() >= sizeof(Init))
             {
                 // C1
-                Init* init = (Init*)&_data[0];
+                Init* init = (Init*)_data.data();
                 _data.erase(_data.begin(), _data.begin() + sizeof(*init));
                 std::cout << "Got Init message, time: " << init->time << ", zero: " << init->zero << std::endl;
                 
                 // S1
                 Init replyInit;
-                replyInit.time = 123;
+                replyInit.time = 127;
                 replyInit.zero = 0;
                 
                 for (size_t i = 0; i < sizeof(replyInit.randomBytes); ++i)
@@ -137,7 +137,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
             if (_data.size() > sizeof(Ack))
             {
                 // C2
-                Ack* ack = (Ack*)&_data[0];
+                Ack* ack = (Ack*)_data.data();
                 _data.erase(_data.begin(), _data.begin() + sizeof(*ack));
                 
                 std::cout << "Got Ack message, time: " << ack->time << ", time2: " << ack->time2 << std::endl;
