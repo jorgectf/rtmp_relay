@@ -64,7 +64,9 @@ void Input::handleRead(const std::vector<uint8_t>& data)
     
     std::cout << "Got " << std::to_string(data.size()) << " bytes" << std::endl;
     
-    while (true)
+    bool done = false;
+    
+    while (!done)
     {
         if (_state == State::UNINITIALIZED)
         {
@@ -79,6 +81,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 {
                     std::cerr << "Unsuported version" << std::endl;
                     _socket.close();
+                    done = true;
                     break;
                 }
                 
@@ -162,7 +165,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == State::HANDSHAKE_DONE)
         {
-            // handle packets
+            // send subscribe
             break;
         }
     }
@@ -170,5 +173,5 @@ void Input::handleRead(const std::vector<uint8_t>& data)
 
 void Input::handleClose()
 {
-    std::cout << "Input disconnect!" << std::endl;
+    std::cout << "Input disconnected" << std::endl;
 }
