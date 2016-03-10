@@ -5,8 +5,7 @@
 #include <iostream>
 #include <cstring>
 #include "Input.h"
-
-static const uint8_t VERSION = 3;
+#include "Constants.h"
 
 Input::Input(Network& network, Socket socket):
     _network(network), _socket(std::move(socket)), _generator(_rd())
@@ -85,7 +84,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 
                 // S0
                 std::vector<uint8_t> reply;
-                reply.push_back(VERSION);
+                reply.push_back(RTMP_VERSION);
                 _socket.send(reply);
                 
                 _state = State::VERSION_SENT;
@@ -110,10 +109,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 // S1
                 Challange replyChallange;
                 replyChallange.time = 127;
-                replyChallange.version[0] = 0;
-                replyChallange.version[1] = 0;
-                replyChallange.version[2] = 0;
-                replyChallange.version[3] = 0;
+                memcpy(replyChallange.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
                 
                 for (size_t i = 0; i < sizeof(replyChallange.randomBytes); ++i)
                 {
