@@ -97,34 +97,40 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == State::VERSION_SENT)
         {
-            if (_data.size() >= sizeof(Init))
+            if (_data.size() >= sizeof(Challange))
             {
                 // C1
-                Init* init = (Init*)_data.data();
-                _data.erase(_data.begin(), _data.begin() + sizeof(*init));
-                std::cout << "Got Init message, time: " << init->time << ", zero: " << init->zero << std::endl;
+                Challange* challange = (Challange*)_data.data();
+                _data.erase(_data.begin(), _data.begin() + sizeof(*challange));
+                std::cout << "Got Challange message, time: " << challange->time << ", version: " << static_cast<uint32_t>(challange->version[0]) << "." <<
+                    static_cast<uint32_t>(challange->version[1]) << "." <<
+                    static_cast<uint32_t>(challange->version[2]) << "." <<
+                    static_cast<uint32_t>(challange->version[3]) << std::endl;
                 
                 // S1
-                Init replyInit;
-                replyInit.time = 127;
-                replyInit.zero = 0;
+                Challange replyChallange;
+                replyChallange.time = 127;
+                replyChallange.version[0] = 0;
+                replyChallange.version[1] = 0;
+                replyChallange.version[2] = 0;
+                replyChallange.version[3] = 0;
                 
-                for (size_t i = 0; i < sizeof(replyInit.randomBytes); ++i)
+                for (size_t i = 0; i < sizeof(replyChallange.randomBytes); ++i)
                 {
-                    replyInit.randomBytes[i] = static_cast<uint8_t>(_generator());
+                    replyChallange.randomBytes[i] = static_cast<uint8_t>(_generator());
                 }
                 
                 std::vector<uint8_t> reply;
                 reply.insert(reply.begin(),
-                             reinterpret_cast<uint8_t*>(&replyInit),
-                             reinterpret_cast<uint8_t*>(&replyInit) + sizeof(replyInit));
+                             reinterpret_cast<uint8_t*>(&replyChallange),
+                             reinterpret_cast<uint8_t*>(&replyChallange) + sizeof(replyChallange));
                 _socket.send(reply);
                 
                 // S2
                 Ack ack;
-                ack.time = init->time;
+                ack.time = challange->time;
                 ack.time2 = static_cast<uint32_t>(time(nullptr));
-                memcpy(ack.randomBytes, init->randomBytes, sizeof(ack.randomBytes));
+                memcpy(ack.randomBytes, challange->randomBytes, sizeof(ack.randomBytes));
                 
                 std::vector<uint8_t> ackData;
                 ackData.insert(ackData.begin(),

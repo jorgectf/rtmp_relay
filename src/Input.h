@@ -19,10 +19,10 @@ public:
         HANDSHAKE_DONE = 3
     };
     
-    struct Init
+    struct Challange
     {
         uint32_t time;
-        uint32_t zero;
+        uint8_t version[4];
         uint8_t randomBytes[1528];
     };
     
