@@ -104,7 +104,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 
                 for (size_t i = 0; i < sizeof(replyInit.randomBytes); ++i)
                 {
-                    replyInit.randomBytes[i] = static_cast<uint8_t>(_generator() % 255);
+                    replyInit.randomBytes[i] = static_cast<uint8_t>(_generator());
                 }
                 
                 std::vector<uint8_t> reply;
