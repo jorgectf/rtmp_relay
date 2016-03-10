@@ -37,7 +37,7 @@ Socket::~Socket()
     
     if (_socketFd > 0)
     {
-        if (close(_socketFd) < 0)
+        if (::close(_socketFd) < 0)
         {
             int error = errno;
             std::cerr << "Failed to close socket, error: " << error << std::endl;
@@ -81,6 +81,15 @@ Socket& Socket::operator=(Socket&& other)
     other._blocking = true;
     
     return *this;
+}
+
+void Socket::close()
+{
+    if (_socketFd > 0)
+    {
+        ::close(_socketFd);
+        _socketFd = 0;
+    }
 }
 
 bool Socket::connect(const std::string& address, uint16_t port)

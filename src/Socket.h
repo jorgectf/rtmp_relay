@@ -23,6 +23,8 @@ public:
     Socket(Socket&& other);
     Socket& operator=(Socket&& other);
     
+    void close();
+    
     bool connect(const std::string& address, uint16_t port = 0);
     bool connect(uint32_t ipAddress, uint16_t port);
     

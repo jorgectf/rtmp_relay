@@ -79,6 +79,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 if (version != 0x03)
                 {
                     std::cerr << "Unsupoorted version" << std::endl;
+                    _socket.close();
                 }
                 
                 // S0
