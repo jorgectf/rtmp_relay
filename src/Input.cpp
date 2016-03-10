@@ -76,6 +76,11 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 _data.erase(_data.begin(), _data.begin() + sizeof(version));
                 std::cout << "Got version " << version << std::endl;
                 
+                if (version != 0x03)
+                {
+                    std::cerr << "Unsupoorted version" << std::endl;
+                }
+                
                 // S0
                 std::vector<uint8_t> reply;
                 reply.push_back(VERSION);
