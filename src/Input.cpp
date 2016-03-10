@@ -99,7 +99,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 
                 // S1
                 Init replyInit;
-                replyInit.time = 0;
+                replyInit.time = 123;
                 replyInit.zero = 0;
                 
                 for (size_t i = 0; i < sizeof(replyInit.randomBytes); ++i)
@@ -136,8 +136,11 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         {
             if (_data.size() > sizeof(Ack))
             {
+                // C2
                 Ack* ack = (Ack*)&_data[0];
                 _data.erase(_data.begin(), _data.begin() + sizeof(*ack));
+                
+                std::cout << "Got Ack message, time: " << ack->time << ", time2: " << ack->time2 << std::endl;
                 
                 std::cout << "Handshake done" << std::endl;
                 
