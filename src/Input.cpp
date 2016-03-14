@@ -107,7 +107,8 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 // C1
                 Challange* challange = (Challange*)_data.data();
                 _data.erase(_data.begin(), _data.begin() + sizeof(*challange));
-                std::cout << "Got Challange message, time: " << challange->time << ", version: " << static_cast<uint32_t>(challange->version[0]) << "." <<
+                std::cout << "Got Challange message, time: " << challange->time <<
+                    ", version: " << static_cast<uint32_t>(challange->version[0]) << "." <<
                     static_cast<uint32_t>(challange->version[1]) << "." <<
                     static_cast<uint32_t>(challange->version[2]) << "." <<
                     static_cast<uint32_t>(challange->version[3]) << std::endl;
