@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include <random>
 #include <string>
 #include <vector>
 #include "Socket.h"
-#include "State.h"
+#include "RTMP.h"
 
 class Output
 {
@@ -34,4 +35,11 @@ private:
     
     Network& _network;
     Socket _socket;
+    
+    std::vector<uint8_t> _data;
+    
+    State _state = State::UNINITIALIZED;
+    
+    std::random_device _rd;
+    std::mt19937 _generator;
 };

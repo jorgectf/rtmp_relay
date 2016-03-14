@@ -7,25 +7,11 @@
 #include <random>
 #include <vector>
 #include "Socket.h"
-#include "State.h"
+#include "RTMP.h"
 
 class Input
 {
 public:
-    struct Challange
-    {
-        uint32_t time;
-        uint8_t version[4];
-        uint8_t randomBytes[1528];
-    };
-    
-    struct Ack
-    {
-        uint32_t time;
-        uint32_t time2;
-        uint8_t randomBytes[1528];
-    };
-    
     Input() = default;
     Input(Network& network, Socket socket);
     ~Input();

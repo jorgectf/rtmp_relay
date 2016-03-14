@@ -68,11 +68,9 @@ void Input::handleRead(const std::vector<uint8_t>& data)
 {
     _data.insert(_data.end(), data.begin(), data.end());
     
-    std::cout << "Got " << std::to_string(data.size()) << " bytes" << std::endl;
+    std::cout << "Input got " << std::to_string(data.size()) << " bytes" << std::endl;
     
-    bool done = false;
-    
-    while (!done)
+    while (!_data.empty())
     {
         if (_state == State::UNINITIALIZED)
         {
@@ -87,7 +85,6 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 {
                     std::cerr << "Unsuported version" << std::endl;
                     _socket.close();
-                    done = true;
                     break;
                 }
                 
@@ -117,7 +114,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 
                 // S1
                 Challange replyChallange;
-                replyChallange.time = 127;
+                replyChallange.time = 0;
                 memcpy(replyChallange.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
                 
                 for (size_t i = 0; i < sizeof(replyChallange.randomBytes); ++i)
