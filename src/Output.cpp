@@ -172,7 +172,7 @@ void Output::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == State::ACK_SENT)
         {
-            if (_data.size() > sizeof(Ack))
+            if (_data.size() >= sizeof(Ack))
             {
                 // S2
                 Ack* ack = (Ack*)_data.data();
