@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cstring>
 #include <unistd.h>
 #include "Output.h"
 #include "Constants.h"
