@@ -29,6 +29,7 @@ public:
     bool connect(uint32_t ipAddress, uint16_t port);
     
     bool startRead();
+    void setConnectCallback(const std::function<void()>& connectCallback);
     void setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& readCallback);
     void setCloseCallback(const std::function<void()>& closeCallback);
     
@@ -56,6 +57,7 @@ protected:
     bool _ready = false;
     bool _blocking = true;
     
+    std::function<void()> _connectCallback;
     std::function<void(const std::vector<uint8_t>&)> _readCallback;
     std::function<void()> _closeCallback;
 };

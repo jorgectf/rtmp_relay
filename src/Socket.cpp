@@ -167,6 +167,7 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
     {
         // connected
         _ready = true;
+        if (_connectCallback) _connectCallback();
     }
     
     return true;
@@ -183,6 +184,11 @@ bool Socket::startRead()
     _ready = true;
     
     return true;
+}
+
+void Socket::setConnectCallback(const std::function<void()>& connectCallback)
+{
+    _connectCallback = connectCallback;
 }
 
 void Socket::setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& readCallback)
@@ -292,7 +298,8 @@ bool Socket::write()
     {
         _connecting = false;
         _ready = true;
-        std::cout << "Connected" << std::endl;
+        std::cout << "Socket connected" << std::endl;
+        if (_connectCallback) _connectCallback();
     }
     
     return true;

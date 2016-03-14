@@ -25,7 +25,7 @@ public:
     
     bool init(const std::string& address);
     void update();
-    void connected();
+    void handleConnect();
     
     bool sendPacket(const std::vector<uint8_t>& packet);
     

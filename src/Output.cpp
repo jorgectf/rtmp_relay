@@ -11,6 +11,7 @@
 Output::Output(Network& network):
     _network(network), _socket(_network), _generator(_rd())
 {
+    _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Output::handleClose, this));
 }
@@ -29,6 +30,7 @@ Output::Output(Output&& other):
 {
     other._state = State::UNINITIALIZED;
     
+    _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Output::handleClose, this));
 }
@@ -42,6 +44,7 @@ Output& Output::operator=(Output&& other)
     
     other._state = State::UNINITIALIZED;
     
+    _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Output::handleClose, this));
     
@@ -71,7 +74,7 @@ void Output::update()
     
 }
 
-void Output::connected()
+void Output::handleConnect()
 {
     std::cout << "Connected" << std::endl;
 
