@@ -9,7 +9,8 @@
 Output::Output(Network& network):
     _network(network), _socket(_network)
 {
-    
+    _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
+    _socket.setCloseCallback(std::bind(&Output::handleClose, this));
 }
 
 Output::~Output()
@@ -21,12 +22,16 @@ Output::Output(Output&& other):
     _network(other._network),
     _socket(std::move(other._socket))
 {
-    
+    _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
+    _socket.setCloseCallback(std::bind(&Output::handleClose, this));
 }
 
 Output& Output::operator=(Output&& other)
 {
     _socket = std::move(other._socket);
+    
+    _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
+    _socket.setCloseCallback(std::bind(&Output::handleClose, this));
     
     return *this;
 }
@@ -65,4 +70,14 @@ bool Output::sendPacket(const std::vector<uint8_t>& packet)
     _socket.send(packet);
     
     return true;
+}
+
+void Output::handleRead(const std::vector<uint8_t>& data)
+{
+    
+}
+
+void Output::handleClose()
+{
+    
 }

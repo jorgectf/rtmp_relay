@@ -7,18 +7,11 @@
 #include <random>
 #include <vector>
 #include "Socket.h"
+#include "State.h"
 
 class Input
 {
 public:
-    enum class State
-    {
-        UNINITIALIZED = 0,
-        VERSION_SENT = 1,
-        ACK_SENT = 2,
-        HANDSHAKE_DONE = 3
-    };
-    
     struct Challange
     {
         uint32_t time;

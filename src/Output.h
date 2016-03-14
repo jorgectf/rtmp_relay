@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "Socket.h"
+#include "State.h"
 
 class Output
 {
@@ -28,6 +29,9 @@ public:
     bool sendPacket(const std::vector<uint8_t>& packet);
     
 private:
+    void handleRead(const std::vector<uint8_t>& data);
+    void handleClose();
+    
     Network& _network;
     Socket _socket;
 };
