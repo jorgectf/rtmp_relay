@@ -81,6 +81,14 @@ void Server::update()
 
 void Server::handleAccept(Socket socket)
 {
-    Input input(_network, std::move(socket));
-    _inputs.push_back(std::move(input));
+    // accept only one input
+    if (_inputs.empty())
+    {
+        Input input(_network, std::move(socket));
+        _inputs.push_back(std::move(input));
+    }
+    else
+    {
+        socket.close();
+    }
 }
