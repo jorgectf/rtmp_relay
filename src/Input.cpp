@@ -70,15 +70,17 @@ void Input::handleRead(const std::vector<uint8_t>& data)
     
     std::cout << "Input got " << std::to_string(data.size()) << " bytes" << std::endl;
     
-    while (!_data.empty())
+    uint32_t offset = 0;
+    
+    while (offset < _data.size())
     {
         if (_state == State::UNINITIALIZED)
         {
-            if (_data.size() >= sizeof(uint8_t))
+            if (_data.size() - offset >= sizeof(uint8_t))
             {
                 // C0
-                uint8_t version = static_cast<uint8_t>(*_data.data());
-                _data.erase(_data.begin(), _data.begin() + sizeof(version));
+                uint8_t version = static_cast<uint8_t>(*(_data.data() + offset));
+                offset += sizeof(version);
                 std::cout << "Got version " << version << std::endl;
                 
                 if (version != 0x03)
@@ -102,11 +104,12 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == State::VERSION_SENT)
         {
-            if (_data.size() >= sizeof(Challange))
+            if (_data.size() - offset >= sizeof(Challange))
             {
                 // C1
-                Challange* challange = (Challange*)_data.data();
-                _data.erase(_data.begin(), _data.begin() + sizeof(*challange));
+                Challange* challange = reinterpret_cast<Challange*>(_data.data() + offset);
+                offset += sizeof(*challange);
+                
                 std::cout << "Got Challange message, time: " << challange->time <<
                     ", version: " << static_cast<uint32_t>(challange->version[0]) << "." <<
                     static_cast<uint32_t>(challange->version[1]) << "." <<
@@ -150,11 +153,11 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         }
         else  if (_state == State::ACK_SENT)
         {
-            if (_data.size() >= sizeof(Ack))
+            if (_data.size() - offset >= sizeof(Ack))
             {
                 // C2
-                Ack* ack = (Ack*)_data.data();
-                _data.erase(_data.begin(), _data.begin() + sizeof(*ack));
+                Ack* ack = reinterpret_cast<Ack*>(_data.data() + offset);
+                offset += sizeof(*ack);
                 
                 std::cout << "Got Ack message, time: " << ack->time << ", time2: " << ack->time2 << std::endl;
                 
@@ -170,9 +173,17 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         else if (_state == State::HANDSHAKE_DONE)
         {
             // send subscribe
+            FILE* tmp = fopen("/Users/elviss/Desktop/data.txt", "wb");
+            fwrite(_data.data() + offset, 1, _data.size() - offset, tmp);
+            fclose(tmp);
+            
+            offset += _data.size() - offset;
+            
             break;
         }
     }
+    
+    _data.erase(_data.begin(), _data.begin() + offset);
 }
 
 void Input::handleClose()
