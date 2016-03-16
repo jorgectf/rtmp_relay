@@ -119,7 +119,7 @@ bool Socket::connect(const std::string& address, uint16_t port)
         return false;
     }
     
-    struct sockaddr_in* addr = (struct sockaddr_in*)result->ai_addr;
+    struct sockaddr_in* addr = reinterpret_cast<struct sockaddr_in*>(result->ai_addr);
     ip = addr->sin_addr.s_addr;
     port = ntohs(addr->sin_port);
     
