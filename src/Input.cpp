@@ -25,9 +25,11 @@ Input::Input(Input&& other):
     _socket(std::move(other._socket)),
     _data(std::move(other._data)),
     _state(other._state),
+    _chunkSize(other._chunkSize),
     _generator(std::move(other._generator))
 {
     other._state = State::UNINITIALIZED;
+    other._chunkSize = 128;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -38,9 +40,11 @@ Input& Input::operator=(Input&& other)
     _socket = std::move(other._socket);
     _data = std::move(other._data);
     _state = other._state;
+    _chunkSize = other._chunkSize;
     _generator = std::move(other._generator);
     
     other._state = State::UNINITIALIZED;
+    other._chunkSize = 128;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Input::handleClose, this));

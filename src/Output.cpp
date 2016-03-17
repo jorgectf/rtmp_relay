@@ -26,9 +26,11 @@ Output::Output(Output&& other):
     _socket(std::move(other._socket)),
     _data(std::move(other._data)),
     _state(other._state),
+    _chunkSize(other._chunkSize),
     _generator(std::move(other._generator))
 {
     other._state = State::UNINITIALIZED;
+    other._chunkSize = 128;
     
     _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
@@ -40,9 +42,11 @@ Output& Output::operator=(Output&& other)
     _socket = std::move(other._socket);
     _data = std::move(other._data);
     _state = other._state;
+    _chunkSize = other._chunkSize;
     _generator = std::move(other._generator);
     
     other._state = State::UNINITIALIZED;
+    other._chunkSize = 128;
     
     _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));

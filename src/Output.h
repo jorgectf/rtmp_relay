@@ -40,6 +40,8 @@ private:
     
     State _state = State::UNINITIALIZED;
     
+    uint32_t _chunkSize = 128;
+    
     std::random_device _rd;
     std::mt19937 _generator;
 };
