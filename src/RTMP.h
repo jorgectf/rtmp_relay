@@ -13,12 +13,25 @@ enum class State
     HANDSHAKE_DONE = 4
 };
 
-enum HeaderType
+enum class HeaderType
 {
-    TWELVE_BYTE_HEADER = 0x00, // 00
-    EIGHT_BYTE_HEADER = 0x01, // 01
-    FOUR_BYTE_HEADER = 0x02, // 10
-    ONE_BYTE_HEADER = 0x03 // 11
+    TWELVE_BYTE = 0x00, // 00
+    EIGHT_BYTE = 0x01, // 01
+    FOUR_BYTE = 0x02, // 10
+    ONE_BYTE = 0x03 // 11
+};
+
+enum class MessageType
+{
+    SET_CHUNK_SIZE = 0x01,
+    PING = 0x04,
+    SERVER_BANDWIDTH = 0x05,
+    CLIENT_BANDWIDTH = 0x06,
+    AUDIO_PACKET = 0x08,
+    VIDEO_PACKET = 0x09,
+    AMD3_COMMAND = 0x11,
+    INVOKE = 0x12, // e.g. onMetaData
+    AMF0_COMMAND = 0x14
 };
 
 struct Challange
