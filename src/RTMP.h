@@ -13,6 +13,14 @@ enum class State
     HANDSHAKE_DONE = 4
 };
 
+enum HeaderType
+{
+    TWELVE_BYTE_HEADER = 0x00, // 00
+    EIGHT_BYTE_HEADER = 0x01, // 01
+    FOUR_BYTE_HEADER = 0x02, // 10
+    ONE_BYTE_HEADER = 0x03 // 11
+};
+
 struct Challange
 {
     uint32_t time;
