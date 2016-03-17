@@ -172,11 +172,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == State::HANDSHAKE_DONE)
         {
-            // send subscribe
-            FILE* tmp = fopen("/Users/elviss/Desktop/data.txt", "wb");
-            fwrite(_data.data() + offset, 1, _data.size() - offset, tmp);
-            fclose(tmp);
-            
+            // send subscribe            
             offset += _data.size() - offset;
             
             break;
