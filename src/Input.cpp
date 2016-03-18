@@ -28,7 +28,7 @@ Input::Input(Input&& other):
     _chunkSize(other._chunkSize),
     _generator(std::move(other._generator))
 {
-    other._state = State::UNINITIALIZED;
+    other._state = rtmp::State::UNINITIALIZED;
     other._chunkSize = 128;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
@@ -43,7 +43,7 @@ Input& Input::operator=(Input&& other)
     _chunkSize = other._chunkSize;
     _generator = std::move(other._generator);
     
-    other._state = State::UNINITIALIZED;
+    other._state = rtmp::State::UNINITIALIZED;
     other._chunkSize = 128;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
@@ -78,7 +78,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
     
     while (offset < _data.size())
     {
-        if (_state == State::UNINITIALIZED)
+        if (_state == rtmp::State::UNINITIALIZED)
         {
             if (_data.size() - offset >= sizeof(uint8_t))
             {
@@ -99,19 +99,19 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 reply.push_back(RTMP_VERSION);
                 _socket.send(reply);
                 
-                _state = State::VERSION_SENT;
+                _state = rtmp::State::VERSION_SENT;
             }
             else
             {
                 break;
             }
         }
-        else if (_state == State::VERSION_SENT)
+        else if (_state == rtmp::State::VERSION_SENT)
         {
-            if (_data.size() - offset >= sizeof(Challange))
+            if (_data.size() - offset >= sizeof(rtmp::Challange))
             {
                 // C1
-                Challange* challange = reinterpret_cast<Challange*>(_data.data() + offset);
+                rtmp::Challange* challange = reinterpret_cast<rtmp::Challange*>(_data.data() + offset);
                 offset += sizeof(*challange);
                 
                 std::cout << "Got Challange message, time: " << challange->time <<
@@ -121,7 +121,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                     static_cast<uint32_t>(challange->version[3]) << std::endl;
                 
                 // S1
-                Challange replyChallange;
+                rtmp::Challange replyChallange;
                 replyChallange.time = 0;
                 memcpy(replyChallange.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
                 
@@ -137,7 +137,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 _socket.send(reply);
                 
                 // S2
-                Ack ack;
+                rtmp::Ack ack;
                 ack.time = challange->time;
                 ack.time2 = static_cast<uint32_t>(time(nullptr));
                 memcpy(ack.randomBytes, challange->randomBytes, sizeof(ack.randomBytes));
@@ -148,38 +148,45 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                                reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                 _socket.send(ackData);
                 
-                _state = State::ACK_SENT;
+                _state = rtmp::State::ACK_SENT;
             }
             else
             {
                 break;
             }
         }
-        else  if (_state == State::ACK_SENT)
+        else  if (_state == rtmp::State::ACK_SENT)
         {
-            if (_data.size() - offset >= sizeof(Ack))
+            if (_data.size() - offset >= sizeof(rtmp::Ack))
             {
                 // C2
-                Ack* ack = reinterpret_cast<Ack*>(_data.data() + offset);
+                rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(_data.data() + offset);
                 offset += sizeof(*ack);
                 
                 std::cout << "Got Ack message, time: " << ack->time << ", time2: " << ack->time2 << std::endl;
                 
                 std::cout << "Handshake done" << std::endl;
                 
-                _state = State::HANDSHAKE_DONE;
+                _state = rtmp::State::HANDSHAKE_DONE;
             }
             else
             {
                 break;
             }
         }
-        else if (_state == State::HANDSHAKE_DONE)
+        else if (_state == rtmp::State::HANDSHAKE_DONE)
         {
-            // send subscribe            
-            offset += _data.size() - offset;
+            // send subscribe
+            uint32_t result = parseData(_data, offset);
             
-            break;
+            if (offset == 0)
+            {
+                break;
+            }
+            else
+            {
+                offset += result;
+            }
         }
     }
     
@@ -189,4 +196,13 @@ void Input::handleRead(const std::vector<uint8_t>& data)
 void Input::handleClose()
 {
     std::cout << "Input disconnected" << std::endl;
+}
+
+uint32_t Input::parseData(const std::vector<uint8_t>& data, uint32_t offset)
+{
+    uint32_t localOffset = 0;
+    
+    
+    
+    return 0;
 }

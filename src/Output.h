@@ -38,7 +38,7 @@ private:
     
     std::vector<uint8_t> _data;
     
-    State _state = State::UNINITIALIZED;
+    rtmp::State _state = rtmp::State::UNINITIALIZED;
     
     uint32_t _chunkSize = 128;
     

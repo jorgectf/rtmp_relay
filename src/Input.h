@@ -32,12 +32,14 @@ protected:
     void handleRead(const std::vector<uint8_t>& data);
     void handleClose();
     
+    uint32_t parseData(const std::vector<uint8_t>& data, uint32_t offset);
+    
     Network& _network;
     Socket _socket;
     
     std::vector<uint8_t> _data;
     
-    State _state = State::UNINITIALIZED;
+    rtmp::State _state = rtmp::State::UNINITIALIZED;
     
     uint32_t _chunkSize = 128;
     
