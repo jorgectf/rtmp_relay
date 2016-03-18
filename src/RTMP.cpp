@@ -38,9 +38,9 @@ namespace rtmp
         uint8_t headerData = *(data.data() + offset);
         offset += 1;
         
-        if ((headerData & 0xFF) != 0x03)
+        if ((headerData & 0x3F) != 0x03)
         {
-            fprintf(stderr, "Wrong header version\n");
+            std::cerr << "Wrong header version" << std::endl;
             return 0;
         }
         
@@ -104,16 +104,44 @@ namespace rtmp
     {
         uint32_t originalOffset = offset;
         
-        Header header;
+        uint32_t remainingBytes = 0;
         
-        uint32_t ret = parseHeader(data, offset, header);
-        
-        if (!ret)
+        do
         {
-            return 0;
+            Header header;
+            uint32_t ret = parseHeader(data, offset, header);
+            
+            if (!ret)
+            {
+                return 0;
+            }
+            
+            offset += ret;
+            
+            if (packet.data.empty())
+            {
+                packet.header = header;
+                remainingBytes = packet.header.length - static_cast<uint32_t>(packet.data.size());
+            }
+            
+            if (offset - data.size() < remainingBytes)
+            {
+                return 0;
+            }
+            else
+            {
+                uint32_t packetSize = (remainingBytes > 128 ? 128 : remainingBytes);
+                
+                std::cout << "Packet size: " << packetSize << std::endl;
+                
+                packet.data.insert(packet.data.end(), data.begin() + offset, data.begin() + offset + packetSize);
+                
+                remainingBytes -= packetSize;
+                offset += packetSize;
+            }
+            
         }
-        
-        offset += ret;
+        while (remainingBytes);
         
         return offset - originalOffset;
     }
