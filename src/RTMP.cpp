@@ -7,7 +7,7 @@
 
 namespace rtmp
 {
-    uint32_t parseInt(const std::vector<uint8_t>& data, uint32_t offset, uint32_t size, uint32_t& result)
+    static uint32_t parseInt(const std::vector<uint8_t>& data, uint32_t offset, uint32_t size, uint32_t& result)
     {
         if (data.size() - offset < size)
         {
@@ -16,7 +16,7 @@ namespace rtmp
         
         result = 0;
         
-        for (int i = 0; i < size; ++i)
+        for (uint32_t i = 0; i < size; ++i)
         {
             result <<= 1;
             result += static_cast<uint32_t>(*(data.data() + offset));
@@ -66,7 +66,7 @@ namespace rtmp
                     return 0;
                 }
                 
-                uint32_t ret = parseInt(data, offset, 3, header.length);
+                ret = parseInt(data, offset, 3, header.length);
                 
                 if (!ret)
                 {

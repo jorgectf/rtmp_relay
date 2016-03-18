@@ -59,7 +59,7 @@ bool Relay::init(const std::string& config)
         
         Server server(_network);
         
-        if (server.init(serverObject["port"].GetInt(), pushAddresses))
+        if (server.init(static_cast<uint16_t>(serverObject["port"].GetInt()), pushAddresses))
         {
             _servers.push_back(std::move(server));
         }
