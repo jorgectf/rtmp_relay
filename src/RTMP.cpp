@@ -61,11 +61,6 @@ namespace rtmp
             
             if (header.type != HeaderType::FOUR_BYTE)
             {
-                if (data.size() - offset < 4)
-                {
-                    return 0;
-                }
-                
                 ret = parseInt(data, offset, 3, header.length);
                 
                 if (!ret)
