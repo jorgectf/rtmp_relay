@@ -100,7 +100,7 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    uint32_t parsePacket(const std::vector<uint8_t>& data, uint32_t offset, Packet& packet)
+    uint32_t parsePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet)
     {
         uint32_t originalOffset = offset;
         
@@ -130,7 +130,7 @@ namespace rtmp
             }
             else
             {
-                uint32_t packetSize = (remainingBytes > 128 ? 128 : remainingBytes);
+                uint32_t packetSize = (remainingBytes > chunkSize ? chunkSize : remainingBytes);
                 
                 std::cout << "Packet size: " << packetSize << std::endl;
                 

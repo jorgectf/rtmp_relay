@@ -70,5 +70,5 @@ namespace rtmp
     };
     
     uint32_t parseHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header);
-    uint32_t parsePacket(const std::vector<uint8_t>& data, uint32_t offset, Packet& packet);
+    uint32_t parsePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet);
 }

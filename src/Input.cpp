@@ -203,7 +203,7 @@ uint32_t Input::parseData(const std::vector<uint8_t>& data, uint32_t offset)
     uint32_t originalOffset = offset;
     rtmp::Packet packet;
     
-    uint32_t ret = rtmp::parsePacket(data, offset, packet);
+    uint32_t ret = rtmp::parsePacket(data, offset, _chunkSize, packet);
     
     if (!ret)
     {
