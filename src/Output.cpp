@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "Output.h"
 #include "Constants.h"
+#include "RTMP.h"
 
 Output::Output(Network& network):
     _network(network), _socket(_network), _generator(_rd())
@@ -198,8 +199,19 @@ void Output::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == rtmp::State::HANDSHAKE_DONE)
         {
-            // receive subscribe
-            break;
+            // TODO: receive subscribe
+            rtmp::Packet packet;
+            
+            uint32_t ret = rtmp::parsePacket(data, offset, _chunkSize, packet);
+            
+            if (ret > 0)
+            {
+                offset += ret;
+            }
+            else
+            {
+                break;
+            }
         }
     }
     

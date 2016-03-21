@@ -176,16 +176,18 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == rtmp::State::HANDSHAKE_DONE)
         {
-            // send subscribe
-            uint32_t ret = parseData(_data, offset);
+            // TODO: send subscribe
+            rtmp::Packet packet;
             
-            if (ret == 0)
+            uint32_t ret = rtmp::parsePacket(data, offset, _chunkSize, packet);
+            
+            if (ret > 0)
             {
-                break;
+                offset += ret;
             }
             else
             {
-                offset += ret;
+                break;
             }
         }
     }
@@ -196,21 +198,4 @@ void Input::handleRead(const std::vector<uint8_t>& data)
 void Input::handleClose()
 {
     std::cout << "Input disconnected" << std::endl;
-}
-
-uint32_t Input::parseData(const std::vector<uint8_t>& data, uint32_t offset)
-{
-    uint32_t originalOffset = offset;
-    rtmp::Packet packet;
-    
-    uint32_t ret = rtmp::parsePacket(data, offset, _chunkSize, packet);
-    
-    if (!ret)
-    {
-        return 0;
-    }
-    
-    offset += ret;
-    
-    return offset - originalOffset;
 }

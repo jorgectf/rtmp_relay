@@ -32,8 +32,6 @@ protected:
     void handleRead(const std::vector<uint8_t>& data);
     void handleClose();
     
-    uint32_t parseData(const std::vector<uint8_t>& data, uint32_t offset);
-    
     Network& _network;
     Socket _socket;
     
