@@ -8,24 +8,6 @@
 
 namespace amf0
 {
-    enum class Marker: uint8_t
-    {
-        Number = 0x00,
-        Boolean = 0x01,
-        String = 0x02,
-        Object = 0x03,
-        Null = 0x05,
-        Undefined = 0x06,
-        ECMAArray = 0x08,
-        ObjectEnd = 0x09,
-        StrictArray = 0x0a,
-        Date = 0x0b,
-        LongString = 0x0c,
-        XMLDocument = 0x0f,
-        TypedObject = 0x10,
-        SwitchToAMF3 = 0x11
-    };
-
     enum HeaderType
     {
         TWELVE_BYTE_HEADER = 0x00, // 00
@@ -34,49 +16,20 @@ namespace amf0
         ONE_BYTE_HEADER = 0x03 // 11
     };
 
-    static uint16_t swap16(uint16_t a)
-    {
-        a = static_cast<uint16_t>(((a & 0x00FF) << 8) |
-                                  ((a & 0xFF00) >> 8));
-        return a;
-    }
-
-    static uint32_t swap32(uint32_t a)
-    {
-        a = ((a & 0x000000FF) << 24) |
-            ((a & 0x0000FF00) <<  8) |
-            ((a & 0x00FF0000) >>  8) |
-            ((a & 0xFF000000) >> 24);
-        return a;
-    }
-
-    static uint64_t swap64(uint64_t a)
-    {
-        a = ((a & 0x00000000000000FFULL) << 56) |
-            ((a & 0x000000000000FF00ULL) << 40) |
-            ((a & 0x0000000000FF0000ULL) << 24) |
-            ((a & 0x00000000FF000000ULL) <<  8) |
-            ((a & 0x000000FF00000000ULL) >>  8) |
-            ((a & 0x0000FF0000000000ULL) >> 24) |
-            ((a & 0x00FF000000000000ULL) >> 40) |
-            ((a & 0xFF00000000000000ULL) >> 56);
-        return a;
-    }
-
-    bool parseNode(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseNumber(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseBoolean(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseString(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseObject(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseNull(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseUndefined(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseECMAArray(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseStrictArray(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseDate(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseLongString(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseXMLDocument(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseTypedObject(const uint8_t* buffer, uint32_t size, uint32_t& offset);
-    bool parseSwitchToAMF3(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseNode(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseNumber(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseBoolean(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseString(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseObject(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseNull(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseUndefined(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseECMAArray(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseStrictArray(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseDate(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseLongString(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseXMLDocument(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseTypedObject(const uint8_t* buffer, uint32_t size, uint32_t& offset);
+    static bool parseSwitchToAMF3(const uint8_t* buffer, uint32_t size, uint32_t& offset);
 
     static const char* markerToString(Marker marker)
     {
@@ -116,14 +69,19 @@ namespace amf0
 
     static double readDouble(const uint8_t* buffer, uint32_t& offset)
     {
-        uint64_t swapped = swap64(*(uint64_t*)(buffer + offset));
-        double result = *(double*)(&swapped);
-        offset += sizeof(result);
+        uint32_t result = 0;
 
-        return result;
+        for (uint32_t i = 0; i < 8; ++i)
+        {
+            result <<= 1;
+            result += static_cast<uint64_t>(*(buffer + offset));
+            offset += 1;
+        }
+
+        return *reinterpret_cast<double*>(&result);
     }
 
-    bool parseHeader(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseHeader(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         if (size - offset < 1)
         {
@@ -168,7 +126,7 @@ namespace amf0
         return true;
     }
 
-    const Marker* parseMarker(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static const Marker* parseMarker(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         if (size - offset < 1)
         {
@@ -181,7 +139,7 @@ namespace amf0
         return marker;
     }
 
-    bool parseNode(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseNode(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         const Marker* marker = parseMarker(buffer, size, offset);
 
@@ -212,7 +170,7 @@ namespace amf0
         }
     }
 
-    bool parseNumber(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseNumber(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         if (size - offset < 8)
         {
@@ -226,7 +184,7 @@ namespace amf0
         return true;
     }
 
-    bool parseBoolean(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseBoolean(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         if (size - offset < 1)
         {
@@ -240,9 +198,20 @@ namespace amf0
         return true;
     }
 
-    bool parseString(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseString(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
+        if (size - offset < 2)
+        {
+            return false;
+        }
+
         uint32_t length = readInt(buffer, 2, offset);
+
+        if (size - offset < length)
+        {
+            return false;
+        }
+
         std::cout << "Length: " << length << std::endl;
 
         char* str = (char*)malloc(length + 1);
@@ -258,7 +227,7 @@ namespace amf0
         return true;
     }
 
-    bool parseObject(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseObject(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         while (size - offset > 0)
         {
@@ -288,21 +257,21 @@ namespace amf0
         return false;
     }
 
-    bool parseNull(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseNull(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         std::cout << "Null" << std::endl;
 
         return true;
     }
 
-    bool parseUndefined(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseUndefined(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         std::cout << "Undefined" << std::endl;
 
         return true;
     }
 
-    bool parseECMAArray(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseECMAArray(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         if (size - offset < 4)
         {
@@ -331,7 +300,7 @@ namespace amf0
         return true;
     }
 
-    bool parseStrictArray(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseStrictArray(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
 
         if (size - offset < 4)
@@ -355,7 +324,7 @@ namespace amf0
         return true;
     }
     
-    bool parseDate(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseDate(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         double ms = readDouble(buffer, offset); // date in milliseconds from 01/01/1970
         uint32_t timezone = readInt(buffer, 4, offset); // unsupported timezone
@@ -365,9 +334,20 @@ namespace amf0
         return true;
     }
     
-    bool parseLongString(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseLongString(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
+        if (size - offset < 4)
+        {
+            return false;
+        }
+
         uint32_t length = readInt(buffer, 4, offset);
+
+        if (size - offset < length)
+        {
+            return false;
+        }
+
         std::cout << "Length: " << length << std::endl;
         
         char* str = static_cast<char*>(malloc(length + 1));
@@ -383,9 +363,20 @@ namespace amf0
         return true;
     }
     
-    bool parseXMLDocument(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseXMLDocument(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
+        if (size - offset < 4)
+        {
+            return false;
+        }
+
         uint32_t length = readInt(buffer, 4, offset);
+
+        if (size - offset < length)
+        {
+            return false;
+        }
+        
         std::cout << "Length: " << length << std::endl;
         
         char* str = (char*)malloc(length + 1);
@@ -399,15 +390,22 @@ namespace amf0
         return true;
     }
     
-    bool parseTypedObject(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseTypedObject(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         return true;
     }
     
-    bool parseSwitchToAMF3(const uint8_t* buffer, uint32_t size, uint32_t& offset)
+    static bool parseSwitchToAMF3(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         std::cerr << "AMF3 not supported" << std::endl;
         
         return true;
+    }
+
+    Node parseBuffer(const std::vector<uint8_t>& buffer)
+    {
+        Node result;
+
+        return result;
     }
 }
