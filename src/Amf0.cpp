@@ -2,6 +2,7 @@
 //  rtmp_relay
 //
 
+#include <iostream>
 #include <stdint.h>
 #include "Amf0.h"
 
@@ -134,7 +135,7 @@ namespace amf0
 
         if ((header & 0xFF) != 0x03)
         {
-            fprintf(stderr, "Wrong header version\n");
+            std::cerr << "Wrong header version\n";
             return false;
         }
 
@@ -143,23 +144,23 @@ namespace amf0
         if (headerType != ONE_BYTE_HEADER)
         {
             uint32_t timestamp = readInt(buffer, 3, offset);
-            printf("Timestamp: %d\n", timestamp);
+            std::cout << "Timestamp: " << timestamp << std::endl;
 
             if (headerType != FOUR_BYTE_HEADER)
             {
                 uint32_t length = readInt(buffer, 3, offset);
-                printf("Length: %d\n", length);
+                std::cout << "Length: " << length << std::endl;
 
                 uint8_t messageTypeId = *(buffer + offset);
                 offset++;
-                printf("Message type ID: %d\n", (uint32_t)messageTypeId);
+                std::cout << "Message type ID: " << static_cast<uint32_t>(messageTypeId) << std::endl;
 
                 if (headerType != EIGHT_BYTE_HEADER)
                 {
                     uint32_t messageStreamId = *reinterpret_cast<const uint32_t*>(buffer + offset);
                     offset += sizeof(messageStreamId);
 
-                    printf("Message stream ID: %d\n", messageStreamId);
+                    std::cout << "Message stream ID: " << messageStreamId << std::endl;
                 }
             }
         }
@@ -189,7 +190,7 @@ namespace amf0
             return false;
         }
 
-        printf("Marker: %s\n", markerToString(*marker));
+        std::cout << "Marker: " << markerToString(*marker) << std::endl;
 
         switch (*marker)
         {
@@ -220,7 +221,7 @@ namespace amf0
 
         double number = readDouble(buffer, offset);
 
-        printf("Number: %lf\n", number);
+        std::cout << "Number: " << number << std::endl;
 
         return true;
     }
@@ -234,7 +235,7 @@ namespace amf0
 
         uint8_t result = *(buffer + offset);
 
-        printf("Bool: %d\n", (uint32_t)result);
+        std::cout << "Bool: " << static_cast<uint32_t>(result) << std::endl;
 
         return true;
     }
@@ -242,7 +243,7 @@ namespace amf0
     bool parseString(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         uint32_t length = readInt(buffer, 2, offset);
-        printf("Length: %d\n", length);
+        std::cout << "Length: " << length << std::endl;
 
         char* str = (char*)malloc(length + 1);
         memcpy(str, buffer + offset, length);
@@ -250,7 +251,7 @@ namespace amf0
 
         offset += length;
 
-        printf("String: %s\n", str);
+        std::cout << "String: " << str << std::endl;
 
         free(str);
 
@@ -261,7 +262,7 @@ namespace amf0
     {
         while (size - offset > 0)
         {
-            printf("Key: \n");
+            std::cout << "Key: " << std::endl;
             if (!parseString(buffer, size, offset))
             {
                 return false;
@@ -272,11 +273,11 @@ namespace amf0
             if (marker == Marker::ObjectEnd)
             {
                 offset++;
-                printf("Object end\n");
+                std::cout << "Object end" << std::endl;
             }
             else
             {
-                printf("Value: \n");
+                std::cout << "Value: " << std::endl;
                 if (!parseNode(buffer, size, offset))
                 {
                     return false;
@@ -289,14 +290,14 @@ namespace amf0
 
     bool parseNull(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
-        printf("Null\n");
+        std::cout << "Null" << std::endl;
 
         return true;
     }
 
     bool parseUndefined(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
-        printf("Undefined\n");
+        std::cout << "Undefined" << std::endl;
 
         return true;
     }
@@ -310,17 +311,17 @@ namespace amf0
 
         uint32_t count = readInt(buffer, 4, offset);
 
-        printf("ECMA array, size: %d\n", count);
+        std::cout << "ECMA array, size: " << count << std::endl;
 
-        for (int i = 0; i < count; ++i)
+        for (uint32_t i = 0; i < count; ++i)
         {
-            printf("Key: \n");
+            std::cout << "Key: " << std::endl;
             if (!parseString(buffer, size, offset))
             {
                 return false;
             }
 
-            printf("Value: \n");
+            std::cout << "Value: " << std::endl;
             if (!parseNode(buffer, size, offset))
             {
                 return false;
@@ -340,11 +341,11 @@ namespace amf0
 
         uint32_t count = readInt(buffer, 4, offset);
 
-        printf("Strict array, size: %d\n", count);
+        std::cout << "Strict array, size: " << count << std::endl;
 
-        for (int i = 0; i < count; ++i)
+        for (uint32_t i = 0; i < count; ++i)
         {
-            printf("Value: \n");
+            std::cout << "Value: " << std::endl;
             if (!parseNode(buffer, size, offset))
             {
                 return false;
@@ -359,7 +360,7 @@ namespace amf0
         double ms = readDouble(buffer, offset); // date in milliseconds from 01/01/1970
         uint32_t timezone = readInt(buffer, 4, offset); // unsupported timezone
         
-        printf("Milliseconds: %lf, timezone: %d\n", ms, timezone);
+        std::cout << "Milliseconds: " << ms << ", timezone: " << timezone << std::endl;
         
         return true;
     }
@@ -367,15 +368,15 @@ namespace amf0
     bool parseLongString(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         uint32_t length = readInt(buffer, 4, offset);
-        printf("Length: %d\n", length);
+        std::cout << "Length: " << length << std::endl;
         
-        char* str = (char*)malloc(length + 1);
+        char* str = static_cast<char*>(malloc(length + 1));
         memcpy(str, buffer + offset, length);
         str[length] = '\0';
         
         offset += length;
         
-        printf("String: %s\n", str);
+        std::cout << "String: " << str << std::endl;
         
         free(str);
         
@@ -385,7 +386,7 @@ namespace amf0
     bool parseXMLDocument(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
         uint32_t length = readInt(buffer, 4, offset);
-        printf("Length: %d\n", length);
+        std::cout << "Length: " << length << std::endl;
         
         char* str = (char*)malloc(length + 1);
         memcpy(str, buffer + offset, length);
@@ -393,7 +394,7 @@ namespace amf0
         
         offset += length;
         
-        printf("XML: %s\n", str);
+        std::cout << "XML: " << str << std::endl;
         
         return true;
     }
@@ -405,7 +406,7 @@ namespace amf0
     
     bool parseSwitchToAMF3(const uint8_t* buffer, uint32_t size, uint32_t& offset)
     {
-        printf("AMF3 not supported");
+        std::cerr << "AMF3 not supported" << std::endl;
         
         return true;
     }
