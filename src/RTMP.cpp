@@ -3,30 +3,31 @@
 //
 
 #include <iostream>
+#include <cmath>
 #include "RTMP.h"
 
 namespace rtmp
 {
-    static uint32_t parseInt(const std::vector<uint8_t>& data, uint32_t offset, uint32_t size, uint32_t& result)
+    static uint32_t decodeInt(const std::vector<uint8_t>& data, uint32_t offset, uint32_t size, uint32_t& value)
     {
         if (data.size() - offset < size)
         {
             return 0;
         }
         
-        result = 0;
+        value = 0;
         
         for (uint32_t i = 0; i < size; ++i)
         {
-            result <<= 1;
-            result += static_cast<uint32_t>(*(data.data() + offset));
+            value <<= 1;
+            value += static_cast<uint32_t>(*(data.data() + offset));
             offset += 1;
         }
         
         return size;
     }
     
-    uint32_t parseHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header)
+    uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header)
     {
         uint32_t originalOffset = offset;
         
@@ -48,7 +49,7 @@ namespace rtmp
         
         if (header.type != HeaderType::ONE_BYTE)
         {
-            uint32_t ret = parseInt(data, offset, 3, header.timestamp);
+            uint32_t ret = decodeInt(data, offset, 3, header.timestamp);
             
             if (!ret)
             {
@@ -61,7 +62,7 @@ namespace rtmp
             
             if (header.type != HeaderType::FOUR_BYTE)
             {
-                ret = parseInt(data, offset, 3, header.length);
+                ret = decodeInt(data, offset, 3, header.length);
                 
                 if (!ret)
                 {
@@ -84,6 +85,7 @@ namespace rtmp
                 
                 if (header.type != HeaderType::EIGHT_BYTE)
                 {
+                    // little endian
                     header.messageStreamId = *reinterpret_cast<const uint32_t*>(data.data() + offset);
                     offset += sizeof(header.messageStreamId);
                     
@@ -95,7 +97,7 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    uint32_t parsePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet)
+    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet)
     {
         uint32_t originalOffset = offset;
         
@@ -104,7 +106,7 @@ namespace rtmp
         do
         {
             Header header;
-            uint32_t ret = parseHeader(data, offset, header);
+            uint32_t ret = decodeHeader(data, offset, header);
             
             if (!ret)
             {
@@ -139,5 +141,87 @@ namespace rtmp
         while (remainingBytes);
         
         return offset - originalOffset;
+    }
+    
+    static uint32_t encodeInt(std::vector<uint8_t>& data, uint32_t size, uint32_t value)
+    {
+        for (uint32_t i = 0; i < size; ++i)
+        {
+            data.insert(data.end(), static_cast<uint8_t>(value >> (size - i - 1)));
+        }
+        
+        return size;
+    }
+    
+    uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header)
+    {
+        uint32_t originalSize = static_cast<uint32_t>(data.size());
+        
+        uint8_t headerData = 0x03;
+        headerData &= (static_cast<uint32_t>(header.type) << 6);
+        
+        if (header.type != HeaderType::ONE_BYTE)
+        {
+            uint32_t ret = encodeInt(data, 3, header.timestamp);
+            
+            if (!ret)
+            {
+                return 0;
+            }
+            
+            if (header.type != HeaderType::FOUR_BYTE)
+            {
+                ret = encodeInt(data, 3, header.length);
+                
+                if (!ret)
+                {
+                    return 0;
+                }
+                
+                data.insert(data.end(), static_cast<uint8_t>(header.messageType));
+                
+                if (header.type != HeaderType::EIGHT_BYTE)
+                {
+                    // little endian
+                    const uint8_t* messageStreamId = reinterpret_cast<const uint8_t*>(&header.messageStreamId);
+                    data.insert(data.end(), messageStreamId, messageStreamId + sizeof(uint32_t));
+                }
+            }
+        }
+        
+        return static_cast<uint32_t>(data.size()) - originalSize;
+    }
+    
+    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet)
+    {
+        uint32_t originalSize = static_cast<uint32_t>(data.size());
+        
+        const uint32_t packetCount = ((static_cast<uint32_t>(packet.data.size()) + chunkSize - 1) / chunkSize);
+        
+        data.reserve(12 + packet.data.size() + packetCount);
+        
+        Header oneByteHeader;
+        oneByteHeader.type = HeaderType::ONE_BYTE;
+        
+        for (uint32_t i = 0; i < packetCount; ++i)
+        {
+            if (i == 0)
+            {
+                encodeHeader(data, packet.header);
+            }
+            else
+            {
+                encodeHeader(data, oneByteHeader);
+            }
+            
+            uint32_t start = i * chunkSize;
+            uint32_t end = start + chunkSize;
+            
+            if (end > packet.data.size()) end = static_cast<uint32_t>(packet.data.size());
+            
+            data.insert(data.end(), packet.data.begin() + start, packet.data.begin() + end);
+        }
+        
+        return static_cast<uint32_t>(data.size()) - originalSize;
     }
 }

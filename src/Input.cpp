@@ -179,7 +179,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
             // TODO: send subscribe
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::parsePacket(data, offset, _chunkSize, packet);
+            uint32_t ret = rtmp::decodePacket(data, offset, _chunkSize, packet);
             
             if (ret > 0)
             {

@@ -69,6 +69,9 @@ namespace rtmp
         uint8_t randomBytes[1528];
     };
     
-    uint32_t parseHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header);
-    uint32_t parsePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet);
+    uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header);
+    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet);
+    
+    uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header);
+    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet);
 }
