@@ -213,7 +213,7 @@ namespace rtmp
             {
                 encodeHeader(data, oneByteHeader);
             }
-            
+
             uint32_t start = i * chunkSize;
             uint32_t end = start + chunkSize;
             
