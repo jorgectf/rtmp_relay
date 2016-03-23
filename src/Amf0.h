@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 namespace amf0
 {
@@ -35,24 +36,27 @@ namespace amf0
     class Node
     {
     public:
-        ~Node();
+        bool parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
 
-        bool parseBuffer(const std::vector<uint8_t>& buffer);
+        double asDouble() const;
+        bool asBool() const;
+        std::string asString() const;
+        Date asDate() const;
 
-        double doubleValue() const;
-        bool boolValue() const;
-        std::string stringValue() const;
-        Date dateValue() const;
-
+        bool isNull() const;
         bool isUndefined() const;
 
         uint32_t getSize() const;
 
     private:
-        Marker marker;
+        Marker _marker;
 
-        uint32_t _size = 0;
-        void* _value = nullptr;
+        bool _boolValue;
+        double _doubleValue;
+        std::string _stringValue;
+        std::vector<Node> _vectorValue;
+        std::map<std::string, Node> _mapValue;
+        Date _dateValue;
     };
 
 }
