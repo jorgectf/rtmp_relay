@@ -205,48 +205,96 @@ void Input::handleClose()
 
 bool Input::handlePacket(const rtmp::Packet& packet)
 {
-    uint32_t offset = 0;
-
-    amf0::Node command;
-
-    uint32_t ret = command.parseBuffer(packet.data, offset);
-
-    if (ret == 0)
+    switch (packet.header.messageType)
     {
-        return false;
+        case rtmp::MessageType::SET_CHUNK_SIZE:
+        {
+            // TODO: set chunk size
+            break;
+        }
+
+        case rtmp::MessageType::PING:
+        {
+            // TODO: handle ping
+            break;
+        }
+
+        case rtmp::MessageType::SERVER_BANDWIDTH:
+        {
+            break;
+        }
+
+        case rtmp::MessageType::CLIENT_BANDWIDTH:
+        {
+            break;
+        }
+
+        case rtmp::MessageType::AUDIO_PACKET:
+        {
+            // TODO: forward audio packet
+            break;
+        }
+
+        case rtmp::MessageType::VIDEO_PACKET:
+        {
+            // TODO: forward video packet
+            break;
+        }
+
+        case rtmp::MessageType::AMF3_COMMAND:
+        {
+            std::cerr << "AMF3 commands are not supported" << std::endl;
+            break;
+        }
+
+        case rtmp::MessageType::INVOKE:
+        case rtmp::MessageType::AMF0_COMMAND:
+        {
+            uint32_t offset = 0;
+
+            amf0::Node command;
+
+            uint32_t ret = command.parseBuffer(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            std::cout << "Command: " << command.asString() << std::endl;
+
+            amf0::Node streamId;
+
+            ret = streamId.parseBuffer(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
+
+            amf0::Node argument;
+
+            ret = streamId.parseBuffer(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            std::cout << "Argument: " << "Object" << std::endl;
+        }
+
+        default:
+            std::cerr << "Unhandled message" << std::endl;
     }
-
-    offset += ret;
-
-    std::cout << "Command: " << command.asString() << std::endl;
-
-    printf("Stream ID:\n");
-
-    amf0::Node streamId;
-
-    ret = streamId.parseBuffer(packet.data, offset);
-
-    if (ret == 0)
-    {
-        return false;
-    }
-
-    offset += ret;
-
-    std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
-
-    amf0::Node argument;
-
-    ret = streamId.parseBuffer(packet.data, offset);
-
-    if (ret == 0)
-    {
-        return false;
-    }
-
-    offset += ret;
-
-    std::cout << "Argument: " << "Object" << std::endl;
 
     return true;
 }

@@ -35,7 +35,7 @@ namespace rtmp
         CLIENT_BANDWIDTH = 0x06,
         AUDIO_PACKET = 0x08,
         VIDEO_PACKET = 0x09,
-        AMD3_COMMAND = 0x11,
+        AMF3_COMMAND = 0x11,
         INVOKE = 0x12, // e.g. onMetaData
         AMF0_COMMAND = 0x14
     };
