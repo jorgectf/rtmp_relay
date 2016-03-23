@@ -26,13 +26,33 @@ namespace amf0
         SwitchToAMF3 = 0x11
     };
 
-    struct Node
+    struct Date
+    {
+        double ms;
+        uint32_t timezone;
+    };
+
+    class Node
     {
     public:
+        ~Node();
+
+        bool parseBuffer(const std::vector<uint8_t>& buffer);
+
+        double doubleValue() const;
+        bool boolValue() const;
+        std::string stringValue() const;
+        Date dateValue() const;
+
+        bool isUndefined() const;
+
+        uint32_t getSize() const;
 
     private:
         Marker marker;
+
+        uint32_t _size = 0;
+        void* _value = nullptr;
     };
 
-    Node parseBuffer(const std::vector<uint8_t>& buffer);
 }

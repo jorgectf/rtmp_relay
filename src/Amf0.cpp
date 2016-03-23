@@ -214,7 +214,7 @@ namespace amf0
 
         std::cout << "Length: " << length << std::endl;
 
-        char* str = (char*)malloc(length + 1);
+        char* str = static_cast<char*>(malloc(length + 1));
         memcpy(str, buffer + offset, length);
         str[length] = '\0';
 
@@ -407,5 +407,24 @@ namespace amf0
         Node result;
 
         return result;
+    }
+
+    Node::~Node()
+    {
+        if (_value)
+        {
+            free(_value);
+        }
+    }
+
+    bool Node::parseBuffer(const std::vector<uint8_t>& buffer)
+    {
+        if (_value)
+        {
+            free(_value);
+        }
+        _size = 0;
+
+        return true;
     }
 }
