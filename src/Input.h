@@ -31,6 +31,8 @@ public:
 protected:
     void handleRead(const std::vector<uint8_t>& data);
     void handleClose();
+
+    bool handlePacket(const rtmp::Packet& packet);
     
     Network& _network;
     Socket _socket;

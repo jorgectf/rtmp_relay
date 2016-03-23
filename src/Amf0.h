@@ -36,7 +36,7 @@ namespace amf0
     class Node
     {
     public:
-        bool parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
+        uint32_t parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
 
         double asDouble() const;
         bool asBool() const;

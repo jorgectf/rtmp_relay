@@ -6,6 +6,7 @@
 #include <cstring>
 #include "Input.h"
 #include "Constants.h"
+#include "Amf0.h"
 
 Input::Input(Network& network, Socket socket):
     _network(network), _socket(std::move(socket)), _generator(_rd())
@@ -184,6 +185,8 @@ void Input::handleRead(const std::vector<uint8_t>& data)
             if (ret > 0)
             {
                 offset += ret;
+
+                handlePacket(packet);
             }
             else
             {
@@ -198,4 +201,52 @@ void Input::handleRead(const std::vector<uint8_t>& data)
 void Input::handleClose()
 {
     std::cout << "Input disconnected" << std::endl;
+}
+
+bool Input::handlePacket(const rtmp::Packet& packet)
+{
+    uint32_t offset = 0;
+
+    amf0::Node command;
+
+    uint32_t ret = command.parseBuffer(packet.data, offset);
+
+    if (ret == 0)
+    {
+        return false;
+    }
+
+    offset += ret;
+
+    std::cout << "Command: " << command.asString() << std::endl;
+
+    printf("Stream ID:\n");
+
+    amf0::Node streamId;
+
+    ret = streamId.parseBuffer(packet.data, offset);
+
+    if (ret == 0)
+    {
+        return false;
+    }
+
+    offset += ret;
+
+    std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
+
+    amf0::Node argument;
+
+    ret = streamId.parseBuffer(packet.data, offset);
+
+    if (ret == 0)
+    {
+        return false;
+    }
+
+    offset += ret;
+
+    std::cout << "Argument: " << "Object" << std::endl;
+
+    return true;
 }

@@ -321,8 +321,10 @@ namespace amf0
         return true;
     }
 
-    bool Node::parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset)
+    uint32_t Node::parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset)
     {
+        uint32_t originalOffset = offset;
+
         if (buffer.size() - offset < 1)
         {
             return false;
@@ -342,15 +344,17 @@ namespace amf0
             case Marker::Null: return readNull(buffer, offset);
             case Marker::Undefined: return readUndefined(buffer, offset);
             case Marker::ECMAArray: return readECMAArray(buffer, offset, _mapValue);
-            case Marker::ObjectEnd: return false; // should not happen
+            case Marker::ObjectEnd: return 0; // should not happen
             case Marker::StrictArray: return readStrictArray(buffer, offset, _vectorValue);
             case Marker::Date: return readDate(buffer, offset, _dateValue);
             case Marker::LongString: return readLongString(buffer, offset, _stringValue);
             case Marker::XMLDocument: return readXMLDocument(buffer, offset, _stringValue);
             case Marker::TypedObject: return readTypedObject(buffer, offset);
             case Marker::SwitchToAMF3: return readSwitchToAMF3(buffer, offset);
-            default: return false;
+            default: return 0;
         }
+
+        return offset - originalOffset;
     }
 
     double Node::asDouble() const
