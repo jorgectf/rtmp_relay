@@ -29,8 +29,8 @@ namespace amf0
 
     struct Date
     {
-        double ms;
-        uint32_t timezone;
+        double ms = 0.0;
+        uint32_t timezone = 0;
     };
 
     class Node
@@ -40,23 +40,25 @@ namespace amf0
 
         double asDouble() const;
         bool asBool() const;
-        std::string asString() const;
-        Date asDate() const;
+        const std::string& asString() const;
+        const Date& asDate() const;
 
         bool isNull() const;
         bool isUndefined() const;
 
         uint32_t getSize() const;
 
+        Node operator[](size_t key) const;
+        Node operator[](const std::string& key) const;
+
     private:
         Marker _marker;
 
-        bool _boolValue;
-        double _doubleValue;
+        bool _boolValue = false;
+        double _doubleValue = 0.0;
         std::string _stringValue;
         std::vector<Node> _vectorValue;
         std::map<std::string, Node> _mapValue;
         Date _dateValue;
     };
-
 }

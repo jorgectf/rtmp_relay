@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdint.h>
 #include "Amf0.h"
+#include "Utils.h"
 
 namespace amf0
 {
@@ -158,6 +159,9 @@ namespace amf0
 
     static bool readNull(const std::vector<uint8_t>& buffer, uint32_t& offset)
     {
+        UNUSED(buffer);
+        UNUSED(offset);
+
         std::cout << "Null" << std::endl;
 
         return true;
@@ -165,6 +169,9 @@ namespace amf0
 
     static bool readUndefined(const std::vector<uint8_t>& buffer, uint32_t& offset)
     {
+        UNUSED(buffer);
+        UNUSED(offset);
+
         std::cout << "Undefined" << std::endl;
 
         return true;
@@ -296,12 +303,20 @@ namespace amf0
     
     static bool readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
     {
+        UNUSED(buffer);
+        UNUSED(offset);
+
+        std::cerr << "Typed objects are not supported" << std::endl;
+
         return true;
     }
     
     static bool readSwitchToAMF3(const std::vector<uint8_t>& buffer, uint32_t& offset)
     {
-        std::cerr << "AMF3 not supported" << std::endl;
+        UNUSED(buffer);
+        UNUSED(offset);
+
+        std::cerr << "AMF3 is not supported" << std::endl;
         
         return true;
     }
@@ -335,6 +350,67 @@ namespace amf0
             case Marker::TypedObject: return readTypedObject(buffer, offset);
             case Marker::SwitchToAMF3: return readSwitchToAMF3(buffer, offset);
             default: return false;
+        }
+    }
+
+    double Node::asDouble() const
+    {
+        return _doubleValue;
+    }
+
+    bool Node::asBool() const
+    {
+        return _boolValue;
+    }
+
+    const std::string& Node::asString() const
+    {
+        return _stringValue;
+    }
+
+    const Date& Node::asDate() const
+    {
+        return _dateValue;
+    }
+
+    bool Node::isNull() const
+    {
+        return _marker == Marker::Null;
+    }
+
+    bool Node::isUndefined() const
+    {
+        return _marker == Marker::Undefined;
+    }
+
+    uint32_t Node::getSize() const
+    {
+        return static_cast<uint32_t>(_vectorValue.size());
+    }
+
+    Node Node::operator[](size_t key) const
+    {
+        if (key >= _vectorValue.size())
+        {
+            return Node();
+        }
+        else
+        {
+            return _vectorValue[key];
+        }
+    }
+
+    Node Node::operator[](const std::string& key) const
+    {
+        std::map<std::string, Node>::const_iterator i = _mapValue.find(key);
+
+        if (i == _mapValue.end())
+        {
+            return Node();
+        }
+        else
+        {
+            return i->second;
         }
     }
 }
