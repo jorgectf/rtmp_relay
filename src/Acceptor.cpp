@@ -54,6 +54,15 @@ bool Acceptor::startAccept(uint16_t port)
             return false;
         }
     }
+
+    int value = 1;
+
+    if (setsockopt(_socketFd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) < 0)
+    {
+        int error = errno;
+        std::cerr << "setsockopt(SO_REUSEADDR) failed, error: " << error << std::endl;
+        return false;
+    }
     
     _port = port;
     
