@@ -33,10 +33,13 @@ namespace amf0
 
     static bool readNumber(const std::vector<uint8_t>& buffer, uint32_t& offset, double& result)
     {
-        if (!readDouble(buffer, offset, result))
+        uint32_t ret = decodeDouble(buffer, offset, result);
+        if (ret == 0)
         {
             return false;
         }
+
+        offset += ret;
 
         return true;
     }
@@ -58,10 +61,14 @@ namespace amf0
     {
         uint16_t length;
 
-        if (!readInt(buffer, offset, 2, length))
+        uint32_t ret = decodeInt(buffer, offset, 2, length);
+
+        if (ret == 0)
         {
             return false;
         }
+
+        offset += ret;
 
         if (buffer.size() - offset < length)
         {
@@ -135,10 +142,14 @@ namespace amf0
     {
         uint32_t count;
 
-        if (!readInt(buffer, offset, 4, count))
+        uint32_t ret = decodeInt(buffer, offset, 4, count);
+
+        if (ret == 0)
         {
             return false;
         }
+
+        offset += ret;
 
         for (uint32_t i = 0; i < count; ++i)
         {
@@ -166,10 +177,14 @@ namespace amf0
     {
         uint32_t count;
 
-        if (!readInt(buffer, offset, 4, count))
+        uint32_t ret = decodeInt(buffer, offset, 4, count);
+
+        if (ret == 0)
         {
             return false;
         }
+
+        offset += ret;
 
         for (uint32_t i = 0; i < count; ++i)
         {
@@ -188,15 +203,23 @@ namespace amf0
 
     static bool readDate(const std::vector<uint8_t>& buffer, uint32_t& offset, Date& result)
     {
-        if (!readDouble(buffer, offset, result.ms)) // date in milliseconds from 01/01/1970
+        uint32_t ret = decodeDouble(buffer, offset, result.ms);
+
+        if (ret == 0) // date in milliseconds from 01/01/1970
         {
             return false;
         }
 
-        if (!readInt(buffer, offset, 4, result.timezone)) // unsupported timezone
+        offset += ret;
+
+        ret = decodeInt(buffer, offset, 4, result.timezone);
+
+        if (ret == 0) // unsupported timezone
         {
             return false;
         }
+
+        offset += ret;
 
         return true;
     }
@@ -205,10 +228,14 @@ namespace amf0
     {
         uint32_t length;
 
-        if (!readInt(buffer, offset, 4, length))
+        uint32_t ret = decodeInt(buffer, offset, 4, length);
+
+        if (ret == 0)
         {
             return false;
         }
+
+        offset += ret;
 
         if (buffer.size() - offset < length)
         {
@@ -225,10 +252,14 @@ namespace amf0
     {
         uint32_t length;
 
-        if (!readInt(buffer, offset, 4, length))
+        uint32_t ret = decodeInt(buffer, offset, 4, length);
+
+        if (ret == 0)
         {
             return false;
         }
+
+        offset += ret;
 
         if (buffer.size() - offset < length)
         {

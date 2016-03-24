@@ -5,28 +5,10 @@
 #include <iostream>
 #include <cmath>
 #include "RTMP.h"
+#include "Utils.h"
 
 namespace rtmp
 {
-    static uint32_t decodeInt(const std::vector<uint8_t>& data, uint32_t offset, uint32_t size, uint32_t& value)
-    {
-        if (data.size() - offset < size)
-        {
-            return 0;
-        }
-        
-        value = 0;
-        
-        for (uint32_t i = 0; i < size; ++i)
-        {
-            value <<= 1;
-            value += static_cast<uint32_t>(*(data.data() + offset));
-            offset += 1;
-        }
-        
-        return size;
-    }
-    
     uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header)
     {
         uint32_t originalOffset = offset;

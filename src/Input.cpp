@@ -7,6 +7,7 @@
 #include "Input.h"
 #include "Constants.h"
 #include "Amf0.h"
+#include "Utils.h"
 
 Input::Input(Network& network, Socket socket):
     _network(network), _socket(std::move(socket)), _generator(_rd())
@@ -209,13 +210,50 @@ bool Input::handlePacket(const rtmp::Packet& packet)
     {
         case rtmp::MessageType::SET_CHUNK_SIZE:
         {
-            // TODO: set chunk size
+            uint32_t ret = decodeInt(packet.data, 0, 4, _chunkSize);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
             break;
         }
 
         case rtmp::MessageType::PING:
         {
-            // TODO: handle ping
+            uint32_t offset = 0;
+
+            uint16_t pingType;
+            uint32_t ret = decodeInt(packet.data, offset, 2, pingType);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += 2;
+
+            uint16_t param1;
+            ret = decodeInt(packet.data, offset, 2, param1);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += 2;
+
+            uint16_t param2;
+            ret = decodeInt(packet.data, offset, 2, param2);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += 2;
+
             break;
         }
 

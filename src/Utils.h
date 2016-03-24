@@ -13,41 +13,42 @@
 std::string ipToString(uint32_t ip);
 
 template <class T>
-inline bool readInt(const std::vector<uint8_t>& buffer, uint32_t& offset, uint32_t bytes, T& result)
+inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, T& value)
 {
-    if (sizeof(T) < bytes ||
-        buffer.size() - offset < bytes)
+    if (buffer.size() - offset < size)
     {
-        return false;
+        return 0;
     }
 
-    result = 0;
+    value = 0;
 
-    for (uint32_t i = 0; i < bytes; ++i)
+    for (uint32_t i = 0; i < size; ++i)
     {
-        result <<= 1;
-        result += static_cast<uint16_t>(*(buffer.data() + offset));
+        value <<= 1;
+        value += static_cast<T>(*(buffer.data() + offset));
         offset += 1;
     }
 
-    return bytes;
+    return size;
 }
 
-inline bool readDouble(const std::vector<uint8_t>& buffer, uint32_t& offset, double& result)
+inline uint32_t decodeDouble(const std::vector<uint8_t>& buffer, uint32_t offset, double& result)
 {
-    if (buffer.size() - offset < sizeof(double))
+    if (buffer.size() - offset < 8)
     {
-        return false;
+        return 0;
     }
 
-    uint64_t intValue = 0;
+    uint64_t value = 0;
 
-    if (!readInt(buffer, offset, sizeof(double), intValue))
+    for (uint32_t i = 0; i < 8; ++i)
     {
-        return false;
+        value <<= 1;
+        value += static_cast<uint64_t>(*(buffer.data() + offset));
+        offset += 1;
     }
 
     result = *reinterpret_cast<double*>(&result);
 
-    return true;
+    return 8;
 }

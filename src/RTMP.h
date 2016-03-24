@@ -18,7 +18,7 @@ namespace rtmp
         HANDSHAKE_DONE = 4
     };
 
-    enum class HeaderType
+    enum class HeaderType: uint8_t
     {
         TWELVE_BYTE = 0x00, // 00
         EIGHT_BYTE = 0x01, // 01
@@ -26,7 +26,7 @@ namespace rtmp
         ONE_BYTE = 0x03 // 11
     };
 
-    enum class MessageType
+    enum class MessageType: uint8_t
     {
         UNKNOWN = 0x00,
         SET_CHUNK_SIZE = 0x01,
@@ -38,6 +38,16 @@ namespace rtmp
         AMF3_COMMAND = 0x11,
         INVOKE = 0x12, // e.g. onMetaData
         AMF0_COMMAND = 0x14
+    };
+
+    enum class PingType: uint16_t
+    {
+        CLEAR_STREAM = 0,
+        CLEAR_BUFFER = 1,
+        CLIENT_BUFFER_TIME = 3,
+        RESET_STREAM = 4,
+        PING = 5, // from server to client
+        PONG = 6 // from client
     };
     
     struct Header
