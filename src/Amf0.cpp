@@ -133,11 +133,16 @@ namespace amf0
 
             std::cout << "Key: " << key << std::endl;
 
+            if (buffer.size() - offset < 1)
+            {
+                return false;
+            }
+
             Marker marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
 
             if (marker == Marker::ObjectEnd)
             {
-                offset++;
+                offset += 1;
                 std::cout << "Object end" << std::endl;
             }
             else
@@ -145,10 +150,14 @@ namespace amf0
                 Node node;
 
                 std::cout << "Value: " << std::endl;
-                if (!node.parseBuffer(buffer, offset))
+
+                uint32_t ret = node.parseBuffer(buffer, offset);
+
+                if (ret == 0)
                 {
                     return false;
                 }
+                offset += ret;
 
                 result[key] = node;
             }
@@ -337,20 +346,20 @@ namespace amf0
 
         switch (_marker)
         {
-            case Marker::Number: return readNumber(buffer, offset, _doubleValue);
-            case Marker::Boolean: return readBoolean(buffer, offset, _boolValue);
-            case Marker::String: return readString(buffer, offset, _stringValue);
-            case Marker::Object: return readObject(buffer, offset, _mapValue);
-            case Marker::Null: return readNull(buffer, offset);
-            case Marker::Undefined: return readUndefined(buffer, offset);
-            case Marker::ECMAArray: return readECMAArray(buffer, offset, _mapValue);
-            case Marker::ObjectEnd: return 0; // should not happen
-            case Marker::StrictArray: return readStrictArray(buffer, offset, _vectorValue);
-            case Marker::Date: return readDate(buffer, offset, _dateValue);
-            case Marker::LongString: return readLongString(buffer, offset, _stringValue);
-            case Marker::XMLDocument: return readXMLDocument(buffer, offset, _stringValue);
-            case Marker::TypedObject: return readTypedObject(buffer, offset);
-            case Marker::SwitchToAMF3: return readSwitchToAMF3(buffer, offset);
+            case Marker::Number: if (!readNumber(buffer, offset, _doubleValue)) return 0; break;
+            case Marker::Boolean: if (!readBoolean(buffer, offset, _boolValue)) return 0; break;
+            case Marker::String: if (!readString(buffer, offset, _stringValue)) return 0; break;
+            case Marker::Object: if (!readObject(buffer, offset, _mapValue)) return 0; break;
+            case Marker::Null: if (!readNull(buffer, offset)) return 0; break;
+            case Marker::Undefined: if (!readUndefined(buffer, offset)) return 0; break;
+            case Marker::ECMAArray: if (!readECMAArray(buffer, offset, _mapValue)) return 0; break;
+            case Marker::ObjectEnd: break; // should not happen
+            case Marker::StrictArray: if (!readStrictArray(buffer, offset, _vectorValue)) return 0; break;
+            case Marker::Date: if (!readDate(buffer, offset, _dateValue)) return 0; break;
+            case Marker::LongString: if (!readLongString(buffer, offset, _stringValue)) return 0; break;
+            case Marker::XMLDocument: if (!readXMLDocument(buffer, offset, _stringValue)) return 0; break;
+            case Marker::TypedObject: if (!readTypedObject(buffer, offset)) return 0; break;
+            case Marker::SwitchToAMF3: if (!readSwitchToAMF3(buffer, offset)) return 0; break;
             default: return 0;
         }
 

@@ -265,6 +265,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             std::cout << "Command: " << command.asString() << std::endl;
 
+            std::cout << "Offset: " << offset << std::endl;
+            
             amf0::Node streamId;
 
             ret = streamId.parseBuffer(packet.data, offset);
@@ -277,6 +279,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
             std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
+
+            std::cout << "Offset: " << offset << std::endl;
 
             amf0::Node argument;
 
