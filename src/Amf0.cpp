@@ -376,29 +376,13 @@ namespace amf0
         return static_cast<uint32_t>(_vectorValue.size());
     }
 
-    Node Node::operator[](size_t key) const
+    Node& Node::operator[](size_t key)
     {
-        if (key >= _vectorValue.size())
-        {
-            return Node();
-        }
-        else
-        {
-            return _vectorValue[key];
-        }
+        return _vectorValue[key];
     }
 
-    Node Node::operator[](const std::string& key) const
+    Node& Node::operator[](const std::string& key)
     {
-        std::map<std::string, Node>::const_iterator i = _mapValue.find(key);
-
-        if (i == _mapValue.end())
-        {
-            return Node();
-        }
-        else
-        {
-            return i->second;
-        }
+        return _mapValue[key];
     }
 }

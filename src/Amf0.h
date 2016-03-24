@@ -50,8 +50,8 @@ namespace amf0
 
         uint32_t getSize() const;
 
-        Node operator[](size_t key) const;
-        Node operator[](const std::string& key) const;
+        Node& operator[](size_t key);
+        Node& operator[](const std::string& key);
 
     private:
         Marker _marker;
