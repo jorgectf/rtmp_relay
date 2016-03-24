@@ -24,7 +24,9 @@ namespace amf0
         LongString = 0x0c,
         XMLDocument = 0x0f,
         TypedObject = 0x10,
-        SwitchToAMF3 = 0x11
+        SwitchToAMF3 = 0x11,
+
+        Unknown = 0xff
     };
 
     std::string markerToString(Marker marker);
@@ -38,7 +40,13 @@ namespace amf0
     class Node
     {
     public:
-        uint32_t parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
+        Node();
+        Node(Marker marker);
+
+        Marker getMarker() const { return _marker; }
+
+        uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
+        uint32_t encode(std::vector<uint8_t>& buffer);
 
         double asDouble() const;
         bool asBool() const;
@@ -53,8 +61,11 @@ namespace amf0
         Node& operator[](size_t key);
         Node& operator[](const std::string& key);
 
+        bool hasElement(const std::string& key);
+        void append(const Node& node);
+
     private:
-        Marker _marker;
+        Marker _marker = Marker::Unknown;
 
         bool _boolValue = false;
         double _doubleValue = 0.0;

@@ -292,7 +292,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             amf0::Node command;
 
-            uint32_t ret = command.parseBuffer(packet.data, offset);
+            uint32_t ret = command.decode(packet.data, offset);
 
             if (ret == 0)
             {
@@ -305,7 +305,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             
             amf0::Node streamId;
 
-            ret = streamId.parseBuffer(packet.data, offset);
+            ret = streamId.decode(packet.data, offset);
 
             if (ret == 0)
             {
@@ -318,7 +318,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             amf0::Node argument;
 
-            ret = streamId.parseBuffer(packet.data, offset);
+            ret = streamId.decode(packet.data, offset);
 
             if (ret == 0)
             {

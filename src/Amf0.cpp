@@ -120,7 +120,7 @@ namespace amf0
             {
                 Node node;
 
-                ret = node.parseBuffer(buffer, offset);
+                ret = node.decode(buffer, offset);
 
                 if (ret == 0)
                 {
@@ -165,7 +165,7 @@ namespace amf0
 
             Node node;
 
-            if (!node.parseBuffer(buffer, offset))
+            if (!node.decode(buffer, offset))
             {
                 return 0;
             }
@@ -195,7 +195,7 @@ namespace amf0
         {
             Node node;
 
-            if (!node.parseBuffer(buffer, offset))
+            if (!node.decode(buffer, offset))
             {
                 return 0;
             }
@@ -303,7 +303,18 @@ namespace amf0
         return 0;
     }
 
-    uint32_t Node::parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset)
+    Node::Node()
+    {
+
+    }
+
+    Node::Node(Marker marker):
+        _marker(marker)
+    {
+
+    }
+
+    uint32_t Node::decode(const std::vector<uint8_t>& buffer, uint32_t offset)
     {
         uint32_t originalOffset = offset;
 
@@ -339,6 +350,11 @@ namespace amf0
         offset += ret;
 
         return offset - originalOffset;
+    }
+
+    uint32_t Node::encode(std::vector<uint8_t>& buffer)
+    {
+        return 0;
     }
 
     double Node::asDouble() const
@@ -384,5 +400,15 @@ namespace amf0
     Node& Node::operator[](const std::string& key)
     {
         return _mapValue[key];
+    }
+
+    bool Node::hasElement(const std::string& key)
+    {
+        return _mapValue.find(key) != _mapValue.end();
+    }
+
+    void Node::append(const Node& node)
+    {
+        _vectorValue.push_back(node);
     }
 }
