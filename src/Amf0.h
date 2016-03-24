@@ -27,6 +27,8 @@ namespace amf0
         SwitchToAMF3 = 0x11
     };
 
+    std::string markerToString(Marker marker);
+
     struct Date
     {
         double ms = 0.0;

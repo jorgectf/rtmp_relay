@@ -3,13 +3,13 @@
 //
 
 #include <iostream>
-#include <stdint.h>
+#include <cstdint>
 #include "Amf0.h"
 #include "Utils.h"
 
 namespace amf0
 {
-    static std::string markerToString(Marker marker)
+    std::string markerToString(Marker marker)
     {
         switch (marker)
         {
@@ -31,54 +31,12 @@ namespace amf0
         }
     }
 
-    template <class T>
-    static bool readInt(const std::vector<uint8_t>& buffer, uint32_t& offset, uint32_t bytes, T& result)
-    {
-        if (sizeof(T) < bytes ||
-            buffer.size() - offset < bytes)
-        {
-            return false;
-        }
-
-        result = 0;
-
-        for (uint32_t i = 0; i < bytes; ++i)
-        {
-            result <<= 1;
-            result += static_cast<uint16_t>(*(buffer.data() + offset));
-            offset += 1;
-        }
-
-        return bytes;
-    }
-
-    static bool readDouble(const std::vector<uint8_t>& buffer, uint32_t& offset, double& result)
-    {
-        if (buffer.size() - offset < sizeof(double))
-        {
-            return false;
-        }
-
-        uint64_t intValue = 0;
-
-        if (!readInt(buffer, offset, sizeof(double), intValue))
-        {
-            return false;
-        }
-
-        result = *reinterpret_cast<double*>(&result);
-        
-        return true;
-    }
-
     static bool readNumber(const std::vector<uint8_t>& buffer, uint32_t& offset, double& result)
     {
         if (!readDouble(buffer, offset, result))
         {
             return false;
         }
-
-        std::cout << "Number: " << result << std::endl;
 
         return true;
     }
@@ -92,8 +50,6 @@ namespace amf0
 
         result = static_cast<bool>(*(buffer.data() + offset));
         offset += 1;
-
-        std::cout << "Bool: " << result << std::endl;
 
         return true;
     }
@@ -115,8 +71,6 @@ namespace amf0
         result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
         offset += length;
 
-        std::cout << "String: " << result << ", length: " << length << std::endl;
-
         return true;
     }
 
@@ -131,8 +85,6 @@ namespace amf0
                 return false;
             }
 
-            std::cout << "Key: " << key << std::endl;
-
             if (buffer.size() - offset < 1)
             {
                 return false;
@@ -143,13 +95,10 @@ namespace amf0
             if (marker == Marker::ObjectEnd)
             {
                 offset += 1;
-                std::cout << "Object end" << std::endl;
             }
             else
             {
                 Node node;
-
-                std::cout << "Value: " << std::endl;
 
                 uint32_t ret = node.parseBuffer(buffer, offset);
 
@@ -171,8 +120,6 @@ namespace amf0
         UNUSED(buffer);
         UNUSED(offset);
 
-        std::cout << "Null" << std::endl;
-
         return true;
     }
 
@@ -180,8 +127,6 @@ namespace amf0
     {
         UNUSED(buffer);
         UNUSED(offset);
-
-        std::cout << "Undefined" << std::endl;
 
         return true;
     }
@@ -195,8 +140,6 @@ namespace amf0
             return false;
         }
 
-        std::cout << "ECMA array, size: " << count << std::endl;
-
         for (uint32_t i = 0; i < count; ++i)
         {
             std::string key;
@@ -206,11 +149,8 @@ namespace amf0
                 return false;
             }
 
-            std::cout << "Key: " << key << std::endl;
-
             Node node;
 
-            std::cout << "Value: " << std::endl;
             if (!node.parseBuffer(buffer, offset))
             {
                 return false;
@@ -231,13 +171,10 @@ namespace amf0
             return false;
         }
 
-        std::cout << "Strict array, size: " << count << std::endl;
-
         for (uint32_t i = 0; i < count; ++i)
         {
             Node node;
 
-            std::cout << "Value: " << std::endl;
             if (!node.parseBuffer(buffer, offset))
             {
                 return false;
@@ -261,8 +198,6 @@ namespace amf0
             return false;
         }
 
-        std::cout << "Milliseconds: " << result.ms << ", timezone: " << result.timezone << std::endl;
-
         return true;
     }
 
@@ -283,8 +218,6 @@ namespace amf0
         result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
         offset += length;
 
-        std::cout << "String: " << result << ", length: " << length << std::endl;
-
         return true;
     }
 
@@ -304,8 +237,6 @@ namespace amf0
 
         result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
         offset += length;
-
-        std::cout << "XML: " << result << ", length: " << length << std::endl;
 
         return true;
     }
@@ -341,8 +272,6 @@ namespace amf0
 
         _marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
         offset += 1;
-
-        std::cout << "Marker: " << markerToString(_marker) << std::endl;
 
         switch (_marker)
         {

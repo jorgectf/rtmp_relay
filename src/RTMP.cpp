@@ -58,8 +58,6 @@ namespace rtmp
             
             offset += ret;
             
-            std::cout << "Timestamp: " << header.timestamp << std::endl;
-            
             if (header.type != HeaderType::FOUR_BYTE)
             {
                 ret = decodeInt(data, offset, 3, header.length);
@@ -71,8 +69,6 @@ namespace rtmp
                 
                 offset += ret;
                 
-                std::cout << "Length: " << header.length << std::endl;
-                
                 if (data.size() - offset < 1)
                 {
                     return 0;
@@ -81,15 +77,11 @@ namespace rtmp
                 header.messageType = static_cast<MessageType>(*(data.data() + offset));
                 offset += 1;
                 
-                std::cout << "Message type ID: " << static_cast<uint32_t>(header.messageType) << std::endl;
-                
                 if (header.type != HeaderType::EIGHT_BYTE)
                 {
                     // little endian
                     header.messageStreamId = *reinterpret_cast<const uint32_t*>(data.data() + offset);
                     offset += sizeof(header.messageStreamId);
-                    
-                    std::cout << "Message stream ID: " << header.messageStreamId << std::endl;
                 }
             }
         }
@@ -128,8 +120,6 @@ namespace rtmp
             else
             {
                 uint32_t packetSize = (remainingBytes > chunkSize ? chunkSize : remainingBytes);
-                
-                std::cout << "Packet size: " << packetSize << std::endl;
                 
                 packet.data.insert(packet.data.end(), data.begin() + offset, data.begin() + offset + packetSize);
                 
