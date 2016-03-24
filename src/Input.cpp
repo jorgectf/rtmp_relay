@@ -328,10 +328,15 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
             std::cout << "Argument: " << "Object" << std::endl;
+
+            break;
         }
 
         default:
+        {
             std::cerr << "Unhandled message" << std::endl;
+            break;
+        }
     }
 
     return true;

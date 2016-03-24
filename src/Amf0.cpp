@@ -31,70 +31,83 @@ namespace amf0
         }
     }
 
-    static bool readNumber(const std::vector<uint8_t>& buffer, uint32_t& offset, double& result)
+    static uint32_t readNumber(const std::vector<uint8_t>& buffer, uint32_t offset, double& result)
     {
+        uint32_t originalOffset = offset;
+
         uint32_t ret = decodeDouble(buffer, offset, result);
+
         if (ret == 0)
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
 
-        return true;
+        return offset - originalOffset;
     }
 
-    static bool readBoolean(const std::vector<uint8_t>& buffer, uint32_t& offset, bool& result)
+    static uint32_t readBoolean(const std::vector<uint8_t>& buffer, uint32_t offset, bool& result)
     {
+        uint32_t originalOffset = offset;
+
         if (buffer.size() - offset < 1)
         {
-            return false;
+            return 0;
         }
 
         result = static_cast<bool>(*(buffer.data() + offset));
         offset += 1;
 
-        return true;
+        return offset - originalOffset;
     }
 
-    static bool readString(const std::vector<uint8_t>& buffer, uint32_t& offset, std::string& result)
+    static uint32_t readString(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
     {
+        uint32_t originalOffset = offset;
+
         uint16_t length;
 
         uint32_t ret = decodeInt(buffer, offset, 2, length);
 
         if (ret == 0)
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
 
         if (buffer.size() - offset < length)
         {
-            return false;
+            return 0;
         }
 
         result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
         offset += length;
 
-        return true;
+        return offset - originalOffset;
     }
 
-    static bool readObject(const std::vector<uint8_t>& buffer, uint32_t& offset, std::map<std::string, Node>& result)
+    static uint32_t readObject(const std::vector<uint8_t>& buffer, uint32_t offset, std::map<std::string, Node>& result)
     {
+        uint32_t originalOffset = offset;
+
         while (buffer.size() - offset > 0)
         {
             std::string key;
 
-            if (!readString(buffer, offset, key))
+            uint32_t ret = readString(buffer, offset, key);
+
+            if (ret == 0)
             {
-                return false;
+                return 0;
             }
+
+            offset += ret;
 
             if (buffer.size() - offset < 1)
             {
-                return false;
+                return 0;
             }
 
             Marker marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
@@ -107,11 +120,11 @@ namespace amf0
             {
                 Node node;
 
-                uint32_t ret = node.parseBuffer(buffer, offset);
+                ret = node.parseBuffer(buffer, offset);
 
                 if (ret == 0)
                 {
-                    return false;
+                    return 0;
                 }
                 offset += ret;
 
@@ -119,34 +132,20 @@ namespace amf0
             }
         }
 
-        return false;
+        return offset - originalOffset;
     }
 
-    static bool readNull(const std::vector<uint8_t>& buffer, uint32_t& offset)
+    static uint32_t readECMAArray(const std::vector<uint8_t>& buffer, uint32_t offset, std::map<std::string, Node>& result)
     {
-        UNUSED(buffer);
-        UNUSED(offset);
+        uint32_t originalOffset = offset;
 
-        return true;
-    }
-
-    static bool readUndefined(const std::vector<uint8_t>& buffer, uint32_t& offset)
-    {
-        UNUSED(buffer);
-        UNUSED(offset);
-
-        return true;
-    }
-
-    static bool readECMAArray(const std::vector<uint8_t>& buffer, uint32_t& offset, std::map<std::string, Node>& result)
-    {
         uint32_t count;
 
         uint32_t ret = decodeInt(buffer, offset, 4, count);
 
         if (ret == 0)
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
@@ -155,33 +154,39 @@ namespace amf0
         {
             std::string key;
 
-            if (!readString(buffer, offset, key))
+            ret = readString(buffer, offset, key);
+
+            if (ret == 0)
             {
-                return false;
+                return 0;
             }
+
+            offset += ret;
 
             Node node;
 
             if (!node.parseBuffer(buffer, offset))
             {
-                return false;
+                return 0;
             }
 
             result[key] = node;
         }
 
-        return true;
+        return offset - originalOffset;
     }
 
-    static bool readStrictArray(const std::vector<uint8_t>& buffer, uint32_t& offset, std::vector<Node>& result)
+    static uint32_t readStrictArray(const std::vector<uint8_t>& buffer, uint32_t offset, std::vector<Node>& result)
     {
+        uint32_t originalOffset = offset;
+
         uint32_t count;
 
         uint32_t ret = decodeInt(buffer, offset, 4, count);
 
         if (ret == 0)
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
@@ -192,22 +197,24 @@ namespace amf0
 
             if (!node.parseBuffer(buffer, offset))
             {
-                return false;
+                return 0;
             }
 
             result.push_back(node);
         }
 
-        return true;
+        return offset - originalOffset;
     }
 
-    static bool readDate(const std::vector<uint8_t>& buffer, uint32_t& offset, Date& result)
+    static uint32_t readDate(const std::vector<uint8_t>& buffer, uint32_t offset, Date& result)
     {
+        uint32_t originalOffset = offset;
+
         uint32_t ret = decodeDouble(buffer, offset, result.ms);
 
         if (ret == 0) // date in milliseconds from 01/01/1970
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
@@ -216,80 +223,84 @@ namespace amf0
 
         if (ret == 0) // unsupported timezone
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
 
-        return true;
+        return offset - originalOffset;
     }
 
-    static bool readLongString(const std::vector<uint8_t>& buffer, uint32_t& offset, std::string& result)
+    static uint32_t readLongString(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
     {
+        uint32_t originalOffset = offset;
+
         uint32_t length;
 
         uint32_t ret = decodeInt(buffer, offset, 4, length);
 
         if (ret == 0)
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
 
         if (buffer.size() - offset < length)
         {
-            return false;
+            return 0;
         }
 
         result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
         offset += length;
 
-        return true;
+        return offset - originalOffset;
     }
 
-    static bool readXMLDocument(const std::vector<uint8_t>& buffer, uint32_t& offset, std::string& result)
+    static uint32_t readXMLDocument(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
     {
+        uint32_t originalOffset = offset;
+
         uint32_t length;
 
         uint32_t ret = decodeInt(buffer, offset, 4, length);
 
         if (ret == 0)
         {
-            return false;
+            return 0;
         }
 
         offset += ret;
 
         if (buffer.size() - offset < length)
         {
-            return false;
+            return 0;
         }
 
         result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
         offset += length;
 
-        return true;
+        return offset - originalOffset;
     }
     
-    static bool readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
+    static uint32_t readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
     {
         UNUSED(buffer);
         UNUSED(offset);
 
         std::cerr << "Typed objects are not supported" << std::endl;
 
-        return true;
+        return 0;
     }
     
-    static bool readSwitchToAMF3(const std::vector<uint8_t>& buffer, uint32_t& offset)
+    static uint32_t readSwitchToAMF3(const std::vector<uint8_t>& buffer, uint32_t& offset)
     {
         UNUSED(buffer);
         UNUSED(offset);
 
         std::cerr << "AMF3 is not supported" << std::endl;
         
-        return true;
+        return 0;
     }
 
     uint32_t Node::parseBuffer(const std::vector<uint8_t>& buffer, uint32_t offset)
@@ -298,30 +309,34 @@ namespace amf0
 
         if (buffer.size() - offset < 1)
         {
-            return false;
+            return 0;
         }
 
         _marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
         offset += 1;
 
+        uint32_t ret = 0;
+
         switch (_marker)
         {
-            case Marker::Number: if (!readNumber(buffer, offset, _doubleValue)) return 0; break;
-            case Marker::Boolean: if (!readBoolean(buffer, offset, _boolValue)) return 0; break;
-            case Marker::String: if (!readString(buffer, offset, _stringValue)) return 0; break;
-            case Marker::Object: if (!readObject(buffer, offset, _mapValue)) return 0; break;
-            case Marker::Null: if (!readNull(buffer, offset)) return 0; break;
-            case Marker::Undefined: if (!readUndefined(buffer, offset)) return 0; break;
-            case Marker::ECMAArray: if (!readECMAArray(buffer, offset, _mapValue)) return 0; break;
+            case Marker::Number: ret = readNumber(buffer, offset, _doubleValue); break;
+            case Marker::Boolean: ret = readBoolean(buffer, offset, _boolValue); break;
+            case Marker::String: ret = readString(buffer, offset, _stringValue); break;
+            case Marker::Object: ret = readObject(buffer, offset, _mapValue); break;
+            case Marker::Null: /* Null */; break;
+            case Marker::Undefined: /* Undefined */; break;
+            case Marker::ECMAArray: ret = readECMAArray(buffer, offset, _mapValue); break;
             case Marker::ObjectEnd: break; // should not happen
-            case Marker::StrictArray: if (!readStrictArray(buffer, offset, _vectorValue)) return 0; break;
-            case Marker::Date: if (!readDate(buffer, offset, _dateValue)) return 0; break;
-            case Marker::LongString: if (!readLongString(buffer, offset, _stringValue)) return 0; break;
-            case Marker::XMLDocument: if (!readXMLDocument(buffer, offset, _stringValue)) return 0; break;
-            case Marker::TypedObject: if (!readTypedObject(buffer, offset)) return 0; break;
-            case Marker::SwitchToAMF3: if (!readSwitchToAMF3(buffer, offset)) return 0; break;
+            case Marker::StrictArray: ret = readStrictArray(buffer, offset, _vectorValue); break;
+            case Marker::Date: ret = readDate(buffer, offset, _dateValue); break;
+            case Marker::LongString: ret = readLongString(buffer, offset, _stringValue); break;
+            case Marker::XMLDocument: ret = readXMLDocument(buffer, offset, _stringValue); break;
+            case Marker::TypedObject: ret = readTypedObject(buffer, offset); break;
+            case Marker::SwitchToAMF3: ret = readSwitchToAMF3(buffer, offset); break;
             default: return 0;
         }
+
+        offset += ret;
 
         return offset - originalOffset;
     }
