@@ -129,7 +129,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 
                 for (size_t i = 0; i < sizeof(replyChallange.randomBytes); ++i)
                 {
-                    replyChallange.randomBytes[i] = static_cast<uint8_t>(_generator());
+                    replyChallange.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(_generator);
                 }
                 
                 std::vector<uint8_t> reply;
