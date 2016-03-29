@@ -618,9 +618,21 @@ namespace amf0
         return size;
     }
 
+    void Node::setDouble(double value)
+    {
+        _marker = Marker::Number;
+        _doubleValue = value;
+    }
+
     double Node::asDouble() const
     {
         return _doubleValue;
+    }
+
+    void Node::setBool(bool value)
+    {
+        _marker = Marker::Boolean;
+        _boolValue = value;
     }
 
     bool Node::asBool() const
@@ -628,9 +640,30 @@ namespace amf0
         return _boolValue;
     }
 
+    void Node::setString(const std::string& value)
+    {
+        if (value.length() <= UINT16_MAX)
+        {
+            _marker = Marker::String;
+        }
+        else
+        {
+            _marker = Marker::LongString;
+        }
+
+        _stringValue = value;
+    }
+
     const std::string& Node::asString() const
     {
         return _stringValue;
+    }
+
+    void Node::setDate(const Date& value)
+    {
+        _marker = Marker::Date;
+
+        _dateValue = value;
     }
 
     const Date& Node::asDate() const
@@ -638,9 +671,19 @@ namespace amf0
         return _dateValue;
     }
 
+    void Node::setNull()
+    {
+        _marker = Marker::Null;
+    }
+
     bool Node::isNull() const
     {
         return _marker == Marker::Null;
+    }
+
+    void Node::setUndefined()
+    {
+        _marker = Marker::Undefined;
     }
 
     bool Node::isUndefined() const
@@ -653,13 +696,41 @@ namespace amf0
         return static_cast<uint32_t>(_vectorValue.size());
     }
 
+    Node Node::operator[](size_t key) const
+    {
+        if (key >= _vectorValue.size())
+        {
+            return Node();
+        }
+        else
+        {
+            return _vectorValue[key];
+        }
+    }
+
     Node& Node::operator[](size_t key)
     {
+        _marker = Marker::StrictArray;
         return _vectorValue[key];
+    }
+
+    Node Node::operator[](const std::string& key) const
+    {
+        auto i = _mapValue.find(key);
+
+        if (i == _mapValue.end())
+        {
+            return Node();
+        }
+        else
+        {
+            return i->second;
+        }
     }
 
     Node& Node::operator[](const std::string& key)
     {
+        _marker = Marker::Object;
         return _mapValue[key];
     }
 
