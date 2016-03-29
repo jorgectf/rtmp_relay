@@ -69,7 +69,7 @@ void Server::update()
     {
         if (inputIterator->isConnected())
         {
-            (*inputIterator).update();
+            inputIterator->update();
             ++inputIterator;
         }
         else
