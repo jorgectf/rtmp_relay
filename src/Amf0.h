@@ -46,7 +46,7 @@ namespace amf0
         Marker getMarker() const { return _marker; }
 
         uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
-        uint32_t encode(std::vector<uint8_t>& buffer);
+        uint32_t encode(std::vector<uint8_t>& buffer) const;
 
         double asDouble() const;
         bool asBool() const;

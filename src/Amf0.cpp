@@ -31,6 +31,7 @@ namespace amf0
         }
     }
 
+    // reading
     static uint32_t readNumber(const std::vector<uint8_t>& buffer, uint32_t offset, double& result)
     {
         uint32_t originalOffset = offset;
@@ -92,7 +93,7 @@ namespace amf0
     {
         uint32_t originalOffset = offset;
 
-        while (buffer.size() - offset > 0)
+        while (true)
         {
             std::string key;
 
@@ -115,6 +116,7 @@ namespace amf0
             if (marker == Marker::ObjectEnd)
             {
                 offset += 1;
+                break;
             }
             else
             {
@@ -303,6 +305,237 @@ namespace amf0
         return 0;
     }
 
+    // writing
+    static uint32_t writeNumber(std::vector<uint8_t>& buffer, double value)
+    {
+        uint32_t ret = encodeDouble(buffer, value);
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+
+        return ret;
+    }
+
+    static uint32_t writeBoolean(std::vector<uint8_t>& buffer, bool value)
+    {
+        buffer.push_back(static_cast<uint8_t>(value));
+
+        return 1;
+    }
+
+    static uint32_t writeString(std::vector<uint8_t>& buffer, const std::string& value)
+    {
+        uint32_t ret = encodeInt(buffer, 2, value.size());
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+
+        uint32_t size = ret;
+
+        for (char i : value)
+        {
+            buffer.push_back(static_cast<uint8_t>(i));
+            size += 1;
+        }
+
+        return size;
+    }
+
+    static uint32_t writeObject(std::vector<uint8_t>& buffer, const std::map<std::string, Node>& value)
+    {
+        uint32_t size = 0;
+        uint32_t ret;
+
+        for (const auto& i : value)
+        {
+            ret = writeString(buffer, i.first);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+
+            ret = i.second.encode(buffer);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+        }
+
+        ret = writeString(buffer, "");
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+
+        size += ret;
+
+        Marker marker = Marker::ObjectEnd;
+        buffer.push_back(static_cast<uint8_t>(marker));
+
+        size += 1;
+
+        return size;
+    }
+
+    static uint32_t writeECMAArray(std::vector<uint8_t>& buffer, const std::map<std::string, Node>& value)
+    {
+        uint32_t size = 0;
+
+        uint32_t ret = encodeInt(buffer, 4, value.size());
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+
+        size += ret;
+
+        for (const auto& i : value)
+        {
+            ret = writeString(buffer, i.first);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+
+            ret = i.second.encode(buffer);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+        }
+
+        return size;
+    }
+
+    static uint32_t writeStrictArray(std::vector<uint8_t>& buffer, const std::vector<Node>& value)
+    {
+        uint32_t size = 0;
+
+        uint32_t ret = encodeInt(buffer, 4, value.size());
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+
+        size += ret;
+
+        for (const auto& i : value)
+        {
+            ret = i.encode(buffer);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+        }
+
+        return size;
+    }
+
+    static uint32_t writeDate(std::vector<uint8_t>& buffer, const Date& value)
+    {
+        uint32_t size = 0;
+
+        uint32_t ret = encodeDouble(buffer, value.ms);
+
+        if (ret == 0) // date in milliseconds from 01/01/1970
+        {
+            return 0;
+        }
+
+        size += ret;
+
+        ret = encodeInt(buffer, 4, value.timezone);
+
+        if (ret == 0) // unsupported timezone
+        {
+            return 0;
+        }
+
+        size += ret;
+
+        return size;
+    }
+
+    static uint32_t writeLongString(std::vector<uint8_t>& buffer, const std::string& value)
+    {
+        uint32_t ret = encodeInt(buffer, 4, value.size());
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+
+        uint32_t size = ret;
+
+        for (char i : value)
+        {
+            buffer.push_back(static_cast<uint8_t>(i));
+            size += 1;
+        }
+        
+        return size;
+    }
+
+    static uint32_t writeXMLDocument(std::vector<uint8_t>& buffer, const std::string& value)
+    {
+        uint32_t ret = encodeInt(buffer, 4, value.size());
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+
+        uint32_t size = ret;
+
+        for (char i : value)
+        {
+            buffer.push_back(static_cast<uint8_t>(i));
+            size += 1;
+        }
+
+        return size;
+    }
+    
+    static uint32_t writeTypedObject(std::vector<uint8_t>& buffer)
+    {
+        UNUSED(buffer);
+        
+        std::cerr << "Typed objects are not supported" << std::endl;
+        
+        return 0;
+    }
+    
+    static uint32_t writeSwitchToAMF3(std::vector<uint8_t>& buffer)
+    {
+        UNUSED(buffer);
+        
+        std::cerr << "AMF3 is not supported" << std::endl;
+        
+        return 0;
+    }
+
     Node::Node()
     {
 
@@ -352,9 +585,37 @@ namespace amf0
         return offset - originalOffset;
     }
 
-    uint32_t Node::encode(std::vector<uint8_t>& buffer)
+    uint32_t Node::encode(std::vector<uint8_t>& buffer) const
     {
-        return 0;
+        uint32_t size = 0;
+
+        uint32_t ret = 0;
+
+        buffer.push_back(static_cast<uint8_t>(_marker));
+        size += 1;
+
+        switch (_marker)
+        {
+            case Marker::Number: ret = writeNumber(buffer, _doubleValue); break;
+            case Marker::Boolean: ret = writeBoolean(buffer, _boolValue); break;
+            case Marker::String: ret = writeString(buffer, _stringValue); break;
+            case Marker::Object: ret = writeObject(buffer, _mapValue); break;
+            case Marker::Null: /* Null */; break;
+            case Marker::Undefined: /* Undefined */; break;
+            case Marker::ECMAArray: ret = writeECMAArray(buffer, _mapValue); break;
+            case Marker::ObjectEnd: break; // should not happen
+            case Marker::StrictArray: ret = writeStrictArray(buffer, _vectorValue); break;
+            case Marker::Date: ret = writeDate(buffer, _dateValue); break;
+            case Marker::LongString: ret = writeLongString(buffer, _stringValue); break;
+            case Marker::XMLDocument: ret = writeXMLDocument(buffer, _stringValue); break;
+            case Marker::TypedObject: ret = writeTypedObject(buffer); break;
+            case Marker::SwitchToAMF3: ret = writeSwitchToAMF3(buffer); break;
+            default: return 0;
+        }
+
+        size += ret;
+
+        return size;
     }
 
     double Node::asDouble() const
