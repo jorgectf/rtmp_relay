@@ -42,7 +42,7 @@ bool Relay::init(const std::string& config)
     
     const rapidjson::Value& serversArray = document["servers"];
     
-    for (uint32_t serverIndex = 0; serverIndex < static_cast<uint32_t>(serversArray.Size()); ++serverIndex)
+    for (rapidjson::SizeType serverIndex = 0; serverIndex < serversArray.Size(); ++serverIndex)
     {
         const rapidjson::Value& serverObject = serversArray[serverIndex];
         

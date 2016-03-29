@@ -10,6 +10,11 @@ int main(int argc, const char * argv[])
     if (argc < 2)
     {
         std::cerr << "Too few arguments" << std::endl;
+
+        const char* exe = argc >= 1 ? argv[0] : "rtmp_relay";
+        std::cerr << "Usage: " << exe << " <path to config file>" << std::endl;
+
+        return 1;
     }
     
     Relay relay;

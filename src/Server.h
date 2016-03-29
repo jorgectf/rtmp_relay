@@ -16,7 +16,6 @@
 class Server
 {
 public:
-    Server() = default;
     Server(Network& network);
     ~Server();
     

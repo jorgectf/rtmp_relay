@@ -13,7 +13,6 @@ class Socket
 {
     friend Network;
 public:
-    Socket() = delete;
     Socket(Network& network, int socketFd = -1);
     virtual ~Socket();
     

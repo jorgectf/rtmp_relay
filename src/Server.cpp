@@ -45,7 +45,7 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 {
     _socket.startAccept(port);
     
-    for (const std::string address : pushAddresses)
+    for (const std::string& address : pushAddresses)
     {
         Output output(_network);
         
@@ -65,9 +65,9 @@ void Server::update()
         output.update();
     }
     
-    for (std::vector<Input>::iterator inputIterator = _inputs.begin(); inputIterator != _inputs.end();)
+    for (auto inputIterator = _inputs.begin(); inputIterator != _inputs.end();)
     {
-        if ((*inputIterator).isConnected())
+        if (inputIterator->isConnected())
         {
             (*inputIterator).update();
             ++inputIterator;

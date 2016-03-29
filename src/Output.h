@@ -13,7 +13,6 @@
 class Output
 {
 public:
-    Output() = default;
     Output(Network& network);
     ~Output();
     

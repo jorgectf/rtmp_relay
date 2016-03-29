@@ -23,7 +23,7 @@ bool Network::update()
     
     std::map<uint32_t, std::reference_wrapper<Socket>> socketMap;
     
-    for (std::reference_wrapper<Socket> socket : _sockets)
+    for (auto socket : _sockets)
     {
         if (socket.get().isConnecting() || socket.get().isReady())
         {
@@ -35,7 +35,7 @@ bool Network::update()
             
             pollFds.push_back(pollFd);
             
-            socketMap.insert(std::pair<int, std::reference_wrapper<Socket>>(i, socket));
+            socketMap.insert(std::pair<uint32_t, std::reference_wrapper<Socket>>(i, socket));
         }
     }
     
@@ -48,7 +48,7 @@ bool Network::update()
     
     for (uint32_t i = 0; i < pollFds.size(); ++i)
     {
-        std::map<uint32_t, std::reference_wrapper<Socket>>::iterator iter = socketMap.find(i);
+        auto iter = socketMap.find(i);
         
         if (iter != socketMap.end())
         {

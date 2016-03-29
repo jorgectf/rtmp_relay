@@ -12,7 +12,6 @@
 class Input
 {
 public:
-    Input() = default;
     Input(Network& network, Socket socket);
     ~Input();
     
