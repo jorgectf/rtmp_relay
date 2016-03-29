@@ -115,16 +115,6 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    static uint32_t encodeInt(std::vector<uint8_t>& data, uint32_t size, uint32_t value)
-    {
-        for (uint32_t i = 0; i < size; ++i)
-        {
-            data.insert(data.end(), static_cast<uint8_t>(value >> (size - i - 1)));
-        }
-        
-        return size;
-    }
-    
     uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
@@ -171,10 +161,7 @@ namespace rtmp
         const uint32_t packetCount = ((static_cast<uint32_t>(packet.data.size()) + chunkSize - 1) / chunkSize);
         
         data.reserve(12 + packet.data.size() + packetCount);
-        
-        Header oneByteHeader;
-        oneByteHeader.type = HeaderType::ONE_BYTE;
-        
+
         for (uint32_t i = 0; i < packetCount; ++i)
         {
             if (i == 0)
@@ -183,6 +170,8 @@ namespace rtmp
             }
             else
             {
+                Header oneByteHeader;
+                oneByteHeader.type = HeaderType::ONE_BYTE;
                 encodeHeader(data, oneByteHeader);
             }
 
