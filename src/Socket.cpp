@@ -52,7 +52,6 @@ Socket::~Socket()
 Socket::Socket(Socket&& other):
     _network(other._network),
     _socketFd(other._socketFd),
-    _data(std::move(other._data)),
     _connecting(other._connecting),
     _ready(other._ready),
     _blocking(other._blocking),
@@ -69,7 +68,6 @@ Socket::Socket(Socket&& other):
 Socket& Socket::operator=(Socket&& other)
 {
     _socketFd = other._socketFd;
-    _data = std::move(other._data);
     _connecting = other._connecting;
     _ready = other._ready;
     _blocking = other._blocking;
@@ -279,15 +277,13 @@ bool Socket::read()
         
         return false;
     }
-    
-    _data.insert(_data.end(), TEMP_BUFFER, TEMP_BUFFER + size);
+
+    std::vector<uint8_t> data(TEMP_BUFFER, TEMP_BUFFER + size);
     
     if (_readCallback)
     {
-        _readCallback(_data);
+        _readCallback(data);
     }
-    
-    _data.clear();
     
     return true;
 }

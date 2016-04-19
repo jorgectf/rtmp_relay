@@ -50,8 +50,6 @@ protected:
     
     int _socketFd = -1;
     
-    std::vector<uint8_t> _data;
-    
     bool _connecting = false;
     bool _ready = false;
     bool _blocking = true;
