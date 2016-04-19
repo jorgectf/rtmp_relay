@@ -327,7 +327,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
-            std::cout << "Argument: " << "Object" << std::endl;
+            std::cout << "Argument: " << amf0::markerToString(argument.getMarker()) << std::endl;
 
             if (command.asString() == "connect")
             {
@@ -350,8 +350,6 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 replyStatus["objectEncoding"] = static_cast<double>(0);
                 replyStatus.encode(replyData);
 
-
-                std::vector<uint8_t> reply;
                 rtmp::Header replyHeader;
                 replyHeader.type = rtmp::Header::Type::TWELVE_BYTE;
                 replyHeader.messageStreamId = packet.header.messageStreamId;
@@ -363,6 +361,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 replyPacket.header = replyHeader;
                 replyPacket.data = replyData;
 
+                std::vector<uint8_t> reply;
                 encodePacket(reply, _chunkSize, replyPacket);
 
                 _socket.send(reply);
