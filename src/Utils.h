@@ -24,7 +24,7 @@ inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, u
 
     for (uint32_t i = 0; i < size; ++i)
     {
-        result <<= 1;
+        result <<= 8;
         result += static_cast<T>(*(buffer.data() + offset));
         offset += 1;
     }
@@ -43,7 +43,7 @@ inline uint32_t decodeDouble(const std::vector<uint8_t>& buffer, uint32_t offset
 
     for (uint32_t i = 0; i < 8; ++i)
     {
-        value <<= 1;
+        value <<= 8;
         value += static_cast<uint64_t>(*(buffer.data() + offset));
         offset += 1;
     }
@@ -58,7 +58,7 @@ inline uint32_t encodeInt(std::vector<uint8_t>& buffer, uint32_t size, T value)
 {
     for (uint32_t i = 0; i < size; ++i)
     {
-        buffer.push_back(static_cast<uint8_t>(value >> (size - i - 1)));
+        buffer.push_back(static_cast<uint8_t>(value >> 8 * (size - i - 1)));
     }
 
     return size;
@@ -70,7 +70,7 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
 
     for (uint32_t i = 0; i < 8; ++i)
     {
-        buffer.push_back(static_cast<uint8_t>(data >> (7 - i)));
+        buffer.push_back(static_cast<uint8_t>(data >> 8 * (sizeof(value) - i - 1)));
     }
     
     return 8;
