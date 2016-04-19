@@ -120,7 +120,9 @@ namespace rtmp
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
         uint8_t headerData = 0x03;
-        headerData &= (static_cast<uint32_t>(header.type) << 6);
+        headerData |= (static_cast<uint32_t>(header.type) << 6);
+
+        data.push_back(headerData);
         
         if (header.type != Header::Type::ONE_BYTE)
         {
