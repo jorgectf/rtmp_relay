@@ -27,9 +27,9 @@ namespace rtmp
             return 0;
         }
         
-        header.type = static_cast<HeaderType>(headerData >> 6);
+        header.type = static_cast<Header::Type>(headerData >> 6);
         
-        if (header.type != HeaderType::ONE_BYTE)
+        if (header.type != Header::Type::ONE_BYTE)
         {
             uint32_t ret = decodeInt(data, offset, 3, header.timestamp);
             
@@ -40,7 +40,7 @@ namespace rtmp
             
             offset += ret;
             
-            if (header.type != HeaderType::FOUR_BYTE)
+            if (header.type != Header::Type::FOUR_BYTE)
             {
                 ret = decodeInt(data, offset, 3, header.length);
                 
@@ -59,7 +59,7 @@ namespace rtmp
                 header.messageType = static_cast<MessageType>(*(data.data() + offset));
                 offset += 1;
                 
-                if (header.type != HeaderType::EIGHT_BYTE)
+                if (header.type != Header::Type::EIGHT_BYTE)
                 {
                     // little endian
                     header.messageStreamId = *reinterpret_cast<const uint32_t*>(data.data() + offset);
@@ -122,7 +122,7 @@ namespace rtmp
         uint8_t headerData = 0x03;
         headerData &= (static_cast<uint32_t>(header.type) << 6);
         
-        if (header.type != HeaderType::ONE_BYTE)
+        if (header.type != Header::Type::ONE_BYTE)
         {
             uint32_t ret = encodeInt(data, 3, header.timestamp);
             
@@ -131,7 +131,7 @@ namespace rtmp
                 return 0;
             }
             
-            if (header.type != HeaderType::FOUR_BYTE)
+            if (header.type != Header::Type::FOUR_BYTE)
             {
                 ret = encodeInt(data, 3, header.length);
                 
@@ -142,7 +142,7 @@ namespace rtmp
                 
                 data.insert(data.end(), static_cast<uint8_t>(header.messageType));
                 
-                if (header.type != HeaderType::EIGHT_BYTE)
+                if (header.type != Header::Type::EIGHT_BYTE)
                 {
                     // little endian
                     const uint8_t* messageStreamId = reinterpret_cast<const uint8_t*>(&header.messageStreamId);
@@ -160,7 +160,7 @@ namespace rtmp
         
         const uint32_t packetCount = ((static_cast<uint32_t>(packet.data.size()) + chunkSize - 1) / chunkSize);
         
-        data.reserve(12 + packet.data.size() + packetCount);
+        data.reserve(12 + packet.data.size() + packetCount); // 12-byte header + data size + 1-byte header count
 
         for (uint32_t i = 0; i < packetCount; ++i)
         {
@@ -171,7 +171,7 @@ namespace rtmp
             else
             {
                 Header oneByteHeader;
-                oneByteHeader.type = HeaderType::ONE_BYTE;
+                oneByteHeader.type = Header::Type::ONE_BYTE;
                 encodeHeader(data, oneByteHeader);
             }
 

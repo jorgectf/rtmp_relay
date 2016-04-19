@@ -42,6 +42,10 @@ namespace amf0
     public:
         Node();
         Node(Marker marker);
+        Node(double value);
+        Node(bool value);
+        Node(const std::string& value);
+        Node(const Date& value);
 
         Marker getMarker() const { return _marker; }
 

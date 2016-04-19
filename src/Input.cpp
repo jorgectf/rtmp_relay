@@ -318,7 +318,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             amf0::Node argument;
 
-            ret = streamId.decode(packet.data, offset);
+            ret = argument.decode(packet.data, offset);
 
             if (ret == 0)
             {
@@ -329,6 +329,44 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             std::cout << "Argument: " << "Object" << std::endl;
 
+            if (command.asString() == "connect")
+            {
+                std::vector<uint8_t> replyData;
+
+                amf0::Node replyCommand = std::string("_result");
+                replyCommand.encode(replyData);
+
+                streamId.encode(replyData);
+
+                amf0::Node replyFmsVer;
+                replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
+                replyFmsVer["capabilities"] = static_cast<double>(31);
+                replyFmsVer.encode(replyData);
+
+                amf0::Node replyStatus;
+                replyStatus["level"] = std::string("status");
+                replyStatus["code"] = std::string("NetConnection.Connect.Success");
+                replyStatus["description"] = std::string("Connection succeeded");
+                replyStatus["objectEncoding"] = static_cast<double>(0);
+                replyStatus.encode(replyData);
+
+
+                std::vector<uint8_t> reply;
+                rtmp::Header replyHeader;
+                replyHeader.type = rtmp::Header::Type::TWELVE_BYTE;
+                replyHeader.messageStreamId = packet.header.messageStreamId;
+                replyHeader.timestamp = packet.header.timestamp + 1;
+                replyHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
+                replyHeader.length = static_cast<uint32_t>(replyData.size());
+
+                rtmp::Packet replyPacket;
+                replyPacket.header = replyHeader;
+                replyPacket.data = replyData;
+
+                encodePacket(reply, _chunkSize, replyPacket);
+
+                _socket.send(reply);
+            }
             break;
         }
 

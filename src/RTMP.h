@@ -18,14 +18,6 @@ namespace rtmp
         HANDSHAKE_DONE = 4
     };
 
-    enum class HeaderType: uint8_t
-    {
-        TWELVE_BYTE = 0x00, // 00
-        EIGHT_BYTE = 0x01, // 01
-        FOUR_BYTE = 0x02, // 10
-        ONE_BYTE = 0x03 // 11
-    };
-
     enum class MessageType: uint8_t
     {
         UNKNOWN = 0x00,
@@ -52,7 +44,15 @@ namespace rtmp
     
     struct Header
     {
-        HeaderType type;
+        enum class Type: uint8_t
+        {
+            TWELVE_BYTE = 0x00, // 00
+            EIGHT_BYTE = 0x01, // 01
+            FOUR_BYTE = 0x02, // 10
+            ONE_BYTE = 0x03 // 11
+        };
+
+        Type type;
         uint32_t timestamp = 0;
         uint32_t length = 0;
         MessageType messageType = MessageType::UNKNOWN;
