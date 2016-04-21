@@ -9,6 +9,8 @@
 
 namespace amf0
 {
+    static const std::string INDENT = "  ";
+
     std::string markerToString(Marker marker)
     {
         switch (marker)
@@ -770,5 +772,52 @@ namespace amf0
     void Node::append(const Node& node)
     {
         _vectorValue.push_back(node);
+    }
+
+    void Node::dump(const std::string& indent)
+    {
+        std::cout << "Type: " << markerToString(_marker);
+
+        if (_marker == Marker::Object ||
+            _marker == Marker::StrictArray ||
+            _marker == Marker::ECMAArray)
+        {
+            std::cout << ", values: " << std::endl;
+
+            if (_marker == Marker::StrictArray)
+            {
+                for (size_t index = 0; index < _vectorValue.size(); index++)
+                {
+                    std::cout << indent + INDENT << index << ": ";
+                    _vectorValue[index].dump(indent + INDENT);
+                }
+            }
+            else
+            {
+                for (auto i : _mapValue)
+                {
+                    std::cout << indent + INDENT << i.first << ": ";
+                    i.second.dump(indent + INDENT);
+                }
+            }
+        }
+        else
+        {
+            std::cout << ", value: ";
+
+
+            switch (_marker)
+            {
+                case Marker::Number: std::cout << _doubleValue; break;
+                case Marker::Boolean: std::cout << (_boolValue ? "true" : "false"); break;
+                case Marker::String: std::cout << _stringValue; break;
+                case Marker::Date: std::cout << "ms=" <<  _dateValue.ms << "timezone=" <<  _dateValue.timezone; break;
+                case Marker::LongString: std::cout << _stringValue; break;
+                case Marker::XMLDocument: std::cout << _stringValue; break;
+                default:break;
+            }
+
+            std::cout << std::endl;
+        }
     }
 }

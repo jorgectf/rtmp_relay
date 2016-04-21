@@ -81,6 +81,8 @@ namespace amf0
         bool hasElement(const std::string& key);
         void append(const Node& node);
 
+        void dump(const std::string& indent = "");
+
     private:
         Marker _marker = Marker::Unknown;
 

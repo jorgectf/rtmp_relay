@@ -327,7 +327,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
-            std::cout << "Argument: " << amf0::markerToString(argument.getMarker()) << std::endl;
+            std::cout << "Argument: ";
+            argument.dump();
 
             if (command.asString() == "connect")
             {
