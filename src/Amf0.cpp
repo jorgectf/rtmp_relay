@@ -801,10 +801,14 @@ namespace amf0
                 }
             }
         }
-        else
+        else if (_marker == Marker::Number ||
+                 _marker == Marker::Boolean ||
+                 _marker == Marker::String ||
+                 _marker == Marker::Date ||
+                 _marker == Marker::LongString ||
+                 _marker == Marker::XMLDocument)
         {
             std::cout << ", value: ";
-
 
             switch (_marker)
             {
@@ -817,6 +821,10 @@ namespace amf0
                 default:break;
             }
 
+            std::cout << std::endl;
+        }
+        else
+        {
             std::cout << std::endl;
         }
     }
