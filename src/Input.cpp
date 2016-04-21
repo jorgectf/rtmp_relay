@@ -29,11 +29,13 @@ Input::Input(Input&& other):
     _state(other._state),
     _chunkSize(other._chunkSize),
     _generator(std::move(other._generator)),
-    _messageStreamId(other._messageStreamId)
+    _messageStreamId(other._messageStreamId),
+    _timestamp(other._timestamp)
 {
     other._state = rtmp::State::UNINITIALIZED;
     other._chunkSize = 128;
     other._messageStreamId = 0;
+    other._timestamp = 0;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -47,10 +49,12 @@ Input& Input::operator=(Input&& other)
     _chunkSize = other._chunkSize;
     _generator = std::move(other._generator);
     _messageStreamId = other._messageStreamId;
+    _timestamp = other._timestamp;
     
     other._state = rtmp::State::UNINITIALIZED;
     other._chunkSize = 128;
     other._messageStreamId = 0;
+    other._timestamp = 0;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     _socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -210,7 +214,11 @@ void Input::handleClose()
 
 bool Input::handlePacket(const rtmp::Packet& packet)
 {
+    std::cout << "Message Stream ID: " << packet.header.messageStreamId << std::endl;
+    //std::cout << "Message Stream ID: " << packet.header. << std::endl;
+
     _messageStreamId = packet.header.messageStreamId;
+    _timestamp = packet.header.timestamp;
 
     switch (packet.header.messageType)
     {
@@ -343,7 +351,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 amf0::Node resultName = std::string("_result");
                 resultName.encode(resultData);
 
-                streamId.encode(resultData);
+                amf0::Node resultStreamId = static_cast<double>(0);
+                resultStreamId.encode(resultData);
 
                 amf0::Node replyFmsVer;
                 replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
@@ -353,14 +362,14 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 amf0::Node replyStatus;
                 replyStatus["level"] = std::string("status");
                 replyStatus["code"] = std::string("NetConnection.Connect.Success");
-                replyStatus["description"] = std::string("Connection succeeded");
+                replyStatus["description"] = std::string("Connection succeeded.");
                 replyStatus["objectEncoding"] = static_cast<double>(0);
                 replyStatus.encode(resultData);
 
                 rtmp::Header resultHeader;
                 resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-                resultHeader.messageStreamId = packet.header.messageStreamId;
-                resultHeader.timestamp = packet.header.timestamp + 1;
+                resultHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID; //packet.header.messageStreamId;
+                resultHeader.timestamp = packet.header.timestamp;
                 resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
                 resultHeader.length = static_cast<uint32_t>(resultData.size());
 
@@ -372,8 +381,6 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 encodePacket(result, _chunkSize, resultPacket);
 
                 _socket.send(result);
-
-                startPlaying("casino/blackjack/wallclock_test_med");
 
                 /*
                 std::vector<uint8_t> onBWDoneData;
@@ -406,6 +413,11 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
                 _socket.send(onBWDone);
                 */
+            }
+            else if (command.asString() == "publish")
+            {
+                //startPlaying("casino/blackjack/wallclock_test_med");
+                startPlaying("wallclock_test_med");
             }
             break;
         }
@@ -441,24 +453,24 @@ void Input::startPlaying(const std::string filename)
     amf0::Node replyStatus;
     replyStatus["level"] = std::string("status");
     replyStatus["code"] = std::string("NetStream.Play.Start");
-    replyStatus["description"] = filename + " is now playing";
-    replyStatus["details"] = filename;
-    replyStatus["clientid"] = std::string("Lavf");
+    replyStatus["description"] = std::string("Start live");
+    //replyStatus["details"] = filename;
+    //replyStatus["clientid"] = std::string("Lavf");
     replyStatus.encode(statusData);
 
-    rtmp::Header resultHeader;
-    resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    resultHeader.messageStreamId = _messageStreamId;
-    resultHeader.timestamp = 1;
-    resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
-    resultHeader.length = static_cast<uint32_t>(statusData.size());
+    rtmp::Header statusHeader;
+    statusHeader.type = rtmp::Header::Type::TWELVE_BYTE;
+    statusHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+    statusHeader.timestamp = _timestamp;
+    statusHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
+    statusHeader.length = static_cast<uint32_t>(statusData.size());
 
-    rtmp::Packet resultPacket;
-    resultPacket.header = resultHeader;
-    resultPacket.data = statusData;
+    rtmp::Packet statusPacket;
+    statusPacket.header = statusHeader;
+    statusPacket.data = statusData;
 
     std::vector<uint8_t> result;
-    encodePacket(result, _chunkSize, resultPacket);
+    encodePacket(result, _chunkSize, statusPacket);
 
     _socket.send(result);
 }

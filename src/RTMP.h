@@ -9,6 +9,13 @@
 
 namespace rtmp
 {
+    const uint32_t MESSAGE_STREAM_ID = 1;
+
+    const uint32_t CLIENT_STREAM_ID_AMF_INI = 3;
+    const uint32_t CLIENT_STREAM_ID_AMF = 5;
+    const uint32_t CLIENT_STREAM_ID_AUDIO = 6;
+    const uint32_t CLIENT_STREAM_ID_VIDEO = 7;
+
     enum class State
     {
         UNINITIALIZED = 0,
