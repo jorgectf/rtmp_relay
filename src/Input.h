@@ -26,6 +26,8 @@ public:
     bool getPacket(std::vector<uint8_t>& packet);
     
     bool isConnected() const { return _socket.isReady(); }
+
+    void startPlaying(const std::string filename);
     
 protected:
     void handleRead(const std::vector<uint8_t>& data);
@@ -44,4 +46,6 @@ protected:
     
     std::random_device _rd;
     std::mt19937 _generator;
+
+    uint32_t _messageStreamId = 0;
 };
