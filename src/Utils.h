@@ -12,26 +12,6 @@
 
 std::string ipToString(uint32_t ip);
 
-
-template <uint8_t>
-inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, uint8_t& result)
-{
-    if (buffer.size() - offset < size)
-    {
-        return 0;
-    }
-
-    result = 0;
-
-    for (uint32_t i = 0; i < size; ++i)
-    {
-        result += static_cast<uint8_t>(*(buffer.data() + offset));
-        offset += 1;
-    }
-
-    return size;
-}
-
 template <class T>
 inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, T& result)
 {
@@ -47,6 +27,25 @@ inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, u
         result <<= 8;
 
         result += static_cast<T>(*(buffer.data() + offset));
+        offset += 1;
+    }
+
+    return size;
+}
+
+template <>
+inline uint32_t decodeInt<uint8_t>(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, uint8_t& result)
+{
+    if (buffer.size() - offset < size)
+    {
+        return 0;
+    }
+
+    result = 0;
+
+    for (uint32_t i = 0; i < size; ++i)
+    {
+        result += static_cast<uint8_t>(*(buffer.data() + offset));
         offset += 1;
     }
 

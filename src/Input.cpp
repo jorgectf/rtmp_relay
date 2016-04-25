@@ -81,8 +81,10 @@ bool Input::getPacket(std::vector<uint8_t>& packet)
 void Input::handleRead(const std::vector<uint8_t>& data)
 {
     _data.insert(_data.end(), data.begin(), data.end());
-    
+
+#ifdef DEBUG
     std::cout << "Input got " << std::to_string(data.size()) << " bytes" << std::endl;
+#endif
     
     uint32_t offset = 0;
     
@@ -95,7 +97,10 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 // C0
                 uint8_t version = static_cast<uint8_t>(*(_data.data() + offset));
                 offset += sizeof(version);
+
+#ifdef DEBUG
                 std::cout << "Got version " << version << std::endl;
+#endif
                 
                 if (version != 0x03)
                 {
@@ -123,12 +128,14 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 // C1
                 rtmp::Challange* challange = reinterpret_cast<rtmp::Challange*>(_data.data() + offset);
                 offset += sizeof(*challange);
-                
+
+#ifdef DEBUG
                 std::cout << "Got Challange message, time: " << challange->time <<
                     ", version: " << static_cast<uint32_t>(challange->version[0]) << "." <<
                     static_cast<uint32_t>(challange->version[1]) << "." <<
                     static_cast<uint32_t>(challange->version[2]) << "." <<
                     static_cast<uint32_t>(challange->version[3]) << std::endl;
+#endif
                 
                 // S1
                 rtmp::Challange replyChallange;
@@ -172,10 +179,11 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 // C2
                 rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(_data.data() + offset);
                 offset += sizeof(*ack);
-                
+
+#ifdef DEBUG
                 std::cout << "Got Ack message, time: " << ack->time << ", time2: " << ack->time2 << std::endl;
-                
                 std::cout << "Handshake done" << std::endl;
+#endif
                 
                 _state = rtmp::State::HANDSHAKE_DONE;
             }
@@ -214,9 +222,9 @@ void Input::handleClose()
 
 bool Input::handlePacket(const rtmp::Packet& packet)
 {
+#ifdef DEBUG
     std::cout << "Message Type: " << static_cast<uint32_t>(packet.header.messageType) << std::endl;
-    //std::cout << "Message Stream ID: " << packet.header.messageStreamId << std::endl;
-    //std::cout << "Message Stream ID: " << packet.header. << std::endl;
+#endif
 
     _messageStreamId = packet.header.messageStreamId;
     _timestamp = packet.header.timestamp;
@@ -232,7 +240,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 return false;
             }
 
+#ifdef DEBUG
             std::cout << "Chunk size: " << _chunkSize << std::endl;
+#endif
 
             break;
         }
@@ -271,7 +281,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
+#ifdef DEBUG
             std::cout << "Ping type: " << pingType << ", param 1: " << param1 << ", param 2: " << param2 << std::endl;
+#endif
             
             break;
         }
@@ -290,7 +302,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
+#ifdef DEBUG
             std::cout << "Server bandwidth: " << bandwidth << std::endl;
+#endif
             
             break;
         }
@@ -319,7 +333,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
+#ifdef DEBUG
             std::cout << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type) << std::endl;
+#endif
 
             break;
         }
@@ -358,7 +374,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
+#ifdef DEBUG
             std::cout << "Command: " << command.asString() << std::endl;
+#endif
             
             amf0::Node streamId;
 
@@ -371,7 +389,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
+#ifdef DEBUG
             std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
+#endif
 
             amf0::Node argument;
 
@@ -384,8 +404,10 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
+#ifdef DEBUG
             std::cout << "Argument: ";
             argument.dump();
+#endif
 
             if (command.asString() == "connect")
             {
