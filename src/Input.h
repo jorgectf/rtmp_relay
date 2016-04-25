@@ -50,6 +50,5 @@ protected:
     std::random_device _rd;
     std::mt19937 _generator;
 
-    uint32_t _messageStreamId = 0;
     uint32_t _timestamp;
 };

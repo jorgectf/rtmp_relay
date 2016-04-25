@@ -29,12 +29,10 @@ Input::Input(Input&& other):
     _state(other._state),
     _chunkSize(other._chunkSize),
     _generator(std::move(other._generator)),
-    _messageStreamId(other._messageStreamId),
     _timestamp(other._timestamp)
 {
     other._state = rtmp::State::UNINITIALIZED;
     other._chunkSize = 128;
-    other._messageStreamId = 0;
     other._timestamp = 0;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
@@ -48,12 +46,10 @@ Input& Input::operator=(Input&& other)
     _state = other._state;
     _chunkSize = other._chunkSize;
     _generator = std::move(other._generator);
-    _messageStreamId = other._messageStreamId;
     _timestamp = other._timestamp;
     
     other._state = rtmp::State::UNINITIALIZED;
     other._chunkSize = 128;
-    other._messageStreamId = 0;
     other._timestamp = 0;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
@@ -226,7 +222,6 @@ bool Input::handlePacket(const rtmp::Packet& packet)
     std::cout << "Message Type: " << static_cast<uint32_t>(packet.header.messageType) << std::endl;
 #endif
 
-    _messageStreamId = packet.header.messageStreamId;
     _timestamp = packet.header.timestamp;
 
     switch (packet.header.messageType)
@@ -456,7 +451,7 @@ void Input::sendResult()
 
     rtmp::Header resultHeader;
     resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    resultHeader.chunkStreamId = 3;
+    resultHeader.channel = rtmp::Channel::SYSTEM;
     resultHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID; //packet.header.messageStreamId;
     resultHeader.timestamp = _timestamp;
     resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
@@ -533,7 +528,7 @@ void Input::startPlaying(const std::string filename)
 
     rtmp::Header statusHeader;
     statusHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    statusHeader.chunkStreamId = 3;
+    statusHeader.channel = rtmp::Channel::SYSTEM;
     statusHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID;
     statusHeader.timestamp = _timestamp;
     statusHeader.messageType = rtmp::MessageType::AMF0_COMMAND;

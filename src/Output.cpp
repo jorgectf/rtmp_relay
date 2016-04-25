@@ -460,7 +460,7 @@ void Output::sendConnect()
 
     rtmp::Header resultHeader;
     resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    resultHeader.chunkStreamId = 3;
+    resultHeader.channel = rtmp::Channel::SYSTEM;
     resultHeader.messageStreamId = 0;
     resultHeader.timestamp = 0; //packet.header.timestamp;
     resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;

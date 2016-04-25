@@ -21,10 +21,10 @@ namespace rtmp
         uint8_t headerData = *(data.data() + offset);
         offset += 1;
 
-        header.chunkStreamId = (headerData & 0x3F);
+        header.channel = static_cast<Channel>(headerData & 0x3F);
 
 #ifdef DEBUG
-        std::cout << "Chunk stream ID: " << static_cast<uint32_t>(header.chunkStreamId) << std::endl;
+        std::cout << "Chunk stream ID: " << static_cast<uint32_t>(header.channel) << std::endl;
 #endif
 
         header.type = static_cast<Header::Type>(headerData >> 6);
@@ -135,7 +135,7 @@ namespace rtmp
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
-        uint8_t headerData = header.chunkStreamId;
+        uint8_t headerData = static_cast<uint8_t>(header.channel);
         headerData |= (static_cast<uint32_t>(header.type) << 6);
 
         data.push_back(headerData);
@@ -190,7 +190,7 @@ namespace rtmp
             {
                 Header oneByteHeader;
                 oneByteHeader.type = Header::Type::ONE_BYTE;
-                oneByteHeader.chunkStreamId = packet.header.chunkStreamId;
+                oneByteHeader.channel = packet.header.channel;
                 encodeHeader(data, oneByteHeader);
             }
 

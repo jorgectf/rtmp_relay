@@ -16,6 +16,15 @@ namespace rtmp
     const uint32_t CLIENT_STREAM_ID_AUDIO = 6;
     const uint32_t CLIENT_STREAM_ID_VIDEO = 7;
 
+    enum class Channel
+    {
+        NETWORK = 2,   ///< channel for network-related messages (bandwidth report, ping, etc)
+        SYSTEM = 3,    ///< channel for sending server control messages
+        AUDIO = 4,     ///< channel for audio data
+        VIDEO   = 6,   ///< channel for video data
+        SOURCE  = 8,   ///< channel for a/v invokes
+    };
+
     enum class State
     {
         UNINITIALIZED = 0,
@@ -60,7 +69,7 @@ namespace rtmp
         };
 
         Type type;
-        uint8_t chunkStreamId;
+        Channel channel;
         uint32_t timestamp = 0;
         uint32_t length = 0;
         MessageType messageType = MessageType::UNKNOWN;
