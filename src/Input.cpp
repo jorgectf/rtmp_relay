@@ -430,37 +430,33 @@ void Input::sendPing()
 
 void Input::sendResult()
 {
-    std::vector<uint8_t> resultData;
+    rtmp::Packet resultPacket;
+
+    resultPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    resultPacket.header.channel = rtmp::Channel::SYSTEM;
+    resultPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID; //packet.header.messageStreamId;
+    resultPacket.header.timestamp = _timestamp;
+    resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
     amf0::Node resultName = std::string("_result");
-    resultName.encode(resultData);
+    resultName.encode(resultPacket.data);
 
     amf0::Node resultStreamId = static_cast<double>(0);
-    resultStreamId.encode(resultData);
+    resultStreamId.encode(resultPacket.data);
 
     amf0::Node replyFmsVer;
     replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
     replyFmsVer["capabilities"] = static_cast<double>(31);
-    replyFmsVer.encode(resultData);
+    replyFmsVer.encode(resultPacket.data);
 
     amf0::Node replyStatus;
     replyStatus["level"] = std::string("status");
     replyStatus["code"] = std::string("NetConnection.Connect.Success");
     replyStatus["description"] = std::string("Connection succeeded.");
     replyStatus["objectEncoding"] = static_cast<double>(0);
-    replyStatus.encode(resultData);
+    replyStatus.encode(resultPacket.data);
 
-    rtmp::Header resultHeader;
-    resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    resultHeader.channel = rtmp::Channel::SYSTEM;
-    resultHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID; //packet.header.messageStreamId;
-    resultHeader.timestamp = _timestamp;
-    resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
-    resultHeader.length = static_cast<uint32_t>(resultData.size());
-
-    rtmp::Packet resultPacket;
-    resultPacket.header = resultHeader;
-    resultPacket.data = resultData;
+    resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
     std::vector<uint8_t> result;
     encodePacket(result, _chunkSize, resultPacket);
@@ -470,30 +466,26 @@ void Input::sendResult()
 
 void Input::sendBWDone()
 {
-    std::vector<uint8_t> onBWDoneData;
+    rtmp::Packet onBWDonePacket;
+
+    onBWDonePacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    onBWDonePacket.header.messageStreamId = 0;
+    onBWDonePacket.header.timestamp = _timestamp;
+    onBWDonePacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
     amf0::Node onBWDoneName = std::string("onBWDone");
-    onBWDoneName.encode(onBWDoneData);
+    onBWDoneName.encode(onBWDonePacket.data);
 
     amf0::Node arg1 = static_cast<double>(0);
-    arg1.encode(onBWDoneData);
+    arg1.encode(onBWDonePacket.data);
 
     amf0::Node arg2(amf0::Marker::Null);
-    arg2.encode(onBWDoneData);
+    arg2.encode(onBWDonePacket.data);
 
     amf0::Node arg3 = static_cast<double>(8192);
-    arg3.encode(onBWDoneData);
+    arg3.encode(onBWDonePacket.data);
 
-    rtmp::Header onBWDoneHeader;
-    onBWDoneHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    onBWDoneHeader.messageStreamId = 0;
-    onBWDoneHeader.timestamp = _timestamp;
-    onBWDoneHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
-    onBWDoneHeader.length = static_cast<uint32_t>(onBWDoneData.size());
-
-    rtmp::Packet onBWDonePacket;
-    onBWDonePacket.header = onBWDoneHeader;
-    onBWDonePacket.data = onBWDoneData;
+    onBWDonePacket.header.length = static_cast<uint32_t>(onBWDonePacket.data.size());
 
     std::vector<uint8_t> onBWDone;
     encodePacket(onBWDone, _chunkSize, onBWDonePacket);
@@ -503,21 +495,27 @@ void Input::sendBWDone()
 
 void Input::startPlaying(const std::string filename)
 {
-    std::vector<uint8_t> statusData;
+    rtmp::Packet statusPacket;
+
+    statusPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    statusPacket.header.channel = rtmp::Channel::SYSTEM;
+    statusPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+    statusPacket.header.timestamp = _timestamp;
+    statusPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
     amf0::Node commandName = std::string("onStatus");
-    commandName.encode(statusData);
+    commandName.encode(statusPacket.data);
 
     amf0::Node zeroNode = static_cast<double>(0);
-    zeroNode.encode(statusData);
+    zeroNode.encode(statusPacket.data);
 
     amf0::Node nullNode(amf0::Marker::Null);
-    nullNode.encode(statusData);
+    nullNode.encode(statusPacket.data);
 
     amf0::Node replyFmsVer;
-    replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
     replyFmsVer["capabilities"] = static_cast<double>(31);
-    replyFmsVer.encode(statusData);
+    replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
+    replyFmsVer.encode(statusPacket.data);
 
     amf0::Node replyStatus;
     replyStatus["level"] = std::string("status");
@@ -525,19 +523,9 @@ void Input::startPlaying(const std::string filename)
     replyStatus["description"] = std::string("Start live");
     //replyStatus["details"] = filename;
     //replyStatus["clientid"] = std::string("Lavf");
-    replyStatus.encode(statusData);
+    replyStatus.encode(statusPacket.data);
 
-    rtmp::Header statusHeader;
-    statusHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    statusHeader.channel = rtmp::Channel::SYSTEM;
-    statusHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID;
-    statusHeader.timestamp = _timestamp;
-    statusHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
-    statusHeader.length = static_cast<uint32_t>(statusData.size());
-
-    rtmp::Packet statusPacket;
-    statusPacket.header = statusHeader;
-    statusPacket.data = statusData;
+    statusPacket.header.length = static_cast<uint32_t>(statusPacket.data.size());
 
     std::vector<uint8_t> result;
     encodePacket(result, _chunkSize, statusPacket);

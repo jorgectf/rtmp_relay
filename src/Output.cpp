@@ -432,32 +432,28 @@ bool Output::handlePacket(const rtmp::Packet& packet)
 
 void Output::sendConnect()
 {
-    std::vector<uint8_t> commandData;
+    rtmp::Packet resultPacket;
+
+    resultPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    resultPacket.header.channel = rtmp::Channel::SYSTEM;
+    resultPacket.header.messageStreamId = 0;
+    resultPacket.header.timestamp = 0; //packet.header.timestamp;
+    resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
     amf0::Node commandName = std::string("connect");
-    commandName.encode(commandData);
+    commandName.encode(resultPacket.data);
 
     amf0::Node resultStreamId = static_cast<double>(0);
-    resultStreamId.encode(commandData);
+    resultStreamId.encode(resultPacket.data);
 
     amf0::Node replyStatus;
     replyStatus["app"] = std::string("casino/blackjack");
     replyStatus["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
     replyStatus["tcUrl"] = std::string("rtmp://127.0.0.1:2200/casino/blackjack");
     replyStatus["type"] = std::string("nonprivate");
-    replyStatus.encode(commandData);
+    replyStatus.encode(resultPacket.data);
 
-    rtmp::Header resultHeader;
-    resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
-    resultHeader.channel = rtmp::Channel::SYSTEM;
-    resultHeader.messageStreamId = 0;
-    resultHeader.timestamp = 0; //packet.header.timestamp;
-    resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
-    resultHeader.length = static_cast<uint32_t>(commandData.size());
-
-    rtmp::Packet resultPacket;
-    resultPacket.header = resultHeader;
-    resultPacket.data = commandData;
+    resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
     std::vector<uint8_t> result;
     encodePacket(result, _chunkSize, resultPacket);
