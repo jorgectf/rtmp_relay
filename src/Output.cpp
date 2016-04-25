@@ -261,7 +261,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
                 return false;
             }
 
-            offset += 2;
+            offset += ret;
 
             uint16_t param1;
             ret = decodeInt(packet.data, offset, 2, param1);
@@ -271,7 +271,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
                 return false;
             }
 
-            offset += 2;
+            offset += ret;
 
             uint16_t param2;
             ret = decodeInt(packet.data, offset, 2, param2);
@@ -281,7 +281,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
                 return false;
             }
 
-            offset += 2;
+            offset += ret;
 
             std::cout << "Ping type: " << pingType << ", param 1: " << param1 << ", param 2: " << param2 << std::endl;
 
@@ -290,11 +290,49 @@ bool Output::handlePacket(const rtmp::Packet& packet)
 
         case rtmp::MessageType::SERVER_BANDWIDTH:
         {
+            uint32_t offset = 0;
+
+            uint32_t bandwidth;
+            uint32_t ret = decodeInt(packet.data, offset, 4, bandwidth);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            std::cout << "Server bandwidth: " << bandwidth << std::endl;
+
             break;
         }
 
         case rtmp::MessageType::CLIENT_BANDWIDTH:
         {
+            uint32_t offset = 0;
+
+            uint32_t bandwidth;
+            uint32_t ret = decodeInt(packet.data, offset, 4, bandwidth);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            uint8_t type;
+            ret = decodeInt(packet.data, offset, 1, type);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+            
+            std::cout << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type) << std::endl;
+            
             break;
         }
 

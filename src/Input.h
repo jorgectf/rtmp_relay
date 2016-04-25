@@ -26,14 +26,17 @@ public:
     bool getPacket(std::vector<uint8_t>& packet);
     
     bool isConnected() const { return _socket.isReady(); }
-
-    void startPlaying(const std::string filename);
     
 protected:
     void handleRead(const std::vector<uint8_t>& data);
     void handleClose();
 
     bool handlePacket(const rtmp::Packet& packet);
+
+    void sendPing();
+    void sendResult();
+    void sendBWDone();
+    void startPlaying(const std::string filename);
     
     Network& _network;
     Socket _socket;
