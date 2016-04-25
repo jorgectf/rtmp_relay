@@ -214,7 +214,8 @@ void Input::handleClose()
 
 bool Input::handlePacket(const rtmp::Packet& packet)
 {
-    std::cout << "Message Stream ID: " << packet.header.messageStreamId << std::endl;
+    std::cout << "Message Type: " << static_cast<uint32_t>(packet.header.messageType) << std::endl;
+    //std::cout << "Message Stream ID: " << packet.header.messageStreamId << std::endl;
     //std::cout << "Message Stream ID: " << packet.header. << std::endl;
 
     _messageStreamId = packet.header.messageStreamId;
@@ -230,6 +231,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             {
                 return false;
             }
+
+            std::cout << "Chunk size: " << _chunkSize << std::endl;
 
             break;
         }
@@ -268,6 +271,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += 2;
 
+            std::cout << "Ping type: " << pingType << ", param 1: " << param1 << ", param 2: " << param2 << std::endl;
+            
             break;
         }
 

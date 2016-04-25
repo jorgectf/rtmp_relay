@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include "RTMP.h"
 #include "Amf0.h"
+#include "Utils.h"
 
 Output::Output(Network& network):
     _network(network), _socket(_network), _generator(_rd())
@@ -209,6 +210,8 @@ void Output::handleRead(const std::vector<uint8_t>& data)
             if (ret > 0)
             {
                 offset += ret;
+
+                handlePacket(packet);
             }
             else
             {
@@ -223,6 +226,158 @@ void Output::handleRead(const std::vector<uint8_t>& data)
 void Output::handleClose()
 {
     
+}
+
+bool Output::handlePacket(const rtmp::Packet& packet)
+{
+    std::cout << "Message Type: " << static_cast<uint32_t>(packet.header.messageType) << std::endl;
+    //std::cout << "Message Stream ID: " << packet.header.messageStreamId << std::endl;
+
+    switch (packet.header.messageType)
+    {
+        case rtmp::MessageType::SET_CHUNK_SIZE:
+        {
+            uint32_t ret = decodeInt(packet.data, 0, 4, _chunkSize);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            std::cout << "Chunk size: " << _chunkSize << std::endl;
+
+            break;
+        }
+
+        case rtmp::MessageType::PING:
+        {
+            uint32_t offset = 0;
+
+            uint16_t pingType;
+            uint32_t ret = decodeInt(packet.data, offset, 2, pingType);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += 2;
+
+            uint16_t param1;
+            ret = decodeInt(packet.data, offset, 2, param1);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += 2;
+
+            uint16_t param2;
+            ret = decodeInt(packet.data, offset, 2, param2);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += 2;
+
+            std::cout << "Ping type: " << pingType << ", param 1: " << param1 << ", param 2: " << param2 << std::endl;
+
+            break;
+        }
+
+        case rtmp::MessageType::SERVER_BANDWIDTH:
+        {
+            break;
+        }
+
+        case rtmp::MessageType::CLIENT_BANDWIDTH:
+        {
+            break;
+        }
+
+        case rtmp::MessageType::AUDIO_PACKET:
+        {
+            // TODO: forward audio packet
+            break;
+        }
+
+        case rtmp::MessageType::VIDEO_PACKET:
+        {
+            // TODO: forward video packet
+            break;
+        }
+
+        case rtmp::MessageType::AMF3_COMMAND:
+        {
+            std::cerr << "AMF3 commands are not supported" << std::endl;
+            break;
+        }
+
+        case rtmp::MessageType::INVOKE:
+        case rtmp::MessageType::AMF0_COMMAND:
+        {
+            uint32_t offset = 0;
+
+            amf0::Node command;
+
+            uint32_t ret = command.decode(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            std::cout << "Command: " << command.asString() << std::endl;
+
+            amf0::Node streamId;
+
+            ret = streamId.decode(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
+
+            amf0::Node argument;
+
+            ret = argument.decode(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+            std::cout << "Argument: ";
+            argument.dump();
+
+            if (command.asString() == "connect")
+            {
+            }
+            else if (command.asString() == "publish")
+            {
+            }
+            break;
+        }
+            
+        default:
+        {
+            std::cerr << "Unhandled message" << std::endl;
+            break;
+        }
+    }
+
+    return true;
 }
 
 void Output::sendConnect()
