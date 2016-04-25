@@ -20,12 +20,8 @@ namespace rtmp
         
         uint8_t headerData = *(data.data() + offset);
         offset += 1;
-        
-        if ((headerData & 0x3F) != 0x03)
-        {
-            std::cerr << "Wrong header version" << std::endl;
-            return 0;
-        }
+
+        header.chunkStreamId = (headerData & 0x3F);
         
         header.type = static_cast<Header::Type>(headerData >> 6);
         
@@ -119,7 +115,7 @@ namespace rtmp
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
-        uint8_t headerData = 0x03;
+        uint8_t headerData = header.chunkStreamId;
         headerData |= (static_cast<uint32_t>(header.type) << 6);
 
         data.push_back(headerData);
@@ -174,6 +170,7 @@ namespace rtmp
             {
                 Header oneByteHeader;
                 oneByteHeader.type = Header::Type::ONE_BYTE;
+                oneByteHeader.chunkStreamId = packet.header.chunkStreamId;
                 encodeHeader(data, oneByteHeader);
             }
 

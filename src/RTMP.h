@@ -60,6 +60,7 @@ namespace rtmp
         };
 
         Type type;
+        uint8_t chunkStreamId;
         uint32_t timestamp = 0;
         uint32_t length = 0;
         MessageType messageType = MessageType::UNKNOWN;

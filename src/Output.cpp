@@ -8,6 +8,7 @@
 #include "Output.h"
 #include "Constants.h"
 #include "RTMP.h"
+#include "Amf0.h"
 
 Output::Output(Network& network):
     _network(network), _socket(_network), _generator(_rd())
@@ -81,7 +82,7 @@ void Output::update()
 
 void Output::handleConnect()
 {
-    std::cout << "Connected" << std::endl;
+    std::cout << "Output connected" << std::endl;
 
     std::vector<uint8_t> version;
     version.push_back(RTMP_VERSION);
@@ -191,6 +192,8 @@ void Output::handleRead(const std::vector<uint8_t>& data)
                 std::cout << "Handshake done" << std::endl;
                 
                 _state = rtmp::State::HANDSHAKE_DONE;
+
+                sendConnect();
             }
             else
             {
@@ -199,10 +202,9 @@ void Output::handleRead(const std::vector<uint8_t>& data)
         }
         else if (_state == rtmp::State::HANDSHAKE_DONE)
         {
-            // TODO: receive subscribe
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::decodePacket(data, offset, _chunkSize, packet);
+            uint32_t ret = rtmp::decodePacket(_data, offset, _chunkSize, packet);
             
             if (ret > 0)
             {
@@ -221,4 +223,39 @@ void Output::handleRead(const std::vector<uint8_t>& data)
 void Output::handleClose()
 {
     
+}
+
+void Output::sendConnect()
+{
+    std::vector<uint8_t> commandData;
+
+    amf0::Node commandName = std::string("connect");
+    commandName.encode(commandData);
+
+    amf0::Node resultStreamId = static_cast<double>(0);
+    resultStreamId.encode(commandData);
+
+    amf0::Node replyStatus;
+    replyStatus["app"] = std::string("casino/blackjack");
+    replyStatus["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
+    replyStatus["tcUrl"] = std::string("rtmp://127.0.0.1:2200/casino/blackjack");
+    replyStatus["type"] = std::string("nonprivate");
+    replyStatus.encode(commandData);
+
+    rtmp::Header resultHeader;
+    resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
+    resultHeader.chunkStreamId = 3;
+    resultHeader.messageStreamId = 0;
+    resultHeader.timestamp = 0; //packet.header.timestamp;
+    resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
+    resultHeader.length = static_cast<uint32_t>(commandData.size());
+
+    rtmp::Packet resultPacket;
+    resultPacket.header = resultHeader;
+    resultPacket.data = commandData;
+
+    std::vector<uint8_t> result;
+    encodePacket(result, _chunkSize, resultPacket);
+
+    _socket.send(result);
 }

@@ -278,8 +278,10 @@ bool Socket::read()
         return false;
     }
 
+    std::cout << "Socket received " << size << " bytes" << std::endl;
+
     std::vector<uint8_t> data(TEMP_BUFFER, TEMP_BUFFER + size);
-    
+
     if (_readCallback)
     {
         _readCallback(data);

@@ -368,6 +368,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
                 rtmp::Header resultHeader;
                 resultHeader.type = rtmp::Header::Type::TWELVE_BYTE;
+                resultHeader.chunkStreamId = 3;
                 resultHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID; //packet.header.messageStreamId;
                 resultHeader.timestamp = packet.header.timestamp;
                 resultHeader.messageType = rtmp::MessageType::AMF0_COMMAND;
@@ -460,6 +461,7 @@ void Input::startPlaying(const std::string filename)
 
     rtmp::Header statusHeader;
     statusHeader.type = rtmp::Header::Type::TWELVE_BYTE;
+    statusHeader.chunkStreamId = 3;
     statusHeader.messageStreamId = rtmp::MESSAGE_STREAM_ID;
     statusHeader.timestamp = _timestamp;
     statusHeader.messageType = rtmp::MessageType::AMF0_COMMAND;

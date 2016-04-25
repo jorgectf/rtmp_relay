@@ -31,6 +31,8 @@ public:
 private:
     void handleRead(const std::vector<uint8_t>& data);
     void handleClose();
+
+    void sendConnect();
     
     Network& _network;
     Socket _socket;
