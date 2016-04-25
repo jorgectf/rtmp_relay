@@ -93,6 +93,27 @@ namespace rtmp
                 
                 header.messageType = static_cast<MessageType>(*(data.data() + offset));
                 offset += 1;
+
+#ifdef DEBUG
+                std::cout << ", message Type: ";
+
+                switch (header.messageType)
+                {
+                    case rtmp::MessageType::UNKNOWN: std::cout << "UNKNOWN"; break;
+                    case rtmp::MessageType::SET_CHUNK_SIZE: std::cout << "SET_CHUNK_SIZE"; break;
+                    case rtmp::MessageType::PING: std::cout << "PING"; break;
+                    case rtmp::MessageType::SERVER_BANDWIDTH: std::cout << "SERVER_BANDWIDTH"; break;
+                    case rtmp::MessageType::CLIENT_BANDWIDTH: std::cout << "CLIENT_BANDWIDTH"; break;
+                    case rtmp::MessageType::AUDIO_PACKET: std::cout << "AUDIO_PACKET"; break;
+                    case rtmp::MessageType::VIDEO_PACKET: std::cout << "VIDEO_PACKET"; break;
+                    case rtmp::MessageType::AMF3_COMMAND: std::cout << "AMF3_COMMAND"; break;
+                    case rtmp::MessageType::INVOKE: std::cout << "INVOKE"; break;
+                    case rtmp::MessageType::AMF0_COMMAND: std::cout << "AMF0_COMMAND"; break;
+                    default: std::cout << "unknown command";
+                };
+                
+                std::cout << "(" << static_cast<uint32_t>(header.messageType) << ")";
+#endif
                 
                 if (header.type != Header::Type::EIGHT_BYTE)
                 {

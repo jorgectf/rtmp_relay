@@ -238,27 +238,6 @@ void Output::handleClose()
 
 bool Output::handlePacket(const rtmp::Packet& packet)
 {
-#ifdef DEBUG
-    std::cout << "Message Type: ";
-
-    switch (packet.header.messageType)
-    {
-        case rtmp::MessageType::UNKNOWN: std::cout << "UNKNOWN"; break;
-        case rtmp::MessageType::SET_CHUNK_SIZE: std::cout << "SET_CHUNK_SIZE"; break;
-        case rtmp::MessageType::PING: std::cout << "PING"; break;
-        case rtmp::MessageType::SERVER_BANDWIDTH: std::cout << "SERVER_BANDWIDTH"; break;
-        case rtmp::MessageType::CLIENT_BANDWIDTH: std::cout << "CLIENT_BANDWIDTH"; break;
-        case rtmp::MessageType::AUDIO_PACKET: std::cout << "AUDIO_PACKET"; break;
-        case rtmp::MessageType::VIDEO_PACKET: std::cout << "VIDEO_PACKET"; break;
-        case rtmp::MessageType::AMF3_COMMAND: std::cout << "AMF3_COMMAND"; break;
-        case rtmp::MessageType::INVOKE: std::cout << "INVOKE"; break;
-        case rtmp::MessageType::AMF0_COMMAND: std::cout << "AMF0_COMMAND"; break;
-        default: std::cout << "unknown command";
-    };
-
-    std::cout << "(" << static_cast<uint32_t>(packet.header.messageType) << ")" << std::endl;
-#endif
-
     switch (packet.header.messageType)
     {
         case rtmp::MessageType::SET_CHUNK_SIZE:
@@ -412,9 +391,9 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
 #endif
 
-            amf0::Node argument;
+            amf0::Node argument1;
 
-            ret = argument.decode(packet.data, offset);
+            ret = argument1.decode(packet.data, offset);
 
             if (ret == 0)
             {
@@ -424,9 +403,26 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Argument: ";
-            argument.dump();
+            std::cout << "Argument 1: ";
+            argument1.dump();
 #endif
+
+            amf0::Node argument2;
+
+            ret = argument2.decode(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+
+#ifdef DEBUG
+            std::cout << "Argument 2: ";
+            argument2.dump();
+#endif
+
 
             if (command.asString() == "connect")
             {
@@ -472,8 +468,8 @@ void Output::sendConnect()
 
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
-    std::vector<uint8_t> result;
-    encodePacket(result, _chunkSize, resultPacket);
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, resultPacket);
 
-    _socket.send(result);
+    _socket.send(buffer);
 }

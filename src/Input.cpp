@@ -218,27 +218,6 @@ void Input::handleClose()
 
 bool Input::handlePacket(const rtmp::Packet& packet)
 {
-#ifdef DEBUG
-    std::cout << "Message Type: ";
-
-    switch (packet.header.messageType)
-    {
-        case rtmp::MessageType::UNKNOWN: std::cout << "UNKNOWN"; break;
-        case rtmp::MessageType::SET_CHUNK_SIZE: std::cout << "SET_CHUNK_SIZE"; break;
-        case rtmp::MessageType::PING: std::cout << "PING"; break;
-        case rtmp::MessageType::SERVER_BANDWIDTH: std::cout << "SERVER_BANDWIDTH"; break;
-        case rtmp::MessageType::CLIENT_BANDWIDTH: std::cout << "CLIENT_BANDWIDTH"; break;
-        case rtmp::MessageType::AUDIO_PACKET: std::cout << "AUDIO_PACKET"; break;
-        case rtmp::MessageType::VIDEO_PACKET: std::cout << "VIDEO_PACKET"; break;
-        case rtmp::MessageType::AMF3_COMMAND: std::cout << "AMF3_COMMAND"; break;
-        case rtmp::MessageType::INVOKE: std::cout << "INVOKE"; break;
-        case rtmp::MessageType::AMF0_COMMAND: std::cout << "AMF0_COMMAND"; break;
-        default: std::cout << "unknown command";
-    };
-
-    std::cout << "(" << static_cast<uint32_t>(packet.header.messageType) << ")" << std::endl;
-#endif
-
     _timestamp = packet.header.timestamp;
 
     switch (packet.header.messageType)
@@ -394,9 +373,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
 #endif
 
-            amf0::Node argument;
+            amf0::Node argument1;
 
-            ret = argument.decode(packet.data, offset);
+            ret = argument1.decode(packet.data, offset);
 
             if (ret == 0)
             {
@@ -406,8 +385,24 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Argument: ";
-            argument.dump();
+            std::cout << "Argument 1: ";
+            argument1.dump();
+#endif
+
+            amf0::Node argument2;
+
+            ret = argument2.decode(packet.data, offset);
+
+            if (ret == 0)
+            {
+                return false;
+            }
+
+            offset += ret;
+            
+#ifdef DEBUG
+            std::cout << "Argument 2: ";
+            argument2.dump();
 #endif
 
             if (command.asString() == "connect")
@@ -418,7 +413,14 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             else if (command.asString() == "publish")
             {
                 //startPlaying("casino/blackjack/wallclock_test_med");
-                startPlaying("wallclock_test_med");
+                //startPlaying("wallclock_test_med");
+
+                sendServerBandwidth();
+                sendClientBandwidth();
+                sendPing();
+                sendSetChunkSize();
+                sendResult();
+                sendBWDone();
             }
             break;
         }
@@ -438,29 +440,84 @@ void Input::sendServerBandwidth()
     rtmp::Packet bandwidthPacket;
     bandwidthPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
     bandwidthPacket.header.channel = rtmp::Channel::NETWORK;
-    bandwidthPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
-    bandwidthPacket.header.timestamp = _timestamp;
+    bandwidthPacket.header.timestamp = 0;
     bandwidthPacket.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
+    bandwidthPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
 
     encodeInt(bandwidthPacket.data, 4, _serverBandwidth);
+
+    bandwidthPacket.header.length = static_cast<uint32_t>(bandwidthPacket.data.size());
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, bandwidthPacket);
+
+    _socket.send(buffer);
 }
 
 void Input::sendClientBandwidth()
 {
+    rtmp::Packet bandwidthPacket;
+    bandwidthPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    bandwidthPacket.header.channel = rtmp::Channel::NETWORK;
+    bandwidthPacket.header.timestamp = 0;
+    bandwidthPacket.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
+
+    encodeInt(bandwidthPacket.data, 4, _serverBandwidth);
+    encodeInt(bandwidthPacket.data, 2, 2); // dynamic
+
+    bandwidthPacket.header.length = static_cast<uint32_t>(bandwidthPacket.data.size());
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, bandwidthPacket);
+
+    _socket.send(buffer);
 }
 
 void Input::sendPing()
 {
+    rtmp::Packet pingPacket;
+    pingPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    pingPacket.header.channel = rtmp::Channel::NETWORK;
+    pingPacket.header.timestamp = 0;
+    pingPacket.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
+
+    encodeInt(pingPacket.data, 2, 0); // ping type
+    encodeInt(pingPacket.data, 4, 0); // ping param
+
+    pingPacket.header.length = static_cast<uint32_t>(pingPacket.data.size());
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, pingPacket);
+
+    _socket.send(buffer);
+}
+
+void Input::sendSetChunkSize()
+{
+    rtmp::Packet chunkSizePacket;
+    chunkSizePacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
+    chunkSizePacket.header.timestamp = 0;
+    chunkSizePacket.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
+    chunkSizePacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+
+    encodeInt(chunkSizePacket.data, 4, _chunkSize);
+
+    chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, chunkSizePacket);
+
+    _socket.send(buffer);
 }
 
 void Input::sendResult()
 {
     rtmp::Packet resultPacket;
 
-    resultPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    resultPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
     resultPacket.header.channel = rtmp::Channel::SYSTEM;
-    resultPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
-    resultPacket.header.timestamp = _timestamp;
+    resultPacket.header.timestamp = 0;
     resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
     amf0::Node resultName = std::string("_result");
@@ -483,39 +540,39 @@ void Input::sendResult()
 
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
-    std::vector<uint8_t> result;
-    encodePacket(result, _chunkSize, resultPacket);
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, resultPacket);
 
-    _socket.send(result);
+    _socket.send(buffer);
 }
 
 void Input::sendBWDone()
 {
     rtmp::Packet onBWDonePacket;
 
-    onBWDonePacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    onBWDonePacket.header.messageStreamId = 0;
-    onBWDonePacket.header.timestamp = _timestamp;
+    onBWDonePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    onBWDonePacket.header.channel = rtmp::Channel::SYSTEM;
+    onBWDonePacket.header.timestamp = 0;
     onBWDonePacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
     amf0::Node onBWDoneName = std::string("onBWDone");
     onBWDoneName.encode(onBWDonePacket.data);
 
-    amf0::Node arg1 = static_cast<double>(0);
-    arg1.encode(onBWDonePacket.data);
+    amf0::Node streamId = static_cast<double>(0);
+    streamId.encode(onBWDonePacket.data);
 
-    amf0::Node arg2(amf0::Marker::Null);
-    arg2.encode(onBWDonePacket.data);
+    amf0::Node argument1(amf0::Marker::Null);
+    argument1.encode(onBWDonePacket.data);
 
-    amf0::Node arg3 = static_cast<double>(8192);
-    arg3.encode(onBWDonePacket.data);
+    amf0::Node argument2 = static_cast<double>(0);
+    argument2.encode(onBWDonePacket.data);
 
     onBWDonePacket.header.length = static_cast<uint32_t>(onBWDonePacket.data.size());
 
-    std::vector<uint8_t> onBWDone;
-    encodePacket(onBWDone, _chunkSize, onBWDonePacket);
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, onBWDonePacket);
 
-    _socket.send(onBWDone);
+    _socket.send(buffer);
 }
 
 void Input::startPlaying(const std::string filename)
@@ -524,8 +581,8 @@ void Input::startPlaying(const std::string filename)
 
     statusPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
     statusPacket.header.channel = rtmp::Channel::SYSTEM;
-    statusPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
     statusPacket.header.timestamp = _timestamp;
+    statusPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
     statusPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
     amf0::Node commandName = std::string("onStatus");
@@ -552,8 +609,8 @@ void Input::startPlaying(const std::string filename)
 
     statusPacket.header.length = static_cast<uint32_t>(statusPacket.data.size());
 
-    std::vector<uint8_t> result;
-    encodePacket(result, _chunkSize, statusPacket);
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, statusPacket);
 
-    _socket.send(result);
+    _socket.send(buffer);
 }

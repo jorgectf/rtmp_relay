@@ -35,8 +35,9 @@ protected:
 
     void sendServerBandwidth();
     void sendClientBandwidth();
-
     void sendPing();
+    void sendSetChunkSize();
+
     void sendResult();
     void sendBWDone();
     void startPlaying(const std::string filename);
