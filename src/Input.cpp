@@ -256,18 +256,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             offset += ret;
 
-            uint16_t param1;
-            ret = decodeInt(packet.data, offset, 2, param1);
-
-            if (ret == 0)
-            {
-                return false;
-            }
-
-            offset += ret;
-
-            uint16_t param2;
-            ret = decodeInt(packet.data, offset, 2, param2);
+            uint32_t param;
+            ret = decodeInt(packet.data, offset, 4, param);
 
             if (ret == 0)
             {
@@ -277,9 +267,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Ping type: " << pingType << ", param 1: " << param1 << ", param 2: " << param2 << std::endl;
+            std::cout << "Ping type: " << pingType << ", param: " << param << std::endl;
 #endif
-            
             break;
         }
 
@@ -425,6 +414,18 @@ bool Input::handlePacket(const rtmp::Packet& packet)
     }
 
     return true;
+}
+
+void Input::sendServerBandwidth()
+{
+}
+
+void Input::sendClientBandwidth()
+{
+}
+
+void Input::sendPing()
+{
 }
 
 void Input::sendResult()

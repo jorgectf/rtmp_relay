@@ -24,13 +24,13 @@ namespace rtmp
         header.channel = static_cast<Channel>(headerData & 0x3F);
 
 #ifdef DEBUG
-        std::cout << "Chunk stream ID: " << static_cast<uint32_t>(header.channel) << std::endl;
+        std::cout << "Chunk stream ID: " << static_cast<uint32_t>(header.channel);
 #endif
 
         header.type = static_cast<Header::Type>(headerData >> 6);
 
 #ifdef DEBUG
-        std::cout << "Header type: " << static_cast<uint32_t>(header.type) << std::endl;
+        std::cout << ", header type: " << static_cast<uint32_t>(header.type);
 #endif
         
         if (header.type != Header::Type::ONE_BYTE)
@@ -38,7 +38,7 @@ namespace rtmp
             uint32_t ret = decodeInt(data, offset, 3, header.timestamp);
 
 #ifdef DEBUG
-            std::cout << "Timestamp: " << header.timestamp << std::endl;
+            std::cout << ", timestamp: " << header.timestamp;
 #endif
             
             if (!ret)
@@ -53,7 +53,7 @@ namespace rtmp
                 ret = decodeInt(data, offset, 3, header.length);
 
 #ifdef DEBUG
-                std::cout << "Data length: " << header.length << std::endl;
+                std::cout << ", data length: " << header.length;
 #endif
                 
                 if (!ret)
@@ -78,11 +78,15 @@ namespace rtmp
                     offset += sizeof(header.messageStreamId);
 
 #ifdef DEBUG
-                    std::cout << "Message stream ID: " << header.messageStreamId << std::endl;
+                    std::cout << ", message stream ID: " << header.messageStreamId;
 #endif
                 }
             }
         }
+
+#ifdef DEBUG
+        std::cout << std::endl;
+#endif
         
         return offset - originalOffset;
     }

@@ -33,6 +33,9 @@ protected:
 
     bool handlePacket(const rtmp::Packet& packet);
 
+    void sendServerBandwidth();
+    void sendClientBandwidth();
+
     void sendPing();
     void sendResult();
     void sendBWDone();
@@ -46,6 +49,7 @@ protected:
     rtmp::State _state = rtmp::State::UNINITIALIZED;
     
     uint32_t _chunkSize = 128;
+    uint32_t _serverBandwidth = 2500000;
     
     std::random_device _rd;
     std::mt19937 _generator;
