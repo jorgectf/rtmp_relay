@@ -219,7 +219,24 @@ void Input::handleClose()
 bool Input::handlePacket(const rtmp::Packet& packet)
 {
 #ifdef DEBUG
-    std::cout << "Message Type: " << static_cast<uint32_t>(packet.header.messageType) << std::endl;
+    std::cout << "Message Type: ";
+
+    switch (packet.header.messageType)
+    {
+        case rtmp::MessageType::UNKNOWN: std::cout << "UNKNOWN"; break;
+        case rtmp::MessageType::SET_CHUNK_SIZE: std::cout << "SET_CHUNK_SIZE"; break;
+        case rtmp::MessageType::PING: std::cout << "PING"; break;
+        case rtmp::MessageType::SERVER_BANDWIDTH: std::cout << "SERVER_BANDWIDTH"; break;
+        case rtmp::MessageType::CLIENT_BANDWIDTH: std::cout << "CLIENT_BANDWIDTH"; break;
+        case rtmp::MessageType::AUDIO_PACKET: std::cout << "AUDIO_PACKET"; break;
+        case rtmp::MessageType::VIDEO_PACKET: std::cout << "VIDEO_PACKET"; break;
+        case rtmp::MessageType::AMF3_COMMAND: std::cout << "AMF3_COMMAND"; break;
+        case rtmp::MessageType::INVOKE: std::cout << "INVOKE"; break;
+        case rtmp::MessageType::AMF0_COMMAND: std::cout << "AMF0_COMMAND"; break;
+        default: std::cout << "unknown command";
+    };
+
+    std::cout << "(" << static_cast<uint32_t>(packet.header.messageType) << ")" << std::endl;
 #endif
 
     _timestamp = packet.header.timestamp;
@@ -418,6 +435,14 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
 void Input::sendServerBandwidth()
 {
+    rtmp::Packet bandwidthPacket;
+    bandwidthPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    bandwidthPacket.header.channel = rtmp::Channel::NETWORK;
+    bandwidthPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+    bandwidthPacket.header.timestamp = _timestamp;
+    bandwidthPacket.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
+
+    encodeInt(bandwidthPacket.data, 4, _serverBandwidth);
 }
 
 void Input::sendClientBandwidth()
@@ -434,7 +459,7 @@ void Input::sendResult()
 
     resultPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
     resultPacket.header.channel = rtmp::Channel::SYSTEM;
-    resultPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID; //packet.header.messageStreamId;
+    resultPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
     resultPacket.header.timestamp = _timestamp;
     resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
