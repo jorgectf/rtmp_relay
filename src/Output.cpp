@@ -447,7 +447,7 @@ void Output::sendConnect()
     amf0::Node commandName = std::string("connect");
     commandName.encode(resultPacket.data);
 
-    amf0::Node streamId = static_cast<double>(0);
+    amf0::Node streamId = 0.0;
     streamId.encode(resultPacket.data);
 
     amf0::Node argument1;
@@ -494,7 +494,7 @@ void Output::sendCheckBW()
     amf0::Node commandName = std::string("_checkbw");
     commandName.encode(chunkSizePacket.data);
 
-    amf0::Node streamId = static_cast<double>(0);
+    amf0::Node streamId = 0.0;
     streamId.encode(chunkSizePacket.data);
 
     amf0::Node argument1(amf0::Marker::Null);

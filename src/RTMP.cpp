@@ -181,7 +181,7 @@ namespace rtmp
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
         uint8_t headerData = static_cast<uint8_t>(header.channel);
-        headerData |= (static_cast<uint32_t>(header.type) << 6);
+        headerData |= (static_cast<uint8_t>(header.type) << 6);
 
         data.push_back(headerData);
         

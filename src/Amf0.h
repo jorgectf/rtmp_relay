@@ -47,6 +47,12 @@ namespace amf0
         Node(const std::string& value);
         Node(const Date& value);
 
+        Node& operator=(Marker marker);
+        Node& operator=(double value);
+        Node& operator=(bool value);
+        Node& operator=(const std::string& value);
+        Node& operator=(const Date& value);
+
         Marker getMarker() const { return _marker; }
 
         uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);

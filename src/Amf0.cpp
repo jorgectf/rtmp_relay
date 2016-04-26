@@ -577,6 +577,47 @@ namespace amf0
     {
     }
 
+    Node& Node::operator=(Marker marker)
+    {
+        _marker = marker;
+        return *this;
+    }
+
+    Node& Node::operator=(double value)
+    {
+        _marker = Marker::Number;
+        _doubleValue = value;
+        return *this;
+    }
+
+    Node& Node::operator=(bool value)
+    {
+        _marker = Marker::Boolean;
+        _boolValue = value;
+        return *this;
+    }
+
+    Node& Node::operator=(const std::string& value)
+    {
+        _stringValue = value;
+        if (value.length() <= UINT16_MAX)
+        {
+            _marker = Marker::String;
+        }
+        else
+        {
+            _marker = Marker::LongString;
+        }
+        return *this;
+    }
+
+    Node& Node::operator=(const Date& value)
+    {
+        _marker = Marker::Date;
+        _dateValue = value;
+        return *this;
+    }
+
     uint32_t Node::decode(const std::vector<uint8_t>& buffer, uint32_t offset)
     {
         uint32_t originalOffset = offset;

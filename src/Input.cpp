@@ -516,19 +516,19 @@ void Input::sendConnectResult()
     amf0::Node commandName = std::string("_result");
     commandName.encode(resultPacket.data);
 
-    amf0::Node streamId = static_cast<double>(0);
+    amf0::Node streamId = 0.0;
     streamId.encode(resultPacket.data);
 
     amf0::Node argument1;
     argument1["fmsVer"] = std::string("FMS/3,0,1,123");
-    argument1["capabilities"] = static_cast<double>(31);
+    argument1["capabilities"] = 31.0;
     argument1.encode(resultPacket.data);
 
     amf0::Node argument2;
     argument2["level"] = std::string("status");
     argument2["code"] = std::string("NetConnection.Connect.Success");
     argument2["description"] = std::string("Connection succeeded.");
-    argument2["objectEncoding"] = static_cast<double>(0);
+    argument2["objectEncoding"] = 0.0;
     argument2.encode(resultPacket.data);
 
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
@@ -551,13 +551,13 @@ void Input::sendBWDone()
     amf0::Node commandName = std::string("onBWDone");
     commandName.encode(onBWDonePacket.data);
 
-    amf0::Node streamId = static_cast<double>(0);
+    amf0::Node streamId = 0.0;
     streamId.encode(onBWDonePacket.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(onBWDonePacket.data);
 
-    amf0::Node argument2 = static_cast<double>(0);
+    amf0::Node argument2 = 0.0;
     argument2.encode(onBWDonePacket.data);
 
     onBWDonePacket.header.length = static_cast<uint32_t>(onBWDonePacket.data.size());
@@ -580,7 +580,7 @@ void Input::sendCheckBWResult()
     amf0::Node commandName = std::string("_result");
     commandName.encode(resultPacket.data);
 
-    amf0::Node streamId = static_cast<double>(0);
+    amf0::Node streamId = 0.0;
     streamId.encode(resultPacket.data);
 
     amf0::Node argument1(amf0::Marker::Null);
@@ -607,11 +607,11 @@ void Input::startPlaying(const std::string filename)
     amf0::Node commandName = std::string("onStatus");
     commandName.encode(statusPacket.data);
 
-    amf0::Node streamId = static_cast<double>(0);
+    amf0::Node streamId = 0.0;
     streamId.encode(statusPacket.data);
 
     amf0::Node replyFmsVer;
-    replyFmsVer["capabilities"] = static_cast<double>(31);
+    replyFmsVer["capabilities"] = 31.0;
     replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
     replyFmsVer.encode(statusPacket.data);
 
