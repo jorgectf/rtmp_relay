@@ -375,35 +375,27 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             amf0::Node argument1;
 
-            ret = argument1.decode(packet.data, offset);
-
-            if (ret == 0)
+            if ((ret = argument1.decode(packet.data, offset))  > 0)
             {
-                return false;
-            }
-
-            offset += ret;
+                offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Argument 1: ";
-            argument1.dump();
+                std::cout << "Argument 1: ";
+                argument1.dump();
 #endif
+            }
 
             amf0::Node argument2;
 
-            ret = argument2.decode(packet.data, offset);
-
-            if (ret == 0)
+            if ((ret = argument2.decode(packet.data, offset)) > 0)
             {
-                return false;
-            }
-
-            offset += ret;
+                offset += ret;
             
 #ifdef DEBUG
-            std::cout << "Argument 2: ";
-            argument2.dump();
+                std::cout << "Argument 2: ";
+                argument2.dump();
 #endif
+            }
 
             if (command.asString() == "connect")
             {
