@@ -399,6 +399,10 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             if (command.asString() == "connect")
             {
+                sendServerBandwidth();
+                sendClientBandwidth();
+                sendPing();
+                sendSetChunkSize();
                 sendResult();
                 sendBWDone();
             }
@@ -406,13 +410,6 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             {
                 //startPlaying("casino/blackjack/wallclock_test_med");
                 //startPlaying("wallclock_test_med");
-
-                sendServerBandwidth();
-                sendClientBandwidth();
-                sendPing();
-                sendSetChunkSize();
-                sendResult();
-                sendBWDone();
             }
             break;
         }
