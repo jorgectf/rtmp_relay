@@ -203,10 +203,6 @@ void Input::handleRead(const std::vector<uint8_t>& data)
             {
                 offset += ret;
 
-#ifdef DEBUG
-                std::cout << "Handshake done, chunk size: " << _inChunkSize << std::endl;
-#endif
-
                 handlePacket(packet);
             }
             else
