@@ -53,6 +53,9 @@ protected:
     bool _connecting = false;
     bool _ready = false;
     bool _blocking = true;
+
+    uint32_t _ipAddress = 0;
+    uint16_t _port = 0;
     
     std::function<void()> _connectCallback;
     std::function<void(const std::vector<uint8_t>&)> _readCallback;

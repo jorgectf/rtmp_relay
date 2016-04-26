@@ -55,7 +55,9 @@ Socket::Socket(Socket&& other):
     _connecting(other._connecting),
     _ready(other._ready),
     _blocking(other._blocking),
-    _readCallback(std::move(other._readCallback))
+    _readCallback(std::move(other._readCallback)),
+    _ipAddress(other._ipAddress),
+    _port(other._port)
 {
     _network.addSocket(*this);
     
@@ -63,6 +65,8 @@ Socket::Socket(Socket&& other):
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
+    other._ipAddress = 0;
+    other._port = 0;
 }
 
 Socket& Socket::operator=(Socket&& other)
@@ -72,11 +76,15 @@ Socket& Socket::operator=(Socket&& other)
     _ready = other._ready;
     _blocking = other._blocking;
     _readCallback = std::move(other._readCallback);
+    _ipAddress = other._ipAddress;
+    _port = other._port;
     
     other._socketFd = -1;
     other._connecting = false;
     other._ready = false;
     other._blocking = true;
+    other._ipAddress = 0;
+    other._port = 0;
     
     return *this;
 }
@@ -139,14 +147,17 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
             return false;
         }
     }
+
+    _ipAddress = ipAddress;
+    _port = port;
     
-    std::cout << "Connecting to " << ipToString(ipAddress) << ":" << static_cast<int>(port) << std::endl;
+    std::cout << "Connecting to " << ipToString(_ipAddress) << ":" << static_cast<int>(port) << std::endl;
     
     sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = ipAddress;
+    addr.sin_port = htons(_port);
+    addr.sin_addr.s_addr = _ipAddress;
     
     if (::connect(_socketFd, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0)
     {
@@ -157,7 +168,7 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
         else
         {
             int error = errno;
-            std::cerr << "Connection failed, error: " << error << std::endl;
+            std::cerr << "Failed to connect to " << ipToString(_ipAddress) << ":" << _port << ", error: " << error << std::endl;
             return false;
         }
     }
@@ -254,7 +265,7 @@ bool Socket::read()
         
         if (_connecting)
         {
-            std::cerr << "Connection failed, error: " << error << std::endl;
+            std::cerr << "Failed to connect to " << ipToString(_ipAddress) << ":" << _port << ", error: " << error << std::endl;
             _connecting = false;
         }
         else
@@ -304,7 +315,7 @@ bool Socket::write()
     {
         _connecting = false;
         _ready = true;
-        std::cout << "Socket connected" << std::endl;
+        std::cout << "Socket connected to " << ipToString(_ipAddress) << ":" << _port << std::endl;
         if (_connectCallback) _connectCallback();
     }
     
