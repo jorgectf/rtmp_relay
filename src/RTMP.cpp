@@ -22,9 +22,23 @@ namespace rtmp
         offset += 1;
 
         header.channel = static_cast<Channel>(headerData & 0x3F);
+        header.type = static_cast<Header::Type>(headerData >> 6);
 
 #ifdef DEBUG
-        std::cout << "Channel: ";
+        std::cout << "Header type: ";
+
+        switch (header.type)
+        {
+            case Header::Type::TWELVE_BYTE: std::cout << "TWELVE_BYTE"; break;
+            case Header::Type::EIGHT_BYTE: std::cout << "EIGHT_BYTE"; break;
+            case Header::Type::FOUR_BYTE: std::cout << "FOUR_BYTE"; break;
+            case Header::Type::ONE_BYTE: std::cout << "ONE_BYTE"; break;
+            default: std::cout << "invalid header type"; break;
+        };
+
+        std::cout << "(" << static_cast<uint32_t>(header.type) << ")";
+
+        std::cout << ", channel: ";
 
         switch (header.channel)
         {
@@ -37,23 +51,6 @@ namespace rtmp
         };
 
         std::cout << "(" << static_cast<uint32_t>(header.channel) << ")";
-#endif
-
-        header.type = static_cast<Header::Type>(headerData >> 6);
-
-#ifdef DEBUG
-        std::cout << ", header type: ";
-
-        switch (header.type)
-        {
-            case Header::Type::TWELVE_BYTE: std::cout << "TWELVE_BYTE"; break;
-            case Header::Type::EIGHT_BYTE: std::cout << "EIGHT_BYTE"; break;
-            case Header::Type::FOUR_BYTE: std::cout << "FOUR_BYTE"; break;
-            case Header::Type::ONE_BYTE: std::cout << "ONE_BYTE"; break;
-            default: std::cout << "invalid header type"; break;
-        };
-
-        std::cout << "(" << static_cast<uint32_t>(header.type) << ")";
 #endif
         
         if (header.type != Header::Type::ONE_BYTE)

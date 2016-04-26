@@ -776,7 +776,7 @@ namespace amf0
 
     void Node::dump(const std::string& indent)
     {
-        std::cout << "Type: " << markerToString(_marker);
+        std::cout << "Type: " << markerToString(_marker) << "(" << static_cast<uint32_t>(_marker) << ")";
 
         if (_marker == Marker::Object ||
             _marker == Marker::StrictArray ||
