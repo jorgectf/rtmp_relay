@@ -312,11 +312,6 @@ namespace amf0
     {
         uint32_t ret = encodeDouble(buffer, value);
 
-        if (ret == 0)
-        {
-            return 0;
-        }
-
         return ret;
     }
 
