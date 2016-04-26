@@ -403,13 +403,17 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 sendClientBandwidth();
                 sendPing();
                 sendSetChunkSize();
-                sendResult();
+                sendConnectResult();
                 sendBWDone();
             }
             else if (command.asString() == "publish")
             {
                 //startPlaying("casino/blackjack/wallclock_test_med");
                 //startPlaying("wallclock_test_med");
+            }
+            else if (command.asString() == "_checkbw")
+            {
+                sendCheckBWResult();
             }
             break;
         }
@@ -431,7 +435,7 @@ void Input::sendServerBandwidth()
     bandwidthPacket.header.channel = rtmp::Channel::NETWORK;
     bandwidthPacket.header.timestamp = 0;
     bandwidthPacket.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
-    bandwidthPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+    bandwidthPacket.header.messageStreamId = 0;
 
     encodeInt(bandwidthPacket.data, 4, _serverBandwidth);
 
@@ -488,7 +492,7 @@ void Input::sendSetChunkSize()
     chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
     chunkSizePacket.header.timestamp = 0;
     chunkSizePacket.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
-    chunkSizePacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+    chunkSizePacket.header.messageStreamId = 0;
 
     encodeInt(chunkSizePacket.data, 4, _chunkSize);
 
@@ -500,7 +504,7 @@ void Input::sendSetChunkSize()
     _socket.send(buffer);
 }
 
-void Input::sendResult()
+void Input::sendConnectResult()
 {
     rtmp::Packet resultPacket;
 
@@ -509,23 +513,23 @@ void Input::sendResult()
     resultPacket.header.timestamp = 0;
     resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
-    amf0::Node resultName = std::string("_result");
-    resultName.encode(resultPacket.data);
+    amf0::Node commandName = std::string("_result");
+    commandName.encode(resultPacket.data);
 
-    amf0::Node resultStreamId = static_cast<double>(0);
-    resultStreamId.encode(resultPacket.data);
+    amf0::Node streamId = static_cast<double>(0);
+    streamId.encode(resultPacket.data);
 
-    amf0::Node replyFmsVer;
-    replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
-    replyFmsVer["capabilities"] = static_cast<double>(31);
-    replyFmsVer.encode(resultPacket.data);
+    amf0::Node argument1;
+    argument1["fmsVer"] = std::string("FMS/3,0,1,123");
+    argument1["capabilities"] = static_cast<double>(31);
+    argument1.encode(resultPacket.data);
 
-    amf0::Node replyStatus;
-    replyStatus["level"] = std::string("status");
-    replyStatus["code"] = std::string("NetConnection.Connect.Success");
-    replyStatus["description"] = std::string("Connection succeeded.");
-    replyStatus["objectEncoding"] = static_cast<double>(0);
-    replyStatus.encode(resultPacket.data);
+    amf0::Node argument2;
+    argument2["level"] = std::string("status");
+    argument2["code"] = std::string("NetConnection.Connect.Success");
+    argument2["description"] = std::string("Connection succeeded.");
+    argument2["objectEncoding"] = static_cast<double>(0);
+    argument2.encode(resultPacket.data);
 
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
@@ -544,8 +548,8 @@ void Input::sendBWDone()
     onBWDonePacket.header.timestamp = 0;
     onBWDonePacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
 
-    amf0::Node onBWDoneName = std::string("onBWDone");
-    onBWDoneName.encode(onBWDonePacket.data);
+    amf0::Node commandName = std::string("onBWDone");
+    commandName.encode(onBWDonePacket.data);
 
     amf0::Node streamId = static_cast<double>(0);
     streamId.encode(onBWDonePacket.data);
@@ -564,6 +568,32 @@ void Input::sendBWDone()
     _socket.send(buffer);
 }
 
+void Input::sendCheckBWResult()
+{
+    rtmp::Packet resultPacket;
+
+    resultPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    resultPacket.header.channel = rtmp::Channel::SYSTEM;
+    resultPacket.header.timestamp = 0;
+    resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+
+    amf0::Node commandName = std::string("_result");
+    commandName.encode(resultPacket.data);
+
+    amf0::Node streamId = static_cast<double>(0);
+    streamId.encode(resultPacket.data);
+
+    amf0::Node argument1(amf0::Marker::Null);
+    argument1.encode(resultPacket.data);
+
+    resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, resultPacket);
+    
+    _socket.send(buffer);
+}
+
 void Input::startPlaying(const std::string filename)
 {
     rtmp::Packet statusPacket;
@@ -577,11 +607,8 @@ void Input::startPlaying(const std::string filename)
     amf0::Node commandName = std::string("onStatus");
     commandName.encode(statusPacket.data);
 
-    amf0::Node zeroNode = static_cast<double>(0);
-    zeroNode.encode(statusPacket.data);
-
-    amf0::Node nullNode(amf0::Marker::Null);
-    nullNode.encode(statusPacket.data);
+    amf0::Node streamId = static_cast<double>(0);
+    streamId.encode(statusPacket.data);
 
     amf0::Node replyFmsVer;
     replyFmsVer["capabilities"] = static_cast<double>(31);

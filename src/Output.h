@@ -33,7 +33,10 @@ private:
     void handleClose();
 
     bool handlePacket(const rtmp::Packet& packet);
+
     void sendConnect();
+    void sendSetChunkSize();
+    void sendCheckBW();
     
     Network& _network;
     Socket _socket;

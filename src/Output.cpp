@@ -252,6 +252,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
 #ifdef DEBUG
             std::cout << "Chunk size: " << _chunkSize << std::endl;
 #endif
+            sendSetChunkSize();
 
             break;
         }
@@ -422,6 +423,10 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             else if (command.asString() == "publish")
             {
             }
+            else if (command.asString() == "onBWDone")
+            {
+                sendCheckBW();
+            }
             break;
         }
             
@@ -448,20 +453,64 @@ void Output::sendConnect()
     amf0::Node commandName = std::string("connect");
     commandName.encode(resultPacket.data);
 
-    amf0::Node resultStreamId = static_cast<double>(0);
-    resultStreamId.encode(resultPacket.data);
+    amf0::Node streamId = static_cast<double>(0);
+    streamId.encode(resultPacket.data);
 
-    amf0::Node replyStatus;
-    replyStatus["app"] = std::string("casino/blackjack");
-    replyStatus["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
-    replyStatus["tcUrl"] = std::string("rtmp://127.0.0.1:2200/casino/blackjack");
-    replyStatus["type"] = std::string("nonprivate");
-    replyStatus.encode(resultPacket.data);
+    amf0::Node argument1;
+    argument1["app"] = std::string("casino/blackjack");
+    argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
+    argument1["tcUrl"] = std::string("rtmp://127.0.0.1:2200/casino/blackjack");
+    argument1["type"] = std::string("nonprivate");
+    argument1.encode(resultPacket.data);
 
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _chunkSize, resultPacket);
+
+    _socket.send(buffer);
+}
+
+void Output::sendSetChunkSize()
+{
+    rtmp::Packet chunkSizePacket;
+    chunkSizePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
+    chunkSizePacket.header.timestamp = 0;
+    chunkSizePacket.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
+
+    encodeInt(chunkSizePacket.data, 4, _chunkSize);
+
+    chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, chunkSizePacket);
+
+    _socket.send(buffer);
+}
+
+void Output::sendCheckBW()
+{
+    rtmp::Packet chunkSizePacket;
+    chunkSizePacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
+    chunkSizePacket.header.timestamp = 0;
+    chunkSizePacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+    chunkSizePacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+
+    amf0::Node commandName = std::string("_checkbw");
+    commandName.encode(chunkSizePacket.data);
+
+    amf0::Node streamId = static_cast<double>(0);
+    streamId.encode(chunkSizePacket.data);
+
+    amf0::Node argument1(amf0::Marker::Null);
+    argument1.encode(chunkSizePacket.data);
+
+    chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, _chunkSize, chunkSizePacket);
 
     _socket.send(buffer);
 }

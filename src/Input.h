@@ -38,8 +38,10 @@ protected:
     void sendPing();
     void sendSetChunkSize();
 
-    void sendResult();
+    void sendConnectResult();
     void sendBWDone();
+    void sendCheckBWResult();
+
     void startPlaying(const std::string filename);
     
     Network& _network;
