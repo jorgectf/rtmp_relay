@@ -58,22 +58,11 @@ namespace amf0
         uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
         uint32_t encode(std::vector<uint8_t>& buffer) const;
 
-        void setDouble(double value);
         double asDouble() const;
-
-        void setBool(bool value);
         bool asBool() const;
-
-        void setString(const std::string& value);
         const std::string& asString() const;
-
-        void setDate(const Date& value);
         const Date& asDate() const;
-
-        void setNull();
         bool isNull() const;
-
-        void setUndefined();
         bool isUndefined() const;
 
         uint32_t getSize() const;

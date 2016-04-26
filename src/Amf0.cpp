@@ -689,21 +689,9 @@ namespace amf0
         return size;
     }
 
-    void Node::setDouble(double value)
-    {
-        _marker = Marker::Number;
-        _doubleValue = value;
-    }
-
     double Node::asDouble() const
     {
         return _doubleValue;
-    }
-
-    void Node::setBool(bool value)
-    {
-        _marker = Marker::Boolean;
-        _boolValue = value;
     }
 
     bool Node::asBool() const
@@ -711,30 +699,9 @@ namespace amf0
         return _boolValue;
     }
 
-    void Node::setString(const std::string& value)
-    {
-        if (value.length() <= UINT16_MAX)
-        {
-            _marker = Marker::String;
-        }
-        else
-        {
-            _marker = Marker::LongString;
-        }
-
-        _stringValue = value;
-    }
-
     const std::string& Node::asString() const
     {
         return _stringValue;
-    }
-
-    void Node::setDate(const Date& value)
-    {
-        _marker = Marker::Date;
-
-        _dateValue = value;
     }
 
     const Date& Node::asDate() const
@@ -742,19 +709,9 @@ namespace amf0
         return _dateValue;
     }
 
-    void Node::setNull()
-    {
-        _marker = Marker::Null;
-    }
-
     bool Node::isNull() const
     {
         return _marker == Marker::Null;
-    }
-
-    void Node::setUndefined()
-    {
-        _marker = Marker::Undefined;
     }
 
     bool Node::isUndefined() const
