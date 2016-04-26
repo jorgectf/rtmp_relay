@@ -452,7 +452,7 @@ void Input::sendClientBandwidth()
     bandwidthPacket.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
 
     encodeInt(bandwidthPacket.data, 4, _serverBandwidth);
-    encodeInt(bandwidthPacket.data, 2, 2); // dynamic
+    encodeInt(bandwidthPacket.data, 1, 2); // dynamic
 
     bandwidthPacket.header.length = static_cast<uint32_t>(bandwidthPacket.data.size());
 
