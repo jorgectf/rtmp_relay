@@ -417,13 +417,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             }
 
 
-            if (command.asString() == "connect")
-            {
-            }
-            else if (command.asString() == "publish")
-            {
-            }
-            else if (command.asString() == "onBWDone")
+            if (command.asString() == "onBWDone")
             {
                 sendCheckBW();
             }
@@ -492,11 +486,10 @@ void Output::sendSetChunkSize()
 void Output::sendCheckBW()
 {
     rtmp::Packet chunkSizePacket;
-    chunkSizePacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    chunkSizePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
     chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
     chunkSizePacket.header.timestamp = 0;
     chunkSizePacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
-    chunkSizePacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
 
     amf0::Node commandName = std::string("_checkbw");
     commandName.encode(chunkSizePacket.data);

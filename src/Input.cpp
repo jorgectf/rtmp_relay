@@ -406,14 +406,14 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 sendConnectResult();
                 sendBWDone();
             }
+            else if (command.asString() == "_checkbw")
+            {
+                sendCheckBWResult();
+            }
             else if (command.asString() == "publish")
             {
                 //startPlaying("casino/blackjack/wallclock_test_med");
                 //startPlaying("wallclock_test_med");
-            }
-            else if (command.asString() == "_checkbw")
-            {
-                sendCheckBWResult();
             }
             break;
         }
