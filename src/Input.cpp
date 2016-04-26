@@ -27,12 +27,14 @@ Input::Input(Input&& other):
     _socket(std::move(other._socket)),
     _data(std::move(other._data)),
     _state(other._state),
-    _chunkSize(other._chunkSize),
+    _inChunkSize(other._inChunkSize),
+    _outChunkSize(other._outChunkSize),
     _generator(std::move(other._generator)),
     _timestamp(other._timestamp)
 {
     other._state = rtmp::State::UNINITIALIZED;
-    other._chunkSize = 128;
+    other._inChunkSize = 128;
+    other._outChunkSize = 128;
     other._timestamp = 0;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
@@ -44,12 +46,14 @@ Input& Input::operator=(Input&& other)
     _socket = std::move(other._socket);
     _data = std::move(other._data);
     _state = other._state;
-    _chunkSize = other._chunkSize;
+    _inChunkSize = other._inChunkSize;
+    _outChunkSize = other._outChunkSize;
     _generator = std::move(other._generator);
     _timestamp = other._timestamp;
     
     other._state = rtmp::State::UNINITIALIZED;
-    other._chunkSize = 128;
+    other._inChunkSize = 128;
+    other._outChunkSize = 128;
     other._timestamp = 0;
     
     _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
@@ -193,11 +197,15 @@ void Input::handleRead(const std::vector<uint8_t>& data)
             // TODO: send subscribe
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::decodePacket(data, offset, _chunkSize, packet);
-            
+            uint32_t ret = rtmp::decodePacket(data, offset, _inChunkSize, packet);
+
             if (ret > 0)
             {
                 offset += ret;
+
+#ifdef DEBUG
+                std::cout << "Handshake done, chunk size: " << _inChunkSize << std::endl;
+#endif
 
                 handlePacket(packet);
             }
@@ -224,7 +232,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
     {
         case rtmp::MessageType::SET_CHUNK_SIZE:
         {
-            uint32_t ret = decodeInt(packet.data, 0, 4, _chunkSize);
+            uint32_t ret = decodeInt(packet.data, 0, 4, _inChunkSize);
 
             if (ret == 0)
             {
@@ -232,7 +240,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             }
 
 #ifdef DEBUG
-            std::cout << "Chunk size: " << _chunkSize << std::endl;
+            std::cout << "Chunk size: " << _inChunkSize << std::endl;
 #endif
 
             break;
@@ -442,7 +450,7 @@ void Input::sendServerBandwidth()
     bandwidthPacket.header.length = static_cast<uint32_t>(bandwidthPacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, bandwidthPacket);
+    encodePacket(buffer, _outChunkSize, bandwidthPacket);
 
     _socket.send(buffer);
 }
@@ -461,7 +469,7 @@ void Input::sendClientBandwidth()
     bandwidthPacket.header.length = static_cast<uint32_t>(bandwidthPacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, bandwidthPacket);
+    encodePacket(buffer, _outChunkSize, bandwidthPacket);
 
     _socket.send(buffer);
 }
@@ -480,7 +488,7 @@ void Input::sendPing()
     pingPacket.header.length = static_cast<uint32_t>(pingPacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, pingPacket);
+    encodePacket(buffer, _outChunkSize, pingPacket);
 
     _socket.send(buffer);
 }
@@ -494,12 +502,12 @@ void Input::sendSetChunkSize()
     chunkSizePacket.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
     chunkSizePacket.header.messageStreamId = 0;
 
-    encodeInt(chunkSizePacket.data, 4, _chunkSize);
+    encodeInt(chunkSizePacket.data, 4, _outChunkSize);
 
     chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, chunkSizePacket);
+    encodePacket(buffer, _outChunkSize, chunkSizePacket);
 
     _socket.send(buffer);
 }
@@ -534,7 +542,7 @@ void Input::sendConnectResult()
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, resultPacket);
+    encodePacket(buffer, _outChunkSize, resultPacket);
 
     _socket.send(buffer);
 }
@@ -563,7 +571,7 @@ void Input::sendBWDone()
     onBWDonePacket.header.length = static_cast<uint32_t>(onBWDonePacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, onBWDonePacket);
+    encodePacket(buffer, _outChunkSize, onBWDonePacket);
 
     _socket.send(buffer);
 }
@@ -589,7 +597,7 @@ void Input::sendCheckBWResult()
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, resultPacket);
+    encodePacket(buffer, _outChunkSize, resultPacket);
     
     _socket.send(buffer);
 }
@@ -626,7 +634,7 @@ void Input::startPlaying(const std::string filename)
     statusPacket.header.length = static_cast<uint32_t>(statusPacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, statusPacket);
+    encodePacket(buffer, _outChunkSize, statusPacket);
 
     _socket.send(buffer);
 }

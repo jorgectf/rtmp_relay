@@ -29,11 +29,13 @@ Output::Output(Output&& other):
     _socket(std::move(other._socket)),
     _data(std::move(other._data)),
     _state(other._state),
-    _chunkSize(other._chunkSize),
+    _inChunkSize(other._inChunkSize),
+    _outChunkSize(other._outChunkSize),
     _generator(std::move(other._generator))
 {
     other._state = rtmp::State::UNINITIALIZED;
-    other._chunkSize = 128;
+    other._inChunkSize = 128;
+    other._outChunkSize = 128;
     
     _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
@@ -45,11 +47,13 @@ Output& Output::operator=(Output&& other)
     _socket = std::move(other._socket);
     _data = std::move(other._data);
     _state = other._state;
-    _chunkSize = other._chunkSize;
+    _inChunkSize = other._inChunkSize;
+    _outChunkSize = other._outChunkSize;
     _generator = std::move(other._generator);
     
     other._state = rtmp::State::UNINITIALIZED;
-    other._chunkSize = 128;
+    other._inChunkSize = 128;
+    other._outChunkSize = 128;
     
     _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
@@ -213,11 +217,15 @@ void Output::handleRead(const std::vector<uint8_t>& data)
         {
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::decodePacket(_data, offset, _chunkSize, packet);
+            uint32_t ret = rtmp::decodePacket(_data, offset, _inChunkSize, packet);
             
             if (ret > 0)
             {
                 offset += ret;
+
+#ifdef DEBUG
+                std::cout << "Handshake done, chunk size: " << _inChunkSize << std::endl;
+#endif
 
                 handlePacket(packet);
             }
@@ -242,7 +250,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
     {
         case rtmp::MessageType::SET_CHUNK_SIZE:
         {
-            uint32_t ret = decodeInt(packet.data, 0, 4, _chunkSize);
+            uint32_t ret = decodeInt(packet.data, 0, 4, _inChunkSize);
 
             if (ret == 0)
             {
@@ -250,7 +258,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             }
 
 #ifdef DEBUG
-            std::cout << "Chunk size: " << _chunkSize << std::endl;
+            std::cout << "Chunk size: " << _inChunkSize << std::endl;
 #endif
             sendSetChunkSize();
 
@@ -460,7 +468,7 @@ void Output::sendConnect()
     resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, resultPacket);
+    encodePacket(buffer, _outChunkSize, resultPacket);
 
     _socket.send(buffer);
 }
@@ -473,12 +481,12 @@ void Output::sendSetChunkSize()
     chunkSizePacket.header.timestamp = 0;
     chunkSizePacket.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
 
-    encodeInt(chunkSizePacket.data, 4, _chunkSize);
+    encodeInt(chunkSizePacket.data, 4, _outChunkSize);
 
     chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, chunkSizePacket);
+    encodePacket(buffer, _outChunkSize, chunkSizePacket);
 
     _socket.send(buffer);
 }
@@ -503,7 +511,7 @@ void Output::sendCheckBW()
     chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _chunkSize, chunkSizePacket);
+    encodePacket(buffer, _outChunkSize, chunkSizePacket);
 
     _socket.send(buffer);
 }

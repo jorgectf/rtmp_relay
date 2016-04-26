@@ -45,7 +45,8 @@ private:
     
     rtmp::State _state = rtmp::State::UNINITIALIZED;
     
-    uint32_t _chunkSize = 128;
+    uint32_t _inChunkSize = 128;
+    uint32_t _outChunkSize = 128;
     
     std::random_device _rd;
     std::mt19937 _generator;
