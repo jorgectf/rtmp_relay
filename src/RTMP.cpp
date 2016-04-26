@@ -95,7 +95,7 @@ namespace rtmp
                 offset += 1;
 
 #ifdef DEBUG
-                std::cout << ", message Type: ";
+                std::cout << ", message type: ";
 
                 switch (header.messageType)
                 {

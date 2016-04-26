@@ -225,7 +225,9 @@ bool Socket::setBlocking(bool blocking)
 
 bool Socket::send(std::vector<uint8_t> buffer)
 {
-    if (::send(_socketFd, buffer.data(), buffer.size(), 0) < 0)
+    ssize_t size = ::send(_socketFd, buffer.data(), buffer.size(), 0);
+
+    if (size < 0)
     {
         if (errno != EAGAIN && errno != EWOULDBLOCK)
         {
@@ -234,6 +236,10 @@ bool Socket::send(std::vector<uint8_t> buffer)
             return false;
         }
     }
+
+#ifdef DEBUG
+    std::cout << "Socket sent " << size << " bytes" << std::endl;
+#endif
     
     return true;
 }
@@ -278,7 +284,9 @@ bool Socket::read()
         return false;
     }
 
+#ifdef DEBUG
     std::cout << "Socket received " << size << " bytes" << std::endl;
+#endif
 
     std::vector<uint8_t> data(TEMP_BUFFER, TEMP_BUFFER + size);
 

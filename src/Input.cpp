@@ -468,7 +468,7 @@ void Input::sendPing()
     pingPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
     pingPacket.header.channel = rtmp::Channel::NETWORK;
     pingPacket.header.timestamp = 0;
-    pingPacket.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
+    pingPacket.header.messageType = rtmp::MessageType::PING;
 
     encodeInt(pingPacket.data, 2, 0); // ping type
     encodeInt(pingPacket.data, 4, 0); // ping param
