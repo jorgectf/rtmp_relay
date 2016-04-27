@@ -336,14 +336,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             break;
         }
 
-        case rtmp::MessageType::AMF3_COMMAND:
-        {
-            std::cerr << "AMF3 commands are not supported" << std::endl;
-            break;
-        }
-
         case rtmp::MessageType::INVOKE:
-        case rtmp::MessageType::AMF0_COMMAND:
         {
             uint32_t offset = 0;
 
@@ -517,7 +510,7 @@ void Input::sendConnectResult()
     resultPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
     resultPacket.header.channel = rtmp::Channel::SYSTEM;
     resultPacket.header.timestamp = 0;
-    resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+    resultPacket.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("_result");
     commandName.encode(resultPacket.data);
@@ -552,7 +545,7 @@ void Input::sendBWDone()
     onBWDonePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
     onBWDonePacket.header.channel = rtmp::Channel::SYSTEM;
     onBWDonePacket.header.timestamp = 0;
-    onBWDonePacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+    onBWDonePacket.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("onBWDone");
     commandName.encode(onBWDonePacket.data);
@@ -581,7 +574,7 @@ void Input::sendCheckBWResult()
     resultPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
     resultPacket.header.channel = rtmp::Channel::SYSTEM;
     resultPacket.header.timestamp = 0;
-    resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+    resultPacket.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("_result");
     commandName.encode(resultPacket.data);
@@ -608,7 +601,7 @@ void Input::startPlaying(const std::string filename)
     statusPacket.header.channel = rtmp::Channel::SYSTEM;
     statusPacket.header.timestamp = _timestamp;
     statusPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
-    statusPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+    statusPacket.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("onStatus");
     commandName.encode(statusPacket.data);

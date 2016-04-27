@@ -36,16 +36,20 @@ namespace rtmp
 
     enum class MessageType: uint8_t
     {
-        UNKNOWN = 0x00,
-        SET_CHUNK_SIZE = 0x01,
-        PING = 0x04,
-        SERVER_BANDWIDTH = 0x05,
-        CLIENT_BANDWIDTH = 0x06,
-        AUDIO_PACKET = 0x08,
-        VIDEO_PACKET = 0x09,
-        AMF3_COMMAND = 0x11,
-        INVOKE = 0x12, // e.g. onMetaData
-        AMF0_COMMAND = 0x14
+        SET_CHUNK_SIZE = 1,
+        BYTES_READ = 3,
+        PING = 4,
+        SERVER_BANDWIDTH = 5,
+        CLIENT_BANDWIDTH = 6,
+        AUDIO_PACKET = 8,
+        VIDEO_PACKET = 9,
+        FLEX_STREAM = 15,
+        FLEX_OBJECT = 16,
+        FLEX_MESSAGE = 17,
+        NOTIFY = 18,
+        SHARED_OBJ = 19,
+        INVOKE = 20,
+        METADATA = 22
     };
 
     enum class PingType: uint16_t
@@ -70,10 +74,10 @@ namespace rtmp
 
         Type type;
         Channel channel;
-        uint32_t timestamp = 0;
-        uint32_t length = 0;
-        MessageType messageType = MessageType::UNKNOWN;
-        uint32_t messageStreamId = 0;
+        uint32_t timestamp;
+        uint32_t length;
+        MessageType messageType;
+        uint32_t messageStreamId;
     };
     
     struct Packet

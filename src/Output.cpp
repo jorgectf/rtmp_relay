@@ -355,14 +355,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             break;
         }
 
-        case rtmp::MessageType::AMF3_COMMAND:
-        {
-            std::cerr << "AMF3 commands are not supported" << std::endl;
-            break;
-        }
-
         case rtmp::MessageType::INVOKE:
-        case rtmp::MessageType::AMF0_COMMAND:
         {
             uint32_t offset = 0;
 
@@ -448,7 +441,7 @@ void Output::sendConnect()
     resultPacket.header.channel = rtmp::Channel::SYSTEM;
     resultPacket.header.messageStreamId = 0;
     resultPacket.header.timestamp = 0; //packet.header.timestamp;
-    resultPacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+    resultPacket.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("connect");
     commandName.encode(resultPacket.data);
@@ -495,7 +488,7 @@ void Output::sendCheckBW()
     chunkSizePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
     chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
     chunkSizePacket.header.timestamp = 0;
-    chunkSizePacket.header.messageType = rtmp::MessageType::AMF0_COMMAND;
+    chunkSizePacket.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("_checkbw");
     commandName.encode(chunkSizePacket.data);

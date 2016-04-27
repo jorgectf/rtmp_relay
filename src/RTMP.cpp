@@ -96,16 +96,20 @@ namespace rtmp
 
                 switch (header.messageType)
                 {
-                    case rtmp::MessageType::UNKNOWN: std::cout << "UNKNOWN"; break;
                     case rtmp::MessageType::SET_CHUNK_SIZE: std::cout << "SET_CHUNK_SIZE"; break;
+                    case rtmp::MessageType::BYTES_READ: std::cout << "BYTES_READ"; break;
                     case rtmp::MessageType::PING: std::cout << "PING"; break;
                     case rtmp::MessageType::SERVER_BANDWIDTH: std::cout << "SERVER_BANDWIDTH"; break;
                     case rtmp::MessageType::CLIENT_BANDWIDTH: std::cout << "CLIENT_BANDWIDTH"; break;
                     case rtmp::MessageType::AUDIO_PACKET: std::cout << "AUDIO_PACKET"; break;
                     case rtmp::MessageType::VIDEO_PACKET: std::cout << "VIDEO_PACKET"; break;
-                    case rtmp::MessageType::AMF3_COMMAND: std::cout << "AMF3_COMMAND"; break;
+                    case rtmp::MessageType::FLEX_STREAM: std::cout << "FLEX_STREAM"; break;
+                    case rtmp::MessageType::FLEX_OBJECT: std::cout << "FLEX_OBJECT"; break;
+                    case rtmp::MessageType::FLEX_MESSAGE: std::cout << "FLEX_MESSAGE"; break;
+                    case rtmp::MessageType::NOTIFY: std::cout << "NOTIFY"; break;
+                    case rtmp::MessageType::SHARED_OBJ: std::cout << "SHARED_OBJ"; break;
                     case rtmp::MessageType::INVOKE: std::cout << "INVOKE"; break;
-                    case rtmp::MessageType::AMF0_COMMAND: std::cout << "AMF0_COMMAND"; break;
+                    case rtmp::MessageType::METADATA: std::cout << "METADATA"; break;
                     default: std::cout << "unknown command";
                 };
                 
