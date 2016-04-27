@@ -378,7 +378,8 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Command: " << command.asString() << std::endl;
+            std::cout << "Command: ";
+            command.dump();
 #endif
 
             amf0::Node streamId;
@@ -393,7 +394,8 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Stream ID: " << streamId.asDouble() << std::endl;
+            std::cout << "Stream ID: ";
+            streamId.dump();
 #endif
 
             amf0::Node argument1;
