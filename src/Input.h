@@ -42,7 +42,7 @@ protected:
     void sendBWDone();
     void sendCheckBWResult();
 
-    void startPlaying(const std::string filename);
+    void startPlaying();
     
     Network& _network;
     Socket _socket;

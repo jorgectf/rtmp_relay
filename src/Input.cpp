@@ -431,19 +431,17 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
 void Input::sendServerBandwidth()
 {
-    rtmp::Packet bandwidthPacket;
-    bandwidthPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    bandwidthPacket.header.channel = rtmp::Channel::NETWORK;
-    bandwidthPacket.header.timestamp = 0;
-    bandwidthPacket.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
-    bandwidthPacket.header.messageStreamId = 0;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    packet.header.channel = rtmp::Channel::NETWORK;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
+    packet.header.messageStreamId = 0;
 
-    encodeInt(bandwidthPacket.data, 4, _serverBandwidth);
-
-    bandwidthPacket.header.length = static_cast<uint32_t>(bandwidthPacket.data.size());
+    encodeInt(packet.data, 4, _serverBandwidth);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, bandwidthPacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending SERVER_BANDWIDTH" << std::endl;
@@ -454,19 +452,17 @@ void Input::sendServerBandwidth()
 
 void Input::sendClientBandwidth()
 {
-    rtmp::Packet bandwidthPacket;
-    bandwidthPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    bandwidthPacket.header.channel = rtmp::Channel::NETWORK;
-    bandwidthPacket.header.timestamp = 0;
-    bandwidthPacket.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::NETWORK;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
 
-    encodeInt(bandwidthPacket.data, 4, _serverBandwidth);
-    encodeInt(bandwidthPacket.data, 1, 2); // dynamic
-
-    bandwidthPacket.header.length = static_cast<uint32_t>(bandwidthPacket.data.size());
+    encodeInt(packet.data, 4, _serverBandwidth);
+    encodeInt(packet.data, 1, 2); // dynamic
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, bandwidthPacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending CLIENT_BANDWIDTH" << std::endl;
@@ -477,19 +473,17 @@ void Input::sendClientBandwidth()
 
 void Input::sendPing()
 {
-    rtmp::Packet pingPacket;
-    pingPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    pingPacket.header.channel = rtmp::Channel::NETWORK;
-    pingPacket.header.timestamp = 0;
-    pingPacket.header.messageType = rtmp::MessageType::PING;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::NETWORK;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::PING;
 
-    encodeInt(pingPacket.data, 2, 0); // ping type
-    encodeInt(pingPacket.data, 4, 0); // ping param
-
-    pingPacket.header.length = static_cast<uint32_t>(pingPacket.data.size());
+    encodeInt(packet.data, 2, 0); // ping type
+    encodeInt(packet.data, 4, 0); // ping param
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, pingPacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending PING" << std::endl;
@@ -500,19 +494,17 @@ void Input::sendPing()
 
 void Input::sendSetChunkSize()
 {
-    rtmp::Packet chunkSizePacket;
-    chunkSizePacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
-    chunkSizePacket.header.timestamp = 0;
-    chunkSizePacket.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
-    chunkSizePacket.header.messageStreamId = 0;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
+    packet.header.messageStreamId = 0;
 
-    encodeInt(chunkSizePacket.data, 4, _outChunkSize);
-
-    chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
+    encodeInt(packet.data, 4, _outChunkSize);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, chunkSizePacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
@@ -523,35 +515,32 @@ void Input::sendSetChunkSize()
 
 void Input::sendConnectResult()
 {
-    rtmp::Packet resultPacket;
-
-    resultPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    resultPacket.header.channel = rtmp::Channel::SYSTEM;
-    resultPacket.header.timestamp = 0;
-    resultPacket.header.messageType = rtmp::MessageType::INVOKE;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("_result");
-    commandName.encode(resultPacket.data);
+    commandName.encode(packet.data);
 
     amf0::Node streamId = 0.0;
-    streamId.encode(resultPacket.data);
+    streamId.encode(packet.data);
 
     amf0::Node argument1;
     argument1["fmsVer"] = std::string("FMS/3,0,1,123");
     argument1["capabilities"] = 31.0;
-    argument1.encode(resultPacket.data);
+    argument1.encode(packet.data);
 
     amf0::Node argument2;
     argument2["level"] = std::string("status");
     argument2["code"] = std::string("NetConnection.Connect.Success");
     argument2["description"] = std::string("Connection succeeded.");
     argument2["objectEncoding"] = 0.0;
-    argument2.encode(resultPacket.data);
-
-    resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
+    argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, resultPacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE _result" << std::endl;
@@ -562,29 +551,26 @@ void Input::sendConnectResult()
 
 void Input::sendBWDone()
 {
-    rtmp::Packet onBWDonePacket;
-
-    onBWDonePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    onBWDonePacket.header.channel = rtmp::Channel::SYSTEM;
-    onBWDonePacket.header.timestamp = 0;
-    onBWDonePacket.header.messageType = rtmp::MessageType::INVOKE;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("onBWDone");
-    commandName.encode(onBWDonePacket.data);
+    commandName.encode(packet.data);
 
     amf0::Node streamId = 0.0;
-    streamId.encode(onBWDonePacket.data);
+    streamId.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
-    argument1.encode(onBWDonePacket.data);
+    argument1.encode(packet.data);
 
     amf0::Node argument2 = 0.0;
-    argument2.encode(onBWDonePacket.data);
-
-    onBWDonePacket.header.length = static_cast<uint32_t>(onBWDonePacket.data.size());
+    argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, onBWDonePacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE onBWDone" << std::endl;
@@ -595,26 +581,23 @@ void Input::sendBWDone()
 
 void Input::sendCheckBWResult()
 {
-    rtmp::Packet resultPacket;
-
-    resultPacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    resultPacket.header.channel = rtmp::Channel::SYSTEM;
-    resultPacket.header.timestamp = 0;
-    resultPacket.header.messageType = rtmp::MessageType::INVOKE;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("_result");
-    commandName.encode(resultPacket.data);
+    commandName.encode(packet.data);
 
     amf0::Node streamId = 0.0;
-    streamId.encode(resultPacket.data);
+    streamId.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
-    argument1.encode(resultPacket.data);
-
-    resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
+    argument1.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, resultPacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE _result" << std::endl;
@@ -623,39 +606,7 @@ void Input::sendCheckBWResult()
     _socket.send(buffer);
 }
 
-void Input::startPlaying(const std::string filename)
+void Input::startPlaying()
 {
-    rtmp::Packet statusPacket;
 
-    statusPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    statusPacket.header.channel = rtmp::Channel::SYSTEM;
-    statusPacket.header.timestamp = _timestamp;
-    statusPacket.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
-    statusPacket.header.messageType = rtmp::MessageType::INVOKE;
-
-    amf0::Node commandName = std::string("onStatus");
-    commandName.encode(statusPacket.data);
-
-    amf0::Node streamId = 0.0;
-    streamId.encode(statusPacket.data);
-
-    amf0::Node replyFmsVer;
-    replyFmsVer["capabilities"] = 31.0;
-    replyFmsVer["fmsVer"] = std::string("FMS/3,0,1,123");
-    replyFmsVer.encode(statusPacket.data);
-
-    amf0::Node replyStatus;
-    replyStatus["level"] = std::string("status");
-    replyStatus["code"] = std::string("NetStream.Play.Start");
-    replyStatus["description"] = std::string("Start live");
-    //replyStatus["details"] = filename;
-    //replyStatus["clientid"] = std::string("Lavf");
-    replyStatus.encode(statusPacket.data);
-
-    statusPacket.header.length = static_cast<uint32_t>(statusPacket.data.size());
-
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, statusPacket);
-
-    _socket.send(buffer);
 }

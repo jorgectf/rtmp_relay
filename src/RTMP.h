@@ -74,10 +74,10 @@ namespace rtmp
 
         Type type;
         Channel channel;
-        uint32_t timestamp;
-        uint32_t length;
+        uint32_t timestamp = 0;
+        uint32_t length = 0;
         MessageType messageType;
-        uint32_t messageStreamId;
+        uint32_t messageStreamId = 0;
     };
     
     struct Packet

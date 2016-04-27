@@ -224,7 +224,7 @@ namespace rtmp
     uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
-        
+
         const uint32_t packetCount = ((static_cast<uint32_t>(packet.data.size()) + chunkSize - 1) / chunkSize);
         
         data.reserve(12 + packet.data.size() + packetCount); // 12-byte header + data size + 1-byte header count
@@ -233,7 +233,14 @@ namespace rtmp
         {
             if (i == 0)
             {
-                encodeHeader(data, packet.header);
+                Header header = packet.header;
+
+                if (header.length == 0)
+                {
+                    header.length = static_cast<uint32_t>(packet.data.size());
+                }
+
+                encodeHeader(data, header);
             }
             else
             {

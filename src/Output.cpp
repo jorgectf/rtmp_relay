@@ -437,31 +437,28 @@ bool Output::handlePacket(const rtmp::Packet& packet)
 
 void Output::sendConnect()
 {
-    rtmp::Packet resultPacket;
-
-    resultPacket.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    resultPacket.header.channel = rtmp::Channel::SYSTEM;
-    resultPacket.header.messageStreamId = 0;
-    resultPacket.header.timestamp = 0; //packet.header.timestamp;
-    resultPacket.header.messageType = rtmp::MessageType::INVOKE;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.messageStreamId = 0;
+    packet.header.timestamp = 0; //packet.header.timestamp;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("connect");
-    commandName.encode(resultPacket.data);
+    commandName.encode(packet.data);
 
     amf0::Node streamId = 0.0;
-    streamId.encode(resultPacket.data);
+    streamId.encode(packet.data);
 
     amf0::Node argument1;
     argument1["app"] = std::string("casino/blackjack");
     argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
     argument1["tcUrl"] = std::string("rtmp://127.0.0.1:2200/casino/blackjack");
     argument1["type"] = std::string("nonprivate");
-    argument1.encode(resultPacket.data);
-
-    resultPacket.header.length = static_cast<uint32_t>(resultPacket.data.size());
+    argument1.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, resultPacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE connect" << std::endl;
@@ -472,18 +469,16 @@ void Output::sendConnect()
 
 void Output::sendSetChunkSize()
 {
-    rtmp::Packet chunkSizePacket;
-    chunkSizePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
-    chunkSizePacket.header.timestamp = 0;
-    chunkSizePacket.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
 
-    encodeInt(chunkSizePacket.data, 4, _outChunkSize);
-
-    chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
+    encodeInt(packet.data, 4, _outChunkSize);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, chunkSizePacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
@@ -494,25 +489,23 @@ void Output::sendSetChunkSize()
 
 void Output::sendCheckBW()
 {
-    rtmp::Packet chunkSizePacket;
-    chunkSizePacket.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    chunkSizePacket.header.channel = rtmp::Channel::SYSTEM;
-    chunkSizePacket.header.timestamp = 0;
-    chunkSizePacket.header.messageType = rtmp::MessageType::INVOKE;
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("_checkbw");
-    commandName.encode(chunkSizePacket.data);
+    commandName.encode(packet.data);
 
     amf0::Node streamId = 0.0;
-    streamId.encode(chunkSizePacket.data);
+    streamId.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
-    argument1.encode(chunkSizePacket.data);
-
-    chunkSizePacket.header.length = static_cast<uint32_t>(chunkSizePacket.data.size());
+    argument1.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, chunkSizePacket);
+    encodePacket(buffer, _outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE _checkbw" << std::endl;
