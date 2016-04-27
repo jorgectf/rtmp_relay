@@ -99,7 +99,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 offset += sizeof(version);
 
 #ifdef DEBUG
-                std::cout << "Got version " << version << std::endl;
+                std::cout << "Got version " << static_cast<uint32_t>(version) << std::endl;
 #endif
                 
                 if (version != 0x03)
@@ -228,7 +228,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
     {
         case rtmp::MessageType::SET_CHUNK_SIZE:
         {
-            uint32_t ret = decodeInt(packet.data, 0, 4, _inChunkSize);
+            uint32_t offset = 0;
+
+            uint32_t ret = decodeInt(packet.data, offset, 4, _inChunkSize);
 
             if (ret == 0)
             {
@@ -443,6 +445,10 @@ void Input::sendServerBandwidth()
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, bandwidthPacket);
 
+#ifdef DEBUG
+    std::cout << "Sending SERVER_BANDWIDTH" << std::endl;
+#endif
+
     _socket.send(buffer);
 }
 
@@ -461,6 +467,10 @@ void Input::sendClientBandwidth()
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, bandwidthPacket);
+
+#ifdef DEBUG
+    std::cout << "Sending CLIENT_BANDWIDTH" << std::endl;
+#endif
 
     _socket.send(buffer);
 }
@@ -481,6 +491,10 @@ void Input::sendPing()
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, pingPacket);
 
+#ifdef DEBUG
+    std::cout << "Sending PING" << std::endl;
+#endif
+
     _socket.send(buffer);
 }
 
@@ -499,6 +513,10 @@ void Input::sendSetChunkSize()
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, chunkSizePacket);
+
+#ifdef DEBUG
+    std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
+#endif
 
     _socket.send(buffer);
 }
@@ -535,6 +553,10 @@ void Input::sendConnectResult()
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, resultPacket);
 
+#ifdef DEBUG
+    std::cout << "Sending INVOKE _result" << std::endl;
+#endif
+
     _socket.send(buffer);
 }
 
@@ -564,6 +586,10 @@ void Input::sendBWDone()
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, onBWDonePacket);
 
+#ifdef DEBUG
+    std::cout << "Sending INVOKE onBWDone" << std::endl;
+#endif
+
     _socket.send(buffer);
 }
 
@@ -589,7 +615,11 @@ void Input::sendCheckBWResult()
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, resultPacket);
-    
+
+#ifdef DEBUG
+    std::cout << "Sending INVOKE _result" << std::endl;
+#endif
+
     _socket.send(buffer);
 }
 

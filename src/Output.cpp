@@ -139,7 +139,7 @@ void Output::handleRead(const std::vector<uint8_t>& data)
                 offset += sizeof(version);
 
 #ifdef DEBUG
-                std::cout << "Got version " << version << std::endl;
+                std::cout << "Got version " << static_cast<uint32_t>(version) << std::endl;
 #endif
                 
                 if (version != 0x03)
@@ -246,7 +246,9 @@ bool Output::handlePacket(const rtmp::Packet& packet)
     {
         case rtmp::MessageType::SET_CHUNK_SIZE:
         {
-            uint32_t ret = decodeInt(packet.data, 0, 4, _inChunkSize);
+            uint32_t offset = 0;
+
+            uint32_t ret = decodeInt(packet.data, offset, 4, _inChunkSize);
 
             if (ret == 0)
             {
@@ -461,6 +463,10 @@ void Output::sendConnect()
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, resultPacket);
 
+#ifdef DEBUG
+    std::cout << "Sending INVOKE connect" << std::endl;
+#endif
+
     _socket.send(buffer);
 }
 
@@ -478,6 +484,10 @@ void Output::sendSetChunkSize()
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, chunkSizePacket);
+
+#ifdef DEBUG
+    std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
+#endif
 
     _socket.send(buffer);
 }
@@ -503,6 +513,10 @@ void Output::sendCheckBW()
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, _outChunkSize, chunkSizePacket);
+
+#ifdef DEBUG
+    std::cout << "Sending INVOKE _checkbw" << std::endl;
+#endif
 
     _socket.send(buffer);
 }
