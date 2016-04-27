@@ -18,11 +18,11 @@ namespace rtmp
 
     enum class Channel
     {
-        NETWORK = 2,   ///< channel for network-related messages (bandwidth report, ping, etc)
-        SYSTEM = 3,    ///< channel for sending server control messages
-        AUDIO = 4,     ///< channel for audio data
-        VIDEO   = 6,   ///< channel for video data
-        SOURCE  = 8,   ///< channel for a/v invokes
+        NETWORK = 2,   // channel for network-related messages (bandwidth report, ping, etc)
+        SYSTEM = 3,    // channel for sending server control messages
+        AUDIO = 4,     // channel for audio data
+        VIDEO   = 6,   // channel for video data
+        SOURCE  = 8,   // channel for a/v invokes
     };
 
     enum class State
@@ -36,20 +36,20 @@ namespace rtmp
 
     enum class MessageType: uint8_t
     {
-        SET_CHUNK_SIZE = 1,
-        BYTES_READ = 3,
-        PING = 4,
-        SERVER_BANDWIDTH = 5,
-        CLIENT_BANDWIDTH = 6,
-        AUDIO_PACKET = 8,
-        VIDEO_PACKET = 9,
-        FLEX_STREAM = 15,
-        FLEX_OBJECT = 16,
-        FLEX_MESSAGE = 17,
-        NOTIFY = 18,
-        SHARED_OBJ = 19,
-        INVOKE = 20,
-        METADATA = 22
+        SET_CHUNK_SIZE = 1,     // chunk size change
+        BYTES_READ = 3,         // number of bytes read
+        PING = 4,               // ping
+        SERVER_BANDWIDTH = 5,   // server bandwidth
+        CLIENT_BANDWIDTH = 6,   // client bandwidth
+        AUDIO_PACKET = 8,       // audio packet
+        VIDEO_PACKET = 9,       // video packet
+        FLEX_STREAM = 15,       // Flex shared stream
+        FLEX_OBJECT = 16,       // Flex shared object
+        FLEX_MESSAGE = 17,      // Flex shared message
+        NOTIFY = 18,            // some notification
+        SHARED_OBJ = 19,        // shared object
+        INVOKE = 20,            // invoke some stream action
+        METADATA = 22           // FLV metadata
     };
 
     enum class PingType: uint16_t
@@ -66,10 +66,10 @@ namespace rtmp
     {
         enum class Type: uint8_t
         {
-            TWELVE_BYTE = 0x00, // 00
-            EIGHT_BYTE = 0x01, // 01
-            FOUR_BYTE = 0x02, // 10
-            ONE_BYTE = 0x03 // 11
+            TWELVE_BYTE = 0x00, // bits 00, 12-byte header
+            EIGHT_BYTE = 0x01,  // bits 01, 8-byte header
+            FOUR_BYTE = 0x02,   // bits 10, 4-byte header
+            ONE_BYTE = 0x03     // bits 11, 1-byte header
         };
 
         Type type;
