@@ -28,6 +28,6 @@ public:
     void run();
     
 private:
-    Network _network;
-    std::vector<Server> _servers;
+    Network network;
+    std::vector<Server> servers;
 };

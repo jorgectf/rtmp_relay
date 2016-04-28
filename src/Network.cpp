@@ -19,11 +19,11 @@ Network::Network()
 bool Network::update()
 {
     std::vector<pollfd> pollFds;
-    pollFds.reserve(_sockets.size());
+    pollFds.reserve(sockets.size());
     
     std::map<uint32_t, std::reference_wrapper<Socket>> socketMap;
     
-    for (auto socket : _sockets)
+    for (auto socket : sockets)
     {
         if (socket.get().isConnecting() || socket.get().isReady())
         {
@@ -70,15 +70,15 @@ bool Network::update()
 
 void Network::addSocket(Socket& socket)
 {
-    _sockets.push_back(socket);
+    sockets.push_back(socket);
 }
 
 void Network::removeSocket(Socket& socket)
 {
-    std::vector<std::reference_wrapper<Socket>>::iterator i = std::find_if(_sockets.begin(), _sockets.end(), [&socket](const std::reference_wrapper<Socket>& sock) { return &socket == &sock.get(); });
+    std::vector<std::reference_wrapper<Socket>>::iterator i = std::find_if(sockets.begin(), sockets.end(), [&socket](const std::reference_wrapper<Socket>& sock) { return &socket == &sock.get(); });
     
-    if (i != _sockets.end())
+    if (i != sockets.end())
     {
-        _sockets.erase(i);
+        sockets.erase(i);
     }
 }

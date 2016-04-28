@@ -538,78 +538,78 @@ namespace amf0
 
     }
 
-    Node::Node(Marker marker):
-        _marker(marker)
+    Node::Node(Marker pMarker):
+        marker(pMarker)
     {
 
     }
 
     Node::Node(double value):
-        _marker(Marker::Number), _doubleValue(value)
+        marker(Marker::Number), doubleValue(value)
     {
     }
 
     Node::Node(bool value):
-        _marker(Marker::Boolean), _boolValue(value)
+        marker(Marker::Boolean), boolValue(value)
     {
     }
 
     Node::Node(const std::string& value):
-        _stringValue(value)
+        stringValue(value)
     {
         if (value.length() <= UINT16_MAX)
         {
-            _marker = Marker::String;
+            marker = Marker::String;
         }
         else
         {
-            _marker = Marker::LongString;
+            marker = Marker::LongString;
         }
     }
 
     Node::Node(const Date& value):
-        _marker(Marker::Date), _dateValue(value)
+        marker(Marker::Date), dateValue(value)
     {
     }
 
-    Node& Node::operator=(Marker marker)
+    Node& Node::operator=(Marker newMarker)
     {
-        _marker = marker;
+        marker = newMarker;
         return *this;
     }
 
     Node& Node::operator=(double value)
     {
-        _marker = Marker::Number;
-        _doubleValue = value;
+        marker = Marker::Number;
+        doubleValue = value;
         return *this;
     }
 
     Node& Node::operator=(bool value)
     {
-        _marker = Marker::Boolean;
-        _boolValue = value;
+        marker = Marker::Boolean;
+        boolValue = value;
         return *this;
     }
 
     Node& Node::operator=(const std::string& value)
     {
-        _stringValue = value;
+        stringValue = value;
         if (value.length() <= UINT16_MAX)
         {
-            _marker = Marker::String;
+            marker = Marker::String;
         }
         else
         {
-            _marker = Marker::LongString;
+            marker = Marker::LongString;
         }
         return *this;
     }
 
     Node& Node::operator=(const Date& value)
     {
-        _marker = Marker::Date;
-        _dateValue = value;
+        marker = Marker::Date;
+        dateValue = value;
         return *this;
     }
 
@@ -622,25 +622,25 @@ namespace amf0
             return 0;
         }
 
-        _marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
+        marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
         offset += 1;
 
         uint32_t ret = 0;
 
-        switch (_marker)
+        switch (marker)
         {
-            case Marker::Number: ret = readNumber(buffer, offset, _doubleValue); break;
-            case Marker::Boolean: ret = readBoolean(buffer, offset, _boolValue); break;
-            case Marker::String: ret = readString(buffer, offset, _stringValue); break;
-            case Marker::Object: ret = readObject(buffer, offset, _mapValue); break;
+            case Marker::Number: ret = readNumber(buffer, offset, doubleValue); break;
+            case Marker::Boolean: ret = readBoolean(buffer, offset, boolValue); break;
+            case Marker::String: ret = readString(buffer, offset, stringValue); break;
+            case Marker::Object: ret = readObject(buffer, offset, mapValue); break;
             case Marker::Null: /* Null */; break;
             case Marker::Undefined: /* Undefined */; break;
-            case Marker::ECMAArray: ret = readECMAArray(buffer, offset, _mapValue); break;
+            case Marker::ECMAArray: ret = readECMAArray(buffer, offset, mapValue); break;
             case Marker::ObjectEnd: break; // should not happen
-            case Marker::StrictArray: ret = readStrictArray(buffer, offset, _vectorValue); break;
-            case Marker::Date: ret = readDate(buffer, offset, _dateValue); break;
-            case Marker::LongString: ret = readLongString(buffer, offset, _stringValue); break;
-            case Marker::XMLDocument: ret = readXMLDocument(buffer, offset, _stringValue); break;
+            case Marker::StrictArray: ret = readStrictArray(buffer, offset, vectorValue); break;
+            case Marker::Date: ret = readDate(buffer, offset, dateValue); break;
+            case Marker::LongString: ret = readLongString(buffer, offset, stringValue); break;
+            case Marker::XMLDocument: ret = readXMLDocument(buffer, offset, stringValue); break;
             case Marker::TypedObject: ret = readTypedObject(buffer, offset); break;
             case Marker::SwitchToAMF3: ret = readSwitchToAMF3(buffer, offset); break;
             default: return 0;
@@ -657,23 +657,23 @@ namespace amf0
 
         uint32_t ret = 0;
 
-        buffer.push_back(static_cast<uint8_t>(_marker));
+        buffer.push_back(static_cast<uint8_t>(marker));
         size += 1;
 
-        switch (_marker)
+        switch (marker)
         {
-            case Marker::Number: ret = writeNumber(buffer, _doubleValue); break;
-            case Marker::Boolean: ret = writeBoolean(buffer, _boolValue); break;
-            case Marker::String: ret = writeString(buffer, _stringValue); break;
-            case Marker::Object: ret = writeObject(buffer, _mapValue); break;
+            case Marker::Number: ret = writeNumber(buffer, doubleValue); break;
+            case Marker::Boolean: ret = writeBoolean(buffer, boolValue); break;
+            case Marker::String: ret = writeString(buffer, stringValue); break;
+            case Marker::Object: ret = writeObject(buffer, mapValue); break;
             case Marker::Null: /* Null */; break;
             case Marker::Undefined: /* Undefined */; break;
-            case Marker::ECMAArray: ret = writeECMAArray(buffer, _mapValue); break;
+            case Marker::ECMAArray: ret = writeECMAArray(buffer, mapValue); break;
             case Marker::ObjectEnd: break; // should not happen
-            case Marker::StrictArray: ret = writeStrictArray(buffer, _vectorValue); break;
-            case Marker::Date: ret = writeDate(buffer, _dateValue); break;
-            case Marker::LongString: ret = writeLongString(buffer, _stringValue); break;
-            case Marker::XMLDocument: ret = writeXMLDocument(buffer, _stringValue); break;
+            case Marker::StrictArray: ret = writeStrictArray(buffer, vectorValue); break;
+            case Marker::Date: ret = writeDate(buffer, dateValue); break;
+            case Marker::LongString: ret = writeLongString(buffer, stringValue); break;
+            case Marker::XMLDocument: ret = writeXMLDocument(buffer, stringValue); break;
             case Marker::TypedObject: ret = writeTypedObject(buffer); break;
             case Marker::SwitchToAMF3: ret = writeSwitchToAMF3(buffer); break;
             default: return 0;
@@ -686,62 +686,62 @@ namespace amf0
 
     double Node::asDouble() const
     {
-        return _doubleValue;
+        return doubleValue;
     }
 
     bool Node::asBool() const
     {
-        return _boolValue;
+        return boolValue;
     }
 
     const std::string& Node::asString() const
     {
-        return _stringValue;
+        return stringValue;
     }
 
     const Date& Node::asDate() const
     {
-        return _dateValue;
+        return dateValue;
     }
 
     bool Node::isNull() const
     {
-        return _marker == Marker::Null;
+        return marker == Marker::Null;
     }
 
     bool Node::isUndefined() const
     {
-        return _marker == Marker::Undefined;
+        return marker == Marker::Undefined;
     }
 
     uint32_t Node::getSize() const
     {
-        return static_cast<uint32_t>(_vectorValue.size());
+        return static_cast<uint32_t>(vectorValue.size());
     }
 
     Node Node::operator[](size_t key) const
     {
-        if (key >= _vectorValue.size())
+        if (key >= vectorValue.size())
         {
             return Node();
         }
         else
         {
-            return _vectorValue[key];
+            return vectorValue[key];
         }
     }
 
     Node& Node::operator[](size_t key)
     {
-        _marker = Marker::StrictArray;
-        return _vectorValue[key];
+        marker = Marker::StrictArray;
+        return vectorValue[key];
     }
 
     Node Node::operator[](const std::string& key) const
     {
-        auto i = _mapValue.find(key);
+        auto i = mapValue.find(key);
 
-        if (i == _mapValue.end())
+        if (i == mapValue.end())
         {
             return Node();
         }
@@ -753,64 +753,64 @@ namespace amf0
 
     Node& Node::operator[](const std::string& key)
     {
-        _marker = Marker::Object;
-        return _mapValue[key];
+        marker = Marker::Object;
+        return mapValue[key];
     }
 
     bool Node::hasElement(const std::string& key)
     {
-        return _mapValue.find(key) != _mapValue.end();
+        return mapValue.find(key) != mapValue.end();
     }
 
     void Node::append(const Node& node)
     {
-        _vectorValue.push_back(node);
+        vectorValue.push_back(node);
     }
 
     void Node::dump(const std::string& indent)
     {
-        std::cout << "Type: " << markerToString(_marker) << "(" << static_cast<uint32_t>(_marker) << ")";
+        std::cout << "Type: " << markerToString(marker) << "(" << static_cast<uint32_t>(marker) << ")";
 
-        if (_marker == Marker::Object ||
-            _marker == Marker::StrictArray ||
-            _marker == Marker::ECMAArray)
+        if (marker == Marker::Object ||
+            marker == Marker::StrictArray ||
+            marker == Marker::ECMAArray)
         {
             std::cout << ", values: " << std::endl;
 
-            if (_marker == Marker::StrictArray)
+            if (marker == Marker::StrictArray)
             {
-                for (size_t index = 0; index < _vectorValue.size(); index++)
+                for (size_t index = 0; index < vectorValue.size(); index++)
                 {
                     std::cout << indent + INDENT << index << ": ";
-                    _vectorValue[index].dump(indent + INDENT);
+                    vectorValue[index].dump(indent + INDENT);
                 }
             }
             else
             {
-                for (auto i : _mapValue)
+                for (auto i : mapValue)
                 {
                     std::cout << indent + INDENT << i.first << ": ";
                     i.second.dump(indent + INDENT);
                 }
             }
         }
-        else if (_marker == Marker::Number ||
-                 _marker == Marker::Boolean ||
-                 _marker == Marker::String ||
-                 _marker == Marker::Date ||
-                 _marker == Marker::LongString ||
-                 _marker == Marker::XMLDocument)
+        else if (marker == Marker::Number ||
+                 marker == Marker::Boolean ||
+                 marker == Marker::String ||
+                 marker == Marker::Date ||
+                 marker == Marker::LongString ||
+                 marker == Marker::XMLDocument)
         {
             std::cout << ", value: ";
 
-            switch (_marker)
+            switch (marker)
             {
-                case Marker::Number: std::cout << _doubleValue; break;
-                case Marker::Boolean: std::cout << (_boolValue ? "true" : "false"); break;
-                case Marker::String: std::cout << _stringValue; break;
-                case Marker::Date: std::cout << "ms=" <<  _dateValue.ms << "timezone=" <<  _dateValue.timezone; break;
-                case Marker::LongString: std::cout << _stringValue; break;
-                case Marker::XMLDocument: std::cout << _stringValue; break;
+                case Marker::Number: std::cout << doubleValue; break;
+                case Marker::Boolean: std::cout << (boolValue ? "true" : "false"); break;
+                case Marker::String: std::cout << stringValue; break;
+                case Marker::Date: std::cout << "ms=" <<  dateValue.ms << "timezone=" <<  dateValue.timezone; break;
+                case Marker::LongString: std::cout << stringValue; break;
+                case Marker::XMLDocument: std::cout << stringValue; break;
                 default:break;
             }
 

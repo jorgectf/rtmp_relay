@@ -14,30 +14,30 @@
 
 static uint8_t TEMP_BUFFER[65536];
 
-Socket::Socket(Network& network, int socketFd):
-    _network(network), _socketFd(socketFd)
+Socket::Socket(Network& pNetwork, int pSocketFd):
+    network(pNetwork), socketFd(pSocketFd)
 {
-    if (_socketFd < 0)
+    if (socketFd < 0)
     {
-        _socketFd = socket(AF_INET, SOCK_STREAM, 0);
+        socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
-        if (_socketFd < 0)
+        if (socketFd < 0)
         {
             int error = errno;
             std::cerr << "Failed to create socket, error: " << error << std::endl;
         }
     }
     
-    _network.addSocket(*this);
+    network.addSocket(*this);
 }
 
 Socket::~Socket()
 {
-    _network.removeSocket(*this);
+    network.removeSocket(*this);
     
-    if (_socketFd > 0)
+    if (socketFd > 0)
     {
-        if (::close(_socketFd) < 0)
+        if (::close(socketFd) < 0)
         {
             int error = errno;
             std::cerr << "Failed to close socket, error: " << error << std::endl;
@@ -50,58 +50,56 @@ Socket::~Socket()
 }
 
 Socket::Socket(Socket&& other):
-    _network(other._network),
-    _socketFd(other._socketFd),
-    _connecting(other._connecting),
-    _ready(other._ready),
-    _blocking(other._blocking),
-    _readCallback(std::move(other._readCallback)),
-    _ipAddress(other._ipAddress),
-    _port(other._port)
+    network(other.network),
+    socketFd(other.socketFd),
+    connecting(other.connecting),
+    ready(other.ready),
+    blocking(other.blocking),
+    readCallback(std::move(other.readCallback)),
+    ipAddress(other.ipAddress),
+    port(other.port)
 {
-    _network.addSocket(*this);
+    network.addSocket(*this);
     
-    other._socketFd = -1;
-    other._connecting = false;
-    other._ready = false;
-    other._blocking = true;
-    other._ipAddress = 0;
-    other._port = 0;
+    other.socketFd = -1;
+    other.connecting = false;
+    other.ready = false;
+    other.blocking = true;
+    other.ipAddress = 0;
+    other.port = 0;
 }
 
 Socket& Socket::operator=(Socket&& other)
 {
-    _socketFd = other._socketFd;
-    _connecting = other._connecting;
-    _ready = other._ready;
-    _blocking = other._blocking;
-    _readCallback = std::move(other._readCallback);
-    _ipAddress = other._ipAddress;
-    _port = other._port;
+    socketFd = other.socketFd;
+    connecting = other.connecting;
+    ready = other.ready;
+    blocking = other.blocking;
+    readCallback = std::move(other.readCallback);
+    ipAddress = other.ipAddress;
+    port = other.port;
     
-    other._socketFd = -1;
-    other._connecting = false;
-    other._ready = false;
-    other._blocking = true;
-    other._ipAddress = 0;
-    other._port = 0;
+    other.socketFd = -1;
+    other.connecting = false;
+    other.ready = false;
+    other.blocking = true;
+    other.ipAddress = 0;
+    other.port = 0;
     
     return *this;
 }
 
 void Socket::close()
 {
-    if (_socketFd > 0)
+    if (socketFd > 0)
     {
-        ::close(_socketFd);
-        _socketFd = 0;
+        ::close(socketFd);
+        socketFd = 0;
     }
 }
 
-bool Socket::connect(const std::string& address, uint16_t port)
+bool Socket::connect(const std::string& address, uint16_t newPort)
 {
-    uint32_t ip;
-    
     size_t i = address.find(':');
     std::string addressStr;
     std::string portStr;
@@ -114,7 +112,7 @@ bool Socket::connect(const std::string& address, uint16_t port)
     else
     {
         addressStr = address;
-        portStr = std::to_string(port);
+        portStr = std::to_string(newPort);
     }
     
     addrinfo* result;
@@ -126,21 +124,21 @@ bool Socket::connect(const std::string& address, uint16_t port)
     }
     
     struct sockaddr_in* addr = reinterpret_cast<struct sockaddr_in*>(result->ai_addr);
-    ip = addr->sin_addr.s_addr;
-    port = ntohs(addr->sin_port);
+    uint32_t ip = addr->sin_addr.s_addr;
+    newPort = ntohs(addr->sin_port);
     
     freeaddrinfo(result);
     
-    return connect(ip, port);
+    return connect(ip, newPort);
 }
 
-bool Socket::connect(uint32_t ipAddress, uint16_t port)
+bool Socket::connect(uint32_t address, uint16_t newPort)
 {
-    if (_socketFd < 0)
+    if (socketFd < 0)
     {
-        _socketFd = socket(AF_INET, SOCK_STREAM, 0);
+        socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
-        if (_socketFd < 0)
+        if (socketFd < 0)
         {
             int error = errno;
             std::cerr << "Failed to create socket, error: " << error << std::endl;
@@ -148,35 +146,35 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
         }
     }
 
-    _ipAddress = ipAddress;
-    _port = port;
+    ipAddress = address;
+    port = newPort;
     
-    std::cout << "Connecting to " << ipToString(_ipAddress) << ":" << static_cast<int>(port) << std::endl;
+    std::cout << "Connecting to " << ipToString(ipAddress) << ":" << static_cast<int>(port) << std::endl;
     
     sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(_port);
-    addr.sin_addr.s_addr = _ipAddress;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = ipAddress;
     
-    if (::connect(_socketFd, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0)
+    if (::connect(socketFd, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0)
     {
         if (errno == EINPROGRESS)
         {
-            _connecting = true;
+            connecting = true;
         }
         else
         {
             int error = errno;
-            std::cerr << "Failed to connect to " << ipToString(_ipAddress) << ":" << _port << ", error: " << error << std::endl;
+            std::cerr << "Failed to connect to " << ipToString(ipAddress) << ":" << port << ", error: " << error << std::endl;
             return false;
         }
     }
     else
     {
         // connected
-        _ready = true;
-        if (_connectCallback) _connectCallback();
+        ready = true;
+        if (connectCallback) connectCallback();
     }
     
     return true;
@@ -184,59 +182,59 @@ bool Socket::connect(uint32_t ipAddress, uint16_t port)
 
 bool Socket::startRead()
 {
-    if (_socketFd < 0)
+    if (socketFd < 0)
     {
         std::cerr << "Can not start reading, invalid socket" << std::endl;
         return false;
     }
     
-    _ready = true;
+    ready = true;
     
     return true;
 }
 
-void Socket::setConnectCallback(const std::function<void()>& connectCallback)
+void Socket::setConnectCallback(const std::function<void()>& newConnectCallback)
 {
-    _connectCallback = connectCallback;
+    connectCallback = newConnectCallback;
 }
 
-void Socket::setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& readCallback)
+void Socket::setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& newReadCallback)
 {
-    _readCallback = readCallback;
+    readCallback = newReadCallback;
 }
 
-void Socket::setCloseCallback(const std::function<void()>& closeCallback)
+void Socket::setCloseCallback(const std::function<void()>& newCloseCallback)
 {
-    _closeCallback = closeCallback;
+    closeCallback = newCloseCallback;
 }
 
-bool Socket::setBlocking(bool blocking)
+bool Socket::setBlocking(bool newBlocking)
 {
 #ifdef WIN32
-    unsigned long mode = blocking ? 0 : 1;
-    if (ioctlsocket(_socketFd, FIONBIO, &mode) != 0)
+    unsigned long mode = newBlocking ? 0 : 1;
+    if (ioctlsocket(socketFd, FIONBIO, &mode) != 0)
     {
         return false;
     }
 #else
-    int flags = fcntl(_socketFd, F_GETFL, 0);
+    int flags = fcntl(socketFd, F_GETFL, 0);
     if (flags < 0) return false;
-    flags = blocking ? (flags&~O_NONBLOCK) : (flags|O_NONBLOCK);
+    flags = newBlocking ? (flags&~O_NONBLOCK) : (flags|O_NONBLOCK);
     
-    if (fcntl(_socketFd, F_SETFL, flags) != 0)
+    if (fcntl(socketFd, F_SETFL, flags) != 0)
     {
         return false;
     }
 #endif
     
-    _blocking = blocking;
+    blocking = newBlocking;
     
     return true;
 }
 
 bool Socket::send(std::vector<uint8_t> buffer)
 {
-    ssize_t size = ::send(_socketFd, buffer.data(), buffer.size(), 0);
+    ssize_t size = ::send(socketFd, buffer.data(), buffer.size(), 0);
 
     if (size < 0)
     {
@@ -257,27 +255,27 @@ bool Socket::send(std::vector<uint8_t> buffer)
 
 bool Socket::read()
 {
-    ssize_t size = recv(_socketFd, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
+    ssize_t size = recv(socketFd, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
     
     if (size < 0)
     {
         int error = errno;
         
-        if (_connecting)
+        if (connecting)
         {
-            std::cerr << "Failed to connect to " << ipToString(_ipAddress) << ":" << _port << ", error: " << error << std::endl;
-            _connecting = false;
+            std::cerr << "Failed to connect to " << ipToString(ipAddress) << ":" << port << ", error: " << error << std::endl;
+            connecting = false;
         }
         else
         {
             std::cerr << "Failed to read from socket, error: " << error << std::endl;
         }
         
-        _ready = false;
+        ready = false;
         
-        if (_closeCallback)
+        if (closeCallback)
         {
-            _closeCallback();
+            closeCallback();
         }
         
         return false;
@@ -285,11 +283,11 @@ bool Socket::read()
     else if (size == 0)
     {
         std::cout << "Socket disconnected" << std::endl;
-        _ready = false;
+        ready = false;
         
-        if (_closeCallback)
+        if (closeCallback)
         {
-            _closeCallback();
+            closeCallback();
         }
         
         return false;
@@ -301,9 +299,9 @@ bool Socket::read()
 
     std::vector<uint8_t> data(TEMP_BUFFER, TEMP_BUFFER + size);
 
-    if (_readCallback)
+    if (readCallback)
     {
-        _readCallback(data);
+        readCallback(data);
     }
     
     return true;
@@ -311,12 +309,12 @@ bool Socket::read()
 
 bool Socket::write()
 {
-    if (_connecting)
+    if (connecting)
     {
-        _connecting = false;
-        _ready = true;
-        std::cout << "Socket connected to " << ipToString(_ipAddress) << ":" << _port << std::endl;
-        if (_connectCallback) _connectCallback();
+        connecting = false;
+        ready = true;
+        std::cout << "Socket connected to " << ipToString(ipAddress) << ":" << port << std::endl;
+        if (connectCallback) connectCallback();
     }
     
     return true;

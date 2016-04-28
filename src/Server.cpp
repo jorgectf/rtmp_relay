@@ -10,10 +10,10 @@
 #include <unistd.h>
 #include "Server.h"
 
-Server::Server(Network& network):
-    _network(network), _socket(network)
+Server::Server(Network& pNetwork):
+    network(pNetwork), socket(pNetwork)
 {
-    _socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
+    socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
 
 Server::~Server()
@@ -22,36 +22,36 @@ Server::~Server()
 }
 
 Server::Server(Server&& other):
-    _network(other._network),
-    _socket(std::move(other._socket)),
-    _outputs(std::move(other._outputs)),
-    _inputs(std::move(other._inputs))
+    network(other.network),
+    socket(std::move(other.socket)),
+    outputs(std::move(other.outputs)),
+    inputs(std::move(other.inputs))
 {
-    _socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
+    socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
 
 Server& Server::operator=(Server&& other)
 {
-    _socket = std::move(other._socket);
-    _outputs = std::move(other._outputs);
-    _inputs = std::move(other._inputs);
+    socket = std::move(other.socket);
+    outputs = std::move(other.outputs);
+    inputs = std::move(other.inputs);
     
-    _socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
+    socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
     
     return *this;
 }
 
 bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 {
-    _socket.startAccept(port);
+    socket.startAccept(port);
     
     for (const std::string& address : pushAddresses)
     {
-        Output output(_network);
+        Output output(network);
         
         if (output.init(address))
         {            
-            _outputs.push_back(std::move(output));
+            outputs.push_back(std::move(output));
         }
     }
     
@@ -60,12 +60,12 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 
 void Server::update()
 {
-    for (Output& output : _outputs)
+    for (Output& output : outputs)
     {
         output.update();
     }
     
-    for (auto inputIterator = _inputs.begin(); inputIterator != _inputs.end();)
+    for (auto inputIterator = inputs.begin(); inputIterator != inputs.end();)
     {
         if (inputIterator->isConnected())
         {
@@ -74,21 +74,21 @@ void Server::update()
         }
         else
         {
-            inputIterator = _inputs.erase(inputIterator);
+            inputIterator = inputs.erase(inputIterator);
         }
     }
 }
 
-void Server::handleAccept(Socket socket)
+void Server::handleAccept(Socket clientSocket)
 {
     // accept only one input
-    if (_inputs.empty())
+    if (inputs.empty())
     {
-        Input input(_network, std::move(socket));
-        _inputs.push_back(std::move(input));
+        Input input(network, std::move(clientSocket));
+        inputs.push_back(std::move(input));
     }
     else
     {
-        socket.close();
+        clientSocket.close();
     }
 }

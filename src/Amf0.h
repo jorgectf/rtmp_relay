@@ -41,19 +41,19 @@ namespace amf0
     {
     public:
         Node();
-        Node(Marker marker);
+        Node(Marker pMarker);
         Node(double value);
         Node(bool value);
         Node(const std::string& value);
         Node(const Date& value);
 
-        Node& operator=(Marker marker);
+        Node& operator=(Marker newMarker);
         Node& operator=(double value);
         Node& operator=(bool value);
         Node& operator=(const std::string& value);
         Node& operator=(const Date& value);
 
-        Marker getMarker() const { return _marker; }
+        Marker getMarker() const { return marker; }
 
         uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
         uint32_t encode(std::vector<uint8_t>& buffer) const;
@@ -79,13 +79,13 @@ namespace amf0
         void dump(const std::string& indent = "");
 
     private:
-        Marker _marker = Marker::Unknown;
+        Marker marker = Marker::Unknown;
 
-        bool _boolValue = false;
-        double _doubleValue = 0.0;
-        std::string _stringValue;
-        std::vector<Node> _vectorValue;
-        std::map<std::string, Node> _mapValue;
-        Date _dateValue;
+        bool boolValue = false;
+        double doubleValue = 0.0;
+        std::string stringValue;
+        std::vector<Node> vectorValue;
+        std::map<std::string, Node> mapValue;
+        Date dateValue;
     };
 }

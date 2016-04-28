@@ -57,11 +57,11 @@ bool Relay::init(const std::string& config)
             pushAddresses.push_back(pushObject.GetString());
         }
         
-        Server server(_network);
+        Server server(network);
         
         if (server.init(static_cast<uint16_t>(serverObject["port"].GetInt()), pushAddresses))
         {
-            _servers.push_back(std::move(server));
+            servers.push_back(std::move(server));
         }
     }
     
@@ -79,9 +79,9 @@ void Relay::run()
     
     while (true)
     {
-        _network.update();
+        network.update();
         
-        for (Server& server : _servers)
+        for (Server& server : servers)
         {
             server.update();
         }

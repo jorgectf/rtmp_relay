@@ -26,5 +26,5 @@ protected:
     void addSocket(Socket& socket);
     void removeSocket(Socket& socket);
     
-    std::vector<std::reference_wrapper<Socket>> _sockets;
+    std::vector<std::reference_wrapper<Socket>> sockets;
 };

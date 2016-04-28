@@ -9,12 +9,12 @@
 #include "Amf0.h"
 #include "Utils.h"
 
-Input::Input(Network& network, Socket socket):
-    _network(network), _socket(std::move(socket)), _generator(_rd())
+Input::Input(Network& pNetwork, Socket pSocket):
+    network(pNetwork), socket(std::move(pSocket)), generator(rd())
 {
-    _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
-    _socket.setCloseCallback(std::bind(&Input::handleClose, this));
-    _socket.startRead();
+    socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Input::handleClose, this));
+    socket.startRead();
 }
 
 Input::~Input()
@@ -23,41 +23,41 @@ Input::~Input()
 }
 
 Input::Input(Input&& other):
-    _network(other._network),
-    _socket(std::move(other._socket)),
-    _data(std::move(other._data)),
-    _state(other._state),
-    _inChunkSize(other._inChunkSize),
-    _outChunkSize(other._outChunkSize),
-    _generator(std::move(other._generator)),
-    _timestamp(other._timestamp)
+    network(other.network),
+    socket(std::move(other.socket)),
+    data(std::move(other.data)),
+    state(other.state),
+    inChunkSize(other.inChunkSize),
+    outChunkSize(other.outChunkSize),
+    generator(std::move(other.generator)),
+    timestamp(other.timestamp)
 {
-    other._state = rtmp::State::UNINITIALIZED;
-    other._inChunkSize = 128;
-    other._outChunkSize = 128;
-    other._timestamp = 0;
+    other.state = rtmp::State::UNINITIALIZED;
+    other.inChunkSize = 128;
+    other.outChunkSize = 128;
+    other.timestamp = 0;
     
-    _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
-    _socket.setCloseCallback(std::bind(&Input::handleClose, this));
+    socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Input::handleClose, this));
 }
 
 Input& Input::operator=(Input&& other)
 {
-    _socket = std::move(other._socket);
-    _data = std::move(other._data);
-    _state = other._state;
-    _inChunkSize = other._inChunkSize;
-    _outChunkSize = other._outChunkSize;
-    _generator = std::move(other._generator);
-    _timestamp = other._timestamp;
+    socket = std::move(other.socket);
+    data = std::move(other.data);
+    state = other.state;
+    inChunkSize = other.inChunkSize;
+    outChunkSize = other.outChunkSize;
+    generator = std::move(other.generator);
+    timestamp = other.timestamp;
     
-    other._state = rtmp::State::UNINITIALIZED;
-    other._inChunkSize = 128;
-    other._outChunkSize = 128;
-    other._timestamp = 0;
+    other.state = rtmp::State::UNINITIALIZED;
+    other.inChunkSize = 128;
+    other.outChunkSize = 128;
+    other.timestamp = 0;
     
-    _socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
-    _socket.setCloseCallback(std::bind(&Input::handleClose, this));
+    socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Input::handleClose, this));
     
     return *this;
 }
@@ -69,33 +69,33 @@ void Input::update()
 
 bool Input::getPacket(std::vector<uint8_t>& packet)
 {
-    if (_data.size())
+    if (data.size())
     {
-        packet = _data;
+        packet = data;
         return true;
     }
     
     return false;
 }
 
-void Input::handleRead(const std::vector<uint8_t>& data)
+void Input::handleRead(const std::vector<uint8_t>& newData)
 {
-    _data.insert(_data.end(), data.begin(), data.end());
+    data.insert(data.end(), newData.begin(), newData.end());
 
 #ifdef DEBUG
-    std::cout << "Input got " << std::to_string(data.size()) << " bytes" << std::endl;
+    std::cout << "Input got " << std::to_string(newData.size()) << " bytes" << std::endl;
 #endif
     
     uint32_t offset = 0;
     
-    while (offset < _data.size())
+    while (offset < data.size())
     {
-        if (_state == rtmp::State::UNINITIALIZED)
+        if (state == rtmp::State::UNINITIALIZED)
         {
-            if (_data.size() - offset >= sizeof(uint8_t))
+            if (data.size() - offset >= sizeof(uint8_t))
             {
                 // C0
-                uint8_t version = static_cast<uint8_t>(*(_data.data() + offset));
+                uint8_t version = static_cast<uint8_t>(*(data.data() + offset));
                 offset += sizeof(version);
 
 #ifdef DEBUG
@@ -105,28 +105,28 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 if (version != 0x03)
                 {
                     std::cerr << "Unsuported version" << std::endl;
-                    _socket.close();
+                    socket.close();
                     break;
                 }
                 
                 // S0
                 std::vector<uint8_t> reply;
                 reply.push_back(RTMP_VERSION);
-                _socket.send(reply);
+                socket.send(reply);
                 
-                _state = rtmp::State::VERSION_SENT;
+                state = rtmp::State::VERSION_SENT;
             }
             else
             {
                 break;
             }
         }
-        else if (_state == rtmp::State::VERSION_SENT)
+        else if (state == rtmp::State::VERSION_SENT)
         {
-            if (_data.size() - offset >= sizeof(rtmp::Challange))
+            if (data.size() - offset >= sizeof(rtmp::Challange))
             {
                 // C1
-                rtmp::Challange* challange = reinterpret_cast<rtmp::Challange*>(_data.data() + offset);
+                rtmp::Challange* challange = reinterpret_cast<rtmp::Challange*>(data.data() + offset);
                 offset += sizeof(*challange);
 
 #ifdef DEBUG
@@ -144,14 +144,14 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 
                 for (size_t i = 0; i < sizeof(replyChallange.randomBytes); ++i)
                 {
-                    replyChallange.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(_generator);
+                    replyChallange.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(generator);
                 }
                 
                 std::vector<uint8_t> reply;
                 reply.insert(reply.begin(),
                              reinterpret_cast<uint8_t*>(&replyChallange),
                              reinterpret_cast<uint8_t*>(&replyChallange) + sizeof(replyChallange));
-                _socket.send(reply);
+                socket.send(reply);
                 
                 // S2
                 rtmp::Ack ack;
@@ -163,21 +163,21 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 ackData.insert(ackData.begin(),
                                reinterpret_cast<uint8_t*>(&ack),
                                reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
-                _socket.send(ackData);
+                socket.send(ackData);
                 
-                _state = rtmp::State::ACK_SENT;
+                state = rtmp::State::ACK_SENT;
             }
             else
             {
                 break;
             }
         }
-        else  if (_state == rtmp::State::ACK_SENT)
+        else  if (state == rtmp::State::ACK_SENT)
         {
-            if (_data.size() - offset >= sizeof(rtmp::Ack))
+            if (data.size() - offset >= sizeof(rtmp::Ack))
             {
                 // C2
-                rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(_data.data() + offset);
+                rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                 offset += sizeof(*ack);
 
 #ifdef DEBUG
@@ -185,19 +185,19 @@ void Input::handleRead(const std::vector<uint8_t>& data)
                 std::cout << "Handshake done" << std::endl;
 #endif
                 
-                _state = rtmp::State::HANDSHAKE_DONE;
+                state = rtmp::State::HANDSHAKE_DONE;
             }
             else
             {
                 break;
             }
         }
-        else if (_state == rtmp::State::HANDSHAKE_DONE)
+        else if (state == rtmp::State::HANDSHAKE_DONE)
         {
             // TODO: send subscribe
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::decodePacket(data, offset, _inChunkSize, packet);
+            uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet);
 
             if (ret > 0)
             {
@@ -212,7 +212,7 @@ void Input::handleRead(const std::vector<uint8_t>& data)
         }
     }
     
-    _data.erase(_data.begin(), _data.begin() + offset);
+    data.erase(data.begin(), data.begin() + offset);
 }
 
 void Input::handleClose()
@@ -222,7 +222,7 @@ void Input::handleClose()
 
 bool Input::handlePacket(const rtmp::Packet& packet)
 {
-    _timestamp = packet.header.timestamp;
+    timestamp = packet.header.timestamp;
 
     switch (packet.header.messageType)
     {
@@ -230,7 +230,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
         {
             uint32_t offset = 0;
 
-            uint32_t ret = decodeInt(packet.data, offset, 4, _inChunkSize);
+            uint32_t ret = decodeInt(packet.data, offset, 4, inChunkSize);
 
             if (ret == 0)
             {
@@ -238,7 +238,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             }
 
 #ifdef DEBUG
-            std::cout << "Chunk size: " << _inChunkSize << std::endl;
+            std::cout << "Chunk size: " << inChunkSize << std::endl;
 #endif
 
             break;
@@ -438,16 +438,16 @@ void Input::sendServerBandwidth()
     packet.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
     packet.header.messageStreamId = 0;
 
-    encodeInt(packet.data, 4, _serverBandwidth);
+    encodeInt(packet.data, 4, serverBandwidth);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending SERVER_BANDWIDTH" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Input::sendClientBandwidth()
@@ -458,17 +458,17 @@ void Input::sendClientBandwidth()
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
 
-    encodeInt(packet.data, 4, _serverBandwidth);
+    encodeInt(packet.data, 4, serverBandwidth);
     encodeInt(packet.data, 1, 2); // dynamic
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending CLIENT_BANDWIDTH" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Input::sendPing()
@@ -483,13 +483,13 @@ void Input::sendPing()
     encodeInt(packet.data, 4, 0); // ping param
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending PING" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Input::sendSetChunkSize()
@@ -501,16 +501,16 @@ void Input::sendSetChunkSize()
     packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
     packet.header.messageStreamId = 0;
 
-    encodeInt(packet.data, 4, _outChunkSize);
+    encodeInt(packet.data, 4, outChunkSize);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Input::sendConnectResult()
@@ -540,13 +540,13 @@ void Input::sendConnectResult()
     argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE _result" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Input::sendBWDone()
@@ -570,13 +570,13 @@ void Input::sendBWDone()
     argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE onBWDone" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Input::sendCheckBWResult()
@@ -597,13 +597,13 @@ void Input::sendCheckBWResult()
     argument1.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE _result" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Input::startPlaying()

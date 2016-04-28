@@ -13,7 +13,7 @@ class Socket
 {
     friend Network;
 public:
-    Socket(Network& network, int socketFd = -1);
+    Socket(Network& pNetwork, int pSocketFd = -1);
     virtual ~Socket();
     
     Socket(const Socket&) = delete;
@@ -24,40 +24,40 @@ public:
     
     void close();
     
-    bool connect(const std::string& address, uint16_t port = 0);
-    bool connect(uint32_t ipAddress, uint16_t port);
+    bool connect(const std::string& address, uint16_t newPort = 0);
+    bool connect(uint32_t address, uint16_t newPort);
     
     bool startRead();
-    void setConnectCallback(const std::function<void()>& connectCallback);
-    void setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& readCallback);
-    void setCloseCallback(const std::function<void()>& closeCallback);
+    void setConnectCallback(const std::function<void()>& newConnectCallback);
+    void setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& newReadCallback);
+    void setCloseCallback(const std::function<void()>& newCloseCallback);
     
     bool send(std::vector<uint8_t> buffer);
     
-    int getSocketFd() const { return _socketFd; }
+    int getSocketFd() const { return socketFd; }
     
-    bool isBlocking() const { return _blocking; }
-    bool setBlocking(bool blocking);
+    bool isBlocking() const { return blocking; }
+    bool setBlocking(bool newBlocking);
     
-    bool isConnecting() const { return _connecting; }
-    bool isReady() const { return _ready; }
+    bool isConnecting() const { return connecting; }
+    bool isReady() const { return ready; }
     
 protected:
     virtual bool read();
     virtual bool write();
     
-    Network& _network;
+    Network& network;
     
-    int _socketFd = -1;
+    int socketFd = -1;
     
-    bool _connecting = false;
-    bool _ready = false;
-    bool _blocking = true;
+    bool connecting = false;
+    bool ready = false;
+    bool blocking = true;
 
-    uint32_t _ipAddress = 0;
-    uint16_t _port = 0;
+    uint32_t ipAddress = 0;
+    uint16_t port = 0;
     
-    std::function<void()> _connectCallback;
-    std::function<void(const std::vector<uint8_t>&)> _readCallback;
-    std::function<void()> _closeCallback;
+    std::function<void()> connectCallback;
+    std::function<void(const std::vector<uint8_t>&)> readCallback;
+    std::function<void()> closeCallback;
 };

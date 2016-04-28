@@ -11,12 +11,12 @@
 #include "Amf0.h"
 #include "Utils.h"
 
-Output::Output(Network& network):
-    _network(network), _socket(_network), _generator(_rd())
+Output::Output(Network& pNetwork):
+    network(pNetwork), socket(pNetwork), generator(rd())
 {
-    _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
-    _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
-    _socket.setCloseCallback(std::bind(&Output::handleClose, this));
+    socket.setConnectCallback(std::bind(&Output::handleConnect, this));
+    socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Output::handleClose, this));
 }
 
 Output::~Output()
@@ -25,57 +25,55 @@ Output::~Output()
 }
 
 Output::Output(Output&& other):
-    _network(other._network),
-    _socket(std::move(other._socket)),
-    _data(std::move(other._data)),
-    _state(other._state),
-    _inChunkSize(other._inChunkSize),
-    _outChunkSize(other._outChunkSize),
-    _generator(std::move(other._generator))
+    network(other.network),
+    socket(std::move(other.socket)),
+    data(std::move(other.data)),
+    state(other.state),
+    inChunkSize(other.inChunkSize),
+    outChunkSize(other.outChunkSize),
+    generator(std::move(other.generator))
 {
-    other._state = rtmp::State::UNINITIALIZED;
-    other._inChunkSize = 128;
-    other._outChunkSize = 128;
+    other.state = rtmp::State::UNINITIALIZED;
+    other.inChunkSize = 128;
+    other.outChunkSize = 128;
     
-    _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
-    _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
-    _socket.setCloseCallback(std::bind(&Output::handleClose, this));
+    socket.setConnectCallback(std::bind(&Output::handleConnect, this));
+    socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Output::handleClose, this));
 }
 
 Output& Output::operator=(Output&& other)
 {
-    _socket = std::move(other._socket);
-    _data = std::move(other._data);
-    _state = other._state;
-    _inChunkSize = other._inChunkSize;
-    _outChunkSize = other._outChunkSize;
-    _generator = std::move(other._generator);
+    socket = std::move(other.socket);
+    data = std::move(other.data);
+    state = other.state;
+    inChunkSize = other.inChunkSize;
+    outChunkSize = other.outChunkSize;
+    generator = std::move(other.generator);
     
-    other._state = rtmp::State::UNINITIALIZED;
-    other._inChunkSize = 128;
-    other._outChunkSize = 128;
+    other.state = rtmp::State::UNINITIALIZED;
+    other.inChunkSize = 128;
+    other.outChunkSize = 128;
     
-    _socket.setConnectCallback(std::bind(&Output::handleConnect, this));
-    _socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
-    _socket.setCloseCallback(std::bind(&Output::handleClose, this));
+    socket.setConnectCallback(std::bind(&Output::handleConnect, this));
+    socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Output::handleClose, this));
     
     return *this;
 }
 
 bool Output::init(const std::string& address)
 {
-    if (!_socket.setBlocking(false))
+    if (!socket.setBlocking(false))
     {
         std::cerr << "Failed to set socket non-blocking" << std::endl;
         return false;
     }
     
-    if (!_socket.connect(address))
+    if (!socket.connect(address))
     {
         return false;
     }
-    
-    // TODO: make handshake
     
     return true;
 }
@@ -91,7 +89,7 @@ void Output::handleConnect()
 
     std::vector<uint8_t> version;
     version.push_back(RTMP_VERSION);
-    _socket.send(version);
+    socket.send(version);
     
     rtmp::Challange challange;
     challange.time = 0;
@@ -99,43 +97,43 @@ void Output::handleConnect()
     
     for (size_t i = 0; i < sizeof(challange.randomBytes); ++i)
     {
-        challange.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(_generator);
+        challange.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(generator);
     }
     
     std::vector<uint8_t> challangeMessage;
     challangeMessage.insert(challangeMessage.begin(),
                             reinterpret_cast<uint8_t*>(&challange),
                             reinterpret_cast<uint8_t*>(&challange) + sizeof(challange));
-    _socket.send(challangeMessage);
+    socket.send(challangeMessage);
     
-    _state = rtmp::State::VERSION_SENT;
+    state = rtmp::State::VERSION_SENT;
 }
 
 bool Output::sendPacket(const std::vector<uint8_t>& packet)
 {
-    _socket.send(packet);
+    socket.send(packet);
     
     return true;
 }
 
-void Output::handleRead(const std::vector<uint8_t>& data)
+void Output::handleRead(const std::vector<uint8_t>& newData)
 {
-    _data.insert(_data.end(), data.begin(), data.end());
+    data.insert(data.end(), newData.begin(), newData.end());
 
 #ifdef DEBUG
-    std::cout << "Output got " << std::to_string(data.size()) << " bytes" << std::endl;
+    std::cout << "Output got " << std::to_string(newData.size()) << " bytes" << std::endl;
 #endif
     
     uint32_t offset = 0;
     
-    while (offset < _data.size())
+    while (offset < data.size())
     {
-        if (_state == rtmp::State::VERSION_SENT)
+        if (state == rtmp::State::VERSION_SENT)
         {
-            if (_data.size() - offset >= sizeof(uint8_t))
+            if (data.size() - offset >= sizeof(uint8_t))
             {
                 // S0
-                uint8_t version = static_cast<uint8_t>(*_data.data() + offset);
+                uint8_t version = static_cast<uint8_t>(*data.data() + offset);
                 offset += sizeof(version);
 
 #ifdef DEBUG
@@ -145,23 +143,23 @@ void Output::handleRead(const std::vector<uint8_t>& data)
                 if (version != 0x03)
                 {
                     std::cerr << "Unsuported version" << std::endl;
-                    _socket.close();
+                    socket.close();
                     break;
                 }
                 
-                _state = rtmp::State::VERSION_RECEIVED;
+                state = rtmp::State::VERSION_RECEIVED;
             }
             else
             {
                 break;
             }
         }
-        else if (_state == rtmp::State::VERSION_RECEIVED)
+        else if (state == rtmp::State::VERSION_RECEIVED)
         {
-            if (_data.size() - offset >= sizeof(rtmp::Challange))
+            if (data.size() - offset >= sizeof(rtmp::Challange))
             {
                 // S1
-                rtmp::Challange* challange = reinterpret_cast<rtmp::Challange*>(_data.data() + offset);
+                rtmp::Challange* challange = reinterpret_cast<rtmp::Challange*>(data.data() + offset);
                 offset += sizeof(*challange);
 
 #ifdef DEBUG
@@ -182,21 +180,21 @@ void Output::handleRead(const std::vector<uint8_t>& data)
                 ackData.insert(ackData.begin(),
                                reinterpret_cast<uint8_t*>(&ack),
                                reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
-                _socket.send(ackData);
+                socket.send(ackData);
                 
-                _state = rtmp::State::ACK_SENT;
+                state = rtmp::State::ACK_SENT;
             }
             else
             {
                 break;
             }
         }
-        else if (_state == rtmp::State::ACK_SENT)
+        else if (state == rtmp::State::ACK_SENT)
         {
-            if (_data.size() - offset >= sizeof(rtmp::Ack))
+            if (data.size() - offset >= sizeof(rtmp::Ack))
             {
                 // S2
-                rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(_data.data() + offset);
+                rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                 offset += sizeof(*ack);
 
 #ifdef DEBUG
@@ -204,7 +202,7 @@ void Output::handleRead(const std::vector<uint8_t>& data)
                 std::cout << "Handshake done" << std::endl;
 #endif
                 
-                _state = rtmp::State::HANDSHAKE_DONE;
+                state = rtmp::State::HANDSHAKE_DONE;
 
                 sendConnect();
             }
@@ -213,11 +211,11 @@ void Output::handleRead(const std::vector<uint8_t>& data)
                 break;
             }
         }
-        else if (_state == rtmp::State::HANDSHAKE_DONE)
+        else if (state == rtmp::State::HANDSHAKE_DONE)
         {
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::decodePacket(_data, offset, _inChunkSize, packet);
+            uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet);
             
             if (ret > 0)
             {
@@ -232,7 +230,7 @@ void Output::handleRead(const std::vector<uint8_t>& data)
         }
     }
     
-    _data.erase(_data.begin(), _data.begin() + offset);
+    data.erase(data.begin(), data.begin() + offset);
 }
 
 void Output::handleClose()
@@ -248,7 +246,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
         {
             uint32_t offset = 0;
 
-            uint32_t ret = decodeInt(packet.data, offset, 4, _inChunkSize);
+            uint32_t ret = decodeInt(packet.data, offset, 4, inChunkSize);
 
             if (ret == 0)
             {
@@ -256,7 +254,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             }
 
 #ifdef DEBUG
-            std::cout << "Chunk size: " << _inChunkSize << std::endl;
+            std::cout << "Chunk size: " << inChunkSize << std::endl;
 #endif
             sendSetChunkSize();
 
@@ -458,13 +456,13 @@ void Output::sendConnect()
     argument1.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE connect" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Output::sendSetChunkSize()
@@ -475,16 +473,16 @@ void Output::sendSetChunkSize()
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
 
-    encodeInt(packet.data, 4, _outChunkSize);
+    encodeInt(packet.data, 4, outChunkSize);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }
 
 void Output::sendCheckBW()
@@ -505,11 +503,11 @@ void Output::sendCheckBW()
     argument1.encode(packet.data);
 
     std::vector<uint8_t> buffer;
-    encodePacket(buffer, _outChunkSize, packet);
+    encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
     std::cout << "Sending INVOKE _checkbw" << std::endl;
 #endif
 
-    _socket.send(buffer);
+    socket.send(buffer);
 }

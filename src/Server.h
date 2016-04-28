@@ -16,7 +16,7 @@
 class Server
 {
 public:
-    Server(Network& network);
+    Server(Network& pNetwork);
     ~Server();
     
     Server(const Server&) = delete;
@@ -30,11 +30,11 @@ public:
     void update();
     
 protected:
-    void handleAccept(Socket socket);
+    void handleAccept(Socket clientSocket);
     
-    Network& _network;
-    Acceptor _socket;
+    Network& network;
+    Acceptor socket;
     
-    std::vector<Output> _outputs;
-    std::vector<Input> _inputs;
+    std::vector<Output> outputs;
+    std::vector<Input> inputs;
 };

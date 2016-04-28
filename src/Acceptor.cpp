@@ -25,29 +25,29 @@ Acceptor::~Acceptor()
 
 Acceptor::Acceptor(Acceptor&& other):
     Socket(std::move(other)),
-    _acceptCallback(std::move(other._acceptCallback))
+    acceptCallback(std::move(other.acceptCallback))
 {
-    other._port = 0;
+    other.port = 0;
 }
 
 Acceptor& Acceptor::operator=(Acceptor&& other)
 {
     Socket::operator=(std::move(other));
-    _port = other._port;
-    _acceptCallback = std::move(other._acceptCallback);
+    port = other.port;
+    acceptCallback = std::move(other.acceptCallback);
     
-    other._port = 0;
+    other.port = 0;
     
     return *this;
 }
 
-bool Acceptor::startAccept(uint16_t port)
+bool Acceptor::startAccept(uint16_t newPort)
 {
-    if (_socketFd < 0)
+    if (socketFd < 0)
     {
-        _socketFd = socket(AF_INET, SOCK_STREAM, 0);
+        socketFd = socket(AF_INET, SOCK_STREAM, 0);
         
-        if (_socketFd < 0)
+        if (socketFd < 0)
         {
             int error = errno;
             std::cerr << "Failed to create socket, error: " << error << std::endl;
@@ -55,18 +55,16 @@ bool Acceptor::startAccept(uint16_t port)
         }
     }
 
-    _ipAddress = 0;
-    _port = port;
+    ipAddress = 0;
+    port = newPort;
     int value = 1;
 
-    if (setsockopt(_socketFd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) < 0)
+    if (setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) < 0)
     {
         int error = errno;
         std::cerr << "setsockopt(SO_REUSEADDR) failed, error: " << error << std::endl;
         return false;
     }
-    
-    _port = port;
     
     sockaddr_in serverAddress;
     memset(&serverAddress, 0, sizeof(serverAddress));
@@ -74,29 +72,29 @@ bool Acceptor::startAccept(uint16_t port)
     serverAddress.sin_port = htons(port);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     
-    if (bind(_socketFd, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) < 0)
+    if (bind(socketFd, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) < 0)
     {
         int error = errno;
         std::cerr << "Failed to bind server socket, error: " << error << std::endl;
         return false;
     }
     
-    if (listen(_socketFd, WAITING_QUEUE_SIZE) < 0)
+    if (listen(socketFd, WAITING_QUEUE_SIZE) < 0)
     {
         int error = errno;
-        std::cerr << "Failed to listen on port " << _port << ", error: " << error << std::endl;
+        std::cerr << "Failed to listen on port " << port << ", error: " << error << std::endl;
         return false;
     }
     
-    std::cout << "Server listening on port " << _port << std::endl;
-    _ready = true;
+    std::cout << "Server listening on port " << port << std::endl;
+    ready = true;
     
     return true;
 }
 
-void Acceptor::setAcceptCallback(const std::function<void(Socket)>& acceptCallback)
+void Acceptor::setAcceptCallback(const std::function<void(Socket)>& newAcceptCallback)
 {
-    _acceptCallback = acceptCallback;
+    acceptCallback = newAcceptCallback;
 }
 
 bool Acceptor::read()
@@ -104,9 +102,9 @@ bool Acceptor::read()
     sockaddr_in address;
     socklen_t addressLength;
     
-    int socketFd = ::accept(_socketFd, reinterpret_cast<sockaddr*>(&address), &addressLength);
+    int clientFd = ::accept(socketFd, reinterpret_cast<sockaddr*>(&address), &addressLength);
     
-    if (_socketFd < 0)
+    if (clientFd < 0)
     {
         int error = errno;
         std::cerr << "Failed to accept client, error: " << error << std::endl;
@@ -116,11 +114,11 @@ bool Acceptor::read()
     {
         std::cout << "Client connected from " << ipToString(address.sin_addr.s_addr) << std::endl;
         
-        Socket socket(_network, socketFd);
+        Socket socket(network, clientFd);
         
-        if (_acceptCallback)
+        if (acceptCallback)
         {
-            _acceptCallback(std::move(socket));
+            acceptCallback(std::move(socket));
         }
     }
     

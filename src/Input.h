@@ -12,7 +12,7 @@
 class Input
 {
 public:
-    Input(Network& network, Socket socket);
+    Input(Network& pNetwork, Socket pSocket);
     ~Input();
     
     Input(const Input&) = delete;
@@ -25,10 +25,10 @@ public:
     
     bool getPacket(std::vector<uint8_t>& packet);
     
-    bool isConnected() const { return _socket.isReady(); }
+    bool isConnected() const { return socket.isReady(); }
     
 protected:
-    void handleRead(const std::vector<uint8_t>& data);
+    void handleRead(const std::vector<uint8_t>& newData);
     void handleClose();
 
     bool handlePacket(const rtmp::Packet& packet);
@@ -44,19 +44,19 @@ protected:
 
     void startPlaying();
     
-    Network& _network;
-    Socket _socket;
+    Network& network;
+    Socket socket;
     
-    std::vector<uint8_t> _data;
+    std::vector<uint8_t> data;
     
-    rtmp::State _state = rtmp::State::UNINITIALIZED;
+    rtmp::State state = rtmp::State::UNINITIALIZED;
     
-    uint32_t _inChunkSize = 128;
-    uint32_t _outChunkSize = 128;
-    uint32_t _serverBandwidth = 2500000;
+    uint32_t inChunkSize = 128;
+    uint32_t outChunkSize = 128;
+    uint32_t serverBandwidth = 2500000;
     
-    std::random_device _rd;
-    std::mt19937 _generator;
+    std::random_device rd;
+    std::mt19937 generator;
 
-    uint32_t _timestamp;
+    uint32_t timestamp;
 };
