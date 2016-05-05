@@ -358,9 +358,9 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             command.dump();
 #endif
             
-            amf0::Node streamId;
+            amf0::Node transactionId;
 
-            ret = streamId.decode(packet.data, offset);
+            ret = transactionId.decode(packet.data, offset);
 
             if (ret == 0)
             {
@@ -370,8 +370,8 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Stream ID: ";
-            streamId.dump();
+            std::cout << "Transaction ID: ";
+            transactionId.dump();
 #endif
 
             amf0::Node argument1;
@@ -524,8 +524,8 @@ void Input::sendConnectResult()
     amf0::Node commandName = std::string("_result");
     commandName.encode(packet.data);
 
-    amf0::Node streamId = 1.0;
-    streamId.encode(packet.data);
+    amf0::Node transactionId = 1.0;
+    transactionId.encode(packet.data);
 
     amf0::Node argument1;
     argument1["fmsVer"] = std::string("FMS/3,0,1,123");
@@ -560,8 +560,8 @@ void Input::sendBWDone()
     amf0::Node commandName = std::string("onBWDone");
     commandName.encode(packet.data);
 
-    amf0::Node streamId = 0.0;
-    streamId.encode(packet.data);
+    amf0::Node transactionId = 0.0;
+    transactionId.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);
@@ -590,8 +590,8 @@ void Input::sendCheckBWResult()
     amf0::Node commandName = std::string("_result");
     commandName.encode(packet.data);
 
-    amf0::Node streamId = 0.0;
-    streamId.encode(packet.data);
+    amf0::Node transactionId = 0.0;
+    transactionId.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);

@@ -375,9 +375,9 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             command.dump();
 #endif
 
-            amf0::Node streamId;
+            amf0::Node transactionId;
 
-            ret = streamId.decode(packet.data, offset);
+            ret = transactionId.decode(packet.data, offset);
 
             if (ret == 0)
             {
@@ -387,8 +387,8 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             offset += ret;
 
 #ifdef DEBUG
-            std::cout << "Stream ID: ";
-            streamId.dump();
+            std::cout << "Transaction ID: ";
+            transactionId.dump();
 #endif
 
             amf0::Node argument1;
@@ -445,8 +445,8 @@ void Output::sendConnect()
     amf0::Node commandName = std::string("connect");
     commandName.encode(packet.data);
 
-    amf0::Node streamId = 0.0;
-    streamId.encode(packet.data);
+    amf0::Node transactionId = 0.0;
+    transactionId.encode(packet.data);
 
     amf0::Node argument1;
     argument1["app"] = std::string("casino/blackjack");
@@ -496,8 +496,8 @@ void Output::sendCheckBW()
     amf0::Node commandName = std::string("_checkbw");
     commandName.encode(packet.data);
 
-    amf0::Node streamId = 0.0;
-    streamId.encode(packet.data);
+    amf0::Node transactionId = 0.0;
+    transactionId.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);
