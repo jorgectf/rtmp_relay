@@ -524,7 +524,7 @@ void Input::sendConnectResult()
     amf0::Node commandName = std::string("_result");
     commandName.encode(packet.data);
 
-    amf0::Node streamId = 0.0;
+    amf0::Node streamId = 1.0;
     streamId.encode(packet.data);
 
     amf0::Node argument1;
