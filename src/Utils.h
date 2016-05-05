@@ -10,6 +10,11 @@
 
 #define UNUSED(x) (void)(x)
 
+union IntFloat64 {
+    uint64_t i;
+    double   f;
+};
+
 std::string ipToString(uint32_t ip);
 
 template <class T>
@@ -61,16 +66,19 @@ inline uint32_t decodeDouble(const std::vector<uint8_t>& buffer, uint32_t offset
 
     uint64_t value = 0;
 
-    for (uint32_t i = 0; i < 8; ++i)
+    for (uint32_t i = 0; i < sizeof(double); ++i)
     {
         value <<= 8;
         value += static_cast<uint64_t>(*(buffer.data() + offset));
         offset += 1;
     }
 
-    result = *reinterpret_cast<double*>(&result);
+    IntFloat64 intFloat64;
+    intFloat64.i = value;
 
-    return 8;
+    result = intFloat64.f;
+
+    return sizeof(double);
 }
 
 template <class T>
@@ -86,12 +94,15 @@ inline uint32_t encodeInt(std::vector<uint8_t>& buffer, uint32_t size, T value)
 
 inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
 {
-    uint64_t data = *reinterpret_cast<uint64_t*>(&value);
+    IntFloat64 intFloat64;
+    intFloat64.f = value;
 
-    for (uint32_t i = 0; i < 8; ++i)
+    uint64_t data = intFloat64.i;
+
+    for (uint32_t i = 0; i < sizeof(double); ++i)
     {
         buffer.push_back(static_cast<uint8_t>(data >> 8 * (sizeof(value) - i - 1)));
     }
     
-    return 8;
+    return sizeof(double);
 }
