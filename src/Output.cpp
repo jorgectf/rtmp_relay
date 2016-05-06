@@ -419,8 +419,32 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             {
                 sendCheckBW();
             }
+            else if (command.asString() == "_error")
+            {
+                auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
+
+                if (i != invokes.end())
+                {
+                    std::cerr << i->second << " error" << std::endl;
+
+                    invokes.erase(i);
+                }
+            }
             else if (command.asString() == "_result")
             {
+                auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
+
+                if (i != invokes.end())
+                {
+                    if (i->second == "connect")
+                    {
+                        sendReleaseStream();
+                        sendFCPublish();
+                        sendCreateStream();
+                    }
+
+                    invokes.erase(i);
+                }
             }
             break;
         }
@@ -465,6 +489,8 @@ void Output::sendConnect()
 #endif
 
     socket.send(buffer);
+
+    invokes[invokeId] = "connect";
 }
 
 void Output::sendSetChunkSize()
@@ -512,4 +538,18 @@ void Output::sendCheckBW()
 #endif
 
     socket.send(buffer);
+
+    invokes[invokeId] = "_checkbw";
+}
+
+void Output::sendCreateStream()
+{
+}
+
+void Output::sendReleaseStream()
+{
+}
+
+void Output::sendFCPublish()
+{
 }

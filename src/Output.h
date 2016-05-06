@@ -38,6 +38,10 @@ private:
     void sendConnect();
     void sendSetChunkSize();
     void sendCheckBW();
+
+    void sendCreateStream();
+    void sendReleaseStream();
+    void sendFCPublish();
     
     Network& network;
     Socket socket;

@@ -416,8 +416,34 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 //startPlaying("casino/blackjack/wallclock_test_med");
                 //startPlaying("wallclock_test_med");
             }
+            else if (command.asString() == "createStream")
+            {
+            }
+            else if (command.asString() == "releaseStream")
+            {
+            }
+            else if (command.asString() == "FCPublish")
+            {
+            }
+            else if (command.asString() == "_error")
+            {
+                auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
+
+                if (i != invokes.end())
+                {
+                    std::cerr << i->second << " error" << std::endl;
+
+                    invokes.erase(i);
+                }
+            }
             else if (command.asString() == "_result")
             {
+                auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
+
+                if (i != invokes.end())
+                {
+                    invokes.erase(i);
+                }
             }
             break;
         }
@@ -580,6 +606,8 @@ void Input::sendBWDone()
 #endif
 
     socket.send(buffer);
+
+    invokes[invokeId] = "onBWDone";
 }
 
 void Input::sendCheckBWResult(double transactionId)
