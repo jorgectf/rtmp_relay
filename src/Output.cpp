@@ -415,10 +415,12 @@ bool Output::handlePacket(const rtmp::Packet& packet)
 #endif
             }
 
-
             if (command.asString() == "onBWDone")
             {
                 sendCheckBW();
+            }
+            else if (command.asString() == "_result")
+            {
             }
             break;
         }
@@ -445,8 +447,8 @@ void Output::sendConnect()
     amf0::Node commandName = std::string("connect");
     commandName.encode(packet.data);
 
-    amf0::Node transactionId = 0.0;
-    transactionId.encode(packet.data);
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+    transactionIdNode.encode(packet.data);
 
     amf0::Node argument1;
     argument1["app"] = std::string("casino/blackjack");
@@ -496,8 +498,8 @@ void Output::sendCheckBW()
     amf0::Node commandName = std::string("_checkbw");
     commandName.encode(packet.data);
 
-    amf0::Node transactionId = 0.0;
-    transactionId.encode(packet.data);
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+    transactionIdNode.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);

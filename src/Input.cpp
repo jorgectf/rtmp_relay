@@ -404,17 +404,20 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 sendClientBandwidth();
                 sendPing();
                 sendSetChunkSize();
-                sendConnectResult();
+                sendConnectResult(transactionId.asDouble());
                 sendBWDone();
             }
             else if (command.asString() == "_checkbw")
             {
-                sendCheckBWResult();
+                sendCheckBWResult(transactionId.asDouble());
             }
             else if (command.asString() == "publish")
             {
                 //startPlaying("casino/blackjack/wallclock_test_med");
                 //startPlaying("wallclock_test_med");
+            }
+            else if (command.asString() == "_result")
+            {
             }
             break;
         }
@@ -513,7 +516,7 @@ void Input::sendSetChunkSize()
     socket.send(buffer);
 }
 
-void Input::sendConnectResult()
+void Input::sendConnectResult(double transactionId)
 {
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
@@ -524,8 +527,8 @@ void Input::sendConnectResult()
     amf0::Node commandName = std::string("_result");
     commandName.encode(packet.data);
 
-    amf0::Node transactionId = 1.0;
-    transactionId.encode(packet.data);
+    amf0::Node transactionIdNode = transactionId;
+    transactionIdNode.encode(packet.data);
 
     amf0::Node argument1;
     argument1["fmsVer"] = std::string("FMS/3,0,1,123");
@@ -560,8 +563,8 @@ void Input::sendBWDone()
     amf0::Node commandName = std::string("onBWDone");
     commandName.encode(packet.data);
 
-    amf0::Node transactionId = 0.0;
-    transactionId.encode(packet.data);
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+    transactionIdNode.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);
@@ -579,7 +582,7 @@ void Input::sendBWDone()
     socket.send(buffer);
 }
 
-void Input::sendCheckBWResult()
+void Input::sendCheckBWResult(double transactionId)
 {
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
@@ -590,8 +593,8 @@ void Input::sendCheckBWResult()
     amf0::Node commandName = std::string("_result");
     commandName.encode(packet.data);
 
-    amf0::Node transactionId = 0.0;
-    transactionId.encode(packet.data);
+    amf0::Node transactionIdNode = transactionId;
+    transactionIdNode.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);

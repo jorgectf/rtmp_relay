@@ -7,6 +7,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <map>
 #include "Socket.h"
 #include "RTMP.h"
 
@@ -50,4 +51,7 @@ private:
     
     std::random_device rd;
     std::mt19937 generator;
+
+    uint32_t invokeId = 0;
+    std::map<uint32_t, std::string> invokes;
 };

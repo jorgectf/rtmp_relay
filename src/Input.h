@@ -6,6 +6,7 @@
 
 #include <random>
 #include <vector>
+#include <map>
 #include "Socket.h"
 #include "RTMP.h"
 
@@ -38,9 +39,9 @@ protected:
     void sendPing();
     void sendSetChunkSize();
 
-    void sendConnectResult();
+    void sendConnectResult(double transactionId);
     void sendBWDone();
-    void sendCheckBWResult();
+    void sendCheckBWResult(double transactionId);
 
     void startPlaying();
     
@@ -59,4 +60,7 @@ protected:
     std::mt19937 generator;
 
     uint32_t timestamp;
+
+    uint32_t invokeId = 0;
+    std::map<uint32_t, std::string> invokes;
 };
