@@ -42,6 +42,9 @@ protected:
     void sendConnectResult(double transactionId);
     void sendBWDone();
     void sendCheckBWResult(double transactionId);
+    void sendCreateStreamResult(double transactionId);
+    void sendReleaseStreamResult(double transactionId);
+    void sendOnFCPublish();
 
     void startPlaying();
     

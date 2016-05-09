@@ -268,7 +268,14 @@ bool Socket::read()
         }
         else
         {
-            std::cerr << "Failed to read from socket, error: " << error << std::endl;
+            if (error == ECONNRESET)
+            {
+                std::cerr << "Connection reset by peer" << std::endl;
+            }
+            else
+            {
+                std::cerr << "Failed to read from socket, error: " << error << std::endl;
+            }
         }
         
         ready = false;
