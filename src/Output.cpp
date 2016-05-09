@@ -419,6 +419,9 @@ bool Output::handlePacket(const rtmp::Packet& packet)
             {
                 sendCheckBW();
             }
+            else if (command.asString() == "onFCPublish")
+            {
+            }
             else if (command.asString() == "_error")
             {
                 auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
@@ -449,6 +452,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
                     }
                     else if (i->second == "createStream")
                     {
+                        sendPublish();
                     }
 
                     invokes.erase(i);
@@ -620,6 +624,39 @@ void Output::sendFCPublish()
     packet.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("FCPublish");
+    commandName.encode(packet.data);
+
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+    transactionIdNode.encode(packet.data);
+
+    amf0::Node argument1(amf0::Marker::Null);
+    argument1.encode(packet.data);
+
+    amf0::Node argument2 = std::string("wallclock_test_med");
+    argument2.encode(packet.data);
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, outChunkSize, packet);
+
+#ifdef DEBUG
+    std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
+#endif
+
+    socket.send(buffer);
+
+    invokes[invokeId] = commandName.asString();
+}
+
+void Output::sendPublish()
+{
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.messageStreamId = 0;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
+
+    amf0::Node commandName = std::string("publish");
     commandName.encode(packet.data);
 
     amf0::Node transactionIdNode = static_cast<double>(++invokeId);

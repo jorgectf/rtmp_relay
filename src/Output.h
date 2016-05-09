@@ -42,6 +42,7 @@ private:
     void sendCreateStream();
     void sendReleaseStream();
     void sendFCPublish();
+    void sendPublish();
     
     Network& network;
     Socket socket;
