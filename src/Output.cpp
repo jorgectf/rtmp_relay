@@ -231,6 +231,10 @@ void Output::handleRead(const std::vector<uint8_t>& newData)
     }
     
     data.erase(data.begin(), data.begin() + offset);
+
+#ifdef DEBUG
+    std::cout << "Remaining data " << data.size() << std::endl;
+#endif
 }
 
 void Output::handleClose()
