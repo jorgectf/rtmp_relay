@@ -216,9 +216,13 @@ void Output::handleRead(const std::vector<uint8_t>& newData)
             rtmp::Packet packet;
             
             uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet);
-            
+
             if (ret > 0)
             {
+#ifdef DEBUG
+                std::cout << "Total packet size: " << ret << std::endl;
+#endif
+
                 offset += ret;
 
                 handlePacket(packet);

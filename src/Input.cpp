@@ -194,13 +194,16 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
         }
         else if (state == rtmp::State::HANDSHAKE_DONE)
         {
-            // TODO: send subscribe
             rtmp::Packet packet;
             
             uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet);
 
             if (ret > 0)
             {
+#ifdef DEBUG
+                std::cout << "Total packet size: " << ret << std::endl;
+#endif
+                
                 offset += ret;
 
                 handlePacket(packet);
@@ -213,6 +216,10 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
     }
     
     data.erase(data.begin(), data.begin() + offset);
+
+#ifdef DEBUG
+    std::cout << "Remaining data " << data.size() << std::endl;
+#endif
 }
 
 void Input::handleClose()
