@@ -233,7 +233,12 @@ void Output::handleRead(const std::vector<uint8_t>& newData)
             }
         }
     }
-    
+
+    if (offset > data.size())
+    {
+        std::cout << "Reading outside of the buffer" << std::endl;
+    }
+
     data.erase(data.begin(), data.begin() + offset);
 
 #ifdef DEBUG
