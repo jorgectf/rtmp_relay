@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 #include "RTMP.h"
 #include "Utils.h"
@@ -168,7 +169,7 @@ namespace rtmp
             }
             else
             {
-                uint32_t packetSize = (remainingBytes > chunkSize ? chunkSize : remainingBytes);
+                uint32_t packetSize = std::min(remainingBytes, chunkSize);
                 
                 packet.data.insert(packet.data.end(), data.begin() + offset, data.begin() + offset + packetSize);
                 
