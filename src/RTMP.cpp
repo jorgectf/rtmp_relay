@@ -141,7 +141,9 @@ namespace rtmp
         uint32_t originalOffset = offset;
         
         uint32_t remainingBytes = 0;
-        
+
+        packet.data.clear();
+
         do
         {
             Header header;
@@ -157,7 +159,7 @@ namespace rtmp
             if (packet.data.empty())
             {
                 packet.header = header;
-                remainingBytes = packet.header.length - static_cast<uint32_t>(packet.data.size());
+                remainingBytes = packet.header.length;
             }
             
             if (offset - data.size() < remainingBytes)
