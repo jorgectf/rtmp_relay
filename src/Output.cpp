@@ -664,7 +664,7 @@ void Output::sendPublish()
 {
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.channel = rtmp::Channel::SOURCE;
     packet.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::INVOKE;
