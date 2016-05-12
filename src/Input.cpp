@@ -30,12 +30,14 @@ Input::Input(Input&& other):
     inChunkSize(other.inChunkSize),
     outChunkSize(other.outChunkSize),
     generator(std::move(other.generator)),
-    timestamp(other.timestamp)
+    timestamp(other.timestamp),
+    streamId(other.streamId)
 {
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
     other.outChunkSize = 128;
     other.timestamp = 0;
+    other.streamId = 0;
     
     socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -50,11 +52,13 @@ Input& Input::operator=(Input&& other)
     outChunkSize = other.outChunkSize;
     generator = std::move(other.generator);
     timestamp = other.timestamp;
+    streamId = other.streamId;
     
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
     other.outChunkSize = 128;
     other.timestamp = 0;
+    other.streamId = 0;
     
     socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -666,7 +670,13 @@ void Input::sendCreateStreamResult(double transactionId)
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);
 
-    amf0::Node argument2 = 1.0;
+    ++streamId;
+    if (streamId == 0 || streamId == 2)
+    {
+        ++streamId; // Values 0 and 2 are reserved
+    }
+
+    amf0::Node argument2 = static_cast<double>(streamId);
     argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;

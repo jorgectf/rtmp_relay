@@ -31,11 +31,13 @@ Output::Output(Output&& other):
     state(other.state),
     inChunkSize(other.inChunkSize),
     outChunkSize(other.outChunkSize),
-    generator(std::move(other.generator))
+    generator(std::move(other.generator)),
+    streamId(other.streamId)
 {
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
     other.outChunkSize = 128;
+    other.streamId = 0;
     
     socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
@@ -50,10 +52,12 @@ Output& Output::operator=(Output&& other)
     inChunkSize = other.inChunkSize;
     outChunkSize = other.outChunkSize;
     generator = std::move(other.generator);
+    streamId = other.streamId;
     
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
     other.outChunkSize = 128;
+    other.streamId = 0;
     
     socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
@@ -465,6 +469,7 @@ bool Output::handlePacket(const rtmp::Packet& packet)
                     }
                     else if (i->second == "createStream")
                     {
+                        streamId = static_cast<uint32_t>(argument2.asDouble());
                         sendPublish();
                     }
 
@@ -665,7 +670,7 @@ void Output::sendPublish()
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
     packet.header.channel = rtmp::Channel::SOURCE;
-    packet.header.messageStreamId = rtmp::MESSAGE_STREAM_ID;
+    packet.header.messageStreamId = streamId;
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::INVOKE;
 

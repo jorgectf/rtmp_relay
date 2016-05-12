@@ -66,4 +66,6 @@ protected:
 
     uint32_t invokeId = 0;
     std::map<uint32_t, std::string> invokes;
+
+    uint32_t streamId = 0;
 };
