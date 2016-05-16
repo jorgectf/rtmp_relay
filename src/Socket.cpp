@@ -55,9 +55,9 @@ Socket::Socket(Socket&& other):
     connecting(other.connecting),
     ready(other.ready),
     blocking(other.blocking),
-    readCallback(std::move(other.readCallback)),
     ipAddress(other.ipAddress),
-    port(other.port)
+    port(other.port),
+    readCallback(std::move(other.readCallback))
 {
     network.addSocket(*this);
     
