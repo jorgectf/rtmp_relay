@@ -130,6 +130,26 @@ namespace rtmp
             }
         }
 
+        // extended timestamp
+        if ((header.type == Header::Type::TWELVE_BYTE ||
+             header.type == Header::Type::EIGHT_BYTE ||
+             header.type == Header::Type::FOUR_BYTE) &&
+            header.timestamp == 0xFFFFFF)
+        {
+            uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
+
+            if (!ret)
+            {
+                return 0;
+            }
+
+            offset += ret;
+
+#ifdef DEBUG
+            std::cout << ", extended timestamp: " << header.timestamp;
+#endif
+        }
+
 #ifdef DEBUG
         std::cout << std::endl;
 #endif
