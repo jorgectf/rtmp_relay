@@ -10,7 +10,7 @@
 
 namespace rtmp
 {
-    uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header)
+    uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header, Packet& previousPacket)
     {
         uint32_t originalOffset = offset;
         
@@ -131,10 +131,11 @@ namespace rtmp
         }
 
         // extended timestamp
-        if ((header.type == Header::Type::TWELVE_BYTE ||
-             header.type == Header::Type::EIGHT_BYTE ||
-             header.type == Header::Type::FOUR_BYTE) &&
-            header.timestamp == 0xFFFFFF)
+        if (header.type == Header::Type::ONE_BYTE &&
+            (previousPacket.header.type == Header::Type::TWELVE_BYTE ||
+             previousPacket.header.type == Header::Type::EIGHT_BYTE ||
+             previousPacket.header.type == Header::Type::FOUR_BYTE) &&
+            previousPacket.header.timestamp == 0xFFFFFF)
         {
             uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
 
@@ -157,7 +158,7 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet)
+    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, Packet& previousPacket)
     {
         uint32_t originalOffset = offset;
         
@@ -168,7 +169,7 @@ namespace rtmp
         do
         {
             Header header;
-            uint32_t ret = decodeHeader(data, offset, header);
+            uint32_t ret = decodeHeader(data, offset, header, previousPacket);
             
             if (!ret)
             {
@@ -181,6 +182,13 @@ namespace rtmp
             {
                 packet.header = header;
                 remainingBytes = packet.header.length;
+
+                if (packet.header.type == Header::Type::TWELVE_BYTE ||
+                    packet.header.type == Header::Type::EIGHT_BYTE ||
+                    packet.header.type == Header::Type::FOUR_BYTE)
+                {
+                    previousPacket = packet;
+                }
             }
             
             if (offset - data.size() < remainingBytes)

@@ -64,13 +64,16 @@ namespace rtmp
     {
         enum class Type: uint8_t
         {
+            NONE = 0xff,
+
             TWELVE_BYTE = 0x00, // bits 00, 12-byte header
             EIGHT_BYTE = 0x01,  // bits 01, 8-byte header
             FOUR_BYTE = 0x02,   // bits 10, 4-byte header
             ONE_BYTE = 0x03     // bits 11, 1-byte header
+
         };
 
-        Type type;
+        Type type = Type::NONE;
         Channel channel;
         uint32_t timestamp = 0;
         uint32_t length = 0;
@@ -98,8 +101,8 @@ namespace rtmp
         uint8_t randomBytes[1528];
     };
     
-    uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header);
-    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet);
+    uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header, Packet& previousPacket);
+    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, Packet& previousPacket);
     
     uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header);
     uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet);

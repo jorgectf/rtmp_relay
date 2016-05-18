@@ -68,4 +68,6 @@ protected:
     std::map<uint32_t, std::string> invokes;
 
     uint32_t streamId = 0;
+
+    rtmp::Packet previousPacket;
 };

@@ -219,7 +219,7 @@ void Output::handleRead(const std::vector<uint8_t>& newData)
         {
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet);
+            uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet, previousPacket);
 
             if (ret > 0)
             {
