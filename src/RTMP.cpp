@@ -22,8 +22,32 @@ namespace rtmp
         uint8_t headerData = *(data.data() + offset);
         offset += 1;
 
-        header.channel = static_cast<Channel>(headerData & 0x3F);
+        uint32_t channel = static_cast<uint32_t>(headerData & 0x3F);
         header.type = static_cast<Header::Type>(headerData >> 6);
+
+        if (channel == 0)
+        {
+            if (data.size() - offset < 1)
+            {
+                return 0;
+            }
+
+            channel = 64;
+            channel += static_cast<uint32_t>(*(data.data() + offset));
+            offset += 1;
+        }
+        else if (channel == 1)
+        {
+            if (data.size() - offset < 2)
+            {
+                return 0;
+            }
+
+            channel = 64;
+            channel += static_cast<uint32_t>(*(data.data() + offset));
+            channel += 256 * static_cast<uint32_t>(*(data.data() + offset));
+            offset += 2;
+        }
 
 #ifdef DEBUG
         std::cout << "Header type: ";
@@ -36,6 +60,8 @@ namespace rtmp
             case Header::Type::ONE_BYTE: std::cout << "ONE_BYTE"; break;
             default: std::cout << "invalid header type"; break;
         };
+
+        header.channel = static_cast<Channel>(channel);
 
         std::cout << "(" << static_cast<uint32_t>(header.type) << ")";
 
@@ -135,7 +161,7 @@ namespace rtmp
             (previousPacket.header.type == Header::Type::TWELVE_BYTE ||
              previousPacket.header.type == Header::Type::EIGHT_BYTE ||
              previousPacket.header.type == Header::Type::FOUR_BYTE) &&
-            previousPacket.header.timestamp == 0xFFFFFF)
+            previousPacket.header.timestamp == 0x00FFFFFF)
         {
             uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
 
