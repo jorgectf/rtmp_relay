@@ -282,37 +282,36 @@ namespace rtmp
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
 
-        const uint32_t packetCount = ((static_cast<uint32_t>(packet.data.size()) + chunkSize - 1) / chunkSize);
-        
-        data.reserve(12 + packet.data.size() + packetCount); // 12-byte header + data size + 1-byte header count
+        uint32_t remainingBytes = static_cast<uint32_t>(packet.data.size());
+        uint32_t start = 0;
 
-        for (uint32_t i = 0; i < packetCount; ++i)
+        while (remainingBytes > 0)
         {
-            if (i == 0)
+            Header header;
+
+            if (remainingBytes == static_cast<uint32_t>(packet.data.size()))
             {
-                Header header = packet.header;
+                header = packet.header;
 
                 if (header.length == 0)
                 {
                     header.length = static_cast<uint32_t>(packet.data.size());
                 }
-
-                encodeHeader(data, header);
             }
             else
             {
-                Header oneByteHeader;
-                oneByteHeader.type = Header::Type::ONE_BYTE;
-                oneByteHeader.channel = packet.header.channel;
-                encodeHeader(data, oneByteHeader);
+                header.type = Header::Type::ONE_BYTE;
+                header.channel = packet.header.channel;
             }
 
-            uint32_t start = i * chunkSize;
-            uint32_t end = start + chunkSize;
+            encodeHeader(data, header);
+
+            uint32_t size = std::min(remainingBytes, chunkSize);
             
-            if (end > packet.data.size()) end = static_cast<uint32_t>(packet.data.size());
-            
-            data.insert(data.end(), packet.data.begin() + start, packet.data.begin() + end);
+            data.insert(data.end(), packet.data.begin() + start, packet.data.begin() + start + size);
+
+            start += size;
+            remainingBytes -= size;
         }
         
         return static_cast<uint32_t>(data.size()) - originalSize;
