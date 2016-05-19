@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <map>
 
 namespace rtmp
 {
@@ -100,10 +101,7 @@ namespace rtmp
         uint32_t time2;
         uint8_t randomBytes[1528];
     };
-    
-    uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header, Packet& previousPacket);
-    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, Packet& previousPacket);
-    
-    uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header);
+
+    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<rtmp::Channel, rtmp::Packet>& previousPackets);
     uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet);
 }

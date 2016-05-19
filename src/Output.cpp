@@ -32,7 +32,8 @@ Output::Output(Output&& other):
     inChunkSize(other.inChunkSize),
     outChunkSize(other.outChunkSize),
     generator(std::move(other.generator)),
-    streamId(other.streamId)
+    streamId(other.streamId),
+    previousPackets(std::move(other.previousPackets))
 {
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
@@ -53,6 +54,7 @@ Output& Output::operator=(Output&& other)
     outChunkSize = other.outChunkSize;
     generator = std::move(other.generator);
     streamId = other.streamId;
+    previousPackets = std::move(other.previousPackets);
     
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
@@ -219,7 +221,7 @@ void Output::handleRead(const std::vector<uint8_t>& newData)
         {
             rtmp::Packet packet;
             
-            uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet, previousPacket);
+            uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet, previousPackets);
 
             if (ret > 0)
             {

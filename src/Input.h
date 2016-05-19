@@ -69,5 +69,5 @@ protected:
 
     uint32_t streamId = 0;
 
-    rtmp::Packet previousPacket;
+    std::map<rtmp::Channel, rtmp::Packet> previousPackets;
 };
