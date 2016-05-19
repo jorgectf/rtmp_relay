@@ -232,10 +232,25 @@ namespace rtmp
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
-        uint8_t headerData = static_cast<uint8_t>(header.channel);
-        headerData |= (static_cast<uint8_t>(header.type) << 6);
+        uint8_t headerData = static_cast<uint8_t>(static_cast<uint8_t>(header.type) << 6);
 
-        data.push_back(headerData);
+        if (static_cast<uint32_t>(header.channel) < 64)
+        {
+            headerData |= static_cast<uint8_t>(header.channel);
+            data.push_back(headerData);
+        }
+        else if (static_cast<uint32_t>(header.channel) < 64 + 256)
+        {
+            headerData |= 0;
+            data.push_back(headerData);
+            encodeInt(data, 1, static_cast<uint32_t>(header.channel) - 64);
+        }
+        else
+        {
+            headerData |= 1;
+            data.push_back(headerData);
+            encodeInt(data, 2, static_cast<uint32_t>(header.channel) - 64);
+        }
         
         if (header.type != Header::Type::ONE_BYTE)
         {

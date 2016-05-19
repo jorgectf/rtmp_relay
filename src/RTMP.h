@@ -14,7 +14,7 @@ namespace rtmp
     const uint32_t CLIENT_STREAM_ID_AUDIO = 6;
     const uint32_t CLIENT_STREAM_ID_VIDEO = 7;
 
-    enum class Channel
+    enum class Channel: uint32_t
     {
         NETWORK = 2,   // channel for network-related messages (bandwidth report, ping, etc)
         SYSTEM = 3,    // channel for sending server control messages
