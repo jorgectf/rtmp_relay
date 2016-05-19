@@ -25,28 +25,19 @@ namespace rtmp
         uint32_t channel = static_cast<uint32_t>(headerData & 0x3F);
         header.type = static_cast<Header::Type>(headerData >> 6);
 
-        if (channel == 0)
+        if (channel < 2)
         {
-            if (data.size() - offset < 1)
+            uint32_t newChannel;
+            uint32_t ret = decodeInt(data, offset, channel + 1, newChannel);
+
+            if (!ret)
             {
-                return 0;
+                return false;
             }
 
-            channel = 64;
-            channel += static_cast<uint32_t>(*(data.data() + offset));
-            offset += 1;
-        }
-        else if (channel == 1)
-        {
-            if (data.size() - offset < 2)
-            {
-                return 0;
-            }
+            offset += ret;
 
-            channel = 64;
-            channel += static_cast<uint32_t>(*(data.data() + offset));
-            channel += 256 * static_cast<uint32_t>(*(data.data() + offset));
-            offset += 2;
+            channel = 64 + newChannel;
         }
 
 #ifdef DEBUG
