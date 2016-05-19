@@ -217,6 +217,9 @@ namespace rtmp
 
             if (offset - data.size() < remainingBytes)
             {
+#ifdef DEBUG
+                std::cout << "Not enough data to read" << std::endl;
+#endif
                 return 0;
             }
             else
