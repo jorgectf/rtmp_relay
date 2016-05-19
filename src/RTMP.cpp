@@ -169,9 +169,9 @@ namespace rtmp
 
                 offset += ret;
 
-    #ifdef DEBUG
+#ifdef DEBUG
                 std::cout << ", extended timestamp: " << header.timestamp;
-    #endif
+#endif
             }
         }
 
@@ -206,15 +206,15 @@ namespace rtmp
             {
                 packet.header = header;
                 remainingBytes = packet.header.length;
-
-                if (packet.header.type == Header::Type::TWELVE_BYTE ||
-                    packet.header.type == Header::Type::EIGHT_BYTE ||
-                    packet.header.type == Header::Type::FOUR_BYTE)
-                {
-                    previousPackets[packet.header.channel] = packet;
-                }
             }
-            
+
+            if (packet.header.type == Header::Type::TWELVE_BYTE ||
+                packet.header.type == Header::Type::EIGHT_BYTE ||
+                packet.header.type == Header::Type::FOUR_BYTE)
+            {
+                previousPackets[packet.header.channel] = packet;
+            }
+
             if (offset - data.size() < remainingBytes)
             {
                 return 0;
