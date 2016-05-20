@@ -45,8 +45,7 @@ protected:
     void sendCreateStreamResult(double transactionId);
     void sendReleaseStreamResult(double transactionId);
     void sendOnFCPublish();
-
-    void startPlaying();
+    void sendPublishStatus(double transactionId);
     
     Network& network;
     Socket socket;

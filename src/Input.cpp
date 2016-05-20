@@ -441,6 +441,11 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             {
                 sendOnFCPublish();
             }
+            else if (command.asString() == "publish")
+            {
+                sendPing();
+                sendPublishStatus(transactionId.asDouble());
+            }
             else if (command.asString() == "_error")
             {
                 auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
@@ -733,13 +738,43 @@ void Input::sendOnFCPublish()
     encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
-    std::cout << "Sending INVOKE onFCPublish" << std::endl;
+    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
 #endif
 
     socket.send(buffer);
 }
 
-void Input::startPlaying()
+void Input::sendPublishStatus(double transactionId)
 {
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
 
+    amf0::Node commandName = std::string("onStatus");
+    commandName.encode(packet.data);
+
+    amf0::Node transactionIdNode = transactionId;
+    transactionIdNode.encode(packet.data);
+
+    amf0::Node argument1(amf0::Marker::Null);
+    argument1.encode(packet.data);
+
+    amf0::Node argument2;
+    argument2["clientid"] = std::string("Lavf57.1.0");
+    argument2["code"] = std::string("NetStream.Publish.Start");
+    argument2["description"] = std::string("wallclock_test_med is now published");
+    argument2["details"] = std::string("wallclock_test_med");
+    argument2["level"] = std::string("status");
+    argument2.encode(packet.data);
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, outChunkSize, packet);
+
+#ifdef DEBUG
+    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+#endif
+
+    socket.send(buffer);
 }
