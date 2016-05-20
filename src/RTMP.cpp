@@ -77,6 +77,7 @@ namespace rtmp
             header.length  = previousPacket.length;
             header.messageType  = previousPacket.messageType;
             header.messageStreamId = previousPacket.messageStreamId;
+            header.timestamp = previousPacket.timestamp;
         }
 
         std::cout << "(" << static_cast<uint32_t>(header.channel) << ")";
@@ -158,30 +159,21 @@ namespace rtmp
             }
         }
 
-        if (previousPacketIterator != previousPackets.end())
+        // extended timestamp
+        if (header.timestamp == 0x00FFFFFF)
         {
-            Header& previousPacket = previousPacketIterator->second;
+            uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
 
-            // extended timestamp
-            if (header.type == Header::Type::ONE_BYTE &&
-                (previousPacket.type == Header::Type::TWELVE_BYTE ||
-                 previousPacket.type == Header::Type::EIGHT_BYTE ||
-                 previousPacket.type == Header::Type::FOUR_BYTE) &&
-                previousPacket.timestamp == 0x00FFFFFF)
+            if (!ret)
             {
-                uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
+                return 0;
+            }
 
-                if (!ret)
-                {
-                    return 0;
-                }
-
-                offset += ret;
+            offset += ret;
 
 #ifdef DEBUG
-                std::cout << ", extended timestamp: " << header.timestamp;
+            std::cout << ", extended timestamp: " << header.timestamp;
 #endif
-            }
         }
 
 #ifdef DEBUG
@@ -224,23 +216,21 @@ namespace rtmp
                 remainingBytes = packet.header.length;
             }
 
-            if (offset - data.size() < remainingBytes)
+
+            uint32_t packetSize = std::min(remainingBytes, chunkSize);
+
+            if (packetSize + offset > data.size())
             {
 #ifdef DEBUG
                 std::cout << "Not enough data to read" << std::endl;
 #endif
                 return 0;
             }
-            else
-            {
-                uint32_t packetSize = std::min(remainingBytes, chunkSize);
-                
-                packet.data.insert(packet.data.end(), data.begin() + offset, data.begin() + offset + packetSize);
-                
-                remainingBytes -= packetSize;
-                offset += packetSize;
-            }
+
+            packet.data.insert(packet.data.end(), data.begin() + offset, data.begin() + offset + packetSize);
             
+            remainingBytes -= packetSize;
+            offset += packetSize;
         }
         while (remainingBytes);
         
