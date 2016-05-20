@@ -344,6 +344,12 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             break;
         }
 
+        case rtmp::MessageType::NOTIFY:
+        {
+            // TODO: handle this
+            break;
+        }
+
         case rtmp::MessageType::AUDIO_PACKET:
         {
             // TODO: forward audio packet
