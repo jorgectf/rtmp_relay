@@ -68,6 +68,17 @@ namespace rtmp
             default: std::cout << "invalid channel"; break;
         };
 
+        auto previousPacketIterator = previousPackets.find(header.channel);
+
+        if (previousPacketIterator != previousPackets.end())
+        {
+            Packet& previousPacket = previousPacketIterator->second;
+
+            header.length  = previousPacket.header.length;
+            header.messageType  = previousPacket.header.messageType;
+            header.messageStreamId = previousPacket.header.messageStreamId;
+        }
+
         std::cout << "(" << static_cast<uint32_t>(header.channel) << ")";
 #endif
         
@@ -147,11 +158,9 @@ namespace rtmp
             }
         }
 
-        auto i = previousPackets.find(header.channel);
-
-        if (i != previousPackets.end())
+        if (previousPacketIterator != previousPackets.end())
         {
-            Packet& previousPacket = i->second;
+            Packet& previousPacket = previousPacketIterator->second;
 
             // extended timestamp
             if (header.type == Header::Type::ONE_BYTE &&
