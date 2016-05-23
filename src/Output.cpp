@@ -499,7 +499,7 @@ void Output::sendConnect()
     packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
     packet.header.channel = rtmp::Channel::SYSTEM;
     packet.header.messageStreamId = 0;
-    packet.header.timestamp = 0; //packet.header.timestamp;
+    packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::INVOKE;
 
     amf0::Node commandName = std::string("connect");
