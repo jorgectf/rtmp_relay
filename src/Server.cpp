@@ -49,7 +49,7 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
     
     for (const std::string& address : pushAddresses)
     {
-        Output output(network);
+        Output output(network, application);
         
         if (output.init(address))
         {            

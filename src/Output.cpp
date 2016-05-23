@@ -11,8 +11,8 @@
 #include "Amf0.h"
 #include "Utils.h"
 
-Output::Output(Network& pNetwork):
-    network(pNetwork), socket(pNetwork), generator(rd())
+Output::Output(Network& pNetwork, const std::string& pApplication):
+    network(pNetwork), socket(pNetwork), generator(rd()), application(pApplication)
 {
     socket.setConnectCallback(std::bind(&Output::handleConnect, this));
     socket.setReadCallback(std::bind(&Output::handleRead, this, std::placeholders::_1));
@@ -33,7 +33,8 @@ Output::Output(Output&& other):
     outChunkSize(other.outChunkSize),
     generator(std::move(other.generator)),
     streamId(other.streamId),
-    previousPackets(std::move(other.previousPackets))
+    previousPackets(std::move(other.previousPackets)),
+    application(std::move(other.application))
 {
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
@@ -55,6 +56,7 @@ Output& Output::operator=(Output&& other)
     generator = std::move(other.generator);
     streamId = other.streamId;
     previousPackets = std::move(other.previousPackets);
+    application = std::move(other.application);
     
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
@@ -507,9 +509,9 @@ void Output::sendConnect()
     transactionIdNode.encode(packet.data);
 
     amf0::Node argument1;
-    argument1["app"] = std::string("casino/blackjack");
+    argument1["app"] = application;
     argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
-    argument1["tcUrl"] = std::string("rtmp://127.0.0.1:2200/casino/blackjack");
+    argument1["tcUrl"] = std::string("rtmp://127.0.0.1:") + std::to_string(socket.getPort()) + "/" + application;
     argument1["type"] = std::string("nonprivate");
     argument1.encode(packet.data);
 

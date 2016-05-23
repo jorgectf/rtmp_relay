@@ -35,6 +35,8 @@ public:
     bool send(std::vector<uint8_t> buffer);
     
     int getSocketFd() const { return socketFd; }
+    uint32_t getIPAddress() const { return ipAddress; }
+    uint16_t getPort() const { return port; }
     
     bool isBlocking() const { return blocking; }
     bool setBlocking(bool newBlocking);

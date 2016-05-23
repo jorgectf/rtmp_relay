@@ -14,7 +14,7 @@
 class Output
 {
 public:
-    Output(Network& pNetwork);
+    Output(Network& pNetwork, const std::string& pApplication);
     ~Output();
     
     Output(const Output&) = delete;
@@ -63,4 +63,6 @@ private:
     uint32_t streamId = 0;
 
     std::map<rtmp::Channel, rtmp::Header> previousPackets;
+    
+    std::string application;
 };
