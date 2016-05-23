@@ -9,8 +9,8 @@
 #include "Amf0.h"
 #include "Utils.h"
 
-Input::Input(Network& pNetwork, Socket pSocket):
-    network(pNetwork), socket(std::move(pSocket)), generator(rd())
+Input::Input(Network& pNetwork, Socket pSocket, const std::string& pApplication):
+    network(pNetwork), socket(std::move(pSocket)), generator(rd()), application(pApplication)
 {
     socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
     socket.setCloseCallback(std::bind(&Input::handleClose, this));
@@ -32,7 +32,8 @@ Input::Input(Input&& other):
     generator(std::move(other.generator)),
     timestamp(other.timestamp),
     streamId(other.streamId),
-    previousPackets(std::move(other.previousPackets))
+    previousPackets(std::move(other.previousPackets)),
+    application(std::move(other.application))
 {
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
@@ -55,6 +56,7 @@ Input& Input::operator=(Input&& other)
     timestamp = other.timestamp;
     streamId = other.streamId;
     previousPackets = std::move(other.previousPackets);
+    application = std::move(other.application);
     
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
@@ -424,6 +426,13 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             if (command.asString() == "connect")
             {
+                if (argument1["app"].asString() != application)
+                {
+                    std::cerr << "Wrong application" << std::endl;
+                    socket.close();
+                    return false;
+                }
+
                 sendServerBandwidth();
                 sendClientBandwidth();
                 sendPing();

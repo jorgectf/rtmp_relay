@@ -13,7 +13,7 @@
 class Input
 {
 public:
-    Input(Network& pNetwork, Socket pSocket);
+    Input(Network& pNetwork, Socket pSocket, const std::string& pApplication);
     ~Input();
     
     Input(const Input&) = delete;
@@ -69,4 +69,6 @@ protected:
     uint32_t streamId = 0;
 
     std::map<rtmp::Channel, rtmp::Header> previousPackets;
+
+    std::string application;
 };

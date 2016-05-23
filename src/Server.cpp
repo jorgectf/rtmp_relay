@@ -10,8 +10,8 @@
 #include <unistd.h>
 #include "Server.h"
 
-Server::Server(Network& pNetwork):
-    network(pNetwork), socket(pNetwork)
+Server::Server(Network& pNetwork, const std::string& pApplication):
+    network(pNetwork), socket(pNetwork), application(pApplication)
 {
     socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
@@ -25,7 +25,8 @@ Server::Server(Server&& other):
     network(other.network),
     socket(std::move(other.socket)),
     outputs(std::move(other.outputs)),
-    inputs(std::move(other.inputs))
+    inputs(std::move(other.inputs)),
+    application(std::move(other.application))
 {
     socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
@@ -35,6 +36,7 @@ Server& Server::operator=(Server&& other)
     socket = std::move(other.socket);
     outputs = std::move(other.outputs);
     inputs = std::move(other.inputs);
+    application = std::move(other.application);
     
     socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
     
@@ -84,7 +86,7 @@ void Server::handleAccept(Socket clientSocket)
     // accept only one input
     if (inputs.empty())
     {
-        Input input(network, std::move(clientSocket));
+        Input input(network, std::move(clientSocket), application);
         inputs.push_back(std::move(input));
     }
     else

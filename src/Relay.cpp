@@ -47,7 +47,8 @@ bool Relay::init(const std::string& config)
         const rapidjson::Value& serverObject = serversArray[serverIndex];
         
         std::vector<std::string> pushAddresses;
-        
+
+        std::string application = serverObject["application"].GetString();
         const rapidjson::Value& pushArray = serverObject["push"];
         
         for (uint32_t pushIndex = 0; pushIndex < static_cast<uint32_t>(pushArray.Size()); ++pushIndex)
@@ -57,7 +58,7 @@ bool Relay::init(const std::string& config)
             pushAddresses.push_back(pushObject.GetString());
         }
         
-        Server server(network);
+        Server server(network, application);
         
         if (server.init(static_cast<uint16_t>(serverObject["port"].GetInt()), pushAddresses))
         {

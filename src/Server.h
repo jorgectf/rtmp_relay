@@ -16,7 +16,7 @@
 class Server
 {
 public:
-    Server(Network& pNetwork);
+    Server(Network& pNetwork, const std::string& pApplication);
     ~Server();
     
     Server(const Server&) = delete;
@@ -34,6 +34,7 @@ protected:
     
     Network& network;
     Acceptor socket;
+    std::string application;
     
     std::vector<Output> outputs;
     std::vector<Input> inputs;
