@@ -5,6 +5,14 @@
 #include <iostream>
 #include "Relay.h"
 
+static void signalHandler(int signo)
+{
+    if (signo == SIGUSR1)
+    {
+        printf("received SIGUSR1\n");
+    }
+}
+
 int main(int argc, const char * argv[])
 {
     if (argc < 2)
@@ -14,6 +22,12 @@ int main(int argc, const char * argv[])
         const char* exe = argc >= 1 ? argv[0] : "rtmp_relay";
         std::cerr << "Usage: " << exe << " <path to config file>" << std::endl;
 
+        return 1;
+    }
+
+    if (signal(SIGUSR1, signalHandler) == SIG_ERR)
+    {
+        std::cerr << "Failed to capure SIGINFO" << std::endl;
         return 1;
     }
     
