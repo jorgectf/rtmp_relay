@@ -24,9 +24,9 @@ Server::~Server()
 Server::Server(Server&& other):
     network(other.network),
     socket(std::move(other.socket)),
+    application(std::move(other.application)),
     outputs(std::move(other.outputs)),
-    inputs(std::move(other.inputs)),
-    application(std::move(other.application))
+    inputs(std::move(other.inputs))
 {
     socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
@@ -34,9 +34,9 @@ Server::Server(Server&& other):
 Server& Server::operator=(Server&& other)
 {
     socket = std::move(other.socket);
+    application = std::move(other.application);
     outputs = std::move(other.outputs);
     inputs = std::move(other.inputs);
-    application = std::move(other.application);
     
     socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
     
