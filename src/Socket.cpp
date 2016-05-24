@@ -148,6 +148,8 @@ bool Socket::connect(uint32_t address, uint16_t newPort)
 
     ipAddress = address;
     port = newPort;
+    ready = false;
+    connecting = false;
     
     std::cout << "Connecting to " << ipToString(ipAddress) << ":" << static_cast<int>(port) << std::endl;
     

@@ -90,3 +90,11 @@ void Relay::run()
         nanosleep(&sleepTime, nullptr);
     }
 }
+
+void Relay::printInfo() const
+{
+    for (const Server& server : servers)
+    {
+        server.printInfo();
+    }
+}

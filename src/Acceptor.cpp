@@ -58,6 +58,7 @@ bool Acceptor::startAccept(uint16_t newPort)
     ipAddress = 0;
     port = newPort;
     int value = 1;
+    connecting = false;
 
     if (setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) < 0)
     {

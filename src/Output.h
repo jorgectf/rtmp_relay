@@ -28,6 +28,8 @@ public:
     void handleConnect();
     
     bool sendPacket(const std::vector<uint8_t>& packet);
+
+    void printInfo() const;
     
 private:
     void handleRead(const std::vector<uint8_t>& newData);

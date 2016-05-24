@@ -793,3 +793,19 @@ void Input::sendPublishStatus(double transactionId)
 
     socket.send(buffer);
 }
+
+void Input::printInfo() const
+{
+    std::cout << "\tInput " << (socket.isReady() ? "" : "not ") << "connected to: " << ipToString(socket.getIPAddress()) << ":" << ipToString(socket.getPort()) << ", state: ";
+
+    switch (state)
+    {
+        case rtmp::State::UNINITIALIZED: std::cout << "UNINITIALIZED"; break;
+        case rtmp::State::VERSION_RECEIVED: std::cout << "VERSION_RECEIVED"; break;
+        case rtmp::State::VERSION_SENT: std::cout << "VERSION_SENT"; break;
+        case rtmp::State::ACK_SENT: std::cout << "ACK_SENT"; break;
+        case rtmp::State::HANDSHAKE_DONE: std::cout << "HANDSHAKE_DONE"; break;
+    }
+
+    std::cout << std::endl;
+}

@@ -94,3 +94,20 @@ void Server::handleAccept(Socket clientSocket)
         clientSocket.close();
     }
 }
+
+void Server::printInfo() const
+{
+    std::cout << "Server listening on " << socket.getPort() << ", application: " << application << std::endl;
+
+    std::cout << "Outputs:" << std::endl;
+    for (const Output& output : outputs)
+    {
+        output.printInfo();
+    }
+
+    std::cout << "Inputs:" << std::endl;
+    for (const Input& input : inputs)
+    {
+        input.printInfo();
+    }
+}

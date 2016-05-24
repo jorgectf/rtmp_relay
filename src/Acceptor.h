@@ -8,7 +8,7 @@
 #include <functional>
 #include "Socket.h"
 
-class Acceptor: Socket
+class Acceptor: public Socket
 {
 public:
     Acceptor(Network& network, int socketFd = -1);

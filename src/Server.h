@@ -28,6 +28,8 @@ public:
     bool init(uint16_t port, const std::vector<std::string>& pushAddresses);
     
     void update();
+
+    void printInfo() const;
     
 protected:
     void handleAccept(Socket clientSocket);

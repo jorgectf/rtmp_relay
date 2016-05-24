@@ -26,6 +26,8 @@ public:
     bool init(const std::string& config);
     
     void run();
+
+    void printInfo() const;
     
 private:
     Network network;

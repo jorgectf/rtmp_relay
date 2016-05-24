@@ -6,11 +6,13 @@
 #include <signal.h>
 #include "Relay.h"
 
+Relay relay;
+
 static void signalHandler(int signo)
 {
     if (signo == SIGUSR1)
     {
-        printf("received SIGUSR1\n");
+        relay.printInfo();
     }
 }
 
@@ -31,8 +33,6 @@ int main(int argc, const char * argv[])
         std::cerr << "Failed to capure SIGINFO" << std::endl;
         return 1;
     }
-    
-    Relay relay;
     
     if (!relay.init(argv[1]))
     {

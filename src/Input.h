@@ -27,6 +27,8 @@ public:
     bool getPacket(std::vector<uint8_t>& packet);
     
     bool isConnected() const { return socket.isReady(); }
+
+    void printInfo() const;
     
 protected:
     void handleRead(const std::vector<uint8_t>& newData);
