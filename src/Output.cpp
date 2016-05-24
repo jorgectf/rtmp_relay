@@ -99,20 +99,20 @@ void Output::handleConnect()
     version.push_back(RTMP_VERSION);
     socket.send(version);
     
-    rtmp::Challange challange;
-    challange.time = 0;
-    memcpy(challange.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
+    rtmp::Challenge challenge;
+    challenge.time = 0;
+    memcpy(challenge.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
     
-    for (size_t i = 0; i < sizeof(challange.randomBytes); ++i)
+    for (size_t i = 0; i < sizeof(challenge.randomBytes); ++i)
     {
-        challange.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(generator);
+        challenge.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(generator);
     }
     
-    std::vector<uint8_t> challangeMessage;
-    challangeMessage.insert(challangeMessage.begin(),
-                            reinterpret_cast<uint8_t*>(&challange),
-                            reinterpret_cast<uint8_t*>(&challange) + sizeof(challange));
-    socket.send(challangeMessage);
+    std::vector<uint8_t> challengeMessage;
+    challengeMessage.insert(challengeMessage.begin(),
+                            reinterpret_cast<uint8_t*>(&challenge),
+                            reinterpret_cast<uint8_t*>(&challenge) + sizeof(challenge));
+    socket.send(challengeMessage);
     
     state = rtmp::State::VERSION_SENT;
 }
@@ -164,25 +164,25 @@ void Output::handleRead(const std::vector<uint8_t>& newData)
         }
         else if (state == rtmp::State::VERSION_RECEIVED)
         {
-            if (data.size() - offset >= sizeof(rtmp::Challange))
+            if (data.size() - offset >= sizeof(rtmp::Challenge))
             {
                 // S1
-                rtmp::Challange* challange = reinterpret_cast<rtmp::Challange*>(data.data() + offset);
-                offset += sizeof(*challange);
+                rtmp::Challenge* challenge = reinterpret_cast<rtmp::Challenge*>(data.data() + offset);
+                offset += sizeof(*challenge);
 
 #ifdef DEBUG
-                std::cout << "Got Challange message, time: " << challange->time <<
-                    ", version: " << static_cast<uint32_t>(challange->version[0]) << "." <<
-                    static_cast<uint32_t>(challange->version[1]) << "." <<
-                    static_cast<uint32_t>(challange->version[2]) << "." <<
-                    static_cast<uint32_t>(challange->version[3]) << std::endl;
+                std::cout << "Got challenge message, time: " << challenge->time <<
+                    ", version: " << static_cast<uint32_t>(challenge->version[0]) << "." <<
+                    static_cast<uint32_t>(challenge->version[1]) << "." <<
+                    static_cast<uint32_t>(challenge->version[2]) << "." <<
+                    static_cast<uint32_t>(challenge->version[3]) << std::endl;
 #endif
                 
                 // C2
                 rtmp::Ack ack;
-                ack.time = challange->time;
+                ack.time = challenge->time;
                 ack.time2 = static_cast<uint32_t>(time(nullptr));
-                memcpy(ack.randomBytes, challange->randomBytes, sizeof(ack.randomBytes));
+                memcpy(ack.randomBytes, challenge->randomBytes, sizeof(ack.randomBytes));
                 
                 std::vector<uint8_t> ackData;
                 ackData.insert(ackData.begin(),

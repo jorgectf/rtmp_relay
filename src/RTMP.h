@@ -88,7 +88,7 @@ namespace rtmp
         std::vector<uint8_t> data;
     };
     
-    struct Challange
+    struct Challenge
     {
         uint32_t time;
         uint8_t version[4];
