@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <signal.h>
 #include "Relay.h"
 
 static void signalHandler(int signo)
