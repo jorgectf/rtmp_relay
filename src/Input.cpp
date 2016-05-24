@@ -796,7 +796,7 @@ void Input::sendPublishStatus(double transactionId)
 
 void Input::printInfo() const
 {
-    std::cout << "\tInput " << (socket.isReady() ? "" : "not ") << "connected to: " << ipToString(socket.getIPAddress()) << ":" << ipToString(socket.getPort()) << ", state: ";
+    std::cout << "\tInput " << (socket.isReady() ? "" : "not ") << "connected to: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
     switch (state)
     {

@@ -704,7 +704,7 @@ void Output::sendPublish()
 
 void Output::printInfo() const
 {
-    std::cout << "\tOutput " << (socket.isReady() ? "" : "not ") << "connected with: " << ipToString(socket.getIPAddress()) << ":" << ipToString(socket.getPort()) << ", state: ";
+    std::cout << "\tOutput " << (socket.isReady() ? "" : "not ") << "connected with: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
     switch (state)
     {
