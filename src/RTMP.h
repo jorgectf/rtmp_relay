@@ -98,7 +98,7 @@ namespace rtmp
     struct Ack
     {
         uint32_t time;
-        uint32_t time2;
+        uint8_t version[4];
         uint8_t randomBytes[1528];
     };
 

@@ -164,7 +164,7 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
                 // S2
                 rtmp::Ack ack;
                 ack.time = challenge->time;
-                ack.time2 = static_cast<uint32_t>(time(nullptr));
+                memcpy(ack.version, challenge->version, sizeof(ack.version));
                 memcpy(ack.randomBytes, challenge->randomBytes, sizeof(ack.randomBytes));
                 
                 std::vector<uint8_t> ackData;
@@ -189,7 +189,11 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
                 offset += sizeof(*ack);
 
 #ifdef DEBUG
-                std::cout << "Got Ack message, time: " << ack->time << ", time2: " << ack->time2 << std::endl;
+                std::cout << "Got Ack message, time: " << ack->time <<
+                    ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
+                    static_cast<uint32_t>(ack->version[1]) << "." <<
+                    static_cast<uint32_t>(ack->version[2]) << "." <<
+                    static_cast<uint32_t>(ack->version[3]) << std::endl;
                 std::cout << "Handshake done" << std::endl;
 #endif
                 
