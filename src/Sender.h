@@ -11,17 +11,17 @@
 #include "Socket.h"
 #include "RTMP.h"
 
-class Output
+class Sender
 {
 public:
-    Output(Network& pNetwork, const std::string& pApplication);
-    ~Output();
+    Sender(Network& pNetwork, const std::string& pApplication);
+    ~Sender();
     
-    Output(const Output&) = delete;
-    Output& operator=(const Output&) = delete;
+    Sender(const Sender&) = delete;
+    Sender& operator=(const Sender&) = delete;
     
-    Output(Output&& other);
-    Output& operator=(Output&& other);
+    Sender(Sender&& other);
+    Sender& operator=(Sender&& other);
     
     bool init(const std::string& address);
     void update();

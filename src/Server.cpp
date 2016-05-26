@@ -25,8 +25,8 @@ Server::Server(Server&& other):
     network(other.network),
     socket(std::move(other.socket)),
     application(std::move(other.application)),
-    outputs(std::move(other.outputs)),
-    inputs(std::move(other.inputs))
+    senders(std::move(other.senders)),
+    receivers(std::move(other.receivers))
 {
     socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 }
@@ -35,8 +35,8 @@ Server& Server::operator=(Server&& other)
 {
     socket = std::move(other.socket);
     application = std::move(other.application);
-    outputs = std::move(other.outputs);
-    inputs = std::move(other.inputs);
+    senders = std::move(other.senders);
+    receivers = std::move(other.receivers);
     
     socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
     
@@ -49,11 +49,11 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
     
     for (const std::string& address : pushAddresses)
     {
-        Output output(network, application);
+        Sender sender(network, application);
         
-        if (output.init(address))
+        if (sender.init(address))
         {            
-            outputs.push_back(std::move(output));
+            senders.push_back(std::move(sender));
         }
     }
     
@@ -62,21 +62,21 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 
 void Server::update()
 {
-    for (Output& output : outputs)
+    for (Sender& sender : senders)
     {
-        output.update();
+        sender.update();
     }
     
-    for (auto inputIterator = inputs.begin(); inputIterator != inputs.end();)
+    for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
     {
-        if (inputIterator->isConnected())
+        if (receiverIterator->isConnected())
         {
-            inputIterator->update();
-            ++inputIterator;
+            receiverIterator->update();
+            ++receiverIterator;
         }
         else
         {
-            inputIterator = inputs.erase(inputIterator);
+            receiverIterator = receivers.erase(receiverIterator);
         }
     }
 }
@@ -84,10 +84,10 @@ void Server::update()
 void Server::handleAccept(Socket clientSocket)
 {
     // accept only one input
-    if (inputs.empty())
+    if (receivers.empty())
     {
-        Input input(network, std::move(clientSocket), application);
-        inputs.push_back(std::move(input));
+        Receiver receiver(network, std::move(clientSocket), application);
+        receivers.push_back(std::move(receiver));
     }
     else
     {
@@ -99,15 +99,15 @@ void Server::printInfo() const
 {
     std::cout << "Server listening on " << socket.getPort() << ", application: " << application << std::endl;
 
-    std::cout << "Outputs:" << std::endl;
-    for (const Output& output : outputs)
+    std::cout << "Senders:" << std::endl;
+    for (const Sender& sender : senders)
     {
-        output.printInfo();
+        sender.printInfo();
     }
 
-    std::cout << "Inputs:" << std::endl;
-    for (const Input& input : inputs)
+    std::cout << "Receivers:" << std::endl;
+    for (const Receiver& receiver : receivers)
     {
-        input.printInfo();
+        receiver.printInfo();
     }
 }

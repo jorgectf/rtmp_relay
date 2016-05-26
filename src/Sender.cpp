@@ -4,25 +4,27 @@
 
 #include <iostream>
 #include <cstring>
-#include "Input.h"
+#include <unistd.h>
+#include "Sender.h"
 #include "Constants.h"
+#include "RTMP.h"
 #include "Amf0.h"
 #include "Utils.h"
 
-Input::Input(Network& pNetwork, Socket pSocket, const std::string& pApplication):
-    network(pNetwork), socket(std::move(pSocket)), generator(rd()), application(pApplication)
+Sender::Sender(Network& pNetwork, const std::string& pApplication):
+    network(pNetwork), socket(pNetwork), generator(rd()), application(pApplication)
 {
-    socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
-    socket.setCloseCallback(std::bind(&Input::handleClose, this));
-    socket.startRead();
+    socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
+    socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Sender::handleClose, this));
 }
 
-Input::~Input()
+Sender::~Sender()
 {
     
 }
 
-Input::Input(Input&& other):
+Sender::Sender(Sender&& other):
     network(other.network),
     socket(std::move(other.socket)),
     data(std::move(other.data)),
@@ -30,7 +32,6 @@ Input::Input(Input&& other):
     inChunkSize(other.inChunkSize),
     outChunkSize(other.outChunkSize),
     generator(std::move(other.generator)),
-    timestamp(other.timestamp),
     streamId(other.streamId),
     previousPackets(std::move(other.previousPackets)),
     application(std::move(other.application))
@@ -38,14 +39,14 @@ Input::Input(Input&& other):
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
     other.outChunkSize = 128;
-    other.timestamp = 0;
     other.streamId = 0;
     
-    socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
-    socket.setCloseCallback(std::bind(&Input::handleClose, this));
+    socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
+    socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Sender::handleClose, this));
 }
 
-Input& Input::operator=(Input&& other)
+Sender& Sender::operator=(Sender&& other)
 {
     socket = std::move(other.socket);
     data = std::move(other.data);
@@ -53,7 +54,6 @@ Input& Input::operator=(Input&& other)
     inChunkSize = other.inChunkSize;
     outChunkSize = other.outChunkSize;
     generator = std::move(other.generator);
-    timestamp = other.timestamp;
     streamId = other.streamId;
     previousPackets = std::move(other.previousPackets);
     application = std::move(other.application);
@@ -61,49 +61,87 @@ Input& Input::operator=(Input&& other)
     other.state = rtmp::State::UNINITIALIZED;
     other.inChunkSize = 128;
     other.outChunkSize = 128;
-    other.timestamp = 0;
     other.streamId = 0;
     
-    socket.setReadCallback(std::bind(&Input::handleRead, this, std::placeholders::_1));
-    socket.setCloseCallback(std::bind(&Input::handleClose, this));
+    socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
+    socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
+    socket.setCloseCallback(std::bind(&Sender::handleClose, this));
     
     return *this;
 }
 
-void Input::update()
+bool Sender::init(const std::string& address)
 {
-    
-}
-
-bool Input::getPacket(std::vector<uint8_t>& packet)
-{
-    if (data.size())
+    if (!socket.setBlocking(false))
     {
-        packet = data;
-        return true;
+        std::cerr << "Failed to set socket non-blocking" << std::endl;
+        return false;
     }
     
-    return false;
+    if (!socket.connect(address))
+    {
+        return false;
+    }
+    
+    return true;
 }
 
-void Input::handleRead(const std::vector<uint8_t>& newData)
+void Sender::update()
+{
+    
+}
+
+void Sender::handleConnect()
+{
+    std::cout << "Sender connected" << std::endl;
+
+    std::vector<uint8_t> version;
+    version.push_back(RTMP_VERSION);
+    socket.send(version);
+    
+    rtmp::Challenge challenge;
+    challenge.time = 0;
+    memcpy(challenge.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
+    
+    for (size_t i = 0; i < sizeof(challenge.randomBytes); ++i)
+    {
+        challenge.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(generator);
+    }
+    
+    std::vector<uint8_t> challengeMessage;
+    challengeMessage.insert(challengeMessage.begin(),
+                            reinterpret_cast<uint8_t*>(&challenge),
+                            reinterpret_cast<uint8_t*>(&challenge) + sizeof(challenge));
+    socket.send(challengeMessage);
+    
+    state = rtmp::State::VERSION_SENT;
+}
+
+bool Sender::sendPacket(const std::vector<uint8_t>& packet)
+{
+    socket.send(packet);
+    
+    return true;
+}
+
+void Sender::handleRead(const std::vector<uint8_t>& newData)
 {
     data.insert(data.end(), newData.begin(), newData.end());
 
 #ifdef DEBUG
-    std::cout << "Input got " << std::to_string(newData.size()) << " bytes" << std::endl;
+    std::cout << "Sender got " << std::to_string(newData.size()) << " bytes" << std::endl;
 #endif
     
     uint32_t offset = 0;
     
     while (offset < data.size())
     {
-        if (state == rtmp::State::UNINITIALIZED)
+        if (state == rtmp::State::VERSION_SENT)
         {
             if (data.size() - offset >= sizeof(uint8_t))
             {
-                // C0
-                uint8_t version = static_cast<uint8_t>(*(data.data() + offset));
+                // S0
+                uint8_t version = static_cast<uint8_t>(*data.data() + offset);
                 offset += sizeof(version);
 
 #ifdef DEBUG
@@ -117,23 +155,18 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
                     break;
                 }
                 
-                // S0
-                std::vector<uint8_t> reply;
-                reply.push_back(RTMP_VERSION);
-                socket.send(reply);
-                
-                state = rtmp::State::VERSION_SENT;
+                state = rtmp::State::VERSION_RECEIVED;
             }
             else
             {
                 break;
             }
         }
-        else if (state == rtmp::State::VERSION_SENT)
+        else if (state == rtmp::State::VERSION_RECEIVED)
         {
             if (data.size() - offset >= sizeof(rtmp::Challenge))
             {
-                // C1
+                // S1
                 rtmp::Challenge* challenge = reinterpret_cast<rtmp::Challenge*>(data.data() + offset);
                 offset += sizeof(*challenge);
 
@@ -145,23 +178,7 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
                     static_cast<uint32_t>(challenge->version[3]) << std::endl;
 #endif
                 
-                // S1
-                rtmp::Challenge replyChallenge;
-                replyChallenge.time = 0;
-                memcpy(replyChallenge.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
-                
-                for (size_t i = 0; i < sizeof(replyChallenge.randomBytes); ++i)
-                {
-                    replyChallenge.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(generator);
-                }
-                
-                std::vector<uint8_t> reply;
-                reply.insert(reply.begin(),
-                             reinterpret_cast<uint8_t*>(&replyChallenge),
-                             reinterpret_cast<uint8_t*>(&replyChallenge) + sizeof(replyChallenge));
-                socket.send(reply);
-                
-                // S2
+                // C2
                 rtmp::Ack ack;
                 ack.time = challenge->time;
                 memcpy(ack.version, challenge->version, sizeof(ack.version));
@@ -180,11 +197,11 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
                 break;
             }
         }
-        else  if (state == rtmp::State::ACK_SENT)
+        else if (state == rtmp::State::ACK_SENT)
         {
             if (data.size() - offset >= sizeof(rtmp::Ack))
             {
-                // C2
+                // S2
                 rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                 offset += sizeof(*ack);
 
@@ -198,6 +215,8 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
 #endif
                 
                 state = rtmp::State::HANDSHAKE_DONE;
+
+                sendConnect();
             }
             else
             {
@@ -215,7 +234,7 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
 #ifdef DEBUG
                 std::cout << "Total packet size: " << ret << std::endl;
 #endif
-                
+
                 offset += ret;
 
                 handlePacket(packet);
@@ -239,15 +258,13 @@ void Input::handleRead(const std::vector<uint8_t>& newData)
 #endif
 }
 
-void Input::handleClose()
+void Sender::handleClose()
 {
-    std::cout << "Input disconnected" << std::endl;
+    
 }
 
-bool Input::handlePacket(const rtmp::Packet& packet)
+bool Sender::handlePacket(const rtmp::Packet& packet)
 {
-    timestamp = packet.header.timestamp;
-
     switch (packet.header.messageType)
     {
         case rtmp::MessageType::SET_CHUNK_SIZE:
@@ -264,6 +281,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 #ifdef DEBUG
             std::cout << "Chunk size: " << inChunkSize << std::endl;
 #endif
+            sendSetChunkSize();
 
             break;
         }
@@ -315,7 +333,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 #ifdef DEBUG
             std::cout << "Server bandwidth: " << bandwidth << std::endl;
 #endif
-            
+
             break;
         }
 
@@ -346,13 +364,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 #ifdef DEBUG
             std::cout << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type) << std::endl;
 #endif
-
-            break;
-        }
-
-        case rtmp::MessageType::NOTIFY:
-        {
-            // TODO: handle this
+            
             break;
         }
 
@@ -387,7 +399,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             std::cout << "Command: ";
             command.dump();
 #endif
-            
+
             amf0::Node transactionId;
 
             ret = transactionId.decode(packet.data, offset);
@@ -406,7 +418,7 @@ bool Input::handlePacket(const rtmp::Packet& packet)
 
             amf0::Node argument1;
 
-            if ((ret = argument1.decode(packet.data, offset))  > 0)
+            if ((ret = argument1.decode(packet.data, offset)) > 0)
             {
                 offset += ret;
 
@@ -421,49 +433,19 @@ bool Input::handlePacket(const rtmp::Packet& packet)
             if ((ret = argument2.decode(packet.data, offset)) > 0)
             {
                 offset += ret;
-            
+
 #ifdef DEBUG
                 std::cout << "Argument 2: ";
                 argument2.dump();
 #endif
             }
 
-            if (command.asString() == "connect")
+            if (command.asString() == "onBWDone")
             {
-                if (argument1["app"].asString() != application)
-                {
-                    std::cerr << "Wrong application" << std::endl;
-                    socket.close();
-                    return false;
-                }
-
-                sendServerBandwidth();
-                sendClientBandwidth();
-                sendPing();
-                sendSetChunkSize();
-                sendConnectResult(transactionId.asDouble());
-                sendBWDone();
+                sendCheckBW();
             }
-            else if (command.asString() == "_checkbw")
+            else if (command.asString() == "onFCPublish")
             {
-                sendCheckBWResult(transactionId.asDouble());
-            }
-            else if (command.asString() == "createStream")
-            {
-                sendCreateStreamResult(transactionId.asDouble());
-            }
-            else if (command.asString() == "releaseStream")
-            {
-                sendReleaseStreamResult(transactionId.asDouble());
-            }
-            else if (command.asString() == "FCPublish")
-            {
-                sendOnFCPublish();
-            }
-            else if (command.asString() == "publish")
-            {
-                sendPing();
-                sendPublishStatus(transactionId.asDouble());
             }
             else if (command.asString() == "_error")
             {
@@ -483,13 +465,28 @@ bool Input::handlePacket(const rtmp::Packet& packet)
                 if (i != invokes.end())
                 {
                     std::cerr << i->second << " result" << std::endl;
+                    
+                    if (i->second == "connect")
+                    {
+                        sendReleaseStream();
+                        sendFCPublish();
+                        sendCreateStream();
+                    }
+                    else if (i->second == "releaseStream")
+                    {
+                    }
+                    else if (i->second == "createStream")
+                    {
+                        streamId = static_cast<uint32_t>(argument2.asDouble());
+                        sendPublish();
+                    }
 
                     invokes.erase(i);
                 }
             }
             break;
         }
-
+            
         default:
         {
             std::cerr << "Unhandled message" << std::endl;
@@ -500,77 +497,47 @@ bool Input::handlePacket(const rtmp::Packet& packet)
     return true;
 }
 
-void Input::sendServerBandwidth()
-{
-    rtmp::Packet packet;
-    packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    packet.header.channel = rtmp::Channel::NETWORK;
-    packet.header.timestamp = 0;
-    packet.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
-    packet.header.messageStreamId = 0;
-
-    encodeInt(packet.data, 4, serverBandwidth);
-
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, outChunkSize, packet);
-
-#ifdef DEBUG
-    std::cout << "Sending SERVER_BANDWIDTH" << std::endl;
-#endif
-
-    socket.send(buffer);
-}
-
-void Input::sendClientBandwidth()
-{
-    rtmp::Packet packet;
-    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    packet.header.channel = rtmp::Channel::NETWORK;
-    packet.header.timestamp = 0;
-    packet.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
-
-    encodeInt(packet.data, 4, serverBandwidth);
-    encodeInt(packet.data, 1, 2); // dynamic
-
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, outChunkSize, packet);
-
-#ifdef DEBUG
-    std::cout << "Sending CLIENT_BANDWIDTH" << std::endl;
-#endif
-
-    socket.send(buffer);
-}
-
-void Input::sendPing()
-{
-    rtmp::Packet packet;
-    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    packet.header.channel = rtmp::Channel::NETWORK;
-    packet.header.timestamp = 0;
-    packet.header.messageType = rtmp::MessageType::PING;
-
-    encodeInt(packet.data, 2, 0); // ping type
-    encodeInt(packet.data, 4, 0); // ping param
-
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, outChunkSize, packet);
-
-#ifdef DEBUG
-    std::cout << "Sending PING" << std::endl;
-#endif
-
-    socket.send(buffer);
-}
-
-void Input::sendSetChunkSize()
+void Sender::sendConnect()
 {
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
     packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.messageStreamId = 0;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
+
+    amf0::Node commandName = std::string("connect");
+    commandName.encode(packet.data);
+
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+    transactionIdNode.encode(packet.data);
+
+    amf0::Node argument1;
+    argument1["app"] = application;
+    argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
+    argument1["tcUrl"] = std::string("rtmp://127.0.0.1:") + std::to_string(socket.getPort()) + "/" + application;
+    argument1["type"] = std::string("nonprivate");
+    argument1.encode(packet.data);
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, outChunkSize, packet);
+
+#ifdef DEBUG
+    std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
+#endif
+
+    socket.send(buffer);
+
+    invokes[invokeId] = commandName.asString();
+}
+
+void Sender::sendSetChunkSize()
+{
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
-    packet.header.messageStreamId = 0;
 
     encodeInt(packet.data, 4, outChunkSize);
 
@@ -584,7 +551,7 @@ void Input::sendSetChunkSize()
     socket.send(buffer);
 }
 
-void Input::sendConnectResult(double transactionId)
+void Sender::sendCheckBW()
 {
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
@@ -592,43 +559,7 @@ void Input::sendConnectResult(double transactionId)
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::INVOKE;
 
-    amf0::Node commandName = std::string("_result");
-    commandName.encode(packet.data);
-
-    amf0::Node transactionIdNode = transactionId;
-    transactionIdNode.encode(packet.data);
-
-    amf0::Node argument1;
-    argument1["fmsVer"] = std::string("FMS/3,0,1,123");
-    argument1["capabilities"] = 31.0;
-    argument1.encode(packet.data);
-
-    amf0::Node argument2;
-    argument2["level"] = std::string("status");
-    argument2["code"] = std::string("NetConnection.Connect.Success");
-    argument2["description"] = std::string("Connection succeeded.");
-    argument2["objectEncoding"] = 0.0;
-    argument2.encode(packet.data);
-
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, outChunkSize, packet);
-
-#ifdef DEBUG
-    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
-
-    socket.send(buffer);
-}
-
-void Input::sendBWDone()
-{
-    rtmp::Packet packet;
-    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    packet.header.channel = rtmp::Channel::SYSTEM;
-    packet.header.timestamp = 0;
-    packet.header.messageType = rtmp::MessageType::INVOKE;
-
-    amf0::Node commandName = std::string("onBWDone");
+    amf0::Node commandName = std::string("_checkbw");
     commandName.encode(packet.data);
 
     amf0::Node transactionIdNode = static_cast<double>(++invokeId);
@@ -637,7 +568,65 @@ void Input::sendBWDone()
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);
 
-    amf0::Node argument2 = 0.0;
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, outChunkSize, packet);
+
+#ifdef DEBUG
+    std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
+#endif
+
+    socket.send(buffer);
+
+    invokes[invokeId] = commandName.asString();
+}
+
+void Sender::sendCreateStream()
+{
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
+
+    amf0::Node commandName = std::string("createStream");
+    commandName.encode(packet.data);
+
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+    transactionIdNode.encode(packet.data);
+
+    amf0::Node argument1(amf0::Marker::Null);
+    argument1.encode(packet.data);
+
+    std::vector<uint8_t> buffer;
+    encodePacket(buffer, outChunkSize, packet);
+
+#ifdef DEBUG
+    std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
+#endif
+
+    socket.send(buffer);
+
+    invokes[invokeId] = commandName.asString();
+}
+
+void Sender::sendReleaseStream()
+{
+    rtmp::Packet packet;
+    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
+    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.timestamp = 0;
+    packet.header.messageType = rtmp::MessageType::INVOKE;
+
+    amf0::Node commandName = std::string("releaseStream");
+    commandName.encode(packet.data);
+
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+    transactionIdNode.encode(packet.data);
+
+    amf0::Node argument1(amf0::Marker::Null);
+    argument1.encode(packet.data);
+
+    amf0::Node argument2 = std::string("wallclock_test_med");
     argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;
@@ -652,7 +641,7 @@ void Input::sendBWDone()
     invokes[invokeId] = commandName.asString();
 }
 
-void Input::sendCheckBWResult(double transactionId)
+void Sender::sendFCPublish()
 {
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
@@ -660,147 +649,66 @@ void Input::sendCheckBWResult(double transactionId)
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::INVOKE;
 
-    amf0::Node commandName = std::string("_result");
+    amf0::Node commandName = std::string("FCPublish");
     commandName.encode(packet.data);
 
-    amf0::Node transactionIdNode = transactionId;
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
     transactionIdNode.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);
 
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, outChunkSize, packet);
-
-#ifdef DEBUG
-    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
-
-    socket.send(buffer);
-}
-
-void Input::sendCreateStreamResult(double transactionId)
-{
-    rtmp::Packet packet;
-    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    packet.header.channel = rtmp::Channel::SYSTEM;
-    packet.header.timestamp = 0;
-    packet.header.messageType = rtmp::MessageType::INVOKE;
-
-    amf0::Node commandName = std::string("_result");
-    commandName.encode(packet.data);
-
-    amf0::Node transactionIdNode = transactionId;
-    transactionIdNode.encode(packet.data);
-
-    amf0::Node argument1(amf0::Marker::Null);
-    argument1.encode(packet.data);
-
-    ++streamId;
-    if (streamId == 0 || streamId == 2)
-    {
-        ++streamId; // Values 0 and 2 are reserved
-    }
-
-    amf0::Node argument2 = static_cast<double>(streamId);
+    amf0::Node argument2 = std::string("wallclock_test_med");
     argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
-    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+    std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
 #endif
 
     socket.send(buffer);
+
+    invokes[invokeId] = commandName.asString();
 }
 
-void Input::sendReleaseStreamResult(double transactionId)
-{
-    rtmp::Packet packet;
-    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    packet.header.channel = rtmp::Channel::SYSTEM;
-    packet.header.timestamp = 0;
-    packet.header.messageType = rtmp::MessageType::INVOKE;
-
-    amf0::Node commandName = std::string("_result");
-    commandName.encode(packet.data);
-
-    amf0::Node transactionIdNode = transactionId;
-    transactionIdNode.encode(packet.data);
-
-    amf0::Node argument1(amf0::Marker::Null);
-    argument1.encode(packet.data);
-
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, outChunkSize, packet);
-
-#ifdef DEBUG
-    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
-
-    socket.send(buffer);
-}
-
-void Input::sendOnFCPublish()
-{
-    rtmp::Packet packet;
-    packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
-    packet.header.channel = rtmp::Channel::SYSTEM;
-    packet.header.timestamp = 0;
-    packet.header.messageType = rtmp::MessageType::INVOKE;
-
-    amf0::Node commandName = std::string("onFCPublish");
-    commandName.encode(packet.data);
-
-    std::vector<uint8_t> buffer;
-    encodePacket(buffer, outChunkSize, packet);
-
-#ifdef DEBUG
-    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
-
-    socket.send(buffer);
-}
-
-void Input::sendPublishStatus(double transactionId)
+void Sender::sendPublish()
 {
     rtmp::Packet packet;
     packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
-    packet.header.channel = rtmp::Channel::SYSTEM;
+    packet.header.channel = rtmp::Channel::SOURCE;
+    packet.header.messageStreamId = streamId;
     packet.header.timestamp = 0;
     packet.header.messageType = rtmp::MessageType::INVOKE;
 
-    amf0::Node commandName = std::string("onStatus");
+    amf0::Node commandName = std::string("publish");
     commandName.encode(packet.data);
 
-    amf0::Node transactionIdNode = transactionId;
+    amf0::Node transactionIdNode = static_cast<double>(++invokeId);
     transactionIdNode.encode(packet.data);
 
     amf0::Node argument1(amf0::Marker::Null);
     argument1.encode(packet.data);
 
-    amf0::Node argument2;
-    argument2["clientid"] = std::string("Lavf57.1.0");
-    argument2["code"] = std::string("NetStream.Publish.Start");
-    argument2["description"] = std::string("wallclock_test_med is now published");
-    argument2["details"] = std::string("wallclock_test_med");
-    argument2["level"] = std::string("status");
+    amf0::Node argument2 = std::string("wallclock_test_med");
     argument2.encode(packet.data);
 
     std::vector<uint8_t> buffer;
     encodePacket(buffer, outChunkSize, packet);
 
 #ifdef DEBUG
-    std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+    std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
 #endif
 
     socket.send(buffer);
+
+    invokes[invokeId] = commandName.asString();
 }
 
-void Input::printInfo() const
+void Sender::printInfo() const
 {
-    std::cout << "\tInput " << (socket.isReady() ? "" : "not ") << "connected to: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+    std::cout << "\tSender " << (socket.isReady() ? "" : "not ") << "connected with: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
     switch (state)
     {

@@ -10,17 +10,17 @@
 #include "Socket.h"
 #include "RTMP.h"
 
-class Input
+class Receiver
 {
 public:
-    Input(Network& pNetwork, Socket pSocket, const std::string& pApplication);
-    ~Input();
+    Receiver(Network& pNetwork, Socket pSocket, const std::string& pApplication);
+    ~Receiver();
     
-    Input(const Input&) = delete;
-    Input& operator=(const Input&) = delete;
+    Receiver(const Receiver&) = delete;
+    Receiver& operator=(const Receiver&) = delete;
     
-    Input(Input&& other);
-    Input& operator=(Input&& other);
+    Receiver(Receiver&& other);
+    Receiver& operator=(Receiver&& other);
     
     void update();
     

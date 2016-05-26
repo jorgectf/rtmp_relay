@@ -10,8 +10,8 @@
 #include <memory>
 #include <poll.h>
 #include "Acceptor.h"
-#include "Output.h"
-#include "Input.h"
+#include "Sender.h"
+#include "Receiver.h"
 
 class Server
 {
@@ -38,6 +38,6 @@ protected:
     Acceptor socket;
     std::string application;
     
-    std::vector<Output> outputs;
-    std::vector<Input> inputs;
+    std::vector<Sender> senders;
+    std::vector<Receiver> receivers;
 };
