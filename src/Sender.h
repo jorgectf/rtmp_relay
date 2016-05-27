@@ -20,8 +20,8 @@ public:
     Sender(const Sender&) = delete;
     Sender& operator=(const Sender&) = delete;
     
-    Sender(Sender&& other);
-    Sender& operator=(Sender&& other);
+    Sender(Sender&& other) = delete;
+    Sender& operator=(Sender&& other) = delete;
     
     bool init(const std::string& address);
     void update();

@@ -24,52 +24,6 @@ Sender::~Sender()
     
 }
 
-Sender::Sender(Sender&& other):
-    network(other.network),
-    socket(std::move(other.socket)),
-    data(std::move(other.data)),
-    state(other.state),
-    inChunkSize(other.inChunkSize),
-    outChunkSize(other.outChunkSize),
-    generator(std::move(other.generator)),
-    streamId(other.streamId),
-    previousPackets(std::move(other.previousPackets)),
-    application(std::move(other.application))
-{
-    other.state = rtmp::State::UNINITIALIZED;
-    other.inChunkSize = 128;
-    other.outChunkSize = 128;
-    other.streamId = 0;
-    
-    socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
-    socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
-    socket.setCloseCallback(std::bind(&Sender::handleClose, this));
-}
-
-Sender& Sender::operator=(Sender&& other)
-{
-    socket = std::move(other.socket);
-    data = std::move(other.data);
-    state = other.state;
-    inChunkSize = other.inChunkSize;
-    outChunkSize = other.outChunkSize;
-    generator = std::move(other.generator);
-    streamId = other.streamId;
-    previousPackets = std::move(other.previousPackets);
-    application = std::move(other.application);
-    
-    other.state = rtmp::State::UNINITIALIZED;
-    other.inChunkSize = 128;
-    other.outChunkSize = 128;
-    other.streamId = 0;
-    
-    socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
-    socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
-    socket.setCloseCallback(std::bind(&Sender::handleClose, this));
-    
-    return *this;
-}
-
 bool Sender::init(const std::string& address)
 {
     if (!socket.setBlocking(false))

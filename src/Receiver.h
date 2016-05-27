@@ -19,8 +19,8 @@ public:
     Receiver(const Receiver&) = delete;
     Receiver& operator=(const Receiver&) = delete;
     
-    Receiver(Receiver&& other);
-    Receiver& operator=(Receiver&& other);
+    Receiver(Receiver&& other) = delete;
+    Receiver& operator=(Receiver&& other) = delete;
     
     void update();
     

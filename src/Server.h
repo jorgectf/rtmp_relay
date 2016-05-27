@@ -38,6 +38,6 @@ protected:
     Acceptor socket;
     std::string application;
     
-    std::vector<Sender> senders;
-    std::vector<Receiver> receivers;
+    std::vector<std::auto_ptr<Sender>> senders;
+    std::vector<std::auto_ptr<Receiver>> receivers;
 };

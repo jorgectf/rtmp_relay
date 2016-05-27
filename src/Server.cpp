@@ -49,9 +49,9 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
     
     for (const std::string& address : pushAddresses)
     {
-        Sender sender(network, application);
+        std::auto_ptr<Sender> sender(new Sender(network, application));
         
-        if (sender.init(address))
+        if (sender->init(address))
         {            
             senders.push_back(std::move(sender));
         }
@@ -62,16 +62,18 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 
 void Server::update()
 {
-    for (Sender& sender : senders)
+    for (auto sender : senders)
     {
-        sender.update();
+        sender->update();
     }
     
     for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
     {
-        if (receiverIterator->isConnected())
+        auto receiver = *receiverIterator;
+
+        if (receiver->isConnected())
         {
-            receiverIterator->update();
+            receiver->update();
             ++receiverIterator;
         }
         else
@@ -86,7 +88,7 @@ void Server::handleAccept(Socket clientSocket)
     // accept only one input
     if (receivers.empty())
     {
-        Receiver receiver(network, std::move(clientSocket), application);
+        std::auto_ptr<Receiver> receiver(new Receiver(network, std::move(clientSocket), application));
         receivers.push_back(std::move(receiver));
     }
     else
@@ -100,14 +102,14 @@ void Server::printInfo() const
     std::cout << "Server listening on " << socket.getPort() << ", application: " << application << std::endl;
 
     std::cout << "Senders:" << std::endl;
-    for (const Sender& sender : senders)
+    for (const auto& sender : senders)
     {
-        sender.printInfo();
+        sender->printInfo();
     }
 
     std::cout << "Receivers:" << std::endl;
-    for (const Receiver& receiver : receivers)
+    for (const auto& receiver : receivers)
     {
-        receiver.printInfo();
+        receiver->printInfo();
     }
 }
