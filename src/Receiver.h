@@ -7,6 +7,7 @@
 #include <random>
 #include <vector>
 #include <map>
+#include <memory>
 #include "Socket.h"
 #include "RTMP.h"
 
