@@ -57,7 +57,9 @@ Socket::Socket(Socket&& other):
     blocking(other.blocking),
     ipAddress(other.ipAddress),
     port(other.port),
-    readCallback(std::move(other.readCallback))
+    connectCallback(std::move(other.connectCallback)),
+    readCallback(std::move(other.readCallback)),
+    closeCallback(std::move(other.closeCallback))
 {
     network.addSocket(*this);
     
@@ -67,6 +69,9 @@ Socket::Socket(Socket&& other):
     other.blocking = true;
     other.ipAddress = 0;
     other.port = 0;
+    other.connectCallback = nullptr;
+    other.readCallback = nullptr;
+    other.closeCallback = nullptr;
 }
 
 Socket& Socket::operator=(Socket&& other)
@@ -75,9 +80,11 @@ Socket& Socket::operator=(Socket&& other)
     connecting = other.connecting;
     ready = other.ready;
     blocking = other.blocking;
-    readCallback = std::move(other.readCallback);
     ipAddress = other.ipAddress;
     port = other.port;
+    connectCallback = std::move(other.connectCallback);
+    readCallback = std::move(other.readCallback);
+    closeCallback = std::move(other.closeCallback);
     
     other.socketFd = -1;
     other.connecting = false;
@@ -85,6 +92,9 @@ Socket& Socket::operator=(Socket&& other)
     other.blocking = true;
     other.ipAddress = 0;
     other.port = 0;
+    other.connectCallback = nullptr;
+    other.readCallback = nullptr;
+    other.closeCallback = nullptr;
     
     return *this;
 }

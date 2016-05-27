@@ -27,16 +27,15 @@ Acceptor::Acceptor(Acceptor&& other):
     Socket(std::move(other)),
     acceptCallback(std::move(other.acceptCallback))
 {
-    other.port = 0;
+    other.acceptCallback = nullptr;
 }
 
 Acceptor& Acceptor::operator=(Acceptor&& other)
 {
     Socket::operator=(std::move(other));
-    port = other.port;
     acceptCallback = std::move(other.acceptCallback);
     
-    other.port = 0;
+    other.acceptCallback = nullptr;
     
     return *this;
 }
