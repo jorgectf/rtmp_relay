@@ -307,7 +307,11 @@ namespace relay
 
             case rtmp::MessageType::NOTIFY:
             {
-                // TODO: handle this
+                // forward notify packet
+                if (auto localServer = server.lock())
+                {
+                    localServer->sendPacket(packet);
+                }
                 break;
             }
 
