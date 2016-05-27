@@ -62,14 +62,14 @@ bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
 
 void Server::update()
 {
-    for (auto sender : senders)
+    for (const auto& sender : senders)
     {
         sender->update();
     }
     
     for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
     {
-        auto receiver = *receiverIterator;
+        const auto& receiver = *receiverIterator;
 
         if (receiver->isConnected())
         {

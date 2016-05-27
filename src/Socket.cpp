@@ -257,6 +257,11 @@ bool Socket::send(std::vector<uint8_t> buffer)
             return false;
         }
     }
+    else if (size != static_cast<ssize_t>(buffer.size()))
+    {
+        std::cerr << "Failed to send all data" << std::endl;
+        return false;
+    }
 
 #ifdef DEBUG
     std::cout << "Socket sent " << size << " bytes" << std::endl;
