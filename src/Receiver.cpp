@@ -313,13 +313,21 @@ namespace relay
 
             case rtmp::MessageType::AUDIO_PACKET:
             {
-                // TODO: forward audio packet
+                // forward audio packet
+                if (auto localServer = server.lock())
+                {
+                    localServer->sendPacket(packet);
+                }
                 break;
             }
 
             case rtmp::MessageType::VIDEO_PACKET:
             {
-                // TODO: forward video packet
+                // forward video packet
+                if (auto localServer = server.lock())
+                {
+                    localServer->sendPacket(packet);
+                }
                 break;
             }
 

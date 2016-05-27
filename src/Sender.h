@@ -34,6 +34,7 @@ namespace relay
         void printInfo() const;
 
         void createStream(const std::string& newStreamName);
+        void sendPacket(const rtmp::Packet& packet);
         
     private:
         void handleRead(const std::vector<uint8_t>& newData);

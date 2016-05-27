@@ -693,4 +693,12 @@ namespace relay
             sendCreateStream();
         }
     }
+
+    void Sender::sendPacket(const rtmp::Packet& packet)
+    {
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet);
+
+        socket.send(buffer);
+    }
 }

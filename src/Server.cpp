@@ -85,6 +85,14 @@ namespace relay
         }
     }
 
+    void Server::sendPacket(const rtmp::Packet& packet)
+    {
+        for (const auto& sender : senders)
+        {
+            sender->sendPacket(packet);
+        }
+    }
+
     void Server::printInfo() const
     {
         std::cout << "Server listening on " << socket.getPort() << ", application: " << application << std::endl;
