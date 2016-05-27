@@ -6,13 +6,13 @@
 #include <signal.h>
 #include "Relay.h"
 
-Relay relay;
+relay::Relay rel;
 
 static void signalHandler(int signo)
 {
     if (signo == SIGUSR1)
     {
-        relay.printInfo();
+        rel.printInfo();
     }
 }
 
@@ -34,13 +34,13 @@ int main(int argc, const char * argv[])
         return 1;
     }
     
-    if (!relay.init(argv[1]))
+    if (!rel.init(argv[1]))
     {
         std::cerr << "Failed to init relay" << std::endl;
         return 1;
     }
     
-    relay.run();
+    rel.run();
     
     return 0;
 }

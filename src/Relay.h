@@ -9,27 +9,30 @@
 #include "Network.h"
 #include "Socket.h"
 
-class Server;
-
-class Relay
+namespace relay
 {
-public:
-    Relay();
-    ~Relay();
-    
-    Relay(const Relay&) = delete;
-    Relay& operator=(const Relay&) = delete;
-    
-    Relay(Relay&&) = delete;
-    Relay& operator=(Relay&&) = delete;
-    
-    bool init(const std::string& config);
-    
-    void run();
+    class Server;
 
-    void printInfo() const;
-    
-private:
-    Network network;
-    std::vector<Server> servers;
-};
+    class Relay
+    {
+    public:
+        Relay();
+        ~Relay();
+        
+        Relay(const Relay&) = delete;
+        Relay& operator=(const Relay&) = delete;
+        
+        Relay(Relay&&) = delete;
+        Relay& operator=(Relay&&) = delete;
+        
+        bool init(const std::string& config);
+        
+        void run();
+
+        void printInfo() const;
+        
+    private:
+        Network network;
+        std::vector<std::shared_ptr<Server>> servers;
+    };
+}

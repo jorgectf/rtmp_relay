@@ -10,106 +10,95 @@
 #include <unistd.h>
 #include "Server.h"
 
-Server::Server(Network& pNetwork, const std::string& pApplication):
-    network(pNetwork), socket(pNetwork), application(pApplication)
+namespace relay
 {
-    socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
-}
-
-Server::~Server()
-{
-    
-}
-
-Server::Server(Server&& other):
-    network(other.network),
-    socket(std::move(other.socket)),
-    application(std::move(other.application)),
-    senders(std::move(other.senders)),
-    receivers(std::move(other.receivers))
-{
-    socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
-}
-
-Server& Server::operator=(Server&& other)
-{
-    socket = std::move(other.socket);
-    application = std::move(other.application);
-    senders = std::move(other.senders);
-    receivers = std::move(other.receivers);
-    
-    socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
-    
-    return *this;
-}
-
-bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
-{
-    socket.startAccept(port);
-    
-    for (const std::string& address : pushAddresses)
+    Server::Server(Network& pNetwork, const std::string& pApplication):
+        network(pNetwork), socket(pNetwork), application(pApplication)
     {
-        std::auto_ptr<Sender> sender(new Sender(network, application));
+        socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
+    }
+
+    Server::~Server()
+    {
         
-        if (sender->init(address))
-        {            
-            senders.push_back(std::move(sender));
+    }
+
+    bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
+    {
+        socket.startAccept(port);
+        
+        for (const std::string& address : pushAddresses)
+        {
+            std::shared_ptr<Sender> sender = std::make_shared<Sender>(network, application);
+            
+            if (sender->init(address))
+            {            
+                senders.push_back(std::move(sender));
+            }
+        }
+        
+        return true;
+    }
+
+    void Server::update()
+    {
+        for (const auto& sender : senders)
+        {
+            sender->update();
+        }
+        
+        for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
+        {
+            const auto& receiver = *receiverIterator;
+
+            if (receiver->isConnected())
+            {
+                receiver->update();
+                ++receiverIterator;
+            }
+            else
+            {
+                receiverIterator = receivers.erase(receiverIterator);
+            }
         }
     }
-    
-    return true;
-}
 
-void Server::update()
-{
-    for (const auto& sender : senders)
+    void Server::handleAccept(Socket clientSocket)
     {
-        sender->update();
-    }
-    
-    for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
-    {
-        const auto& receiver = *receiverIterator;
-
-        if (receiver->isConnected())
+        // accept only one input
+        if (receivers.empty())
         {
-            receiver->update();
-            ++receiverIterator;
+            std::shared_ptr<Receiver> receiver = std::make_shared<Receiver>(network, std::move(clientSocket), application, shared_from_this());
+            receivers.push_back(std::move(receiver));
         }
         else
         {
-            receiverIterator = receivers.erase(receiverIterator);
+            clientSocket.close();
         }
     }
-}
 
-void Server::handleAccept(Socket clientSocket)
-{
-    // accept only one input
-    if (receivers.empty())
+    void Server::createStream(const std::string& streamName)
     {
-        std::auto_ptr<Receiver> receiver(new Receiver(network, std::move(clientSocket), application));
-        receivers.push_back(std::move(receiver));
-    }
-    else
-    {
-        clientSocket.close();
-    }
-}
-
-void Server::printInfo() const
-{
-    std::cout << "Server listening on " << socket.getPort() << ", application: " << application << std::endl;
-
-    std::cout << "Senders:" << std::endl;
-    for (const auto& sender : senders)
-    {
-        sender->printInfo();
+        for (const auto& sender : senders)
+        {
+            sender->createStream(streamName);
+        }
     }
 
-    std::cout << "Receivers:" << std::endl;
-    for (const auto& receiver : receivers)
+    void Server::printInfo() const
     {
-        receiver->printInfo();
+        std::cout << "Server listening on " << socket.getPort() << ", application: " << application << std::endl;
+
+        std::cout << "Senders:" << std::endl;
+        for (const auto& sender : senders)
+        {
+            sender->printInfo();
+        }
+
+        std::cout << "Receivers:" << std::endl;
+        for (const auto& receiver : receivers)
+        {
+            receiver->printInfo();
+        }
     }
 }

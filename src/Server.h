@@ -13,31 +13,36 @@
 #include "Sender.h"
 #include "Receiver.h"
 
-class Server
+namespace relay
 {
-public:
-    Server(Network& pNetwork, const std::string& pApplication);
-    ~Server();
-    
-    Server(const Server&) = delete;
-    Server& operator=(const Server&) = delete;
-    
-    Server(Server&& other);
-    Server& operator=(Server&& other);
-    
-    bool init(uint16_t port, const std::vector<std::string>& pushAddresses);
-    
-    void update();
+    class Server: public std::enable_shared_from_this<Server>
+    {
+    public:
+        Server(Network& pNetwork, const std::string& pApplication);
+        ~Server();
+        
+        Server(const Server&) = delete;
+        Server& operator=(const Server&) = delete;
+        
+        Server(Server&& other) = delete;
+        Server& operator=(Server&& other) = delete;
+        
+        bool init(uint16_t port, const std::vector<std::string>& pushAddresses);
+        
+        void update();
 
-    void printInfo() const;
-    
-protected:
-    void handleAccept(Socket clientSocket);
-    
-    Network& network;
-    Acceptor socket;
-    std::string application;
-    
-    std::vector<std::unique_ptr<Sender>> senders;
-    std::vector<std::unique_ptr<Receiver>> receivers;
-};
+        void createStream(const std::string& streamName);
+
+        void printInfo() const;
+        
+    protected:
+        void handleAccept(Socket clientSocket);
+        
+        Network& network;
+        Acceptor socket;
+        std::string application;
+        
+        std::vector<std::shared_ptr<Sender>> senders;
+        std::vector<std::shared_ptr<Receiver>> receivers;
+    };
+}
