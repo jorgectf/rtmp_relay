@@ -42,7 +42,7 @@ namespace relay
         Acceptor socket;
         std::string application;
         
-        std::vector<std::shared_ptr<Sender>> senders;
-        std::vector<std::shared_ptr<Receiver>> receivers;
+        std::vector<std::unique_ptr<Sender>> senders;
+        std::vector<std::unique_ptr<Receiver>> receivers;
     };
 }

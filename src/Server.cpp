@@ -29,7 +29,7 @@ namespace relay
         
         for (const std::string& address : pushAddresses)
         {
-            std::shared_ptr<Sender> sender = std::make_shared<Sender>(network, application);
+            std::unique_ptr<Sender> sender(new Sender(network, application));
             
             if (sender->init(address))
             {            
@@ -68,7 +68,7 @@ namespace relay
         // accept only one input
         if (receivers.empty())
         {
-            std::shared_ptr<Receiver> receiver = std::make_shared<Receiver>(network, std::move(clientSocket), application, shared_from_this());
+            std::unique_ptr<Receiver> receiver(new Receiver(network, std::move(clientSocket), application, shared_from_this()));
             receivers.push_back(std::move(receiver));
         }
         else
