@@ -14,6 +14,10 @@ static void signalHandler(int signo)
     {
         rel.printInfo();
     }
+    else if (signo == SIGPIPE)
+    {
+        std::cerr << "Received SIGPIPE" << std::endl;
+    }
 }
 
 int main(int argc, const char * argv[])
@@ -30,7 +34,13 @@ int main(int argc, const char * argv[])
 
     if (signal(SIGUSR1, signalHandler) == SIG_ERR)
     {
-        std::cerr << "Failed to capure SIGINFO" << std::endl;
+        std::cerr << "Failed to capure SIGUSR1" << std::endl;
+        return 1;
+    }
+
+    if (signal(SIGPIPE, signalHandler) == SIG_ERR)
+    {
+        std::cerr << "Failed to capure SIGPIPE" << std::endl;
         return 1;
     }
     
