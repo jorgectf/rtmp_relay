@@ -335,6 +335,16 @@ namespace relay
                 break;
             }
 
+            case rtmp::MessageType::METADATA:
+            {
+                // forward meta data packet
+                if (auto localServer = server.lock())
+                {
+                    localServer->sendPacket(packet);
+                }
+                break;
+            }
+
             case rtmp::MessageType::INVOKE:
             {
                 uint32_t offset = 0;
