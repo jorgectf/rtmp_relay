@@ -106,6 +106,8 @@ void Socket::close()
         ::close(socketFd);
         socketFd = 0;
     }
+
+    ready = false;
 }
 
 bool Socket::connect(const std::string& address, uint16_t newPort)
@@ -246,6 +248,11 @@ bool Socket::setBlocking(bool newBlocking)
 
 bool Socket::send(std::vector<uint8_t> buffer)
 {
+    if (!ready)
+    {
+        return false;
+    }
+
     ssize_t size = ::send(socketFd, buffer.data(), buffer.size(), 0);
 
     if (size < 0)
@@ -272,6 +279,11 @@ bool Socket::send(std::vector<uint8_t> buffer)
 
 bool Socket::read()
 {
+    if (!ready)
+    {
+        return false;
+    }
+    
     ssize_t size = recv(socketFd, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
     
     if (size < 0)

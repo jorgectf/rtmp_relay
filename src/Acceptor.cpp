@@ -99,6 +99,11 @@ void Acceptor::setAcceptCallback(const std::function<void(Socket)>& newAcceptCal
 
 bool Acceptor::read()
 {
+    if (!ready)
+    {
+        return false;
+    }
+    
     sockaddr_in address;
     socklen_t addressLength;
     
