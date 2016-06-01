@@ -77,11 +77,7 @@ namespace rtmp
             header.length  = previousPacket.length;
             header.messageType  = previousPacket.messageType;
             header.messageStreamId = previousPacket.messageStreamId;
-
-            if (header.type == Header::Type::ONE_BYTE)
-            {
-                header.timestamp = previousPacket.timestamp;
-            }
+            header.ts = previousPacket.ts;
         }
 
         std::cout << "(" << static_cast<uint32_t>(header.channel) << ")";
@@ -89,10 +85,10 @@ namespace rtmp
         
         if (header.type != Header::Type::ONE_BYTE)
         {
-            uint32_t ret = decodeInt(data, offset, 3, header.timestamp);
+            uint32_t ret = decodeInt(data, offset, 3, header.ts);
 
 #ifdef DEBUG
-            std::cout << ", timestamp: " << header.timestamp;
+            std::cout << ", timestamp: " << header.ts;
 #endif
             
             if (!ret)
@@ -164,7 +160,7 @@ namespace rtmp
         }
 
         // extended timestamp
-        if (header.timestamp == 0x00FFFFFF)
+        if (header.ts == 0xFFFFFF)
         {
             uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
 
@@ -178,6 +174,10 @@ namespace rtmp
 #ifdef DEBUG
             std::cout << ", extended timestamp: " << header.timestamp;
 #endif
+        }
+        else
+        {
+            header.timestamp = header.ts;
         }
 
 #ifdef DEBUG
@@ -267,7 +267,8 @@ namespace rtmp
         
         if (header.type != Header::Type::ONE_BYTE)
         {
-            uint32_t ret = encodeInt(data, 3, header.timestamp);
+            uint32_t ret = encodeInt(data, 3, (header.timestamp >= 0xffffff) ? 0xffffff : header.timestamp);
+            //TODO: write extended timestamp
             
             if (!ret)
             {

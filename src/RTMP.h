@@ -76,10 +76,11 @@ namespace rtmp
 
         Type type = Type::NONE;
         Channel channel;
-        uint32_t timestamp = 0;
+        uint32_t ts = 0; // 3-btye timestamp field
         uint32_t length = 0;
         MessageType messageType;
         uint32_t messageStreamId = 0;
+        uint32_t timestamp = 0; // final timestamp (either from 3-byte timestamp or extended timestamp fields)
     };
     
     struct Packet
