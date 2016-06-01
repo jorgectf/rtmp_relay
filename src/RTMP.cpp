@@ -77,7 +77,11 @@ namespace rtmp
             header.length  = previousPacket.length;
             header.messageType  = previousPacket.messageType;
             header.messageStreamId = previousPacket.messageStreamId;
-            header.timestamp = previousPacket.timestamp;
+
+            if (header.type == Header::Type::ONE_BYTE)
+            {
+                header.timestamp = previousPacket.timestamp;
+            }
         }
 
         std::cout << "(" << static_cast<uint32_t>(header.channel) << ")";
