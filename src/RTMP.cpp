@@ -88,7 +88,7 @@ namespace rtmp
             uint32_t ret = decodeInt(data, offset, 3, header.ts);
 
 #ifdef DEBUG
-            std::cout << ", timestamp: " << header.ts;
+            std::cout << ", ts: " << header.ts;
 #endif
             
             if (!ret)
@@ -180,7 +180,14 @@ namespace rtmp
             header.timestamp = header.ts;
         }
 
+        if (header.type != rtmp::Header::Type::TWELVE_BYTE && previousPacketIterator != previousPackets.end())
+        {
+            Header& previousPacket = previousPacketIterator->second;
+            header.timestamp += previousPacket.timestamp;
+        }
+
 #ifdef DEBUG
+        std::cout << ", final timestamp: " << header.timestamp;
         std::cout << std::endl;
 #endif
         
