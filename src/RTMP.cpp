@@ -214,12 +214,7 @@ namespace rtmp
             
             offset += ret;
 
-            if (header.type == Header::Type::TWELVE_BYTE ||
-                header.type == Header::Type::EIGHT_BYTE ||
-                header.type == Header::Type::FOUR_BYTE)
-            {
-                previousPackets[header.channel] = header;
-            }
+            previousPackets[header.channel] = header;
             
             if (packet.data.empty())
             {
