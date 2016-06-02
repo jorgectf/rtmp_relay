@@ -17,6 +17,8 @@ namespace rtmp
 
     enum class Channel: uint32_t
     {
+        NONE = 0,
+
         NETWORK = 2,   // channel for network-related messages (bandwidth report, ping, etc)
         SYSTEM = 3,    // channel for sending server control messages
         AUDIO = 4,     // channel for audio data
@@ -35,6 +37,8 @@ namespace rtmp
 
     enum class MessageType: uint8_t
     {
+        NONE = 0,
+
         SET_CHUNK_SIZE = 1,     // chunk size change
         BYTES_READ = 3,         // number of bytes read
         PING = 4,               // ping
@@ -75,10 +79,10 @@ namespace rtmp
         };
 
         Type type = Type::NONE;
-        Channel channel;
+        Channel channel = Channel::NONE;
         uint32_t ts = 0; // 3-btye timestamp field
         uint32_t length = 0;
-        MessageType messageType;
+        MessageType messageType = MessageType::NONE;
         uint32_t messageStreamId = 0;
         uint32_t timestamp = 0; // final timestamp (either from 3-byte timestamp or extended timestamp fields)
     };
