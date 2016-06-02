@@ -206,14 +206,19 @@ namespace rtmp
             
             offset += ret;
 
-            previousPackets[header.channel] = header;
-            
+            // first header of packer
             if (packet.data.empty())
             {
                 packet.header = header;
                 remainingBytes = packet.header.length;
-            }
 
+                previousPackets[header.channel] = header;
+            }
+            else
+            {
+                previousPackets[header.channel].ts = header.ts;
+                previousPackets[header.channel].timestamp = header.timestamp;
+            }
 
             uint32_t packetSize = std::min(remainingBytes, chunkSize);
 
