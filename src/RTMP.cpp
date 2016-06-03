@@ -194,10 +194,12 @@ namespace rtmp
 
         packet.data.clear();
 
+        auto currentPreviousPackets = previousPackets;
+
         do
         {
             Header header;
-            uint32_t ret = decodeHeader(data, offset, header, previousPackets);
+            uint32_t ret = decodeHeader(data, offset, header, currentPreviousPackets);
             
             if (!ret)
             {
@@ -211,14 +213,9 @@ namespace rtmp
             {
                 packet.header = header;
                 remainingBytes = packet.header.length;
+            }
 
-                previousPackets[header.channel] = header;
-            }
-            else
-            {
-                previousPackets[header.channel].ts = header.ts;
-                previousPackets[header.channel].timestamp = header.timestamp;
-            }
+            currentPreviousPackets[header.channel] = header;
 
             uint32_t packetSize = std::min(remainingBytes, chunkSize);
 
@@ -236,6 +233,9 @@ namespace rtmp
             offset += packetSize;
         }
         while (remainingBytes);
+
+        // store previous packet if successfully read packet
+        previousPackets = currentPreviousPackets;
         
         return offset - originalOffset;
     }
