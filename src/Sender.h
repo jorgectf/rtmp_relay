@@ -69,7 +69,8 @@ namespace relay
 
         uint32_t streamId = 0;
 
-        std::map<rtmp::Channel, rtmp::Header> previousPackets;
+        std::map<rtmp::Channel, rtmp::Header> receivedPackets;
+        std::map<rtmp::Channel, rtmp::Header> sentPackets;
 
         bool connected = false;
         std::string application;

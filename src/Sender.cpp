@@ -183,7 +183,7 @@ namespace relay
             {
                 rtmp::Packet packet;
                 
-                uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet, previousPackets);
+                uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet, receivedPackets);
 
                 if (ret > 0)
                 {
@@ -480,7 +480,7 @@ namespace relay
         argument1.encode(packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
     #ifdef DEBUG
         std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
@@ -502,7 +502,7 @@ namespace relay
         encodeInt(packet.data, 4, outChunkSize);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
     #ifdef DEBUG
         std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
@@ -529,7 +529,7 @@ namespace relay
         argument1.encode(packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
     #ifdef DEBUG
         std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
@@ -558,7 +558,7 @@ namespace relay
         argument1.encode(packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
     #ifdef DEBUG
         std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
@@ -590,7 +590,7 @@ namespace relay
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
     #ifdef DEBUG
         std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
@@ -622,7 +622,7 @@ namespace relay
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
     #ifdef DEBUG
         std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
@@ -655,7 +655,7 @@ namespace relay
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
     #ifdef DEBUG
         std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
@@ -697,7 +697,7 @@ namespace relay
     void Sender::sendPacket(const rtmp::Packet& packet)
     {
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet);
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
 
         socket.send(buffer);
     }

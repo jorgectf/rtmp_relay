@@ -108,5 +108,5 @@ namespace rtmp
     };
 
     uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<rtmp::Channel, rtmp::Header>& previousPackets);
-    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet);
+    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<rtmp::Channel, rtmp::Header>& previousPackets);
 }

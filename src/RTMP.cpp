@@ -306,7 +306,7 @@ namespace rtmp
         return static_cast<uint32_t>(data.size()) - originalSize;
     }
     
-    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet)
+    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<rtmp::Channel, rtmp::Header>& previousPackets)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
 
@@ -330,9 +330,15 @@ namespace rtmp
             {
                 header.type = Header::Type::ONE_BYTE;
                 header.channel = packet.header.channel;
+                header.timestamp = packet.header.timestamp;
             }
 
-            encodeHeader(data, header);
+            if (!encodeHeader(data, header))
+            {
+                return 0;
+            }
+
+            previousPackets[header.channel] = header;
 
             uint32_t size = std::min(remainingBytes, chunkSize);
             
