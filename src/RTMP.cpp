@@ -267,7 +267,6 @@ namespace rtmp
         if (header.type != Header::Type::ONE_BYTE)
         {
             uint32_t ret = encodeInt(data, 3, (header.timestamp >= 0xffffff) ? 0xffffff : header.timestamp);
-            //TODO: write extended timestamp
             
             if (!ret)
             {
@@ -291,6 +290,16 @@ namespace rtmp
                     const uint8_t* messageStreamId = reinterpret_cast<const uint8_t*>(&header.messageStreamId);
                     data.insert(data.end(), messageStreamId, messageStreamId + sizeof(uint32_t));
                 }
+            }
+        }
+
+        if (header.timestamp >= 0xffffff)
+        {
+            uint32_t ret = encodeInt(data, 4, header.timestamp);
+
+            if (!ret)
+            {
+                return 0;
             }
         }
         
