@@ -173,7 +173,7 @@ namespace rtmp
             header.timestamp = header.ts;
         }
 
-        if (header.type != rtmp::Header::Type::TWELVE_BYTE)
+        if (previousPackets[header.channel].type != rtmp::Header::Type::TWELVE_BYTE)
         {
             header.timestamp += previousPackets[header.channel].timestamp;
         }
@@ -215,7 +215,12 @@ namespace rtmp
                 remainingBytes = packet.header.length;
             }
 
-            currentPreviousPackets[header.channel] = header;
+            if (header.type == Header::Type::FOUR_BYTE ||
+                header.type == Header::Type::EIGHT_BYTE ||
+                header.type == Header::Type::TWELVE_BYTE)
+            {
+                currentPreviousPackets[header.channel] = header;
+            }
 
             uint32_t packetSize = std::min(remainingBytes, chunkSize);
 
@@ -338,7 +343,12 @@ namespace rtmp
                 return 0;
             }
 
-            previousPackets[header.channel] = header;
+            if (header.type == Header::Type::FOUR_BYTE ||
+                header.type == Header::Type::EIGHT_BYTE ||
+                header.type == Header::Type::TWELVE_BYTE)
+            {
+                previousPackets[header.channel] = header;
+            }
 
             uint32_t size = std::min(remainingBytes, chunkSize);
             

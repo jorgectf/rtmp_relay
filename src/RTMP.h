@@ -71,10 +71,10 @@ namespace rtmp
         {
             NONE = 0xff,
 
-            TWELVE_BYTE = 0x00, // bits 00, 12-byte header
-            EIGHT_BYTE = 0x01,  // bits 01, 8-byte header
-            FOUR_BYTE = 0x02,   // bits 10, 4-byte header
-            ONE_BYTE = 0x03     // bits 11, 1-byte header
+            TWELVE_BYTE = 0x00, // bits 00, 12-byte header, type 0
+            EIGHT_BYTE = 0x01,  // bits 01, 8-byte header, type 1
+            FOUR_BYTE = 0x02,   // bits 10, 4-byte header, type 2
+            ONE_BYTE = 0x03     // bits 11, 1-byte header, type 3
 
         };
 
