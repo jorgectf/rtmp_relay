@@ -173,6 +173,7 @@ namespace rtmp
             header.timestamp = header.ts;
         }
 
+        // relative timestamp
         if (previousPackets[header.channel].type != rtmp::Header::Type::TWELVE_BYTE)
         {
             header.timestamp += previousPackets[header.channel].timestamp;
@@ -245,7 +246,7 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    static uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header)
+    static uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header, std::map<rtmp::Channel, rtmp::Header>& previousPackets)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
@@ -268,10 +269,18 @@ namespace rtmp
             data.push_back(headerData);
             encodeInt(data, 2, static_cast<uint32_t>(header.channel) - 64);
         }
-        
+
+        uint32_t timestamp = header.timestamp;
+
+        // relative timestamp
+        if (previousPackets[header.channel].type != rtmp::Header::Type::TWELVE_BYTE)
+        {
+            timestamp -= previousPackets[header.channel].timestamp;
+        }
+
         if (header.type != Header::Type::ONE_BYTE)
         {
-            uint32_t ret = encodeInt(data, 3, (header.timestamp >= 0xffffff) ? 0xffffff : header.timestamp);
+            uint32_t ret = encodeInt(data, 3, (timestamp >= 0xffffff) ? 0xffffff : timestamp);
             
             if (!ret)
             {
@@ -298,9 +307,9 @@ namespace rtmp
             }
         }
 
-        if (header.timestamp >= 0xffffff)
+        if (timestamp >= 0xffffff)
         {
-            uint32_t ret = encodeInt(data, 4, header.timestamp);
+            uint32_t ret = encodeInt(data, 4, timestamp);
 
             if (!ret)
             {
@@ -338,7 +347,7 @@ namespace rtmp
                 header.timestamp = packet.header.timestamp;
             }
 
-            if (!encodeHeader(data, header))
+            if (!encodeHeader(data, header, previousPackets))
             {
                 return 0;
             }
