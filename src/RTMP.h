@@ -10,12 +10,7 @@
 
 namespace rtmp
 {
-    const uint32_t CLIENT_STREAM_ID_AMF_INI = 3;
-    const uint32_t CLIENT_STREAM_ID_AMF = 5;
-    const uint32_t CLIENT_STREAM_ID_AUDIO = 6;
-    const uint32_t CLIENT_STREAM_ID_VIDEO = 7;
-
-    enum class Channel: uint32_t
+    enum Channel: uint32_t
     {
         NONE = 0,
 
@@ -79,7 +74,7 @@ namespace rtmp
         };
 
         Type type = Type::NONE;
-        Channel channel = Channel::NONE;
+        uint32_t channel = Channel::NONE;
         uint32_t ts = 0; // 3-btye timestamp field
         uint32_t length = 0;
         MessageType messageType = MessageType::NONE;
@@ -107,6 +102,6 @@ namespace rtmp
         uint8_t randomBytes[1528];
     };
 
-    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<rtmp::Channel, rtmp::Header>& previousPackets);
-    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<rtmp::Channel, rtmp::Header>& previousPackets);
+    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets);
+    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets);
 }

@@ -10,7 +10,7 @@
 
 namespace rtmp
 {
-    static uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header, std::map<rtmp::Channel, rtmp::Header>& previousPackets)
+    static uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
     {
         uint32_t originalOffset = offset;
         
@@ -22,13 +22,13 @@ namespace rtmp
         uint8_t headerData = *(data.data() + offset);
         offset += 1;
 
-        uint32_t channel = static_cast<uint32_t>(headerData & 0x3F);
+        header.channel = static_cast<uint32_t>(headerData & 0x3F);
         header.type = static_cast<Header::Type>(headerData >> 6);
 
-        if (channel < 2)
+        if (header.channel < 2)
         {
             uint32_t newChannel;
-            uint32_t ret = decodeInt(data, offset, channel + 1, newChannel);
+            uint32_t ret = decodeInt(data, offset, header.channel + 1, newChannel);
 
             if (!ret)
             {
@@ -37,7 +37,7 @@ namespace rtmp
 
             offset += ret;
 
-            channel = 64 + newChannel;
+            header.channel = 64 + newChannel;
         }
 
 #ifdef DEBUG
@@ -52,29 +52,15 @@ namespace rtmp
             default: std::cout << "invalid header type"; break;
         };
 
-        header.channel = static_cast<Channel>(channel);
-
         std::cout << "(" << static_cast<uint32_t>(header.type) << ")";
 
-        std::cout << ", channel: ";
-
-        switch (header.channel)
-        {
-            case Channel::NETWORK: std::cout << "NETWORK"; break;
-            case Channel::SYSTEM: std::cout << "SYSTEM"; break;
-            case Channel::AUDIO: std::cout << "AUDIO"; break;
-            case Channel::VIDEO: std::cout << "VIDEO"; break;
-            case Channel::SOURCE: std::cout << "SOURCE"; break;
-            default: std::cout << "invalid channel"; break;
-        };
+        std::cout << ", channel: " << static_cast<uint32_t>(header.channel);
+#endif
 
         header.length  = previousPackets[header.channel].length;
         header.messageType  = previousPackets[header.channel].messageType;
         header.messageStreamId = previousPackets[header.channel].messageStreamId;
         header.ts = previousPackets[header.channel].ts;
-
-        std::cout << "(" << static_cast<uint32_t>(header.channel) << ")";
-#endif
         
         if (header.type != Header::Type::ONE_BYTE)
         {
@@ -192,7 +178,7 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<rtmp::Channel, rtmp::Header>& previousPackets)
+    uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets)
     {
         uint32_t originalOffset = offset;
         
@@ -251,7 +237,7 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    static uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header, std::map<rtmp::Channel, rtmp::Header>& previousPackets)
+    static uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
@@ -325,7 +311,7 @@ namespace rtmp
         return static_cast<uint32_t>(data.size()) - originalSize;
     }
     
-    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<rtmp::Channel, rtmp::Header>& previousPackets)
+    uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
 
