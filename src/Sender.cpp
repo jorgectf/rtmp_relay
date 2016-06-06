@@ -14,7 +14,7 @@
 namespace relay
 {
     Sender::Sender(Network& pNetwork, const std::string& pApplication):
-        network(pNetwork), socket(pNetwork), generator(rd()), application(pApplication)
+        network(pNetwork), socket(network), generator(rd()), application(pApplication)
     {
         socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
         socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
