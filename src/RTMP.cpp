@@ -174,7 +174,7 @@ namespace rtmp
         }
 
         // relative timestamp
-        if (previousPackets[header.channel].type != rtmp::Header::Type::TWELVE_BYTE)
+        if (header.type != rtmp::Header::Type::TWELVE_BYTE)
         {
             header.timestamp += previousPackets[header.channel].timestamp;
         }
