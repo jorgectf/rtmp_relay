@@ -82,6 +82,11 @@ namespace rtmp
 
 #ifdef DEBUG
             std::cout << ", ts: " << header.ts;
+
+            if (header.ts == 0xFFFFFF)
+            {
+                std::cout << " (extended)";
+            }
 #endif
             
             if (!ret)
