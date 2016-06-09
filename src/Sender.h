@@ -34,6 +34,7 @@ namespace relay
         void printInfo() const;
 
         void createStream(const std::string& newStreamName);
+        void deleteStream();
         void sendPacket(const rtmp::Packet& packet);
         
     private:
@@ -48,7 +49,10 @@ namespace relay
 
         void sendCreateStream();
         void sendReleaseStream();
+        void sendDeleteStream();
+
         void sendFCPublish();
+        void sendFCUnpublish();
         void sendPublish();
         
         Network& network;

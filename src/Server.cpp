@@ -58,6 +58,7 @@ namespace relay
             }
             else
             {
+                deleteStream();
                 receiverIterator = receivers.erase(receiverIterator);
             }
         }
@@ -82,6 +83,14 @@ namespace relay
         for (const auto& sender : senders)
         {
             sender->createStream(streamName);
+        }
+    }
+
+    void Server::deleteStream()
+    {
+        for (const auto& sender : senders)
+        {
+            sender->deleteStream();
         }
     }
 
