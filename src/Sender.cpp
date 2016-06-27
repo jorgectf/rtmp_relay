@@ -460,7 +460,6 @@ namespace relay
     void Sender::sendConnect()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.messageStreamId = 0;
         packet.header.timestamp = 0;
@@ -494,7 +493,6 @@ namespace relay
     void Sender::sendSetChunkSize()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
@@ -514,7 +512,6 @@ namespace relay
     void Sender::sendCheckBW()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -543,7 +540,6 @@ namespace relay
     void Sender::sendCreateStream()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -572,7 +568,6 @@ namespace relay
     void Sender::sendReleaseStream()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -604,7 +599,6 @@ namespace relay
     void Sender::sendDeleteStream()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -636,7 +630,6 @@ namespace relay
     void Sender::sendFCPublish()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -668,7 +661,6 @@ namespace relay
     void Sender::sendFCUnpublish()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -700,7 +692,6 @@ namespace relay
     void Sender::sendPublish()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
         packet.header.channel = rtmp::Channel::SOURCE;
         packet.header.messageStreamId = streamId;
         packet.header.timestamp = 0;

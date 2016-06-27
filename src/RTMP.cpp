@@ -240,32 +240,10 @@ namespace rtmp
     static uint32_t encodeHeader(std::vector<uint8_t>& data, Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
-        
-        uint8_t headerData = static_cast<uint8_t>(static_cast<uint8_t>(header.type) << 6);
-
-        if (static_cast<uint32_t>(header.channel) < 64)
-        {
-            headerData |= static_cast<uint8_t>(header.channel);
-            data.push_back(headerData);
-        }
-        else if (static_cast<uint32_t>(header.channel) < 64 + 256)
-        {
-            headerData |= 0;
-            data.push_back(headerData);
-            encodeInt(data, 1, static_cast<uint32_t>(header.channel) - 64);
-        }
-        else
-        {
-            headerData |= 1;
-            data.push_back(headerData);
-            encodeInt(data, 2, static_cast<uint32_t>(header.channel) - 64);
-        }
-
-        uint32_t timestamp = header.timestamp;
 
         bool useDelta = previousPackets[header.channel].messageType != MessageType::NONE &&
             previousPackets[header.channel].messageStreamId != header.messageStreamId &&
-            header.timestamp > previousPackets[header.channel].timestamp;
+            header.timestamp >= previousPackets[header.channel].timestamp;
 
         if (useDelta)
         {
@@ -290,6 +268,28 @@ namespace rtmp
         {
             header.type = rtmp::Header::Type::TWELVE_BYTE;
         }
+        
+        uint8_t headerData = static_cast<uint8_t>(static_cast<uint8_t>(header.type) << 6);
+
+        if (static_cast<uint32_t>(header.channel) < 64)
+        {
+            headerData |= static_cast<uint8_t>(header.channel);
+            data.push_back(headerData);
+        }
+        else if (static_cast<uint32_t>(header.channel) < 64 + 256)
+        {
+            headerData |= 0;
+            data.push_back(headerData);
+            encodeInt(data, 1, static_cast<uint32_t>(header.channel) - 64);
+        }
+        else
+        {
+            headerData |= 1;
+            data.push_back(headerData);
+            encodeInt(data, 2, static_cast<uint32_t>(header.channel) - 64);
+        }
+
+        uint32_t timestamp = header.timestamp;
 
         // relative timestamp
         if (useDelta)
@@ -349,6 +349,11 @@ namespace rtmp
         while (remainingBytes > 0)
         {
             Header header = packet.header;
+
+            if (header.length == 0)
+            {
+                header.length = static_cast<uint32_t>(packet.data.size());
+            }
 
             if (!encodeHeader(data, header, previousPackets))
             {

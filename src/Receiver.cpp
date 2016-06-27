@@ -495,7 +495,6 @@ namespace relay
     void Receiver::sendServerBandwidth()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
         packet.header.channel = rtmp::Channel::NETWORK;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
@@ -516,7 +515,6 @@ namespace relay
     void Receiver::sendClientBandwidth()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::NETWORK;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
@@ -537,7 +535,6 @@ namespace relay
     void Receiver::sendPing()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::NETWORK;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::PING;
@@ -558,7 +555,6 @@ namespace relay
     void Receiver::sendSetChunkSize()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
@@ -579,7 +575,6 @@ namespace relay
     void Receiver::sendConnectResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -615,7 +610,6 @@ namespace relay
     void Receiver::sendBWDone()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -647,7 +641,6 @@ namespace relay
     void Receiver::sendCheckBWResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -674,7 +667,6 @@ namespace relay
     void Receiver::sendCreateStreamResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -710,7 +702,6 @@ namespace relay
     void Receiver::sendReleaseStreamResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -737,7 +728,6 @@ namespace relay
     void Receiver::sendOnFCPublish()
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::EIGHT_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
@@ -758,7 +748,6 @@ namespace relay
     void Receiver::sendPublishStatus(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.type = rtmp::Header::Type::TWELVE_BYTE;
         packet.header.channel = rtmp::Channel::SYSTEM;
         packet.header.timestamp = 0;
         packet.header.messageType = rtmp::MessageType::INVOKE;
