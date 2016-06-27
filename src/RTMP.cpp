@@ -237,7 +237,7 @@ namespace rtmp
         return offset - originalOffset;
     }
     
-    static uint32_t encodeHeader(std::vector<uint8_t>& data, const Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
+    static uint32_t encodeHeader(std::vector<uint8_t>& data, Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
         
@@ -263,8 +263,36 @@ namespace rtmp
 
         uint32_t timestamp = header.timestamp;
 
+        bool useDelta = previousPackets[header.channel].messageType != MessageType::NONE &&
+            previousPackets[header.channel].messageStreamId != header.messageStreamId &&
+            header.timestamp > previousPackets[header.channel].timestamp;
+
+        if (useDelta)
+        {
+            if (header.messageType == previousPackets[header.channel].messageType &&
+                header.length == previousPackets[header.channel].length)
+            {
+                if (header.timestamp == previousPackets[header.channel].timestamp)
+                {
+                    header.type = rtmp::Header::Type::ONE_BYTE;
+                }
+                else
+                {
+                    header.type = rtmp::Header::Type::FOUR_BYTE;
+                }
+            }
+            else
+            {
+                header.type = rtmp::Header::Type::EIGHT_BYTE;
+            }
+        }
+        else
+        {
+            header.type = rtmp::Header::Type::TWELVE_BYTE;
+        }
+
         // relative timestamp
-        if (previousPackets[header.channel].type != rtmp::Header::Type::TWELVE_BYTE)
+        if (useDelta)
         {
             timestamp -= previousPackets[header.channel].timestamp;
         }
@@ -320,23 +348,7 @@ namespace rtmp
 
         while (remainingBytes > 0)
         {
-            Header header;
-
-            if (remainingBytes == static_cast<uint32_t>(packet.data.size()))
-            {
-                header = packet.header;
-
-                if (header.length == 0)
-                {
-                    header.length = static_cast<uint32_t>(packet.data.size());
-                }
-            }
-            else
-            {
-                header.type = Header::Type::ONE_BYTE;
-                header.channel = packet.header.channel;
-                header.timestamp = packet.header.timestamp;
-            }
+            Header header = packet.header;
 
             if (!encodeHeader(data, header, previousPackets))
             {
