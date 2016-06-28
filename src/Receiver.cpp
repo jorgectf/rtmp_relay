@@ -307,6 +307,48 @@ namespace relay
 
             case rtmp::MessageType::NOTIFY:
             {
+                uint32_t offset = 0;
+
+                amf0::Node command;
+
+                uint32_t ret = command.decode(packet.data, offset);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+#ifdef DEBUG
+                std::cout << "NOTIFY command: ";
+                command.dump();
+#endif
+
+                amf0::Node argument1;
+
+                if ((ret = argument1.decode(packet.data, offset))  > 0)
+                {
+                    offset += ret;
+
+#ifdef DEBUG
+                    std::cout << "Argument 1: ";
+                    argument1.dump();
+#endif
+                }
+
+                amf0::Node argument2;
+
+                if ((ret = argument2.decode(packet.data, offset)) > 0)
+                {
+                    offset += ret;
+
+#ifdef DEBUG
+                    std::cout << "Argument 2: ";
+                    argument2.dump();
+#endif
+                }
+
                 // forward notify packet
                 if (auto localServer = server.lock())
                 {
@@ -335,31 +377,6 @@ namespace relay
                 break;
             }
 
-            case rtmp::MessageType::METADATA:
-            {
-                uint32_t offset = 0;
-
-                amf0::Node metadata;
-
-                uint32_t ret = metadata.decode(packet.data, offset);
-
-                if (ret == 0)
-                {
-                    return false;
-                }
-                
-                offset += ret;
-
-                metadata.dump();
-
-                // forward meta data packet
-                if (auto localServer = server.lock())
-                {
-                    localServer->sendPacket(packet);
-                }
-                break;
-            }
-
             case rtmp::MessageType::INVOKE:
             {
                 uint32_t offset = 0;
@@ -376,7 +393,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "Command: ";
+                std::cout << "INVOKE command: ";
                 command.dump();
 #endif
                 

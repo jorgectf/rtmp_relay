@@ -47,7 +47,6 @@ namespace rtmp
         NOTIFY = 18,            // some notification
         SHARED_OBJ = 19,        // shared object
         INVOKE = 20,            // invoke some stream action
-        METADATA = 22           // FLV metadata
     };
 
     enum class PingType: uint16_t

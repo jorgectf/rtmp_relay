@@ -123,7 +123,6 @@ namespace rtmp
                     case rtmp::MessageType::NOTIFY: std::cout << "NOTIFY"; break;
                     case rtmp::MessageType::SHARED_OBJ: std::cout << "SHARED_OBJ"; break;
                     case rtmp::MessageType::INVOKE: std::cout << "INVOKE"; break;
-                    case rtmp::MessageType::METADATA: std::cout << "METADATA"; break;
                     default: std::cout << "unknown command";
                 };
                 

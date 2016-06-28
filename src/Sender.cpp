@@ -324,15 +324,20 @@ namespace relay
                 break;
             }
 
+            case rtmp::MessageType::NOTIFY:
+            {
+                break;
+            }
+
             case rtmp::MessageType::AUDIO_PACKET:
             {
-                // TODO: forward audio packet
+                // ignore this, sender should not receive audio data
                 break;
             }
 
             case rtmp::MessageType::VIDEO_PACKET:
             {
-                // TODO: forward video packet
+                // ignore this, sender should not receive video data
                 break;
             }
 
@@ -352,7 +357,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "Command: ";
+                std::cout << "NOTIFY command: ";
                 command.dump();
 #endif
 
