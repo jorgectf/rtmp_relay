@@ -337,6 +337,21 @@ namespace relay
 
             case rtmp::MessageType::METADATA:
             {
+                uint32_t offset = 0;
+
+                amf0::Node metadata;
+
+                uint32_t ret = metadata.decode(packet.data, offset);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+                
+                offset += ret;
+
+                metadata.dump();
+
                 // forward meta data packet
                 if (auto localServer = server.lock())
                 {
