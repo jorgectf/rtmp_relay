@@ -168,11 +168,14 @@ namespace amf0
             offset += ret;
 
             Node node;
+            ret = node.decode(buffer, offset);
 
-            if (!node.decode(buffer, offset))
+            if (ret == 0)
             {
                 return 0;
             }
+
+            offset += ret;
 
             result[key] = node;
         }
