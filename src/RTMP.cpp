@@ -69,7 +69,7 @@ namespace rtmp
 #ifdef DEBUG
             std::cout << ", ts: " << header.ts;
 
-            if (header.ts == 0xFFFFFF)
+            if (header.ts == 0xffffff)
             {
                 std::cout << " (extended)";
             }
@@ -143,7 +143,7 @@ namespace rtmp
         }
 
         // extended timestamp
-        if (header.ts == 0xFFFFFF)
+        if (header.ts == 0xffffff)
         {
             uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
 
@@ -244,9 +244,26 @@ namespace rtmp
     {
         uint32_t originalSize = static_cast<uint32_t>(data.size());
 
-        bool useDelta = previousPackets[header.channel].messageType != MessageType::NONE &&
+        bool useDelta = previousPackets[header.channel].channel != Channel::NONE &&
             previousPackets[header.channel].messageStreamId == header.messageStreamId &&
             header.timestamp >= previousPackets[header.channel].timestamp;
+
+        uint64_t timestamp = header.timestamp;
+
+        // relative timestamp
+        if (useDelta)
+        {
+            timestamp -= previousPackets[header.channel].timestamp;
+        }
+
+        if (timestamp >= 0xffffff)
+        {
+            header.ts = 0xffffff;
+        }
+        else
+        {
+            header.ts = static_cast<uint32_t>(timestamp);
+        }
 
         if (useDelta)
         {
@@ -292,17 +309,9 @@ namespace rtmp
             encodeInt(data, 2, header.channel - 64);
         }
 
-        uint64_t timestamp = header.timestamp;
-
-        // relative timestamp
-        if (useDelta)
-        {
-            timestamp -= previousPackets[header.channel].timestamp;
-        }
-
         if (header.type != Header::Type::ONE_BYTE)
         {
-            uint32_t ret = encodeInt(data, 3, (timestamp >= 0xffffff) ? 0xffffff : static_cast<uint32_t>(timestamp));
+            uint32_t ret = encodeInt(data, 3, header.ts);
             
             if (!ret)
             {
@@ -329,9 +338,9 @@ namespace rtmp
             }
         }
 
-        if (timestamp >= 0xffffff)
+        if (header.ts == 0xffffff || (header.type == Header::Type::ONE_BYTE && previousPackets[header.channel].ts == 0xffffff))
         {
-            uint32_t ret = encodeInt(data, 4, static_cast<uint32_t>(timestamp));
+            uint32_t ret = encodeInt(data, 4, timestamp);
 
             if (!ret)
             {
