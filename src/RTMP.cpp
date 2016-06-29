@@ -274,7 +274,7 @@ namespace rtmp
         
         uint8_t headerData = static_cast<uint8_t>(static_cast<uint8_t>(header.type) << 6);
 
-        if (static_cast<uint32_t>(header.channel) < 64)
+        if (header.channel < 64)
         {
             headerData |= static_cast<uint8_t>(header.channel);
             data.push_back(headerData);
@@ -283,13 +283,13 @@ namespace rtmp
         {
             headerData |= 0;
             data.push_back(headerData);
-            encodeInt(data, 1, static_cast<uint32_t>(header.channel) - 64);
+            encodeInt(data, 1, header.channel - 64);
         }
         else
         {
             headerData |= 1;
             data.push_back(headerData);
-            encodeInt(data, 2, static_cast<uint32_t>(header.channel) - 64);
+            encodeInt(data, 2, header.channel - 64);
         }
 
         uint64_t timestamp = header.timestamp;
