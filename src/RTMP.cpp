@@ -288,7 +288,7 @@ namespace rtmp
             encodeInt(data, 2, static_cast<uint32_t>(header.channel) - 64);
         }
 
-        uint32_t timestamp = header.timestamp;
+        uint64_t timestamp = header.timestamp;
 
         // relative timestamp
         if (useDelta)

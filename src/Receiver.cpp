@@ -201,8 +201,6 @@ namespace relay
 
     bool Receiver::handlePacket(const rtmp::Packet& packet)
     {
-        timestamp = packet.header.timestamp;
-
         switch (packet.header.messageType)
         {
             case rtmp::MessageType::SET_CHUNK_SIZE:

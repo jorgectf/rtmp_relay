@@ -35,7 +35,7 @@ Socket::~Socket()
 {
     network.removeSocket(*this);
     
-    if (socketFd > 0)
+    if (socketFd >= 0)
     {
         if (::close(socketFd) < 0)
         {
@@ -101,10 +101,19 @@ Socket& Socket::operator=(Socket&& other)
 
 void Socket::close()
 {
-    if (socketFd > 0)
+    if (socketFd >= 0)
     {
-        ::close(socketFd);
-        socketFd = 0;
+        if (::close(socketFd) < 0)
+        {
+            int error = errno;
+            std::cerr << "Failed to close socket, error: " << error << std::endl;
+        }
+        else
+        {
+            std::cout << "Socket closed" << std::endl;
+        }
+
+        socketFd = -1;
     }
 
     ready = false;
@@ -112,6 +121,9 @@ void Socket::close()
 
 bool Socket::connect(const std::string& address, uint16_t newPort)
 {
+    ready = false;
+    connecting = false;
+
     size_t i = address.find(':');
     std::string addressStr;
     std::string portStr;
@@ -146,6 +158,9 @@ bool Socket::connect(const std::string& address, uint16_t newPort)
 
 bool Socket::connect(uint32_t address, uint16_t newPort)
 {
+    ready = false;
+    connecting = false;
+
     if (socketFd < 0)
     {
         socketFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -160,8 +175,6 @@ bool Socket::connect(uint32_t address, uint16_t newPort)
 
     ipAddress = address;
     port = newPort;
-    ready = false;
-    connecting = false;
     
     std::cout << "Connecting to " << ipToString(ipAddress) << ":" << static_cast<int>(port) << std::endl;
     

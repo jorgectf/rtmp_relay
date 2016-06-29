@@ -21,21 +21,19 @@ bool Network::update()
     std::vector<pollfd> pollFds;
     pollFds.reserve(sockets.size());
     
-    std::map<uint32_t, std::reference_wrapper<Socket>> socketMap;
+    std::map<int, std::reference_wrapper<Socket>> socketMap;
     
     for (auto socket : sockets)
     {
         if (socket.get().isConnecting() || socket.get().isReady())
         {
-            uint32_t i = static_cast<uint32_t>(pollFds.size());
-            
             pollfd pollFd;
             pollFd.fd = socket.get().socketFd;
             pollFd.events = POLLIN | POLLOUT;
             
             pollFds.push_back(pollFd);
             
-            socketMap.insert(std::pair<uint32_t, std::reference_wrapper<Socket>>(i, socket));
+            socketMap.insert(std::pair<uint32_t, std::reference_wrapper<Socket>>(socket.get().socketFd, socket));
         }
     }
     
@@ -48,12 +46,12 @@ bool Network::update()
     
     for (uint32_t i = 0; i < pollFds.size(); ++i)
     {
-        auto iter = socketMap.find(i);
+        pollfd pollFd = pollFds[i];
+
+        auto iter = socketMap.find(pollFd.fd);
         
         if (iter != socketMap.end())
         {
-            pollfd pollFd = pollFds[i];
-            
             if (pollFd.revents & POLLIN)
             {
                 iter->second.get().read();

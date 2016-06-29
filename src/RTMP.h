@@ -78,7 +78,7 @@ namespace rtmp
         uint32_t length = 0;
         MessageType messageType = MessageType::NONE;
         uint32_t messageStreamId = 0;
-        uint32_t timestamp = 0; // final timestamp (either from 3-byte timestamp or extended timestamp fields)
+        uint64_t timestamp = 0; // final timestamp (either from 3-byte timestamp or extended timestamp fields)
     };
     
     struct Packet
