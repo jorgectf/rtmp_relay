@@ -311,17 +311,17 @@ bool Socket::read()
     std::cout << "Socket received " << size << " bytes" << std::endl;
 #endif
 
-    data.insert(data.end(), TEMP_BUFFER, TEMP_BUFFER + size);
+    inData.insert(inData.end(), TEMP_BUFFER, TEMP_BUFFER + size);
 
-    if (!data.empty())
+    if (!inData.empty())
     {
         if (readCallback)
         {
-            readCallback(data);
+            readCallback(inData);
         }
-    }
 
-    data.clear();
+        inData.clear();
+    }
 
     return true;
 }
