@@ -202,8 +202,12 @@ namespace rtmp
             // first header of packer
             if (packet.data.empty())
             {
-                packet.header = header;
-                remainingBytes = packet.header.length;
+                packet.channel = header.channel;
+                packet.messageType = header.messageType;
+                packet.messageStreamId = header.messageStreamId;
+                packet.timestamp = header.timestamp;
+
+                remainingBytes = header.length;
             }
 
             if (header.type == Header::Type::FOUR_BYTE ||
@@ -347,12 +351,13 @@ namespace rtmp
 
         while (remainingBytes > 0)
         {
-            Header header = packet.header;
+            Header header;
+            header.channel = packet.channel;
+            header.messageType = packet.messageType;
+            header.messageStreamId = packet.messageStreamId;
+            header.timestamp = packet.timestamp;
 
-            if (header.length == 0)
-            {
-                header.length = static_cast<uint32_t>(packet.data.size());
-            }
+            header.length = static_cast<uint32_t>(packet.data.size());
 
             if (!encodeHeader(data, header, previousPackets))
             {

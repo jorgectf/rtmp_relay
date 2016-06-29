@@ -201,7 +201,7 @@ namespace relay
 
     bool Receiver::handlePacket(const rtmp::Packet& packet)
     {
-        switch (packet.header.messageType)
+        switch (packet.messageType)
         {
             case rtmp::MessageType::SET_CHUNK_SIZE:
             {
@@ -525,10 +525,10 @@ namespace relay
     void Receiver::sendServerBandwidth()
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::NETWORK;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
-        packet.header.messageStreamId = 0;
+        packet.channel = rtmp::Channel::NETWORK;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
+        packet.messageStreamId = 0;
 
         encodeInt(packet.data, 4, serverBandwidth);
 
@@ -545,9 +545,9 @@ namespace relay
     void Receiver::sendClientBandwidth()
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::NETWORK;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
+        packet.channel = rtmp::Channel::NETWORK;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
 
         encodeInt(packet.data, 4, serverBandwidth);
         encodeInt(packet.data, 1, 2); // dynamic
@@ -565,9 +565,9 @@ namespace relay
     void Receiver::sendPing()
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::NETWORK;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::PING;
+        packet.channel = rtmp::Channel::NETWORK;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::PING;
 
         encodeInt(packet.data, 2, 0); // ping type
         encodeInt(packet.data, 4, 0); // ping param
@@ -585,10 +585,10 @@ namespace relay
     void Receiver::sendSetChunkSize()
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
-        packet.header.messageStreamId = 0;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
+        packet.messageStreamId = 0;
 
         encodeInt(packet.data, 4, outChunkSize);
 
@@ -605,9 +605,9 @@ namespace relay
     void Receiver::sendConnectResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::INVOKE;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
 
         amf0::Node commandName = std::string("_result");
         commandName.encode(packet.data);
@@ -640,9 +640,9 @@ namespace relay
     void Receiver::sendBWDone()
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::INVOKE;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
 
         amf0::Node commandName = std::string("onBWDone");
         commandName.encode(packet.data);
@@ -671,9 +671,9 @@ namespace relay
     void Receiver::sendCheckBWResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::INVOKE;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
 
         amf0::Node commandName = std::string("_result");
         commandName.encode(packet.data);
@@ -697,9 +697,9 @@ namespace relay
     void Receiver::sendCreateStreamResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::INVOKE;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
 
         amf0::Node commandName = std::string("_result");
         commandName.encode(packet.data);
@@ -732,9 +732,9 @@ namespace relay
     void Receiver::sendReleaseStreamResult(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::INVOKE;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
 
         amf0::Node commandName = std::string("_result");
         commandName.encode(packet.data);
@@ -758,9 +758,9 @@ namespace relay
     void Receiver::sendOnFCPublish()
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::INVOKE;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
 
         amf0::Node commandName = std::string("onFCPublish");
         commandName.encode(packet.data);
@@ -778,9 +778,9 @@ namespace relay
     void Receiver::sendPublishStatus(double transactionId)
     {
         rtmp::Packet packet;
-        packet.header.channel = rtmp::Channel::SYSTEM;
-        packet.header.timestamp = 0;
-        packet.header.messageType = rtmp::MessageType::INVOKE;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
 
         amf0::Node commandName = std::string("onStatus");
         commandName.encode(packet.data);

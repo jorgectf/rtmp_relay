@@ -83,7 +83,11 @@ namespace rtmp
     
     struct Packet
     {
-        Header header;
+        uint32_t channel = Channel::NONE;
+        MessageType messageType = MessageType::NONE;
+        uint32_t messageStreamId = 0;
+        uint64_t timestamp = 0;
+
         std::vector<uint8_t> data;
     };
     
