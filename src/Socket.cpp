@@ -266,37 +266,13 @@ bool Socket::send(std::vector<uint8_t> buffer)
         return false;
     }
 
-    ssize_t size = ::send(socketFd, buffer.data(), buffer.size(), 0);
+    outData.insert(outData.end(), buffer.begin(), buffer.end());
 
-    if (size < 0)
-    {
-        if (errno != EAGAIN && errno != EWOULDBLOCK)
-        {
-            int error = errno;
-            std::cerr << "Failed to send data, error: " << error << std::endl;
-            return false;
-        }
-    }
-    else if (size != static_cast<ssize_t>(buffer.size()))
-    {
-        std::cerr << "Failed to send all data" << std::endl;
-        return false;
-    }
-
-#ifdef DEBUG
-    std::cout << "Socket sent " << size << " bytes" << std::endl;
-#endif
-    
     return true;
 }
 
 bool Socket::read()
 {
-    if (!ready)
-    {
-        return false;
-    }
-    
     ssize_t size = recv(socketFd, TEMP_BUFFER, sizeof(TEMP_BUFFER), 0);
     
     if (size < 0)
@@ -320,24 +296,13 @@ bool Socket::read()
             }
         }
         
-        ready = false;
-        
-        if (closeCallback)
-        {
-            closeCallback();
-        }
+        disconnected();
         
         return false;
     }
     else if (size == 0)
     {
-        std::cout << "Socket disconnected" << std::endl;
-        ready = false;
-        
-        if (closeCallback)
-        {
-            closeCallback();
-        }
+        disconnected();
         
         return false;
     }
@@ -346,13 +311,18 @@ bool Socket::read()
     std::cout << "Socket received " << size << " bytes" << std::endl;
 #endif
 
-    std::vector<uint8_t> data(TEMP_BUFFER, TEMP_BUFFER + size);
+    data.insert(data.end(), TEMP_BUFFER, TEMP_BUFFER + size);
 
-    if (readCallback)
+    if (!data.empty())
     {
-        readCallback(data);
+        if (readCallback)
+        {
+            readCallback(data);
+        }
     }
-    
+
+    data.clear();
+
     return true;
 }
 
@@ -365,6 +335,50 @@ bool Socket::write()
         std::cout << "Socket connected to " << ipToString(ipAddress) << ":" << port << std::endl;
         if (connectCallback) connectCallback();
     }
+    else if (!outData.empty())
+    {
+        ssize_t size = ::send(socketFd, outData.data(), outData.size(), 0);
+
+        outData.clear();
+
+        if (size < 0)
+        {
+            if (errno != EAGAIN && errno != EWOULDBLOCK)
+            {
+                int error = errno;
+                std::cerr << "Failed to send data, error: " << error << std::endl;
+                return false;
+            }
+        }
+        else if (size != static_cast<ssize_t>(outData.size()))
+        {
+            std::cerr << "Failed to send all data" << std::endl;
+            return false;
+        }
+
+#ifdef DEBUG
+        std::cout << "Socket sent " << size << " bytes" << std::endl;
+#endif
+
+    }
     
+    return true;
+}
+
+bool Socket::disconnected()
+{
+    if (ready || connecting)
+    {
+        std::cout << "Socket disconnected" << std::endl;
+
+        connecting = false;
+        ready = false;
+
+        if (closeCallback)
+        {
+            closeCallback();
+        }
+    }
+
     return true;
 }

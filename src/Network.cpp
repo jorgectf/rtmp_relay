@@ -25,16 +25,13 @@ bool Network::update()
     
     for (auto socket : sockets)
     {
-        if (socket.get().isConnecting() || socket.get().isReady())
-        {
-            pollfd pollFd;
-            pollFd.fd = socket.get().socketFd;
-            pollFd.events = POLLIN | POLLOUT;
-            
-            pollFds.push_back(pollFd);
-            
-            socketMap.insert(std::pair<uint32_t, std::reference_wrapper<Socket>>(socket.get().socketFd, socket));
-        }
+        pollfd pollFd;
+        pollFd.fd = socket.get().socketFd;
+        pollFd.events = POLLIN | POLLOUT;
+        
+        pollFds.push_back(pollFd);
+        
+        socketMap.insert(std::pair<uint32_t, std::reference_wrapper<Socket>>(socket.get().socketFd, socket));
     }
     
     if (poll(pollFds.data(), static_cast<nfds_t>(pollFds.size()), 0) < 0)
@@ -56,9 +53,14 @@ bool Network::update()
             {
                 iter->second.get().read();
             }
+
             if (pollFd.revents & POLLOUT)
             {
                 iter->second.get().write();
+            }
+            else if (iter->second.get().isWritable() && iter->second.get().isReady())
+            {
+                iter->second.get().disconnected();
             }
         }
     }

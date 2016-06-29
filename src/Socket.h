@@ -42,10 +42,13 @@ public:
     
     bool isConnecting() const { return connecting; }
     bool isReady() const { return ready; }
+
+    virtual bool isWritable() { return true; }
     
 protected:
     virtual bool read();
     virtual bool write();
+    virtual bool disconnected();
     
     Network& network;
     
@@ -61,4 +64,7 @@ protected:
     std::function<void()> connectCallback;
     std::function<void(const std::vector<uint8_t>&)> readCallback;
     std::function<void()> closeCallback;
+
+    std::vector<uint8_t> data;
+    std::vector<uint8_t> outData;
 };

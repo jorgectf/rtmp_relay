@@ -19,7 +19,9 @@ public:
     
     bool startAccept(uint16_t newPort);
     void setAcceptCallback(const std::function<void(Socket)>& newAcceptCallback);
-    
+
+    virtual bool isWritable() { return false; }
+
 protected:
     virtual bool read();
     
