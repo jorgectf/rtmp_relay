@@ -245,7 +245,7 @@ namespace rtmp
         uint32_t originalSize = static_cast<uint32_t>(data.size());
 
         bool useDelta = previousPackets[header.channel].messageType != MessageType::NONE &&
-            previousPackets[header.channel].messageStreamId != header.messageStreamId &&
+            previousPackets[header.channel].messageStreamId == header.messageStreamId &&
             header.timestamp >= previousPackets[header.channel].timestamp;
 
         if (useDelta)
