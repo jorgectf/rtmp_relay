@@ -343,27 +343,31 @@ bool Socket::write()
     {
         ssize_t size = ::send(socketFd, outData.data(), outData.size(), 0);
 
-        outData.clear();
-
         if (size < 0)
         {
-            if (errno != EAGAIN && errno != EWOULDBLOCK)
+            int error = errno;
+            if (error != EAGAIN && error != EWOULDBLOCK)
             {
-                int error = errno;
                 std::cerr << "Failed to send data, error: " << error << std::endl;
+
+                outData.clear();
+
                 return false;
             }
         }
         else if (size != static_cast<ssize_t>(outData.size()))
         {
             std::cerr << "Failed to send all data" << std::endl;
-            return false;
         }
 
-#ifdef DEBUG
-        std::cout << "Socket sent " << size << " bytes" << std::endl;
-#endif
+        if (size)
+        {
+            outData.erase(outData.begin(), outData.begin() + size);
 
+#ifdef DEBUG
+            std::cout << "Socket sent " << size << " bytes" << std::endl;
+#endif
+        }
     }
     
     return true;
