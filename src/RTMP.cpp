@@ -302,7 +302,7 @@ namespace rtmp
 
         if (header.type != Header::Type::ONE_BYTE)
         {
-            uint32_t ret = encodeInt(data, 3, (timestamp >= 0xffffff) ? 0xffffff : timestamp);
+            uint32_t ret = encodeInt(data, 3, (timestamp >= 0xffffff) ? 0xffffff : static_cast<uint32_t>(timestamp));
             
             if (!ret)
             {
@@ -331,7 +331,7 @@ namespace rtmp
 
         if (timestamp >= 0xffffff)
         {
-            uint32_t ret = encodeInt(data, 4, timestamp);
+            uint32_t ret = encodeInt(data, 4, static_cast<uint32_t>(timestamp));
 
             if (!ret)
             {
@@ -349,16 +349,15 @@ namespace rtmp
         uint32_t remainingBytes = static_cast<uint32_t>(packet.data.size());
         uint32_t start = 0;
 
+        Header header;
+        header.channel = packet.channel;
+        header.messageType = packet.messageType;
+        header.messageStreamId = packet.messageStreamId;
+        header.timestamp = packet.timestamp;
+        header.length = static_cast<uint32_t>(packet.data.size());
+
         while (remainingBytes > 0)
         {
-            Header header;
-            header.channel = packet.channel;
-            header.messageType = packet.messageType;
-            header.messageStreamId = packet.messageStreamId;
-            header.timestamp = packet.timestamp;
-
-            header.length = static_cast<uint32_t>(packet.data.size());
-
             if (!encodeHeader(data, header, previousPackets))
             {
                 return 0;
