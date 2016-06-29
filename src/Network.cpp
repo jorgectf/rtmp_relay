@@ -58,10 +58,6 @@ bool Network::update()
             {
                 iter->second.get().write();
             }
-            else if (iter->second.get().isWritable() && iter->second.get().isReady())
-            {
-                iter->second.get().disconnected();
-            }
         }
     }
     

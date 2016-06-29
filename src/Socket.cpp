@@ -333,9 +333,13 @@ bool Socket::write()
         connecting = false;
         ready = true;
         std::cout << "Socket connected to " << ipToString(ipAddress) << ":" << port << std::endl;
-        if (connectCallback) connectCallback();
+        if (connectCallback)
+        {
+            connectCallback();
+        }
     }
-    else if (!outData.empty())
+
+    if (ready && !outData.empty())
     {
         ssize_t size = ::send(socketFd, outData.data(), outData.size(), 0);
 
