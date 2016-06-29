@@ -42,6 +42,8 @@ public:
     
     bool isConnecting() const { return connecting; }
     bool isReady() const { return ready; }
+
+    bool hasOutData() const { return !outData.empty(); }
     
 protected:
     virtual bool read();

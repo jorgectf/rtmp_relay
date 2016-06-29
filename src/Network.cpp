@@ -27,7 +27,12 @@ bool Network::update()
     {
         pollfd pollFd;
         pollFd.fd = socket.get().socketFd;
-        pollFd.events = POLLIN | POLLOUT;
+        pollFd.events = POLLIN;
+
+        if (socket.get().isConnecting() || socket.get().hasOutData())
+        {
+            pollFd.events |= POLLOUT;
+        }
         
         pollFds.push_back(pollFd);
         
