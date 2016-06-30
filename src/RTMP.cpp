@@ -187,6 +187,8 @@ namespace rtmp
 
         auto currentPreviousPackets = previousPackets;
 
+        bool firstPacket = true;
+
         do
         {
             Header header;
@@ -199,8 +201,15 @@ namespace rtmp
             
             offset += ret;
 
+            if (header.type == Header::Type::FOUR_BYTE ||
+                header.type == Header::Type::EIGHT_BYTE ||
+                header.type == Header::Type::TWELVE_BYTE)
+            {
+                currentPreviousPackets[header.channel] = header;
+            }
+
             // first header of packer
-            if (packet.data.empty())
+            if (firstPacket)
             {
                 packet.channel = header.channel;
                 packet.messageType = header.messageType;
@@ -208,13 +217,11 @@ namespace rtmp
                 packet.timestamp = header.timestamp;
 
                 remainingBytes = header.length;
-            }
 
-            if (header.type == Header::Type::FOUR_BYTE ||
-                header.type == Header::Type::EIGHT_BYTE ||
-                header.type == Header::Type::TWELVE_BYTE)
-            {
-                currentPreviousPackets[header.channel] = header;
+                currentPreviousPackets[header.channel].ts = header.ts;
+                currentPreviousPackets[header.channel].timestamp = header.timestamp;
+
+                firstPacket = false;
             }
 
             uint32_t packetSize = std::min(remainingBytes, chunkSize);
