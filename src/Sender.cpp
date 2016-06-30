@@ -617,7 +617,7 @@ namespace relay
         amf0::Node argument1(amf0::Marker::Null);
         argument1.encode(packet.data);
 
-        amf0::Node argument2 = streamName;
+        amf0::Node argument2 = 1.0;
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
@@ -679,7 +679,7 @@ namespace relay
         amf0::Node argument1(amf0::Marker::Null);
         argument1.encode(packet.data);
 
-        amf0::Node argument2 = 1.0;
+        amf0::Node argument2 = streamName;
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
@@ -756,12 +756,19 @@ namespace relay
 
     void Sender::deleteStream()
     {
-        streamName.clear();
+        if (connected && !streamName.empty())
+        {
+            sendDeleteStream();
+        }
 
+        streamName.clear();
+    }
+
+    void Sender::unpublishStream()
+    {
         if (connected && !streamName.empty())
         {
             sendFCUnpublish();
-            sendDeleteStream();
         }
     }
 

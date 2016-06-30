@@ -94,6 +94,14 @@ namespace relay
         }
     }
 
+    void Server::unpublishStream()
+    {
+        for (const auto& sender : senders)
+        {
+            sender->unpublishStream();
+        }
+    }
+
     void Server::sendPacket(const rtmp::Packet& packet)
     {
         for (const auto& sender : senders)

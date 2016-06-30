@@ -33,6 +33,7 @@ namespace relay
 
         void createStream(const std::string& streamName);
         void deleteStream();
+        void unpublishStream();
         void sendPacket(const rtmp::Packet& packet);
 
         void printInfo() const;

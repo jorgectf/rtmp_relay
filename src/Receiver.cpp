@@ -196,6 +196,12 @@ namespace relay
 
     void Receiver::handleClose()
     {
+        if (auto localServer = server.lock())
+        {
+            localServer->unpublishStream();
+            localServer->deleteStream();
+        }
+
         std::cout << "Input disconnected" << std::endl;
     }
 
@@ -481,6 +487,10 @@ namespace relay
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
+                    if (auto localServer = server.lock())
+                    {
+                        localServer->unpublishStream();
+                    }
                 }
                 else if (command.asString() == "publish")
                 {
