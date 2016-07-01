@@ -356,7 +356,7 @@ namespace relay
                 // forward notify packet
                 if (auto localServer = server.lock())
                 {
-                    localServer->sendPacket(packet);
+                    localServer->sendMetadata(packet.data);
                 }
                 break;
             }
@@ -366,7 +366,7 @@ namespace relay
                 // forward audio packet
                 if (auto localServer = server.lock())
                 {
-                    localServer->sendPacket(packet);
+                    localServer->sendAudio(packet.timestamp, packet.data);
                 }
                 break;
             }
@@ -376,7 +376,7 @@ namespace relay
                 // forward video packet
                 if (auto localServer = server.lock())
                 {
-                    localServer->sendPacket(packet);
+                    localServer->sendVideo(packet.timestamp, packet.data);
                 }
                 break;
             }

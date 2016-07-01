@@ -36,7 +36,9 @@ namespace relay
         void createStream(const std::string& newStreamName);
         void deleteStream();
         void unpublishStream();
-        void sendPacket(const rtmp::Packet& packet);
+        void sendAudio(uint64_t timestamp, std::vector<uint8_t> data);
+        void sendVideo(uint64_t timestamp, std::vector<uint8_t> data);
+        void sendMetadata(std::vector<uint8_t> data);
         
     private:
         void handleRead(const std::vector<uint8_t>& newData);

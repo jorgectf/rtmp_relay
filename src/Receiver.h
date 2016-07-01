@@ -53,7 +53,7 @@ namespace relay
         void sendReleaseStreamResult(double transactionId);
         void sendOnFCPublish();
         void sendPublishStatus(double transactionId);
-        
+
         Network& network;
         Socket socket;
         

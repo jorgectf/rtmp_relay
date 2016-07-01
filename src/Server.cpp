@@ -102,11 +102,27 @@ namespace relay
         }
     }
 
-    void Server::sendPacket(const rtmp::Packet& packet)
+    void Server::sendAudio(uint64_t timestamp, std::vector<uint8_t> data)
     {
         for (const auto& sender : senders)
         {
-            sender->sendPacket(packet);
+            sender->sendAudio(timestamp, data);
+        }
+    }
+
+    void Server::sendVideo(uint64_t timestamp, std::vector<uint8_t> data)
+    {
+        for (const auto& sender : senders)
+        {
+            sender->sendVideo(timestamp, data);
+        }
+    }
+
+    void Server::sendMetadata(std::vector<uint8_t> data)
+    {
+        for (const auto& sender : senders)
+        {
+            sender->sendMetadata(data);
         }
     }
 

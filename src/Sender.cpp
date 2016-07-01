@@ -772,8 +772,48 @@ namespace relay
         }
     }
 
-    void Sender::sendPacket(const rtmp::Packet& packet)
+    void Sender::sendAudio(uint64_t timestamp, std::vector<uint8_t> audioData)
     {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = 1;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
+
+        packet.data = audioData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        socket.send(buffer);
+    }
+
+    void Sender::sendVideo(uint64_t timestamp, std::vector<uint8_t> videoData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::VIDEO;
+        packet.messageStreamId = 1;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+
+        packet.data = videoData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        socket.send(buffer);
+    }
+
+    void Sender::sendMetadata(std::vector<uint8_t> metadata)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = 1;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::NOTIFY;
+
+        packet.data = metadata;
+
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
