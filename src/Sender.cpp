@@ -772,7 +772,7 @@ namespace relay
         }
     }
 
-    void Sender::sendAudio(uint64_t timestamp, std::vector<uint8_t> audioData)
+    void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::AUDIO;
@@ -788,7 +788,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Sender::sendVideo(uint64_t timestamp, std::vector<uint8_t> videoData)
+    void Sender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::VIDEO;
@@ -804,7 +804,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Sender::sendMetadata(std::vector<uint8_t> metadata)
+    void Sender::sendMetadata(const amf0::Node& metadata)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::AUDIO;
@@ -812,7 +812,14 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::NOTIFY;
 
-        packet.data = metadata;
+        amf0::Node commandName = std::string("@setDataFrame");
+        commandName.encode(packet.data);
+
+        amf0::Node argument1 = std::string("onMetaData");
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = metadata;
+        argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);

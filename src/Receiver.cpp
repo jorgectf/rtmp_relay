@@ -353,10 +353,15 @@ namespace relay
 #endif
                 }
 
-                // forward notify packet
-                if (auto localServer = server.lock())
+                if (command.asString() == "@setDataFrame" && argument1.asString() == "onMetaData")
                 {
-                    localServer->sendMetadata(packet.data);
+                    metadata = argument2;
+
+                    // forward notify packet
+                    if (auto localServer = server.lock())
+                    {
+                        localServer->sendMetadata(metadata);
+                    }
                 }
                 break;
             }

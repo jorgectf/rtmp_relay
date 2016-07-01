@@ -10,6 +10,7 @@
 #include <memory>
 #include "Socket.h"
 #include "RTMP.h"
+#include "Amf0.h"
 
 namespace relay
 {
@@ -80,5 +81,7 @@ namespace relay
         std::string streamName;
 
         std::weak_ptr<Server> server;
+
+        amf0::Node metadata;
     };
 }

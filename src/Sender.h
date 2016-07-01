@@ -10,6 +10,7 @@
 #include <map>
 #include "Socket.h"
 #include "RTMP.h"
+#include "Amf0.h"
 
 namespace relay
 {
@@ -36,9 +37,9 @@ namespace relay
         void createStream(const std::string& newStreamName);
         void deleteStream();
         void unpublishStream();
-        void sendAudio(uint64_t timestamp, std::vector<uint8_t> data);
-        void sendVideo(uint64_t timestamp, std::vector<uint8_t> data);
-        void sendMetadata(std::vector<uint8_t> data);
+        void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+        void sendMetadata(const amf0::Node& metadata);
         
     private:
         void handleRead(const std::vector<uint8_t>& newData);

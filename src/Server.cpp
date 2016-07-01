@@ -102,27 +102,27 @@ namespace relay
         }
     }
 
-    void Server::sendAudio(uint64_t timestamp, std::vector<uint8_t> data)
+    void Server::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         for (const auto& sender : senders)
         {
-            sender->sendAudio(timestamp, data);
+            sender->sendAudio(timestamp, audioData);
         }
     }
 
-    void Server::sendVideo(uint64_t timestamp, std::vector<uint8_t> data)
+    void Server::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
         for (const auto& sender : senders)
         {
-            sender->sendVideo(timestamp, data);
+            sender->sendVideo(timestamp, videoData);
         }
     }
 
-    void Server::sendMetadata(std::vector<uint8_t> data)
+    void Server::sendMetadata(const amf0::Node& metadata)
     {
         for (const auto& sender : senders)
         {
-            sender->sendMetadata(data);
+            sender->sendMetadata(metadata);
         }
     }
 
