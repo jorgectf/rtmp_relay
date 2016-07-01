@@ -357,7 +357,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "NOTIFY command: ";
+                std::cout << "INVOKE command: ";
                 command.dump();
 #endif
 
