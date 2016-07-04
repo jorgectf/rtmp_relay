@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <rapidjson/document.h>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -27,7 +28,7 @@ namespace relay
         Server(Server&& other) = delete;
         Server& operator=(Server&& other) = delete;
         
-        bool init(uint16_t port, const std::vector<std::string>& pushAddresses);
+        bool init(uint16_t port, const rapidjson::Value& pushArray);
         
         void update();
 

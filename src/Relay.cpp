@@ -53,16 +53,9 @@ namespace relay
             std::string application = serverObject["application"].GetString();
             const rapidjson::Value& pushArray = serverObject["push"];
             
-            for (uint32_t pushIndex = 0; pushIndex < static_cast<uint32_t>(pushArray.Size()); ++pushIndex)
-            {
-                const rapidjson::Value& pushObject = pushArray[pushIndex];
-                
-                pushAddresses.push_back(pushObject["address"].GetString());
-            }
-            
             std::shared_ptr<Server> server = std::make_shared<Server>(network, application);
             
-            if (server->init(static_cast<uint16_t>(serverObject["port"].GetInt()), pushAddresses))
+            if (server->init(static_cast<uint16_t>(serverObject["port"].GetInt()), pushArray))
             {
                 servers.push_back(std::move(server));
             }

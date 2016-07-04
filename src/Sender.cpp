@@ -26,7 +26,7 @@ namespace relay
         
     }
 
-    bool Sender::init(const std::string& address)
+    bool Sender::init(const std::string& address, bool video, bool audio)
     {
         if (!socket.setBlocking(false))
         {
@@ -38,6 +38,9 @@ namespace relay
         {
             return false;
         }
+
+        videoStream = video;
+        audioStream = audio;
         
         return true;
     }
@@ -774,34 +777,40 @@ namespace relay
 
     void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::AUDIO;
-        packet.messageStreamId = 1;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
+        if (audioStream)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = 1;
+            packet.timestamp = timestamp;
+            packet.messageType = rtmp::MessageType::AUDIO_PACKET;
 
-        packet.data = audioData;
+            packet.data = audioData;
 
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        socket.send(buffer);
+            socket.send(buffer);
+        }
     }
 
     void Sender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::VIDEO;
-        packet.messageStreamId = 1;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+        if (videoStream)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::VIDEO;
+            packet.messageStreamId = 1;
+            packet.timestamp = timestamp;
+            packet.messageType = rtmp::MessageType::VIDEO_PACKET;
 
-        packet.data = videoData;
+            packet.data = videoData;
 
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        socket.send(buffer);
+            socket.send(buffer);
+        }
     }
 
     void Sender::sendMetadata(const amf0::Node& metadata)

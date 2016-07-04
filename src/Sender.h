@@ -26,7 +26,7 @@ namespace relay
         Sender(Sender&& other) = delete;
         Sender& operator=(Sender&& other) = delete;
         
-        bool init(const std::string& address);
+        bool init(const std::string& address, bool video, bool audio);
         void update();
         void handleConnect();
         
@@ -61,6 +61,8 @@ namespace relay
         
         Network& network;
         Socket socket;
+        bool videoStream = false;
+        bool audioStream = false;
         
         std::vector<uint8_t> data;
         

@@ -23,20 +23,26 @@ namespace relay
         
     }
 
-    bool Server::init(uint16_t port, const std::vector<std::string>& pushAddresses)
+    bool Server::init(uint16_t port, const rapidjson::Value& pushArray)
     {
         socket.startAccept(port);
-        
-        for (const std::string& address : pushAddresses)
+
+        for (uint32_t pushIndex = 0; pushIndex < static_cast<uint32_t>(pushArray.Size()); ++pushIndex)
         {
+            const rapidjson::Value& pushObject = pushArray[pushIndex];
+
+            std::string address = pushObject["address"].GetString();
+            bool video = pushObject["video"].GetBool();
+            bool audio = pushObject["audio"].GetBool();
+
             std::unique_ptr<Sender> sender(new Sender(network, application));
-            
-            if (sender->init(address))
-            {            
+
+            if (sender->init(address, video, audio))
+            {
                 senders.push_back(std::move(sender));
             }
         }
-        
+
         return true;
     }
 
