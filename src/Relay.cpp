@@ -57,7 +57,7 @@ namespace relay
             {
                 const rapidjson::Value& pushObject = pushArray[pushIndex];
                 
-                pushAddresses.push_back(pushObject.GetString());
+                pushAddresses.push_back(pushObject["address"].GetString());
             }
             
             std::shared_ptr<Server> server = std::make_shared<Server>(network, application);
