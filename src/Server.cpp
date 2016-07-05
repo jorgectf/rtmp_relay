@@ -31,9 +31,9 @@ namespace relay
         {
             const rapidjson::Value& pushObject = pushArray[pushIndex];
 
-            std::string address = pushObject["address"].GetString();
-            bool video = pushObject["video"].GetBool();
-            bool audio = pushObject["audio"].GetBool();
+            std::string address = pushObject.HasMember("address") ? pushObject["address"].GetString() : "127.0.0.1:1935";
+            bool video = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
+            bool audio = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
 
             std::unique_ptr<Sender> sender(new Sender(network, application));
 
