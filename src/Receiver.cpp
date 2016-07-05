@@ -355,12 +355,19 @@ namespace relay
 
                 if (command.asString() == "@setDataFrame" && argument1.asString() == "onMetaData")
                 {
-                    metadata = argument2;
+                    metaData = argument2;
 
                     // forward notify packet
                     if (auto localServer = server.lock())
                     {
-                        localServer->sendMetadata(metadata);
+                        localServer->sendMetaData(metaData);
+                    }
+                }
+                else if (command.asString() == "onTextData")
+                {
+                    if (auto localServer = server.lock())
+                    {
+                        localServer->sendTextData(argument1);
                     }
                 }
                 break;

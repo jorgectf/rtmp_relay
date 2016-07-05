@@ -32,12 +32,13 @@ namespace relay
             const rapidjson::Value& pushObject = pushArray[pushIndex];
 
             std::string address = pushObject.HasMember("address") ? pushObject["address"].GetString() : "127.0.0.1:1935";
-            bool video = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
-            bool audio = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
+            bool videoOutput = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
+            bool audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
+            bool dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
 
             std::unique_ptr<Sender> sender(new Sender(network, application));
 
-            if (sender->init(address, video, audio))
+            if (sender->init(address, videoOutput, audioOutput, dataOutput))
             {
                 senders.push_back(std::move(sender));
             }
@@ -124,11 +125,19 @@ namespace relay
         }
     }
 
-    void Server::sendMetadata(const amf0::Node& metadata)
+    void Server::sendMetaData(const amf0::Node& metaData)
     {
         for (const auto& sender : senders)
         {
-            sender->sendMetadata(metadata);
+            sender->sendMetaData(metaData);
+        }
+    }
+
+    void Server::sendTextData(const amf0::Node& textData)
+    {
+        for (const auto& sender : senders)
+        {
+            sender->sendMetaData(textData);
         }
     }
 

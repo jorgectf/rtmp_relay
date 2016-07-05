@@ -82,6 +82,6 @@ namespace relay
 
         std::weak_ptr<Server> server;
 
-        amf0::Node metadata;
+        amf0::Node metaData;
     };
 }

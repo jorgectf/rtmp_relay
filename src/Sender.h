@@ -26,7 +26,7 @@ namespace relay
         Sender(Sender&& other) = delete;
         Sender& operator=(Sender&& other) = delete;
         
-        bool init(const std::string& address, bool video, bool audio);
+        bool init(const std::string& address, bool videoOutput, bool audioOutput, bool dataOutput);
         void update();
         void handleConnect();
         
@@ -39,7 +39,8 @@ namespace relay
         void unpublishStream();
         void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
         void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
-        void sendMetadata(const amf0::Node& metadata);
+        void sendMetaData(const amf0::Node& metaData);
+        void sendTextData(const amf0::Node& textData);
         
     private:
         void handleRead(const std::vector<uint8_t>& newData);
@@ -63,6 +64,7 @@ namespace relay
         Socket socket;
         bool videoStream = false;
         bool audioStream = false;
+        bool dataStream = false;
         
         std::vector<uint8_t> data;
         

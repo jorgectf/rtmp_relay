@@ -26,7 +26,7 @@ namespace relay
         
     }
 
-    bool Sender::init(const std::string& address, bool video, bool audio)
+    bool Sender::init(const std::string& address, bool videoOutput, bool audioOutput, bool dataOutput)
     {
         if (!socket.setBlocking(false))
         {
@@ -39,8 +39,9 @@ namespace relay
             return false;
         }
 
-        videoStream = video;
-        audioStream = audio;
+        videoStream = videoOutput;
+        audioStream = audioOutput;
+        dataStream = dataOutput;
         
         return true;
     }
@@ -813,7 +814,7 @@ namespace relay
         }
     }
 
-    void Sender::sendMetadata(const amf0::Node& metadata)
+    void Sender::sendMetaData(const amf0::Node& metaData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::AUDIO;
@@ -827,12 +828,38 @@ namespace relay
         amf0::Node argument1 = std::string("onMetaData");
         argument1.encode(packet.data);
 
-        amf0::Node argument2 = metadata;
+        amf0::Node argument2 = metaData;
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
         socket.send(buffer);
+    }
+
+    void Sender::sendTextData(const amf0::Node& textData)
+    {
+        if (dataStream)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = 1;
+            packet.timestamp = 0;
+            packet.messageType = rtmp::MessageType::NOTIFY;
+
+            amf0::Node commandName = std::string("onTextData");
+            commandName.encode(packet.data);
+
+            amf0::Node argument1 = textData;
+            argument1.encode(packet.data);
+
+            amf0::Node argument2 = 0.0;
+            argument2.encode(packet.data);
+
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
+            
+            socket.send(buffer);
+        }
     }
 }

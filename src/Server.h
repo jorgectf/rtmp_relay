@@ -37,7 +37,8 @@ namespace relay
         void unpublishStream();
         void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
         void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
-        void sendMetadata(const amf0::Node& metadata);
+        void sendMetaData(const amf0::Node& metaData);
+        void sendTextData(const amf0::Node& textData);
 
         void printInfo() const;
         
