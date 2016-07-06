@@ -65,7 +65,7 @@ namespace relay
             }
             else
             {
-                deleteStream();
+                close();
                 receiverIterator = receivers.erase(receiverIterator);
             }
         }
@@ -82,6 +82,18 @@ namespace relay
         else
         {
             clientSocket.close();
+        }
+    }
+
+    void Server::open()
+    {
+    }
+
+    void Server::close()
+    {
+        for (const auto& sender : senders)
+        {
+            sender->disconnect();
         }
     }
 

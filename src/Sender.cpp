@@ -46,6 +46,11 @@ namespace relay
         return true;
     }
 
+    void Sender::disconnect()
+    {
+        socket.close();
+    }
+
     void Sender::update()
     {
         

@@ -27,6 +27,9 @@ namespace relay
         Sender& operator=(Sender&& other) = delete;
         
         bool init(const std::string& address, bool videoOutput, bool audioOutput, bool dataOutput);
+
+        void disconnect();
+
         void update();
         void handleConnect();
         

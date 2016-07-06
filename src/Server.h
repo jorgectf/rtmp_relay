@@ -32,6 +32,9 @@ namespace relay
         
         void update();
 
+        void open();
+        void close();
+
         void createStream(const std::string& streamName);
         void deleteStream();
         void unpublishStream();
