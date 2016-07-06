@@ -61,6 +61,9 @@ namespace relay
         void sendFCPublish();
         void sendFCUnpublish();
         void sendPublish();
+
+        std::random_device rd;
+        std::mt19937 generator;
         
         Network& network;
         Socket socket;
@@ -76,9 +79,6 @@ namespace relay
         
         uint32_t inChunkSize = 128;
         uint32_t outChunkSize = 128;
-        
-        std::random_device rd;
-        std::mt19937 generator;
 
         uint32_t invokeId = 0;
         std::map<uint32_t, std::string> invokes;

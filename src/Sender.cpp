@@ -14,9 +14,9 @@
 namespace relay
 {
     Sender::Sender(Network& pNetwork, const std::string& pApplication, const std::string& pAddress, bool videoOutput, bool audioOutput, bool dataOutput):
+        generator(rd()),
         network(pNetwork),
         socket(network),
-        generator(rd()),
         application(pApplication),
         address(pAddress),
         videoStream(videoOutput),
