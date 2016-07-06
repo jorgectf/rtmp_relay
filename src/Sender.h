@@ -17,7 +17,7 @@ namespace relay
     class Sender
     {
     public:
-        Sender(Network& pNetwork, const std::string& pApplication);
+        Sender(Network& pNetwork, const std::string& pApplication, const std::string& pAddress, bool videoOutput, bool audioOutput, bool dataOutput);
         ~Sender();
         
         Sender(const Sender&) = delete;
@@ -26,8 +26,7 @@ namespace relay
         Sender(Sender&& other) = delete;
         Sender& operator=(Sender&& other) = delete;
         
-        bool init(const std::string& address, bool videoOutput, bool audioOutput, bool dataOutput);
-
+        bool connect();
         void disconnect();
 
         void update();
@@ -89,6 +88,7 @@ namespace relay
 
         bool connected = false;
         std::string application;
+        std::string address;
         std::string streamName;
     };
 }

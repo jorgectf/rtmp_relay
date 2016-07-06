@@ -13,8 +13,15 @@
 
 namespace relay
 {
-    Sender::Sender(Network& pNetwork, const std::string& pApplication):
-        network(pNetwork), socket(network), generator(rd()), application(pApplication)
+    Sender::Sender(Network& pNetwork, const std::string& pApplication, const std::string& pAddress, bool videoOutput, bool audioOutput, bool dataOutput):
+        network(pNetwork),
+        socket(network),
+        generator(rd()),
+        application(pApplication),
+        address(pAddress),
+        videoStream(videoOutput),
+        audioStream(audioOutput),
+        dataStream(dataOutput)
     {
         socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
         socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
@@ -26,7 +33,7 @@ namespace relay
         
     }
 
-    bool Sender::init(const std::string& address, bool videoOutput, bool audioOutput, bool dataOutput)
+    bool Sender::connect()
     {
         if (!socket.setBlocking(false))
         {
@@ -39,10 +46,6 @@ namespace relay
             return false;
         }
 
-        videoStream = videoOutput;
-        audioStream = audioOutput;
-        dataStream = dataOutput;
-        
         return true;
     }
 

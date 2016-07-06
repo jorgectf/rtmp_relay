@@ -36,12 +36,8 @@ namespace relay
             bool audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
             bool dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
 
-            std::unique_ptr<Sender> sender(new Sender(network, application));
-
-            if (sender->init(address, videoOutput, audioOutput, dataOutput))
-            {
-                senders.push_back(std::move(sender));
-            }
+            std::unique_ptr<Sender> sender(new Sender(network, application, address, videoOutput, audioOutput, dataOutput));
+            senders.push_back(std::move(sender));
         }
 
         return true;
@@ -78,6 +74,8 @@ namespace relay
         {
             std::unique_ptr<Receiver> receiver(new Receiver(network, std::move(clientSocket), application, shared_from_this()));
             receivers.push_back(std::move(receiver));
+
+            open();
         }
         else
         {
@@ -87,6 +85,10 @@ namespace relay
 
     void Server::open()
     {
+        for (const auto& sender : senders)
+        {
+            sender->connect();
+        }
     }
 
     void Server::close()
