@@ -64,6 +64,8 @@ namespace relay
         
         Network& network;
         Socket socket;
+        std::string application;
+        std::string address;
         bool videoStream = false;
         bool audioStream = false;
         bool dataStream = false;
@@ -87,8 +89,6 @@ namespace relay
         std::map<uint32_t, rtmp::Header> sentPackets;
 
         bool connected = false;
-        std::string application;
-        std::string address;
         std::string streamName;
     };
 }
