@@ -457,9 +457,7 @@ namespace relay
                         {
                             streamId = static_cast<uint32_t>(argument2.asDouble());
                             sendPublish();
-                        }
-                        else if (i->second == "publish")
-                        {
+
                             streaming = true;
                         }
 
@@ -778,7 +776,7 @@ namespace relay
             sendDeleteStream();
         }
 
-        streamName.clear();
+        streaming = false;
     }
 
     void Sender::unpublishStream()
@@ -787,6 +785,8 @@ namespace relay
         {
             sendFCUnpublish();
         }
+
+        streaming = false;
     }
 
     void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
