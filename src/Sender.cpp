@@ -52,6 +52,7 @@ namespace relay
     void Sender::disconnect()
     {
         socket.close();
+        streaming = false;
     }
 
     void Sender::update()
@@ -457,6 +458,10 @@ namespace relay
                             streamId = static_cast<uint32_t>(argument2.asDouble());
                             sendPublish();
                         }
+                        else if (i->second == "publish")
+                        {
+                            streaming = true;
+                        }
 
                         invokes.erase(i);
                     }
@@ -786,7 +791,7 @@ namespace relay
 
     void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        if (audioStream)
+        if (streaming && audioStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
@@ -805,7 +810,7 @@ namespace relay
 
     void Sender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        if (videoStream)
+        if (streaming && videoStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::VIDEO;
@@ -824,30 +829,33 @@ namespace relay
 
     void Sender::sendMetaData(const amf0::Node& metaData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::AUDIO;
-        packet.messageStreamId = 1;
-        packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::NOTIFY;
+        if (streaming)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = 1;
+            packet.timestamp = 0;
+            packet.messageType = rtmp::MessageType::NOTIFY;
 
-        amf0::Node commandName = std::string("@setDataFrame");
-        commandName.encode(packet.data);
+            amf0::Node commandName = std::string("@setDataFrame");
+            commandName.encode(packet.data);
 
-        amf0::Node argument1 = std::string("onMetaData");
-        argument1.encode(packet.data);
+            amf0::Node argument1 = std::string("onMetaData");
+            argument1.encode(packet.data);
 
-        amf0::Node argument2 = metaData;
-        argument2.encode(packet.data);
+            amf0::Node argument2 = metaData;
+            argument2.encode(packet.data);
 
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        socket.send(buffer);
+            socket.send(buffer);
+        }
     }
 
     void Sender::sendTextData(const amf0::Node& textData)
     {
-        if (dataStream)
+        if (streaming && dataStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;

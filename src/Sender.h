@@ -90,5 +90,7 @@ namespace relay
 
         bool connected = false;
         std::string streamName;
+
+        bool streaming = false;
     };
 }
