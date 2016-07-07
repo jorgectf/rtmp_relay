@@ -67,7 +67,7 @@ namespace relay
                     
                     if (version != 0x03)
                     {
-                        std::cerr << "Unsuported version" << std::endl;
+                        std::cerr << "Unsuported version, disconnecting receiver" << std::endl;
                         socket.disconnect();
                         break;
                     }
@@ -457,7 +457,7 @@ namespace relay
                 {
                     if (argument1["app"].asString() != application)
                     {
-                        std::cerr << "Wrong application" << std::endl;
+                        std::cerr << "Wrong application, disconnecting receiver" << std::endl;
                         socket.disconnect();
                         return false;
                     }
