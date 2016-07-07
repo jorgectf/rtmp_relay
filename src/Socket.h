@@ -21,11 +21,12 @@ public:
     
     Socket(Socket&& other);
     Socket& operator=(Socket&& other);
-    
-    void close();
+
+    bool close();
     
     bool connect(const std::string& address, uint16_t newPort = 0);
     bool connect(uint32_t address, uint16_t newPort);
+    bool disconnect();
     
     bool startRead();
     void setConnectCallback(const std::function<void()>& newConnectCallback);

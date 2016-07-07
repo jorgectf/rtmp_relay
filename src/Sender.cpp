@@ -51,7 +51,7 @@ namespace relay
 
     void Sender::disconnect()
     {
-        socket.close();
+        socket.disconnect();
         streaming = false;
     }
 
@@ -120,7 +120,7 @@ namespace relay
                     if (version != 0x03)
                     {
                         std::cerr << "Unsuported version" << std::endl;
-                        socket.close();
+                        socket.disconnect();
                         break;
                     }
                     

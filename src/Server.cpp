@@ -79,12 +79,14 @@ namespace relay
         }
         else
         {
-            clientSocket.close();
+            clientSocket.disconnect();
         }
     }
 
     void Server::open()
     {
+        close();
+        
         for (const auto& sender : senders)
         {
             sender->connect();
