@@ -101,27 +101,27 @@ Socket& Socket::operator=(Socket&& other)
 
 bool Socket::close()
 {
-    bool result = true;
+    ready = false;
 
     if (socketFd >= 0)
     {
-        if (::close(socketFd) < 0)
+        int result = ::close(socketFd);
+        socketFd = -1;
+
+        if (result < 0)
         {
             int error = errno;
             std::cerr << "Failed to close socket, error: " << error << std::endl;
-            result = false;
+            return false;
         }
         else
         {
             std::cout << "Socket closed" << std::endl;
         }
 
-        socketFd = -1;
     }
 
-    ready = false;
-
-    return result;
+    return true;
 }
 
 bool Socket::connect(const std::string& address, uint16_t newPort)
@@ -214,7 +214,7 @@ bool Socket::connect(uint32_t address, uint16_t newPort)
 
 bool Socket::disconnect()
 {
-    bool result = true;
+    ready = false;
 
     if (socketFd >= 0)
     {
@@ -222,7 +222,7 @@ bool Socket::disconnect()
         {
             int error = errno;
             std::cerr << "Failed to shut down socket, error: " << error << std::endl;
-            result = false;
+            return false;
         }
         else
         {
@@ -230,9 +230,7 @@ bool Socket::disconnect()
         }
     }
 
-    ready = false;
-
-    return result;
+    return true;
 }
 
 bool Socket::startRead()
