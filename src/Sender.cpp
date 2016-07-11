@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include "RTMP.h"
 #include "Amf0.h"
+#include "Network.h"
 #include "Utils.h"
 
 namespace relay
@@ -771,7 +772,7 @@ namespace relay
 
     void Sender::printInfo() const
     {
-        std::cout << "\tSender " << (socket.isReady() ? "" : "not ") << "connected with: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        std::cout << "\tSender " << (socket.isReady() ? "" : "not ") << "connected with: " << Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {

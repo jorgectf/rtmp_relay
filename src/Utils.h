@@ -15,8 +15,6 @@ union IntFloat64 {
     double   f;
 };
 
-std::string ipToString(uint32_t ip);
-
 template <class T>
 inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, T& result)
 {
