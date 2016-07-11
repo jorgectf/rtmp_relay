@@ -7,6 +7,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <set>
 #include <map>
 #include "Socket.h"
 #include "RTMP.h"
@@ -17,7 +18,13 @@ namespace relay
     class Sender
     {
     public:
-        Sender(Network& pNetwork, const std::string& pApplication, const std::string& pAddress, bool videoOutput, bool audioOutput, bool dataOutput);
+        Sender(Network& pNetwork,
+               const std::string& pApplication,
+               const std::string& pAddress,
+               bool videoOutput,
+               bool audioOutput,
+               bool dataOutput,
+               const std::set<std::string>& pMetaDataBlacklist);
         ~Sender();
         
         Sender(const Sender&) = delete;
@@ -72,6 +79,7 @@ namespace relay
         bool videoStream = false;
         bool audioStream = false;
         bool dataStream = false;
+        std::set<std::string> metaDataBlacklist;
         
         std::vector<uint8_t> data;
         

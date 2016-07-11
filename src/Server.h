@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <set>
 #include <memory>
 #include <poll.h>
 #include "Acceptor.h"
@@ -54,5 +55,7 @@ namespace relay
         
         std::vector<std::unique_ptr<Sender>> senders;
         std::vector<std::unique_ptr<Receiver>> receivers;
+
+        std::set<std::string> metaDataBlacklist;
     };
 }

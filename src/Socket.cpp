@@ -118,7 +118,6 @@ bool Socket::close()
         {
             std::cout << "Socket closed" << std::endl;
         }
-
     }
 
     return true;

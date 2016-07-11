@@ -13,7 +13,13 @@
 
 namespace relay
 {
-    Sender::Sender(Network& pNetwork, const std::string& pApplication, const std::string& pAddress, bool videoOutput, bool audioOutput, bool dataOutput):
+    Sender::Sender(Network& pNetwork,
+                   const std::string& pApplication,
+                   const std::string& pAddress,
+                   bool videoOutput,
+                   bool audioOutput,
+                   bool dataOutput,
+                   const std::set<std::string>& pMetaDataBlacklist):
         generator(rd()),
         network(pNetwork),
         socket(network),
@@ -21,11 +27,32 @@ namespace relay
         address(pAddress),
         videoStream(videoOutput),
         audioStream(audioOutput),
-        dataStream(dataOutput)
+        dataStream(dataOutput),
+        metaDataBlacklist(pMetaDataBlacklist)
     {
         socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
         socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
         socket.setCloseCallback(std::bind(&Sender::handleClose, this));
+
+        if (!videoOutput)
+        {
+            metaDataBlacklist.insert("width");
+            metaDataBlacklist.insert("height");
+            metaDataBlacklist.insert("videodatarate");
+            metaDataBlacklist.insert("framerate");
+            metaDataBlacklist.insert("videocodecid");
+            metaDataBlacklist.insert("fps");
+            metaDataBlacklist.insert("gopsize");
+        }
+
+        if (!audioOutput)
+        {
+            metaDataBlacklist.insert("audiodatarate");
+            metaDataBlacklist.insert("audiosamplerate");
+            metaDataBlacklist.insert("audiosamplesize");
+            metaDataBlacklist.insert("stereo");
+            metaDataBlacklist.insert("audiocodecid");
+        }
     }
 
     Sender::~Sender()
@@ -844,7 +871,18 @@ namespace relay
             amf0::Node argument1 = std::string("onMetaData");
             argument1.encode(packet.data);
 
-            amf0::Node argument2 = metaData;
+            amf0::Node filteredMetaData = amf0::Marker::ECMAArray;
+
+            for (auto value : metaData.asMap())
+            {
+                /// not in the blacklist
+                if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
+                {
+                    filteredMetaData[value.first] = value.second;
+                }
+            }
+
+            amf0::Node argument2 = filteredMetaData;
             argument2.encode(packet.data);
 
             std::vector<uint8_t> buffer;

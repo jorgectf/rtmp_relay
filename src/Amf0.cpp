@@ -717,6 +717,16 @@ namespace amf0
         return marker == Marker::Undefined;
     }
 
+    const std::vector<Node>& Node::asVector() const
+    {
+        return vectorValue;
+    }
+
+    const std::map<std::string, Node>& Node::asMap() const
+    {
+        return mapValue;
+    }
+
     uint32_t Node::getSize() const
     {
         return static_cast<uint32_t>(vectorValue.size());
@@ -756,7 +766,11 @@ namespace amf0
 
     Node& Node::operator[](const std::string& key)
     {
-        marker = Marker::Object;
+        if (marker != Marker::Object &&
+            marker != Marker::ECMAArray)
+        {
+            marker = Marker::Object;
+        }
         return mapValue[key];
     }
 

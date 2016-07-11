@@ -36,7 +36,18 @@ namespace relay
             bool audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
             bool dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
 
-            std::unique_ptr<Sender> sender(new Sender(network, application, address, videoOutput, audioOutput, dataOutput));
+            if (pushObject.HasMember("metaDataBlacklist"))
+            {
+                const rapidjson::Value& metaDataBlacklistArray = pushObject["metaDataBlacklist"];
+
+                for (rapidjson::SizeType index = 0; index < metaDataBlacklistArray.Size(); ++index)
+                {
+                    const rapidjson::Value& str = metaDataBlacklistArray[index];
+                    metaDataBlacklist.insert(str.GetString());
+                }
+            }
+
+            std::unique_ptr<Sender> sender(new Sender(network, application, address, videoOutput, audioOutput, dataOutput, metaDataBlacklist));
             senders.push_back(std::move(sender));
         }
 

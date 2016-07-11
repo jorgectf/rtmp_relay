@@ -64,6 +64,8 @@ namespace amf0
         const Date& asDate() const;
         bool isNull() const;
         bool isUndefined() const;
+        const std::vector<Node>& asVector() const;
+        const std::map<std::string, Node>& asMap() const;
 
         uint32_t getSize() const;
 
