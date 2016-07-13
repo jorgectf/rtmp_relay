@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <cstring>
-#include <unistd.h>
 #include "Sender.h"
 #include "Constants.h"
 #include "RTMP.h"

@@ -6,6 +6,8 @@
 #include <memory>
 #include <functional>
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/filereadstream.h>
 #include <rapidjson/document.h>
@@ -71,9 +73,9 @@ namespace relay
 
     void Relay::run()
     {
-        const timespec sleepTime = { 0, 10000000 };
+        const std::chrono::microseconds sleepTime(10000);
         
-        while (true)
+        for (;;)
         {
             network.update();
             
@@ -81,8 +83,8 @@ namespace relay
             {
                 server->update();
             }
-            
-            nanosleep(&sleepTime, nullptr);
+
+            std::this_thread::sleep_for(sleepTime);
         }
     }
 

@@ -10,7 +10,6 @@
 #include <vector>
 #include <set>
 #include <memory>
-#include <poll.h>
 #include "Acceptor.h"
 #include "Sender.h"
 #include "Receiver.h"

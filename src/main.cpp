@@ -8,6 +8,7 @@
 
 relay::Relay rel;
 
+#ifndef _MSC_VER
 static void signalHandler(int signo)
 {
     if (signo == SIGUSR1)
@@ -19,6 +20,7 @@ static void signalHandler(int signo)
         std::cerr << "Received SIGPIPE" << std::endl;
     }
 }
+#endif
 
 int main(int argc, const char * argv[])
 {
@@ -32,6 +34,7 @@ int main(int argc, const char * argv[])
         return 1;
     }
 
+#ifndef _MSC_VER
     if (signal(SIGUSR1, signalHandler) == SIG_ERR)
     {
         std::cerr << "Failed to capure SIGUSR1" << std::endl;
@@ -43,6 +46,7 @@ int main(int argc, const char * argv[])
         std::cerr << "Failed to capure SIGPIPE" << std::endl;
         return 1;
     }
+#endif
     
     if (!rel.init(argv[1]))
     {
