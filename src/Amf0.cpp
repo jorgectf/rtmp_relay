@@ -59,7 +59,7 @@ namespace amf0
             return 0;
         }
 
-        result = static_cast<bool>(*(buffer.data() + offset));
+        result = (*(buffer.data() + offset)) > 0;
         offset += 1;
 
         return offset - originalOffset;

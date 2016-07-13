@@ -1,2 +1,5 @@
 bin
 src/*.o
+Debug/
+Release/
+x64/
