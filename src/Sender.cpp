@@ -102,7 +102,9 @@ namespace relay
         
         for (size_t i = 0; i < sizeof(challenge.randomBytes); ++i)
         {
-            challenge.randomBytes[i] = std::uniform_int_distribution<uint8_t>{0, 255}(generator);
+            uint32_t randomValue = std::uniform_int_distribution<uint32_t>{ 0, 255 }(generator);
+
+            challenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
         }
         
         std::vector<uint8_t> challengeMessage;
