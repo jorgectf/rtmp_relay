@@ -32,7 +32,6 @@ public:
     Socket& operator=(Socket&& other);
 
     bool close();
-    bool disconnect();
 
     bool startRead();
     void setReadCallback(const std::function<void(const std::vector<uint8_t>&)>& newReadCallback);

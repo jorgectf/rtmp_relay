@@ -87,7 +87,7 @@ namespace relay
         }
         else
         {
-            clientSocket.disconnect();
+            clientSocket.close();
         }
     }
 
