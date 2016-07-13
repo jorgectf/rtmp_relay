@@ -95,7 +95,7 @@ bool Acceptor::startAccept(uint16_t newPort)
     return true;
 }
 
-void Acceptor::setAcceptCallback(const std::function<void(Socket&&)>& newAcceptCallback)
+void Acceptor::setAcceptCallback(const std::function<void(Socket&)>& newAcceptCallback)
 {
     acceptCallback = newAcceptCallback;
 }
@@ -130,7 +130,7 @@ bool Acceptor::read()
         
         if (acceptCallback)
         {
-            acceptCallback(std::move(socket));
+            acceptCallback(socket);
         }
     }
     

@@ -46,7 +46,7 @@ namespace relay
         void printInfo() const;
         
     protected:
-        void handleAccept(Socket&& clientSocket);
+        void handleAccept(Socket& clientSocket);
         
         Network& network;
         Acceptor socket;

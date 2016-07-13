@@ -75,7 +75,7 @@ namespace relay
         }
     }
 
-    void Server::handleAccept(Socket&& clientSocket)
+    void Server::handleAccept(Socket& clientSocket)
     {
         // accept only one input
         if (receivers.empty())
