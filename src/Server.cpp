@@ -161,7 +161,7 @@ namespace relay
     {
         for (const auto& sender : senders)
         {
-            sender->sendMetaData(textData);
+            sender->sendTextData(textData);
         }
     }
 
