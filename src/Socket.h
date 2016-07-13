@@ -7,13 +7,21 @@
 #include <vector>
 #include <functional>
 
+#ifdef _MSC_VER
+#include <winsock2.h>
+typedef SOCKET socket_t;
+#else
+typedef int socket_t;
+#define INVALID_SOCKET -1
+#endif
+
 class Network;
 
 class Socket
 {
     friend Network;
 public:
-    Socket(Network& pNetwork, int pSocketFd = -1);
+    Socket(Network& pNetwork, socket_t pSocketFd = INVALID_SOCKET);
     virtual ~Socket();
     
     Socket(const Socket&) = delete;
@@ -53,7 +61,7 @@ protected:
     
     Network& network;
     
-    int socketFd = -1;
+    socket_t socketFd = INVALID_SOCKET;
     
     bool connecting = false;
     bool ready = false;
