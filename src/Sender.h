@@ -9,7 +9,7 @@
 #include <vector>
 #include <set>
 #include <map>
-#include "Socket.h"
+#include "Connector.h"
 #include "RTMP.h"
 #include "Amf0.h"
 
@@ -73,7 +73,7 @@ namespace relay
         std::mt19937 generator;
         
         Network& network;
-        Socket socket;
+        Connector socket;
         std::string application;
         std::string address;
         bool videoStream = false;
