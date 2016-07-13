@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\Acceptor.cpp" />
     <ClCompile Include="src\Amf0.cpp" />
+    <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network.cpp" />
     <ClCompile Include="src\Receiver.cpp" />
@@ -34,6 +35,7 @@
   <ItemGroup>
     <ClInclude Include="src\Acceptor.h" />
     <ClInclude Include="src\Amf0.h" />
+    <ClInclude Include="src\Connector.h" />
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Network.h" />
     <ClInclude Include="src\Receiver.h" />

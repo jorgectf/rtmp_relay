@@ -25,7 +25,7 @@ namespace relay
 
     bool Relay::init(const std::string& config)
     {
-        std::unique_ptr<FILE, std::function<void(FILE*)>> file(fopen(config.c_str(), "r"), std::fclose);
+        std::unique_ptr<FILE, std::function<int(FILE*)>> file(fopen(config.c_str(), "r"), std::fclose);
         
         if (!file)
         {
