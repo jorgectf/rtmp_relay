@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <functional>
+#include <cstdint>
 
 #ifdef _MSC_VER
 #include <winsock2.h>

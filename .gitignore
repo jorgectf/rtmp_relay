@@ -5,3 +5,5 @@ Release/
 x64/
 rtmp_relay.xcodeproj/project.xcworkspace
 rtmp_relay.xcodeproj/xcuserdata
+rtmp_relay.opensdf
+rtmp_relay.sdf
