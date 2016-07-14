@@ -9,10 +9,10 @@ SRC=src/Amf0.cpp \
 	src/Sender.cpp \
 	src/Server.cpp \
 	src/Utils.cpp \
-	external/Acceptor.cpp \
-	external/Connector.cpp \
-	external/Network.cpp \
-	external/Socket.cpp
+	external/cppsocket/Acceptor.cpp \
+	external/cppsocket/Connector.cpp \
+	external/cppsocket/Network.cpp \
+	external/cppsocket/Socket.cpp
 OBJ=$(SRC:.cpp=.o)
 BINDIR := ./bin
 
