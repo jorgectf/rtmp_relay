@@ -1,7 +1,18 @@
 CC=g++
 CPPFLAGS=-std=c++11 -Wall -I external/rapidjson/include -o $(BINDIR)/$@
 LDFLAGS=
-SRC=$(wildcard src/*.cpp)
+SRC=src/Amf0.cpp \
+	src/main.cpp \
+	src/Receiver.cpp \
+	src/Relay.cpp \
+	src/RTMP.cpp \
+	src/Sender.cpp \
+	src/Server.cpp \
+	src/Utils.cpp \
+	external/Acceptor.cpp \
+	external/Connector.cpp \
+	external/Network.cpp \
+	external/Socket.cpp
 OBJ=$(SRC:.cpp=.o)
 BINDIR := ./bin
 
@@ -17,7 +28,7 @@ rtmp_relay: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -rf src/*.o $(BINDIR)/rtmp_relay $(BINDIR)
+	rm -rf src/*.o external/*.o $(BINDIR)/rtmp_relay $(BINDIR)
 
 directories: ${BINDIR}
 
