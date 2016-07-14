@@ -26,17 +26,21 @@ Connector::~Connector()
 
 Connector::Connector(Connector&& other):
     Socket(std::move(other)),
-    connectCallback(std::move(other.connectCallback))
+    connectCallback(std::move(other.connectCallback)),
+    connectErrorCallback(std::move(other.connectErrorCallback))
 {
     other.connectCallback = nullptr;
+    other.connectErrorCallback = nullptr;
 }
 
 Connector& Connector::operator=(Connector&& other)
 {
     Socket::operator=(std::move(other));
     connectCallback = std::move(other.connectCallback);
+    connectErrorCallback = std::move(other.connectErrorCallback);
 
     other.connectCallback = nullptr;
+    other.connectErrorCallback = nullptr;
 
     return *this;
 }
@@ -117,6 +121,12 @@ bool Connector::connect(uint32_t address, uint16_t newPort)
         else
         {
             std::cerr << "Failed to connect to " << Network::ipToString(ipAddress) << ":" << port << ", error: " << error << std::endl;
+
+            if (connectErrorCallback)
+            {
+                connectErrorCallback();
+            }
+
             return false;
         }
     }
@@ -158,6 +168,11 @@ bool Connector::disconnect()
 void Connector::setConnectCallback(const std::function<void()>& newConnectCallback)
 {
     connectCallback = newConnectCallback;
+}
+
+void Connector::setConnectErrorCallback(const std::function<void()>& newConnectErrorCallback)
+{
+    connectErrorCallback = newConnectErrorCallback;
 }
 
 bool Connector::write()
