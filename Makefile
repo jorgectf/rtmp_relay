@@ -1,5 +1,5 @@
 CC=g++
-CPPFLAGS=-std=c++11 -Wall -I external/rapidjson/include -o $(BINDIR)/$@
+CPPFLAGS=-std=c++11 -Wall -I external/rapidjson/include -I external/cppsocket -o $(BINDIR)/$@
 LDFLAGS=
 SRC=src/Amf0.cpp \
 	src/main.cpp \
