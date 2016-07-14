@@ -13,8 +13,8 @@
 
 namespace relay
 {
-    Receiver::Receiver(Network& pNetwork, Socket pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer):
-        network(pNetwork), socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer)
+    Receiver::Receiver(Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer):
+        socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer)
     {
         socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1));
         socket.setCloseCallback(std::bind(&Receiver::handleClose, this));

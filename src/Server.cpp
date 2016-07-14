@@ -80,7 +80,7 @@ namespace relay
         // accept only one input
         if (receivers.empty())
         {
-            std::unique_ptr<Receiver> receiver(new Receiver(network, std::move(clientSocket), application, shared_from_this()));
+            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, application, shared_from_this()));
             receivers.push_back(std::move(receiver));
 
             open();
