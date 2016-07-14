@@ -19,7 +19,7 @@ namespace relay
     class Receiver
     {
     public:
-        Receiver(Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer);
+        Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer);
         ~Receiver();
         
         Receiver(const Receiver&) = delete;
@@ -55,7 +55,7 @@ namespace relay
         void sendOnFCPublish();
         void sendPublishStatus(double transactionId);
 
-        Socket socket;
+        cppsocket::Socket socket;
         
         std::vector<uint8_t> data;
         

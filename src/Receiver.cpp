@@ -13,7 +13,7 @@
 
 namespace relay
 {
-    Receiver::Receiver(Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer):
+    Receiver::Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer):
         socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer)
     {
         socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1));
@@ -835,7 +835,7 @@ namespace relay
 
     void Receiver::printInfo() const
     {
-        std::cout << "\tReceiver " << (socket.isReady() ? "" : "not ") << "connected to: " << Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        std::cout << "\tReceiver " << (socket.isReady() ? "" : "not ") << "connected to: " << cppsocket::Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {

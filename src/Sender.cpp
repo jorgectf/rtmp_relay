@@ -13,7 +13,7 @@
 
 namespace relay
 {
-    Sender::Sender(Network& pNetwork,
+    Sender::Sender(cppsocket::Network& pNetwork,
                    const std::string& pApplication,
                    const std::string& pAddress,
                    bool videoOutput,
@@ -773,7 +773,7 @@ namespace relay
 
     void Sender::printInfo() const
     {
-        std::cout << "\tSender " << (socket.isReady() ? "" : "not ") << "connected with: " << Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        std::cout << "\tSender " << (socket.isReady() ? "" : "not ") << "connected with: " << cppsocket::Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {

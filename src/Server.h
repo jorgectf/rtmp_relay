@@ -19,7 +19,7 @@ namespace relay
     class Server: public std::enable_shared_from_this<Server>
     {
     public:
-        Server(Network& pNetwork, const std::string& pApplication);
+        Server(cppsocket::Network& pNetwork, const std::string& pApplication);
         ~Server();
         
         Server(const Server&) = delete;
@@ -46,10 +46,10 @@ namespace relay
         void printInfo() const;
         
     protected:
-        void handleAccept(Socket& clientSocket);
+        void handleAccept(cppsocket::Socket& clientSocket);
         
-        Network& network;
-        Acceptor socket;
+        cppsocket::Network& network;
+        cppsocket::Acceptor socket;
         std::string application;
         
         std::vector<std::unique_ptr<Sender>> senders;

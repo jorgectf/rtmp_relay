@@ -32,7 +32,7 @@ namespace relay
         void printInfo() const;
         
     private:
-        Network network;
+        cppsocket::Network network;
         std::vector<std::shared_ptr<Server>> servers;
     };
 }

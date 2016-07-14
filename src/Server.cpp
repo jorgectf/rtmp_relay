@@ -9,7 +9,7 @@
 
 namespace relay
 {
-    Server::Server(Network& pNetwork, const std::string& pApplication):
+    Server::Server(cppsocket::Network& pNetwork, const std::string& pApplication):
         network(pNetwork), socket(pNetwork), application(pApplication)
     {
         socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
@@ -75,7 +75,7 @@ namespace relay
         }
     }
 
-    void Server::handleAccept(Socket& clientSocket)
+    void Server::handleAccept(cppsocket::Socket& clientSocket)
     {
         // accept only one input
         if (receivers.empty())

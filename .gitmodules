@@ -1,3 +1,6 @@
 [submodule "external/rapidjson"]
 	path = external/rapidjson
 	url = https://github.com/miloyip/rapidjson.git
+[submodule "external/cppsocket"]
+	path = external/cppsocket
+	url = https://github.com/elnormous/cppsocket.git

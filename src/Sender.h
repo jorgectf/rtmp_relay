@@ -18,7 +18,7 @@ namespace relay
     class Sender
     {
     public:
-        Sender(Network& pNetwork,
+        Sender(cppsocket::Network& pNetwork,
                const std::string& pApplication,
                const std::string& pAddress,
                bool videoOutput,
@@ -72,8 +72,8 @@ namespace relay
         std::random_device rd;
         std::mt19937 generator;
         
-        Network& network;
-        Connector socket;
+        cppsocket::Network& network;
+        cppsocket::Connector socket;
         std::string application;
         std::string address;
         bool videoStream = false;
