@@ -22,7 +22,7 @@ static void signalHandler(int signo)
 }
 #endif
 
-int main(int argc, const char * argv[])
+int main(int argc, const char* argv[])
 {
     if (argc < 2)
     {
