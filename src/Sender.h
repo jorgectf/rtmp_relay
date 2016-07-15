@@ -24,7 +24,8 @@ namespace relay
                bool videoOutput,
                bool audioOutput,
                bool dataOutput,
-               const std::set<std::string>& pMetaDataBlacklist);
+               const std::set<std::string>& pMetaDataBlacklist,
+               float pReconnectInterval);
         ~Sender();
         
         Sender(const Sender&) = delete;
@@ -80,6 +81,7 @@ namespace relay
         bool audioStream = false;
         bool dataStream = false;
         std::set<std::string> metaDataBlacklist;
+        float reconnectInterval;
         
         std::vector<uint8_t> data;
         

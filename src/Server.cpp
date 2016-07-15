@@ -44,7 +44,9 @@ namespace relay
                 }
             }
 
-            std::unique_ptr<Sender> sender(new Sender(network, application, address, videoOutput, audioOutput, dataOutput, metaDataBlacklist));
+            float reconnectInterval = pushObject.HasMember("reconnectInterval") ? pushObject["reconnectInterval"].GetBool() : 10.0f;
+
+            std::unique_ptr<Sender> sender(new Sender(network, application, address, videoOutput, audioOutput, dataOutput, metaDataBlacklist, reconnectInterval));
             senders.push_back(std::move(sender));
         }
 

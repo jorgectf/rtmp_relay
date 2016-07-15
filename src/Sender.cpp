@@ -19,7 +19,8 @@ namespace relay
                    bool videoOutput,
                    bool audioOutput,
                    bool dataOutput,
-                   const std::set<std::string>& pMetaDataBlacklist):
+                   const std::set<std::string>& pMetaDataBlacklist,
+                   float pReconnectInterval):
         generator(rd()),
         network(pNetwork),
         socket(network),
@@ -28,7 +29,8 @@ namespace relay
         videoStream(videoOutput),
         audioStream(audioOutput),
         dataStream(dataOutput),
-        metaDataBlacklist(pMetaDataBlacklist)
+        metaDataBlacklist(pMetaDataBlacklist),
+        reconnectInterval(pReconnectInterval)
     {
         socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
         socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
