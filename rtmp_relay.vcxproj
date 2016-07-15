@@ -19,31 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Acceptor.cpp" />
+    <ClCompile Include="external\cppsocket\Acceptor.cpp" />
+    <ClCompile Include="external\cppsocket\Connector.cpp" />
+    <ClCompile Include="external\cppsocket\Network.cpp" />
+    <ClCompile Include="external\cppsocket\Socket.cpp" />
     <ClCompile Include="src\Amf0.cpp" />
-    <ClCompile Include="src\Connector.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Network.cpp" />
     <ClCompile Include="src\Receiver.cpp" />
     <ClCompile Include="src\Relay.cpp" />
     <ClCompile Include="src\RTMP.cpp" />
     <ClCompile Include="src\Sender.cpp" />
     <ClCompile Include="src\Server.cpp" />
-    <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Acceptor.h" />
+    <ClInclude Include="external\cppsocket\Acceptor.h" />
+    <ClInclude Include="external\cppsocket\Connector.h" />
+    <ClInclude Include="external\cppsocket\Network.h" />
+    <ClInclude Include="external\cppsocket\Socket.h" />
     <ClInclude Include="src\Amf0.h" />
-    <ClInclude Include="src\Connector.h" />
     <ClInclude Include="src\Constants.h" />
-    <ClInclude Include="src\Network.h" />
     <ClInclude Include="src\Receiver.h" />
     <ClInclude Include="src\Relay.h" />
     <ClInclude Include="src\RTMP.h" />
     <ClInclude Include="src\Sender.h" />
     <ClInclude Include="src\Server.h" />
-    <ClInclude Include="src\Socket.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -99,19 +99,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external\rapidjson\include;$(IncludePath)</IncludePath>
+    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external\rapidjson\include;$(IncludePath)</IncludePath>
+    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>external\rapidjson\include;$(IncludePath)</IncludePath>
+    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>external\rapidjson\include;$(IncludePath)</IncludePath>
+    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
