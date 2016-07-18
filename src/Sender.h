@@ -25,6 +25,7 @@ namespace relay
                bool audioOutput,
                bool dataOutput,
                const std::set<std::string>& pMetaDataBlacklist,
+               float pConnectionTimeout,
                float pReconnectInterval);
         ~Sender();
         
@@ -81,6 +82,7 @@ namespace relay
         bool audioStream = false;
         bool dataStream = false;
         std::set<std::string> metaDataBlacklist;
+        float connectionTimeout;
         float reconnectInterval;
         
         std::vector<uint8_t> data;
@@ -102,5 +104,6 @@ namespace relay
         std::string streamName;
 
         bool streaming = false;
+        float timeSinceDisconnect = 0.0f;
     };
 }
