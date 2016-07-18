@@ -16,6 +16,11 @@ namespace relay
     Receiver::Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer):
         socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer)
     {
+        if (!socket.setBlocking(false))
+        {
+            std::cerr << "Failed to set socket non-blocking" << std::endl;
+        }
+        
         socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1));
         socket.setCloseCallback(std::bind(&Receiver::handleClose, this));
         socket.startRead();

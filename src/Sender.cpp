@@ -34,6 +34,11 @@ namespace relay
         connectionTimeout(pConnectionTimeout),
         reconnectInterval(pReconnectInterval)
     {
+        if (!socket.setBlocking(false))
+        {
+            std::cerr << "Failed to set socket non-blocking" << std::endl;
+        }
+        
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
         socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
@@ -67,11 +72,10 @@ namespace relay
 
     bool Sender::connect()
     {
-        if (!socket.setBlocking(false))
-        {
-            std::cerr << "Failed to set socket non-blocking" << std::endl;
-            return false;
-        }
+        socket.close();
+
+        active = true;
+        timeSinceConnect = 0.0f;
         
         if (!socket.connect(address))
         {
@@ -85,12 +89,24 @@ namespace relay
     {
         std::cerr << "Disconnecting sender" << std::endl;
         socket.close();
+        active = false;
+        connected = false;
         streaming = false;
     }
 
-    void Sender::update()
+    void Sender::update(float delta)
     {
-        
+        if (active && !socket.isReady())
+        {
+            timeSinceConnect += delta;
+
+            if (timeSinceConnect >= reconnectInterval)
+            {
+                socket.connect(address);
+
+                timeSinceConnect = 0.0f;
+            }
+        }
     }
 
     void Sender::handleConnect()
@@ -264,7 +280,10 @@ namespace relay
 
     void Sender::handleClose()
     {
-        
+        if (active)
+        {
+            connect();
+        }
     }
 
     bool Sender::handlePacket(const rtmp::Packet& packet)

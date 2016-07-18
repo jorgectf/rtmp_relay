@@ -38,7 +38,7 @@ namespace relay
         bool connect();
         void disconnect();
 
-        void update();
+        void update(float delta);
         void handleConnect();
         
         bool sendPacket(const std::vector<uint8_t>& packet);
@@ -100,10 +100,11 @@ namespace relay
         std::map<uint32_t, rtmp::Header> receivedPackets;
         std::map<uint32_t, rtmp::Header> sentPackets;
 
+        bool active = false;
         bool connected = false;
         std::string streamName;
 
         bool streaming = false;
-        float timeSinceDisconnect = 0.0f;
+        float timeSinceConnect = 0.0f;
     };
 }

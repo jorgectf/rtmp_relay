@@ -54,11 +54,11 @@ namespace relay
         return true;
     }
 
-    void Server::update()
+    void Server::update(float delta)
     {
         for (const auto& sender : senders)
         {
-            sender->update();
+            sender->update(delta);
         }
         
         for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)

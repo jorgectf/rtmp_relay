@@ -30,7 +30,7 @@ namespace relay
         
         bool init(uint16_t port, const rapidjson::Value& pushArray);
         
-        void update();
+        void update(float delta);
 
         void open();
         void close();

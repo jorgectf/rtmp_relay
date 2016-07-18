@@ -20,7 +20,7 @@ namespace relay
 {
     Relay::Relay()
     {
-        
+        previousTime = cppsocket::Network::getTime();
     }
 
     bool Relay::init(const std::string& config)
@@ -77,11 +77,15 @@ namespace relay
         
         for (;;)
         {
+            uint64_t currentTime = cppsocket::Network::getTime();
+            float delta = static_cast<float>((currentTime - previousTime)) / 1000000.0f;
+            previousTime = currentTime;
+
             network.update();
             
             for (const auto& server : servers)
             {
-                server->update();
+                server->update(delta);
             }
 
             std::this_thread::sleep_for(sleepTime);
