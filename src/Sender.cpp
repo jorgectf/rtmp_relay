@@ -15,24 +15,26 @@ namespace relay
 {
     Sender::Sender(cppsocket::Network& pNetwork,
                    const std::string& pApplication,
-                   const std::string& pAddress,
+                   const std::vector<std::string>& pAddresses,
                    bool videoOutput,
                    bool audioOutput,
                    bool dataOutput,
                    const std::set<std::string>& pMetaDataBlacklist,
                    float pConnectionTimeout,
-                   float pReconnectInterval):
+                   float pReconnectInterval,
+                   uint32_t pReconnectCount):
         generator(rd()),
         network(pNetwork),
         socket(network),
         application(pApplication),
-        address(pAddress),
+        addresses(pAddresses),
         videoStream(videoOutput),
         audioStream(audioOutput),
         dataStream(dataOutput),
         metaDataBlacklist(pMetaDataBlacklist),
         connectionTimeout(pConnectionTimeout),
-        reconnectInterval(pReconnectInterval)
+        reconnectInterval(pReconnectInterval),
+        reconnectCount(pReconnectCount)
     {
         if (!socket.setBlocking(false))
         {
@@ -76,11 +78,32 @@ namespace relay
 
         active = true;
         timeSinceConnect = 0.0f;
-        
+
+        if (connectCount >= reconnectCount)
+        {
+            connectCount = 0;
+            ++addressIndex;
+
+            if (addressIndex >= addresses.size())
+            {
+                addressIndex = 0;
+            }
+        }
+
+        if (addressIndex >= addresses.size())
+        {
+            std::cerr << "Invalid address index" << std::endl;
+            return false;
+        }
+
+        std::string address = addresses[addressIndex];
+
         if (!socket.connect(address))
         {
             return false;
         }
+
+        ++connectCount;
 
         return true;
     }
@@ -102,9 +125,7 @@ namespace relay
 
             if (timeSinceConnect >= reconnectInterval)
             {
-                socket.connect(address);
-
-                timeSinceConnect = 0.0f;
+                connect();
             }
         }
     }

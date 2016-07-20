@@ -28,7 +28,21 @@ namespace relay
         {
             const rapidjson::Value& pushObject = pushArray[pushIndex];
 
-            std::string address = pushObject.HasMember("address") ? pushObject["address"].GetString() : "127.0.0.1:1935";
+            std::vector<std::string> addresses;
+            if (pushObject.HasMember("address"))
+            {
+                const rapidjson::Value& addressArray = pushObject["address"];
+
+                for (rapidjson::SizeType index = 0; index < addressArray.Size(); ++index)
+                {
+                    addresses.push_back(addressArray[index].GetString());
+                }
+            }
+            else
+            {
+                addresses.push_back("127.0.0.1:1935");
+            }
+
             bool videoOutput = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
             bool audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
             bool dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
@@ -44,10 +58,20 @@ namespace relay
                 }
             }
 
-            float connectionTimeout = pushObject.HasMember("connectionTimeout") ? pushObject["connectionTimeout"].GetBool() : 5.0f;
-            float reconnectInterval = pushObject.HasMember("reconnectInterval") ? pushObject["reconnectInterval"].GetBool() : 5.0f;
+            float connectionTimeout = pushObject.HasMember("connectionTimeout") ? pushObject["connectionTimeout"].GetFloat() : 5.0f;
+            float reconnectInterval = pushObject.HasMember("reconnectInterval") ? pushObject["reconnectInterval"].GetFloat() : 5.0f;
+            uint32_t reconnectCount = pushObject.HasMember("reconnectCount") ? pushObject["reconnectCount"].GetUint() : 3;
 
-            std::unique_ptr<Sender> sender(new Sender(network, application, address, videoOutput, audioOutput, dataOutput, metaDataBlacklist, connectionTimeout, reconnectInterval));
+            std::unique_ptr<Sender> sender(new Sender(network,
+                                                      application,
+                                                      addresses,
+                                                      videoOutput,
+                                                      audioOutput,
+                                                      dataOutput,
+                                                      metaDataBlacklist,
+                                                      connectionTimeout,
+                                                      reconnectInterval,
+                                                      reconnectCount));
             senders.push_back(std::move(sender));
         }
 

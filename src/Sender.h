@@ -20,13 +20,14 @@ namespace relay
     public:
         Sender(cppsocket::Network& pNetwork,
                const std::string& pApplication,
-               const std::string& pAddress,
+               const std::vector<std::string>& pAddresses,
                bool videoOutput,
                bool audioOutput,
                bool dataOutput,
                const std::set<std::string>& pMetaDataBlacklist,
                float pConnectionTimeout,
-               float pReconnectInterval);
+               float pReconnectInterval,
+               uint32_t pReconnectCount);
         ~Sender();
         
         Sender(const Sender&) = delete;
@@ -77,13 +78,17 @@ namespace relay
         cppsocket::Network& network;
         cppsocket::Connector socket;
         std::string application;
-        std::string address;
+        std::vector<std::string> addresses;
+        uint32_t addressIndex = 0;
+        uint32_t connectCount = 0;
+
         bool videoStream = false;
         bool audioStream = false;
         bool dataStream = false;
         std::set<std::string> metaDataBlacklist;
         float connectionTimeout;
         float reconnectInterval;
+        uint32_t reconnectCount;
         
         std::vector<uint8_t> data;
         
