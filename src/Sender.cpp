@@ -76,6 +76,13 @@ namespace relay
     {
         socket.close();
 
+        if (addresses.empty())
+        {
+            std::cerr << "No addresses to connect to" << std::endl;
+            return false;
+        }
+
+
         active = true;
         timeSinceConnect = 0.0f;
 
@@ -83,17 +90,11 @@ namespace relay
         {
             connectCount = 0;
             ++addressIndex;
-
-            if (addressIndex >= addresses.size())
-            {
-                addressIndex = 0;
-            }
         }
 
         if (addressIndex >= addresses.size())
         {
-            std::cerr << "Invalid address index" << std::endl;
-            return false;
+            addressIndex = 0;
         }
 
         std::string address = addresses[addressIndex];
