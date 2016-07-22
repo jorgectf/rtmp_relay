@@ -52,7 +52,7 @@ namespace relay
         data.insert(data.end(), newData.begin(), newData.end());
 
 #ifdef DEBUG
-        std::cout << "[" << name << "] " << "Receiver got " << std::to_string(newData.size()) << " bytes" << std::endl;
+        std::cout << "[" << name << "] " << "Got " << std::to_string(newData.size()) << " bytes" << std::endl;
 #endif
         
         uint32_t offset = 0;
@@ -73,7 +73,7 @@ namespace relay
                     
                     if (version != 0x03)
                     {
-                        std::cerr << "[" << name << "] " << "Unsuported version, disconnecting receiver" << std::endl;
+                        std::cerr << "[" << name << "] " << "Unsuported version, disconnecting" << std::endl;
                         socket.close();
                         break;
                     }
@@ -464,7 +464,7 @@ namespace relay
                 {
                     if (argument1["app"].asString() != application)
                     {
-                        std::cerr << "[" << name << "] " << "Wrong application, disconnecting receiver" << std::endl;
+                        std::cerr << "[" << name << "] " << "Wrong application, disconnecting" << std::endl;
                         socket.close();
                         return false;
                     }

@@ -125,7 +125,7 @@ namespace relay
 
     void Sender::disconnect()
     {
-        std::cerr << "[" << name << "] " << "Disconnecting sender" << std::endl;
+        std::cerr << "[" << name << "] " << "Disconnecting" << std::endl;
         reset();
         active = false;
         addressIndex = 0;
@@ -147,7 +147,7 @@ namespace relay
 
     void Sender::handleConnect()
     {
-        std::cout << "[" << name << "] " << "Sender connected" << std::endl;
+        std::cout << "[" << name << "] " << "Connected" << std::endl;
 
         std::vector<uint8_t> version;
         version.push_back(RTMP_VERSION);
@@ -185,7 +185,7 @@ namespace relay
         data.insert(data.end(), newData.begin(), newData.end());
 
 #ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sender got " << std::to_string(newData.size()) << " bytes" << std::endl;
+        std::cout << "[" << name << "] " << "Got " << std::to_string(newData.size()) << " bytes" << std::endl;
 #endif
         
         uint32_t offset = 0;
@@ -206,7 +206,7 @@ namespace relay
                     
                     if (version != 0x03)
                     {
-                        std::cerr << "[" << name << "] " << "Unsuported version, disconnecting sender" << std::endl;
+                        std::cerr << "[" << name << "] " << "Unsuported version, disconnecting" << std::endl;
                         socket.close();
                         break;
                     }
