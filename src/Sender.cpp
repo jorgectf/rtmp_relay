@@ -72,19 +72,33 @@ namespace relay
         
     }
 
-    bool Sender::connect()
+    void Sender::reset()
     {
         socket.close();
+        data.clear();
+
+        state = rtmp::State::UNINITIALIZED;
+        inChunkSize = 128;
+        outChunkSize = 128;
+        active = true;
+        connected = false;
+        streamName.clear();
+        streaming = false;
+        invokeId = 0;
+        invokes.clear();
+    }
+
+    bool Sender::connect()
+    {
+        reset();
+
+        timeSinceConnect = 0.0f;
 
         if (addresses.empty())
         {
             std::cerr << "No addresses to connect to" << std::endl;
             return false;
         }
-
-
-        active = true;
-        timeSinceConnect = 0.0f;
 
         if (connectCount >= reconnectCount)
         {
@@ -112,10 +126,9 @@ namespace relay
     void Sender::disconnect()
     {
         std::cerr << "Disconnecting sender" << std::endl;
-        socket.close();
-        active = false;
-        connected = false;
-        streaming = false;
+        reset();
+        addressIndex = 0;
+        connectCount = 0;
     }
 
     void Sender::update(float delta)

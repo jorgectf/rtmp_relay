@@ -55,6 +55,7 @@ namespace relay
         void sendTextData(const amf0::Node& textData);
         
     private:
+        void reset();
         void handleRead(const std::vector<uint8_t>& newData);
         void handleClose();
 
@@ -77,18 +78,18 @@ namespace relay
         
         cppsocket::Network& network;
         cppsocket::Connector socket;
-        std::string application;
-        std::vector<std::string> addresses;
+        const std::string application;
+        const std::vector<std::string> addresses;
         uint32_t addressIndex = 0;
         uint32_t connectCount = 0;
 
-        bool videoStream = false;
-        bool audioStream = false;
-        bool dataStream = false;
+        const bool videoStream = false;
+        const bool audioStream = false;
+        const bool dataStream = false;
         std::set<std::string> metaDataBlacklist;
-        float connectionTimeout;
-        float reconnectInterval;
-        uint32_t reconnectCount;
+        const float connectionTimeout;
+        const float reconnectInterval;
+        const uint32_t reconnectCount;
         
         std::vector<uint8_t> data;
         
