@@ -18,7 +18,7 @@ namespace relay
 
     class Receiver
     {
-        const std::string name = "Sender";
+        const std::string name = "Receiver";
     public:
         Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer);
         ~Receiver();
