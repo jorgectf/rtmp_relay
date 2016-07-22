@@ -17,6 +17,7 @@ namespace relay
 {
     class Sender
     {
+        const std::string name = "Sender";
     public:
         Sender(cppsocket::Network& pNetwork,
                const std::string& pApplication,

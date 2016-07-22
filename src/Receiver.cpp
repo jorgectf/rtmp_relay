@@ -18,7 +18,7 @@ namespace relay
     {
         if (!socket.setBlocking(false))
         {
-            std::cerr << "Failed to set socket non-blocking" << std::endl;
+            std::cerr << "[" << name << "] " << "Failed to set socket non-blocking" << std::endl;
         }
         
         socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1));
@@ -52,7 +52,7 @@ namespace relay
         data.insert(data.end(), newData.begin(), newData.end());
 
 #ifdef DEBUG
-        std::cout << "Receiver got " << std::to_string(newData.size()) << " bytes" << std::endl;
+        std::cout << "[" << name << "] " << "Receiver got " << std::to_string(newData.size()) << " bytes" << std::endl;
 #endif
         
         uint32_t offset = 0;
@@ -68,12 +68,12 @@ namespace relay
                     offset += sizeof(version);
 
 #ifdef DEBUG
-                    std::cout << "Got version " << static_cast<uint32_t>(version) << std::endl;
+                    std::cout << "[" << name << "] " << "Got version " << static_cast<uint32_t>(version) << std::endl;
 #endif
                     
                     if (version != 0x03)
                     {
-                        std::cerr << "Unsuported version, disconnecting receiver" << std::endl;
+                        std::cerr << "[" << name << "] " << "Unsuported version, disconnecting receiver" << std::endl;
                         socket.close();
                         break;
                     }
@@ -99,7 +99,7 @@ namespace relay
                     offset += sizeof(*challenge);
 
 #ifdef DEBUG
-                    std::cout << "Got challenge message, time: " << challenge->time <<
+                    std::cout << "[" << name << "] " << "Got challenge message, time: " << challenge->time <<
                         ", version: " << static_cast<uint32_t>(challenge->version[0]) << "." <<
                         static_cast<uint32_t>(challenge->version[1]) << "." <<
                         static_cast<uint32_t>(challenge->version[2]) << "." <<
@@ -151,12 +151,12 @@ namespace relay
                     offset += sizeof(*ack);
 
 #ifdef DEBUG
-                    std::cout << "Got Ack message, time: " << ack->time <<
+                    std::cout << "[" << name << "] " << "Got Ack message, time: " << ack->time <<
                         ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
                         static_cast<uint32_t>(ack->version[1]) << "." <<
                         static_cast<uint32_t>(ack->version[2]) << "." <<
                         static_cast<uint32_t>(ack->version[3]) << std::endl;
-                    std::cout << "Handshake done" << std::endl;
+                    std::cout << "[" << name << "] " << "Handshake done" << std::endl;
 #endif
                     
                     state = rtmp::State::HANDSHAKE_DONE;
@@ -175,7 +175,7 @@ namespace relay
                 if (ret > 0)
                 {
 #ifdef DEBUG
-                    std::cout << "Total packet size: " << ret << std::endl;
+                    std::cout << "[" << name << "] " << "Total packet size: " << ret << std::endl;
 #endif
                     
                     offset += ret;
@@ -191,13 +191,13 @@ namespace relay
 
         if (offset > data.size())
         {
-            std::cout << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset << std::endl;
+            std::cout << "[" << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset << std::endl;
         }
 
         data.erase(data.begin(), data.begin() + offset);
 
 #ifdef DEBUG
-        std::cout << "Remaining data " << data.size() << std::endl;
+        std::cout << "[" << name << "] " << "Remaining data " << data.size() << std::endl;
 #endif
     }
 
@@ -209,7 +209,7 @@ namespace relay
             localServer->deleteStream();
         }
 
-        std::cout << "Input disconnected" << std::endl;
+        std::cout << "[" << name << "] " << "Input disconnected" << std::endl;
     }
 
     bool Receiver::handlePacket(const rtmp::Packet& packet)
@@ -228,7 +228,7 @@ namespace relay
                 }
 
 #ifdef DEBUG
-                std::cout << "Chunk size: " << inChunkSize << std::endl;
+                std::cout << "[" << name << "] " << "Chunk size: " << inChunkSize << std::endl;
 #endif
 
                 break;
@@ -259,7 +259,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "Ping type: " << pingType << ", param: " << param << std::endl;
+                std::cout << "[" << name << "] " << "Ping type: " << pingType << ", param: " << param << std::endl;
 #endif
                 break;
             }
@@ -279,7 +279,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "Server bandwidth: " << bandwidth << std::endl;
+                std::cout << "[" << name << "] " << "Server bandwidth: " << bandwidth << std::endl;
 #endif
                 
                 break;
@@ -310,7 +310,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type) << std::endl;
+                std::cout << "[" << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type) << std::endl;
 #endif
 
                 break;
@@ -332,7 +332,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "NOTIFY command: ";
+                std::cout << "[" << name << "] " << "NOTIFY command: ";
                 command.dump();
 #endif
 
@@ -343,7 +343,7 @@ namespace relay
                     offset += ret;
 
 #ifdef DEBUG
-                    std::cout << "Argument 1: ";
+                    std::cout << "[" << name << "] " << "Argument 1: ";
                     argument1.dump();
 #endif
                 }
@@ -355,7 +355,7 @@ namespace relay
                     offset += ret;
 
 #ifdef DEBUG
-                    std::cout << "Argument 2: ";
+                    std::cout << "[" << name << "] " << "Argument 2: ";
                     argument2.dump();
 #endif
                 }
@@ -416,7 +416,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "INVOKE command: ";
+                std::cout << "[" << name << "] " << "INVOKE command: ";
                 command.dump();
 #endif
                 
@@ -432,7 +432,7 @@ namespace relay
                 offset += ret;
 
 #ifdef DEBUG
-                std::cout << "Transaction ID: ";
+                std::cout << "[" << name << "] " << "Transaction ID: ";
                 transactionId.dump();
 #endif
 
@@ -443,7 +443,7 @@ namespace relay
                     offset += ret;
 
 #ifdef DEBUG
-                    std::cout << "Argument 1: ";
+                    std::cout << "[" << name << "] " << "Argument 1: ";
                     argument1.dump();
 #endif
                 }
@@ -455,7 +455,7 @@ namespace relay
                     offset += ret;
                 
 #ifdef DEBUG
-                    std::cout << "Argument 2: ";
+                    std::cout << "[" << name << "] " << "Argument 2: ";
                     argument2.dump();
 #endif
                 }
@@ -464,7 +464,7 @@ namespace relay
                 {
                     if (argument1["app"].asString() != application)
                     {
-                        std::cerr << "Wrong application, disconnecting receiver" << std::endl;
+                        std::cerr << "[" << name << "] " << "Wrong application, disconnecting receiver" << std::endl;
                         socket.close();
                         return false;
                     }
@@ -543,7 +543,7 @@ namespace relay
 
             default:
             {
-                std::cerr << "Unhandled message" << std::endl;
+                std::cerr << "[" << name << "] " << "Unhandled message" << std::endl;
                 break;
             }
         }
@@ -565,7 +565,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending SERVER_BANDWIDTH" << std::endl;
+        std::cout << "[" << name << "] " << "Sending SERVER_BANDWIDTH" << std::endl;
 #endif
 
         socket.send(buffer);
@@ -585,7 +585,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending CLIENT_BANDWIDTH" << std::endl;
+        std::cout << "[" << name << "] " << "Sending CLIENT_BANDWIDTH" << std::endl;
 #endif
 
         socket.send(buffer);
@@ -605,7 +605,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending PING" << std::endl;
+        std::cout << "[" << name << "] " << "Sending PING" << std::endl;
 #endif
 
         socket.send(buffer);
@@ -625,7 +625,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending SET_CHUNK_SIZE" << std::endl;
+        std::cout << "[" << name << "] " << "Sending SET_CHUNK_SIZE" << std::endl;
 #endif
 
         socket.send(buffer);
@@ -660,7 +660,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
 #endif
 
         socket.send(buffer);
@@ -689,7 +689,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
+        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
 #endif
 
         socket.send(buffer);
@@ -717,7 +717,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
 #endif
 
         socket.send(buffer);
@@ -752,7 +752,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
 #endif
 
         socket.send(buffer);
@@ -778,7 +778,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
 #endif
 
         socket.send(buffer);
@@ -798,7 +798,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
 #endif
 
         socket.send(buffer);
@@ -832,7 +832,7 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
 #ifdef DEBUG
-        std::cout << "Sending INVOKE " << commandName.asString() << std::endl;
+        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
 #endif
 
         socket.send(buffer);
@@ -840,7 +840,7 @@ namespace relay
 
     void Receiver::printInfo() const
     {
-        std::cout << "\tReceiver " << (socket.isReady() ? "" : "not ") << "connected to: " << cppsocket::Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        std::cout << "\t[" << name << "] " << (socket.isReady() ? "Connected" : "Not connected") << " to: " << cppsocket::Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {
