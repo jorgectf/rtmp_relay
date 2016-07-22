@@ -80,7 +80,6 @@ namespace relay
         state = rtmp::State::UNINITIALIZED;
         inChunkSize = 128;
         outChunkSize = 128;
-        active = true;
         connected = false;
         streamName.clear();
         streaming = false;
@@ -91,6 +90,7 @@ namespace relay
     bool Sender::connect()
     {
         reset();
+        active = true;
 
         timeSinceConnect = 0.0f;
 
@@ -127,6 +127,7 @@ namespace relay
     {
         std::cerr << "Disconnecting sender" << std::endl;
         reset();
+        active = false;
         addressIndex = 0;
         connectCount = 0;
     }
