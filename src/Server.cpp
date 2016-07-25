@@ -26,26 +26,27 @@ namespace relay
 
         for (uint32_t pushIndex = 0; pushIndex < static_cast<uint32_t>(pushArray.Size()); ++pushIndex)
         {
+            SenderDescriptor senderDescriptor;
+
             const rapidjson::Value& pushObject = pushArray[pushIndex];
 
-            std::vector<std::string> addresses;
             if (pushObject.HasMember("address"))
             {
                 const rapidjson::Value& addressArray = pushObject["address"];
 
                 for (rapidjson::SizeType index = 0; index < addressArray.Size(); ++index)
                 {
-                    addresses.push_back(addressArray[index].GetString());
+                    senderDescriptor.addresses.push_back(addressArray[index].GetString());
                 }
             }
             else
             {
-                addresses.push_back("127.0.0.1:1935");
+                senderDescriptor.addresses.push_back("127.0.0.1:1935");
             }
 
-            bool videoOutput = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
-            bool audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
-            bool dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
+            senderDescriptor.videoOutput = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
+            senderDescriptor.audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
+            senderDescriptor.dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
 
             if (pushObject.HasMember("metaDataBlacklist"))
             {
@@ -54,25 +55,15 @@ namespace relay
                 for (rapidjson::SizeType index = 0; index < metaDataBlacklistArray.Size(); ++index)
                 {
                     const rapidjson::Value& str = metaDataBlacklistArray[index];
-                    metaDataBlacklist.insert(str.GetString());
+                    senderDescriptor.metaDataBlacklist.insert(str.GetString());
                 }
             }
 
-            float connectionTimeout = pushObject.HasMember("connectionTimeout") ? pushObject["connectionTimeout"].GetFloat() : 5.0f;
-            float reconnectInterval = pushObject.HasMember("reconnectInterval") ? pushObject["reconnectInterval"].GetFloat() : 5.0f;
-            uint32_t reconnectCount = pushObject.HasMember("reconnectCount") ? pushObject["reconnectCount"].GetUint() : 3;
+            senderDescriptor.connectionTimeout = pushObject.HasMember("connectionTimeout") ? pushObject["connectionTimeout"].GetFloat() : 5.0f;
+            senderDescriptor.reconnectInterval = pushObject.HasMember("reconnectInterval") ? pushObject["reconnectInterval"].GetFloat() : 5.0f;
+            senderDescriptor.reconnectCount = pushObject.HasMember("reconnectCount") ? pushObject["reconnectCount"].GetUint() : 3;
 
-            std::unique_ptr<Sender> sender(new Sender(network,
-                                                      application,
-                                                      addresses,
-                                                      videoOutput,
-                                                      audioOutput,
-                                                      dataOutput,
-                                                      metaDataBlacklist,
-                                                      connectionTimeout,
-                                                      reconnectInterval,
-                                                      reconnectCount));
-            senders.push_back(std::move(sender));
+            senderDescriptors.push_back(senderDescriptor);
         }
 
         return true;
@@ -110,6 +101,21 @@ namespace relay
             std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, application, shared_from_this()));
             receivers.push_back(std::move(receiver));
 
+            for (const SenderDescriptor& senderDescriptor : senderDescriptors)
+            {
+                std::unique_ptr<Sender> sender(new Sender(network,
+                                                          application,
+                                                          senderDescriptor.addresses,
+                                                          senderDescriptor.videoOutput,
+                                                          senderDescriptor.audioOutput,
+                                                          senderDescriptor.dataOutput,
+                                                          senderDescriptor.metaDataBlacklist,
+                                                          senderDescriptor.connectionTimeout,
+                                                          senderDescriptor.reconnectInterval,
+                                                          senderDescriptor.reconnectCount));
+                senders.push_back(std::move(sender));
+            }
+
             open();
         }
         else
@@ -134,6 +140,8 @@ namespace relay
         {
             sender->disconnect();
         }
+
+        senders.clear();
     }
 
     void Server::createStream(const std::string& streamName)

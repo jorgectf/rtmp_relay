@@ -55,6 +55,18 @@ namespace relay
         std::vector<std::unique_ptr<Sender>> senders;
         std::vector<std::unique_ptr<Receiver>> receivers;
 
-        std::set<std::string> metaDataBlacklist;
+        struct SenderDescriptor
+        {
+            std::vector<std::string> addresses;
+            bool videoOutput;
+            bool audioOutput;
+            bool dataOutput;
+            std::set<std::string> metaDataBlacklist;
+            float connectionTimeout;
+            float reconnectInterval;
+            uint32_t reconnectCount;
+        };
+
+        std::vector<SenderDescriptor> senderDescriptors;
     };
 }
