@@ -17,7 +17,7 @@ namespace relay
                        Server& pServer,
                        const std::string& pApplication,
                        float newPingInterval):
-        socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer), pingInterval(newPingInterval)
+        socket(std::move(pSocket)), generator(rd()), server(pServer), application(pApplication), pingInterval(newPingInterval)
     {
         if (!socket.setBlocking(false))
         {
