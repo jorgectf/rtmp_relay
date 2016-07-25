@@ -20,51 +20,10 @@ namespace relay
         
     }
 
-    bool Server::init(uint16_t port, const rapidjson::Value& pushArray)
+    bool Server::init(uint16_t port, const std::vector<SenderDescriptor>& newSenderDescriptors)
     {
         socket.startAccept(port);
-
-        for (uint32_t pushIndex = 0; pushIndex < static_cast<uint32_t>(pushArray.Size()); ++pushIndex)
-        {
-            SenderDescriptor senderDescriptor;
-
-            const rapidjson::Value& pushObject = pushArray[pushIndex];
-
-            if (pushObject.HasMember("address"))
-            {
-                const rapidjson::Value& addressArray = pushObject["address"];
-
-                for (rapidjson::SizeType index = 0; index < addressArray.Size(); ++index)
-                {
-                    senderDescriptor.addresses.push_back(addressArray[index].GetString());
-                }
-            }
-            else
-            {
-                senderDescriptor.addresses.push_back("127.0.0.1:1935");
-            }
-
-            senderDescriptor.videoOutput = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
-            senderDescriptor.audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
-            senderDescriptor.dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
-
-            if (pushObject.HasMember("metaDataBlacklist"))
-            {
-                const rapidjson::Value& metaDataBlacklistArray = pushObject["metaDataBlacklist"];
-
-                for (rapidjson::SizeType index = 0; index < metaDataBlacklistArray.Size(); ++index)
-                {
-                    const rapidjson::Value& str = metaDataBlacklistArray[index];
-                    senderDescriptor.metaDataBlacklist.insert(str.GetString());
-                }
-            }
-
-            senderDescriptor.connectionTimeout = pushObject.HasMember("connectionTimeout") ? pushObject["connectionTimeout"].GetFloat() : 5.0f;
-            senderDescriptor.reconnectInterval = pushObject.HasMember("reconnectInterval") ? pushObject["reconnectInterval"].GetFloat() : 5.0f;
-            senderDescriptor.reconnectCount = pushObject.HasMember("reconnectCount") ? pushObject["reconnectCount"].GetUint() : 3;
-
-            senderDescriptors.push_back(senderDescriptor);
-        }
+        senderDescriptors = newSenderDescriptors;
 
         return true;
     }

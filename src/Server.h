@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <rapidjson/document.h>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -19,6 +18,18 @@ namespace relay
     class Server: public std::enable_shared_from_this<Server>
     {
     public:
+        struct SenderDescriptor
+        {
+            std::vector<std::string> addresses;
+            bool videoOutput;
+            bool audioOutput;
+            bool dataOutput;
+            std::set<std::string> metaDataBlacklist;
+            float connectionTimeout;
+            float reconnectInterval;
+            uint32_t reconnectCount;
+        };
+
         Server(cppsocket::Network& pNetwork, const std::string& pApplication);
         ~Server();
         
@@ -28,7 +39,7 @@ namespace relay
         Server(Server&& other) = delete;
         Server& operator=(Server&& other) = delete;
         
-        bool init(uint16_t port, const rapidjson::Value& pushArray);
+        bool init(uint16_t port, const std::vector<SenderDescriptor>& newSenderDescriptors);
         
         void update(float delta);
 
@@ -54,18 +65,6 @@ namespace relay
         
         std::vector<std::unique_ptr<Sender>> senders;
         std::vector<std::unique_ptr<Receiver>> receivers;
-
-        struct SenderDescriptor
-        {
-            std::vector<std::string> addresses;
-            bool videoOutput;
-            bool audioOutput;
-            bool dataOutput;
-            std::set<std::string> metaDataBlacklist;
-            float connectionTimeout;
-            float reconnectInterval;
-            uint32_t reconnectCount;
-        };
 
         std::vector<SenderDescriptor> senderDescriptors;
     };
