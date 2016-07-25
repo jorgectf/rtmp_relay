@@ -46,7 +46,7 @@ namespace relay
             }
             else
             {
-                close();
+                senders.clear();
                 receiverIterator = receivers.erase(receiverIterator);
             }
         }
@@ -59,6 +59,8 @@ namespace relay
         {
             std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, application, shared_from_this()));
             receivers.push_back(std::move(receiver));
+
+            senders.clear();
 
             for (const SenderDescriptor& senderDescriptor : senderDescriptors)
             {
@@ -77,33 +79,11 @@ namespace relay
 
                 senders.push_back(std::move(sender));
             }
-
-            open();
         }
         else
         {
             clientSocket.close();
         }
-    }
-
-    void Server::open()
-    {
-        close();
-        
-        for (const auto& sender : senders)
-        {
-            sender->connect();
-        }
-    }
-
-    void Server::close()
-    {
-        for (const auto& sender : senders)
-        {
-            sender->disconnect();
-        }
-
-        senders.clear();
     }
 
     void Server::createStream(const std::string& streamName)

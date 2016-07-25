@@ -43,9 +43,6 @@ namespace relay
         
         void update(float delta);
 
-        void open();
-        void close();
-
         void createStream(const std::string& streamName);
         void deleteStream();
         void unpublishStream();
