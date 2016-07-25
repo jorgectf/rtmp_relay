@@ -53,7 +53,7 @@ namespace relay
 
     void Receiver::update(float delta)
     {
-        if (pingInterval > 0.0f)
+        if (socket.isReady() && pingInterval > 0.0f)
         {
             timeSincePing += delta;
 
