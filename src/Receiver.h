@@ -22,6 +22,8 @@ namespace relay
     public:
         Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer);
         ~Receiver();
+
+        void reset();
         
         Receiver(const Receiver&) = delete;
         Receiver& operator=(const Receiver&) = delete;
@@ -77,7 +79,7 @@ namespace relay
         std::map<uint32_t, rtmp::Header> receivedPackets;
         std::map<uint32_t, rtmp::Header> sentPackets;
 
-        std::string application;
+        const std::string application;
         std::string streamName;
 
         std::weak_ptr<Server> server;

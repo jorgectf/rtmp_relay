@@ -31,6 +31,22 @@ namespace relay
         
     }
 
+    void Receiver::reset()
+    {
+        socket.close();
+        data.clear();
+
+        state = rtmp::State::UNINITIALIZED;
+        inChunkSize = 128;
+        outChunkSize = 128;
+        streamName.clear();
+        invokeId = 0;
+        invokes.clear();
+        receivedPackets.clear();
+        sentPackets.clear();
+        metaData = amf0::Node();
+    }
+
     void Receiver::update()
     {
         
@@ -208,6 +224,8 @@ namespace relay
             localServer->unpublishStream();
             localServer->deleteStream();
         }
+
+        reset();
 
         std::cout << "[" << name << "] " << "Input disconnected" << std::endl;
     }
