@@ -20,7 +20,7 @@ namespace relay
     {
         const std::string name = "Receiver";
     public:
-        Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer);
+        Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer, float newPingInterval);
         ~Receiver();
 
         void reset();
@@ -31,7 +31,7 @@ namespace relay
         Receiver(Receiver&& other) = delete;
         Receiver& operator=(Receiver&& other) = delete;
         
-        void update();
+        void update(float delta);
         
         bool getPacket(std::vector<uint8_t>& packet);
         
@@ -81,6 +81,8 @@ namespace relay
 
         const std::string application;
         std::string streamName;
+        const float pingInterval;
+        float timeSincePing = 0.0f;
 
         std::weak_ptr<Server> server;
 

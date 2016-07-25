@@ -9,23 +9,21 @@
 
 namespace relay
 {
-    Server::Server(cppsocket::Network& pNetwork, const std::string& pApplication):
-        network(pNetwork), socket(pNetwork), application(pApplication)
+    Server::Server(cppsocket::Network& pNetwork,
+                   const std::string& pApplication,
+                   uint16_t port,
+                   const std::vector<SenderDescriptor>& newSenderDescriptors,
+                   float newPingInterval):
+        network(pNetwork), socket(pNetwork), application(pApplication), senderDescriptors(newSenderDescriptors), pingInterval(newPingInterval)
     {
         socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
+
+        socket.startAccept(port);
     }
 
     Server::~Server()
     {
         
-    }
-
-    bool Server::init(uint16_t port, const std::vector<SenderDescriptor>& newSenderDescriptors)
-    {
-        socket.startAccept(port);
-        senderDescriptors = newSenderDescriptors;
-
-        return true;
     }
 
     void Server::update(float delta)
@@ -41,7 +39,7 @@ namespace relay
 
             if (receiver->isConnected())
             {
-                receiver->update();
+                receiver->update(delta);
                 ++receiverIterator;
             }
             else
@@ -57,7 +55,7 @@ namespace relay
         // accept only one input
         if (receivers.empty())
         {
-            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, application, shared_from_this()));
+            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, application, shared_from_this(), pingInterval));
             receivers.push_back(std::move(receiver));
 
             senders.clear();

@@ -13,8 +13,11 @@
 
 namespace relay
 {
-    Receiver::Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer):
-        socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer)
+    Receiver::Receiver(cppsocket::Socket& pSocket,
+                       const std::string& pApplication,
+                       const std::shared_ptr<Server>& pServer,
+                       float newPingInterval):
+        socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer), pingInterval(newPingInterval)
     {
         if (!socket.setBlocking(false))
         {
@@ -47,9 +50,18 @@ namespace relay
         metaData = amf0::Node();
     }
 
-    void Receiver::update()
+    void Receiver::update(float delta)
     {
-        
+        if (pingInterval > 0.0f)
+        {
+            timeSincePing += delta;
+
+            while (timeSincePing >= pingInterval)
+            {
+                timeSincePing -= pingInterval;
+                sendPing();
+            }
+        }
     }
 
     bool Receiver::getPacket(std::vector<uint8_t>& packet)

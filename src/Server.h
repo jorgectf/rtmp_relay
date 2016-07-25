@@ -30,7 +30,7 @@ namespace relay
             uint32_t reconnectCount;
         };
 
-        Server(cppsocket::Network& pNetwork, const std::string& pApplication);
+        Server(cppsocket::Network& pNetwork, const std::string& pApplication, uint16_t port, const std::vector<SenderDescriptor>& newSenderDescriptors, float newPingInterval);
         ~Server();
         
         Server(const Server&) = delete;
@@ -38,8 +38,6 @@ namespace relay
         
         Server(Server&& other) = delete;
         Server& operator=(Server&& other) = delete;
-        
-        bool init(uint16_t port, const std::vector<SenderDescriptor>& newSenderDescriptors);
         
         void update(float delta);
 
@@ -58,11 +56,11 @@ namespace relay
         
         cppsocket::Network& network;
         cppsocket::Acceptor socket;
-        std::string application;
+        const std::string application;
+        const std::vector<SenderDescriptor> senderDescriptors;
+        const float pingInterval;
         
         std::vector<std::unique_ptr<Sender>> senders;
         std::vector<std::unique_ptr<Receiver>> receivers;
-
-        std::vector<SenderDescriptor> senderDescriptors;
     };
 }
