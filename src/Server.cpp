@@ -113,6 +113,9 @@ namespace relay
                                                           senderDescriptor.connectionTimeout,
                                                           senderDescriptor.reconnectInterval,
                                                           senderDescriptor.reconnectCount));
+
+                sender->connect();
+
                 senders.push_back(std::move(sender));
             }
 
