@@ -33,7 +33,7 @@ namespace relay
         
     private:
         cppsocket::Network network;
-        std::vector<std::shared_ptr<Server>> servers;
+        std::vector<std::unique_ptr<Server>> servers;
         uint64_t previousTime;
     };
 }

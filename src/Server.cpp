@@ -55,7 +55,7 @@ namespace relay
         // accept only one input
         if (receivers.empty())
         {
-            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, application, shared_from_this(), pingInterval));
+            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, *this, application, pingInterval));
             receivers.push_back(std::move(receiver));
 
             senders.clear();

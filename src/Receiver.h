@@ -20,7 +20,10 @@ namespace relay
     {
         const std::string name = "Receiver";
     public:
-        Receiver(cppsocket::Socket& pSocket, const std::string& pApplication, const std::shared_ptr<Server>& pServer, float newPingInterval);
+        Receiver(cppsocket::Socket& pSocket,
+                 Server& pServer,
+                 const std::string& pApplication,
+                 float newPingInterval);
         ~Receiver();
 
         void reset();
@@ -79,12 +82,12 @@ namespace relay
         std::map<uint32_t, rtmp::Header> receivedPackets;
         std::map<uint32_t, rtmp::Header> sentPackets;
 
+        Server& server;
         const std::string application;
+        
         std::string streamName;
         const float pingInterval;
         float timeSincePing = 0.0f;
-
-        std::weak_ptr<Server> server;
 
         amf0::Node metaData;
     };

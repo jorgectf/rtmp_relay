@@ -14,8 +14,8 @@
 namespace relay
 {
     Receiver::Receiver(cppsocket::Socket& pSocket,
+                       Server& pServer,
                        const std::string& pApplication,
-                       const std::shared_ptr<Server>& pServer,
                        float newPingInterval):
         socket(std::move(pSocket)), generator(rd()), application(pApplication), server(pServer), pingInterval(newPingInterval)
     {
@@ -232,11 +232,8 @@ namespace relay
 
     void Receiver::handleClose()
     {
-        if (auto localServer = server.lock())
-        {
-            localServer->unpublishStream();
-            localServer->deleteStream();
-        }
+        server.unpublishStream();
+        server.deleteStream();
 
         reset();
 
@@ -396,17 +393,11 @@ namespace relay
                     metaData = argument2;
 
                     // forward notify packet
-                    if (auto localServer = server.lock())
-                    {
-                        localServer->sendMetaData(metaData);
-                    }
+                    server.sendMetaData(metaData);
                 }
                 else if (command.asString() == "onTextData")
                 {
-                    if (auto localServer = server.lock())
-                    {
-                        localServer->sendTextData(argument1);
-                    }
+                    server.sendTextData(argument1);
                 }
                 break;
             }
@@ -414,20 +405,14 @@ namespace relay
             case rtmp::MessageType::AUDIO_PACKET:
             {
                 // forward audio packet
-                if (auto localServer = server.lock())
-                {
-                    localServer->sendAudio(packet.timestamp, packet.data);
-                }
+                server.sendAudio(packet.timestamp, packet.data);
                 break;
             }
 
             case rtmp::MessageType::VIDEO_PACKET:
             {
                 // forward video packet
-                if (auto localServer = server.lock())
-                {
-                    localServer->sendVideo(packet.timestamp, packet.data);
-                }
+                server.sendVideo(packet.timestamp, packet.data);
                 break;
             }
 
@@ -521,26 +506,17 @@ namespace relay
                 }
                 else if (command.asString() == "deleteStream")
                 {
-                    if (auto localServer = server.lock())
-                    {
-                        localServer->deleteStream();
-                    }
+                    server.deleteStream();
                 }
                 else if (command.asString() == "FCPublish")
                 {
                     sendOnFCPublish();
                     streamName = argument2.asString();
-                    if (auto localServer = server.lock())
-                    {
-                        localServer->createStream(streamName);
-                    }
+                    server.createStream(streamName);
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
-                    if (auto localServer = server.lock())
-                    {
-                        localServer->unpublishStream();
-                    }
+                    server.unpublishStream();
                 }
                 else if (command.asString() == "publish")
                 {

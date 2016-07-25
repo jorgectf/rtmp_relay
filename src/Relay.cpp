@@ -102,7 +102,7 @@ namespace relay
             uint16_t port = serverObject.HasMember("port") ? static_cast<uint16_t>(serverObject["port"].GetInt()) : 1935;
             float pingInterval = serverObject.HasMember("pingInterval") ? serverObject["pingInterval"].GetFloat() : 60.0f;
 
-            std::shared_ptr<Server> server = std::make_shared<Server>(network, application, port, senderDescriptors, pingInterval);
+            std::unique_ptr<Server> server(new Server(network, application, port, senderDescriptors, pingInterval));
             servers.push_back(std::move(server));
         }
         
