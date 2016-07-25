@@ -16,14 +16,14 @@ namespace relay
     class Relay
     {
     public:
-        Relay();
+        Relay(cppsocket::Network& pNetwork);
         ~Relay();
         
         Relay(const Relay&) = delete;
         Relay& operator=(const Relay&) = delete;
         
-        Relay(Relay&&) = delete;
-        Relay& operator=(Relay&&) = delete;
+        Relay(Relay&&);
+        Relay& operator=(Relay&&);
         
         bool init(const std::string& config);
         
@@ -32,7 +32,7 @@ namespace relay
         void printInfo() const;
         
     private:
-        cppsocket::Network network;
+        cppsocket::Network& network;
         std::vector<std::unique_ptr<Server>> servers;
         uint64_t previousTime;
     };

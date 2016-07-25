@@ -18,9 +18,25 @@ static char TEMP_BUFFER[65536];
 
 namespace relay
 {
-    Relay::Relay()
+    Relay::Relay(cppsocket::Network& pNetwork):
+        network(pNetwork)
     {
         previousTime = cppsocket::Network::getTime();
+    }
+
+    Relay::Relay(Relay&& other):
+        network(other.network),
+        servers(std::move(other.servers)),
+        previousTime(other.previousTime)
+    {
+    }
+
+    Relay& Relay::operator=(Relay&& other)
+    {
+        servers = std::move(other.servers);
+        previousTime = other.previousTime;
+
+        return *this;
     }
 
     bool Relay::init(const std::string& config)

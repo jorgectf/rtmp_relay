@@ -6,7 +6,8 @@
 #include <signal.h>
 #include "Relay.h"
 
-relay::Relay rel;
+cppsocket::Network network;
+relay::Relay rel(network);
 
 #ifndef _MSC_VER
 static void signalHandler(int signo)
