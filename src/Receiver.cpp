@@ -48,6 +48,7 @@ namespace relay
         receivedPackets.clear();
         sentPackets.clear();
         metaData = amf0::Node();
+        timeSincePing = 0.0f;
     }
 
     void Receiver::update(float delta)
