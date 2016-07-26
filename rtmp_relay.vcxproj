@@ -23,6 +23,33 @@
     <ClCompile Include="external\cppsocket\Connector.cpp" />
     <ClCompile Include="external\cppsocket\Network.cpp" />
     <ClCompile Include="external\cppsocket\Socket.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\binary.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\convert.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\directives.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\emit.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\emitfromevents.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\emitter.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\emitterstate.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\emitterutils.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\exp.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\memory.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\node.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\nodebuilder.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\nodeevents.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\node_data.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\null.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\ostream_wrapper.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\parse.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\parser.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\regex_yaml.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\scanner.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\scanscalar.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\scantag.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\scantoken.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\simplekey.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\singledocparser.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\stream.cpp" />
+    <ClCompile Include="external\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="src\Amf0.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Receiver.cpp" />
@@ -37,6 +64,27 @@
     <ClInclude Include="external\cppsocket\Connector.h" />
     <ClInclude Include="external\cppsocket\Network.h" />
     <ClInclude Include="external\cppsocket\Socket.h" />
+    <ClInclude Include="external\yaml-cpp\src\collectionstack.h" />
+    <ClInclude Include="external\yaml-cpp\src\directives.h" />
+    <ClInclude Include="external\yaml-cpp\src\emitterstate.h" />
+    <ClInclude Include="external\yaml-cpp\src\emitterutils.h" />
+    <ClInclude Include="external\yaml-cpp\src\exp.h" />
+    <ClInclude Include="external\yaml-cpp\src\indentation.h" />
+    <ClInclude Include="external\yaml-cpp\src\nodebuilder.h" />
+    <ClInclude Include="external\yaml-cpp\src\nodeevents.h" />
+    <ClInclude Include="external\yaml-cpp\src\ptr_vector.h" />
+    <ClInclude Include="external\yaml-cpp\src\regeximpl.h" />
+    <ClInclude Include="external\yaml-cpp\src\regex_yaml.h" />
+    <ClInclude Include="external\yaml-cpp\src\scanner.h" />
+    <ClInclude Include="external\yaml-cpp\src\scanscalar.h" />
+    <ClInclude Include="external\yaml-cpp\src\scantag.h" />
+    <ClInclude Include="external\yaml-cpp\src\setting.h" />
+    <ClInclude Include="external\yaml-cpp\src\singledocparser.h" />
+    <ClInclude Include="external\yaml-cpp\src\stream.h" />
+    <ClInclude Include="external\yaml-cpp\src\streamcharsource.h" />
+    <ClInclude Include="external\yaml-cpp\src\stringsource.h" />
+    <ClInclude Include="external\yaml-cpp\src\tag.h" />
+    <ClInclude Include="external\yaml-cpp\src\token.h" />
     <ClInclude Include="src\Amf0.h" />
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Receiver.h" />
@@ -99,19 +147,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
+    <IncludePath>external\cppsocket;external\yaml-cpp\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
+    <IncludePath>external\cppsocket;external\yaml-cpp\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
+    <IncludePath>external\cppsocket;external\yaml-cpp\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>external\rapidjson\include;external\cppsocket;$(IncludePath)</IncludePath>
+    <IncludePath>external\cppsocket;external\yaml-cpp\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
