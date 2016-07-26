@@ -237,7 +237,7 @@ namespace relay
 
         reset();
 
-        std::cout << "[" << name << "] " << "Disconnected" << std::endl;
+        std::cout << "[" << name << "] " << "Input disconnected" << std::endl;
     }
 
     bool Receiver::handlePacket(const rtmp::Packet& packet)
