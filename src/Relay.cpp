@@ -8,13 +8,9 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/filereadstream.h>
-#include <rapidjson/document.h>
+#include "yaml-cpp/yaml.h"
 #include "Relay.h"
 #include "Server.h"
-
-static char TEMP_BUFFER[65536];
 
 namespace relay
 {
@@ -41,51 +37,44 @@ namespace relay
 
     bool Relay::init(const std::string& config)
     {
-        std::unique_ptr<FILE, std::function<int(FILE*)>> file(fopen(config.c_str(), "r"), std::fclose);
-        
-        if (!file)
+        YAML::Node document;
+
+        try
+        {
+            document = YAML::LoadFile(config);
+        }
+        catch (std::exception)
         {
             std::cerr << "Failed to open file" << std::endl;
             return false;
         }
         
-        rapidjson::FileReadStream is(file.get(), TEMP_BUFFER, sizeof(TEMP_BUFFER));
+        const YAML::Node& serversArray = document["servers"];
         
-        rapidjson::Document document;
-        document.ParseStream<0>(is);
-        
-        if (document.HasParseError())
+        for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
-            std::cerr << "Failed to open file" << std::endl;
-            return false;
-        }
-        
-        const rapidjson::Value& serversArray = document["servers"];
-        
-        for (rapidjson::SizeType serverIndex = 0; serverIndex < serversArray.Size(); ++serverIndex)
-        {
-            const rapidjson::Value& serverObject = serversArray[serverIndex];
+            const YAML::Node& serverObject = serversArray[serverIndex];
             
             std::vector<std::string> pushAddresses;
 
-            std::string application = serverObject["application"].GetString();
-            const rapidjson::Value& pushArray = serverObject["push"];
+            std::string application = serverObject["application"].as<std::string>();
+            const YAML::Node& pushArray = serverObject["push"];
 
             std::vector<Server::SenderDescriptor> senderDescriptors;
 
-            for (uint32_t pushIndex = 0; pushIndex < static_cast<uint32_t>(pushArray.Size()); ++pushIndex)
+            for (size_t pushIndex = 0; pushIndex < pushArray.size(); ++pushIndex)
             {
                 Server::SenderDescriptor senderDescriptor;
 
-                const rapidjson::Value& pushObject = pushArray[pushIndex];
+                const YAML::Node& pushObject = pushArray[pushIndex];
 
-                if (pushObject.HasMember("address"))
+                if (pushObject["address"])
                 {
-                    const rapidjson::Value& addressArray = pushObject["address"];
+                    const YAML::Node& addressArray = pushObject["address"];
 
-                    for (rapidjson::SizeType index = 0; index < addressArray.Size(); ++index)
+                    for (size_t index = 0; index < addressArray.size(); ++index)
                     {
-                        senderDescriptor.addresses.push_back(addressArray[index].GetString());
+                        senderDescriptor.addresses.push_back(addressArray[index].as<std::string>());
                     }
                 }
                 else
@@ -93,30 +82,30 @@ namespace relay
                     senderDescriptor.addresses.push_back("127.0.0.1:1935");
                 }
 
-                senderDescriptor.videoOutput = pushObject.HasMember("video") ? pushObject["video"].GetBool() : true;
-                senderDescriptor.audioOutput = pushObject.HasMember("audio") ? pushObject["audio"].GetBool() : true;
-                senderDescriptor.dataOutput = pushObject.HasMember("data") ? pushObject["data"].GetBool() : true;
+                senderDescriptor.videoOutput = pushObject["video"] ? pushObject["video"].as<bool>() : true;
+                senderDescriptor.audioOutput = pushObject["audio"] ? pushObject["audio"].as<bool>() : true;
+                senderDescriptor.dataOutput = pushObject["data"] ? pushObject["data"].as<bool>() : true;
 
-                if (pushObject.HasMember("metaDataBlacklist"))
+                if (pushObject["metaDataBlacklist"])
                 {
-                    const rapidjson::Value& metaDataBlacklistArray = pushObject["metaDataBlacklist"];
+                    const YAML::Node& metaDataBlacklistArray = pushObject["metaDataBlacklist"];
 
-                    for (rapidjson::SizeType index = 0; index < metaDataBlacklistArray.Size(); ++index)
+                    for (size_t index = 0; index < metaDataBlacklistArray.size(); ++index)
                     {
-                        const rapidjson::Value& str = metaDataBlacklistArray[index];
-                        senderDescriptor.metaDataBlacklist.insert(str.GetString());
+                        const YAML::Node& str = metaDataBlacklistArray[index];
+                        senderDescriptor.metaDataBlacklist.insert(str.as<std::string>());
                     }
                 }
 
-                senderDescriptor.connectionTimeout = pushObject.HasMember("connectionTimeout") ? pushObject["connectionTimeout"].GetFloat() : 5.0f;
-                senderDescriptor.reconnectInterval = pushObject.HasMember("reconnectInterval") ? pushObject["reconnectInterval"].GetFloat() : 5.0f;
-                senderDescriptor.reconnectCount = pushObject.HasMember("reconnectCount") ? pushObject["reconnectCount"].GetUint() : 3;
+                senderDescriptor.connectionTimeout = pushObject["connectionTimeout"] ? pushObject["connectionTimeout"].as<float>() : 5.0f;
+                senderDescriptor.reconnectInterval = pushObject["reconnectInterval"] ? pushObject["reconnectInterval"].as<float>() : 5.0f;
+                senderDescriptor.reconnectCount = pushObject["reconnectCount"] ? pushObject["reconnectCount"].as<uint32_t>() : 3;
                 
                 senderDescriptors.push_back(senderDescriptor);
             }
 
-            uint16_t port = serverObject.HasMember("port") ? static_cast<uint16_t>(serverObject["port"].GetInt()) : 1935;
-            float pingInterval = serverObject.HasMember("pingInterval") ? serverObject["pingInterval"].GetFloat() : 60.0f;
+            uint16_t port = serverObject["port"] ? serverObject["port"].as<uint16_t>() : 1935;
+            float pingInterval = serverObject["pingInterval"] ? serverObject["pingInterval"].as<float>() : 60.0f;
 
             std::unique_ptr<Server> server(new Server(network, application, port, senderDescriptors, pingInterval));
             servers.push_back(std::move(server));
