@@ -55,7 +55,7 @@ rtmp_relay: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -rf src/*.o external/*.o $(BINDIR)/rtmp_relay $(BINDIR)
+	rm -rf src/*.o external/cppsocket/*.o external/yaml-cpp/src/*.o $(BINDIR)/rtmp_relay $(BINDIR)
 
 directories: ${BINDIR}
 
