@@ -559,7 +559,7 @@ namespace relay
                 
             default:
             {
-                std::cerr << "[" << name << "] " << "Unhandled message" << std::endl;
+                std::cerr << "[" << name << "] " << "Unhandled message: %d" << static_cast<uint32_t>(packet.messageType) << std::endl;
                 break;
             }
         }
