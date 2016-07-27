@@ -345,6 +345,23 @@ namespace relay
                 break;
             }
 
+            case rtmp::MessageType::BYTES_READ:
+            {
+                uint32_t offset = 0;
+                uint32_t bytesRead;
+
+                uint32_t ret = decodeInt(packet.data, offset, 4, bytesRead);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+#ifdef DEBUG
+                std::cout << "[" << name << "] " << "Bytes read: " << bytesRead << std::endl;
+#endif
+                break;
+            }
+
             case rtmp::MessageType::PING:
             {
                 uint32_t offset = 0;
