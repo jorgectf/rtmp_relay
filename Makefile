@@ -42,12 +42,12 @@ SOURCES=src/Amf0.cpp \
 	external/yaml-cpp/src/tag.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
-BINDIR := ./bin
+BINDIR=./bin
 EXECUTABLE=rtmp_relay
 
 all: directories $(SOURCES) $(EXECUTABLE)
 
-debug: CXXFLAGS += -DDEBUG -g
+debug: CXXFLAGS+=-DDEBUG -g
 debug: directories $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
