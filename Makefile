@@ -48,7 +48,7 @@ EXECUTABLE=rtmp_relay
 all: directories $(SOURCES) $(EXECUTABLE)
 
 debug: CXXFLAGS += -DDEBUG -g
-debug: directories $(EXECUTABLE)
+debug: directories $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(OBJECTS) $(LDFLAGS) -o $(BINDIR)/$@
