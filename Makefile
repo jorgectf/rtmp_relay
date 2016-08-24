@@ -1,7 +1,7 @@
-CC=g++
-CPPFLAGS=-std=c++11 -Wall -I external/cppsocket -I external/yaml-cpp/include -o $(BINDIR)/$@
+CXXFLAGS=-std=c++11 -Wall -I external/cppsocket -I external/yaml-cpp/include -o $(BINDIR)/$@
 LDFLAGS=
-SRC=src/Amf0.cpp \
+
+SOURCES=src/Amf0.cpp \
 	src/main.cpp \
 	src/Receiver.cpp \
 	src/Relay.cpp \
@@ -40,22 +40,26 @@ SRC=src/Amf0.cpp \
 	external/yaml-cpp/src/singledocparser.cpp \
 	external/yaml-cpp/src/stream.cpp \
 	external/yaml-cpp/src/tag.cpp
-OBJ=$(SRC:.cpp=.o)
-BINDIR := ./bin
+OBJECTS=$(SOURCES:.cpp=.o)
 
-all: directories rtmp_relay
+BINDIR := ./bin
+EXECUTABLE=rtmp_relay
+
+all: directories $(EXECUTABLE)
 
 debug: CXXFLAGS += -DDEBUG -g
-debug: CCFLAGS += -DDEBUG -g
-debug: directories rtmp_relay
+debug: directories $(EXECUTABLE)
 
-rtmp_relay: $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $(BINDIR)/$@
+$(EXECUTABLE): $(OBJECTS)
+	$(CXX) $(OBJECTS) $(LDFLAGS) -o $(BINDIR)/$@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 .PHONY: clean
 
 clean:
-	rm -rf src/*.o external/cppsocket/*.o external/yaml-cpp/src/*.o $(BINDIR)/rtmp_relay $(BINDIR)
+	rm -rf src/*.o external/cppsocket/*.o external/yaml-cpp/src/*.o $(BINDIR)/$(EXECUTABLE) $(BINDIR)
 
 directories: ${BINDIR}
 
