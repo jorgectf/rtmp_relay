@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++11 -Wall -I external/cppsocket -I external/yaml-cpp/include -o $(BINDIR)/$@
+CXXFLAGS=-c -std=c++11 -Wall -I external/cppsocket -I external/yaml-cpp/include
 LDFLAGS=
 
 SOURCES=src/Amf0.cpp \
