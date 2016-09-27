@@ -15,9 +15,8 @@ namespace relay
 {
     Receiver::Receiver(cppsocket::Socket& pSocket,
                        Server& pServer,
-                       const std::string& pApplication,
                        float newPingInterval):
-        socket(std::move(pSocket)), generator(rd()), server(pServer), application(pApplication), pingInterval(newPingInterval)
+        socket(std::move(pSocket)), generator(rd()), server(pServer), pingInterval(newPingInterval)
     {
         if (!socket.setBlocking(false))
         {
@@ -495,9 +494,10 @@ namespace relay
 
                 if (command.asString() == "connect")
                 {
-                    if (argument1["app"].asString() != application)
+                    std::cerr << "[" << name << "] " << "Wrong application, disconnecting" << std::endl;
+
+                    if (!server.connect(argument1["app"].asString()))
                     {
-                        std::cerr << "[" << name << "] " << "Wrong application, disconnecting" << std::endl;
                         socket.close();
                         return false;
                     }

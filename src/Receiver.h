@@ -22,7 +22,6 @@ namespace relay
     public:
         Receiver(cppsocket::Socket& pSocket,
                  Server& pServer,
-                 const std::string& pApplication,
                  float newPingInterval);
         ~Receiver();
 
@@ -83,7 +82,6 @@ namespace relay
         std::map<uint32_t, rtmp::Header> sentPackets;
 
         Server& server;
-        const std::string application;
         
         std::string streamName;
         const float pingInterval;

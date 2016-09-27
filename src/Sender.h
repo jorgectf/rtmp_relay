@@ -91,11 +91,11 @@ namespace relay
         const float connectionTimeout;
         const float reconnectInterval;
         const uint32_t reconnectCount;
-        
+
         std::vector<uint8_t> data;
-        
+
         rtmp::State state = rtmp::State::UNINITIALIZED;
-        
+
         uint32_t inChunkSize = 128;
         uint32_t outChunkSize = 128;
 

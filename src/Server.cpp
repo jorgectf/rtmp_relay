@@ -6,15 +6,15 @@
 #include <iostream>
 #include <algorithm>
 #include "Server.h"
+#include "Application.h"
 
 namespace relay
 {
     Server::Server(cppsocket::Network& pNetwork,
-                   const std::string& pApplication,
                    uint16_t port,
-                   const std::vector<SenderDescriptor>& newSenderDescriptors,
-                   float newPingInterval):
-        network(pNetwork), socket(pNetwork), application(pApplication), senderDescriptors(newSenderDescriptors), pingInterval(newPingInterval)
+                   float newPingInterval,
+                   const std::vector<ApplicationDescriptor>& newApplicationDescriptors):
+        network(pNetwork), socket(pNetwork), pingInterval(newPingInterval), applicationDescriptors(newApplicationDescriptors)
     {
         socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 
@@ -28,10 +28,7 @@ namespace relay
 
     void Server::update(float delta)
     {
-        for (const auto& sender : senders)
-        {
-            sender->update(delta);
-        }
+        if (application) application->update(delta);
         
         for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
         {
@@ -44,7 +41,7 @@ namespace relay
             }
             else
             {
-                senders.clear();
+                application.reset();
                 receiverIterator = receivers.erase(receiverIterator);
             }
         }
@@ -55,28 +52,10 @@ namespace relay
         // accept only one input
         if (receivers.empty())
         {
-            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, *this, application, pingInterval));
+            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, *this, pingInterval));
             receivers.push_back(std::move(receiver));
 
-            senders.clear();
-
-            for (const SenderDescriptor& senderDescriptor : senderDescriptors)
-            {
-                std::unique_ptr<Sender> sender(new Sender(network,
-                                                          application,
-                                                          senderDescriptor.addresses,
-                                                          senderDescriptor.videoOutput,
-                                                          senderDescriptor.audioOutput,
-                                                          senderDescriptor.dataOutput,
-                                                          senderDescriptor.metaDataBlacklist,
-                                                          senderDescriptor.connectionTimeout,
-                                                          senderDescriptor.reconnectInterval,
-                                                          senderDescriptor.reconnectCount));
-
-                sender->connect();
-
-                senders.push_back(std::move(sender));
-            }
+            application.reset();
         }
         else
         {
@@ -84,76 +63,71 @@ namespace relay
         }
     }
 
+    bool Server::connect(const std::string& applicationName)
+    {
+        for (const ApplicationDescriptor& applicationDescriptor : applicationDescriptors)
+        {
+            if (applicationDescriptor.name.empty() ||
+                applicationDescriptor.name == applicationName)
+            {
+                application.reset(new Application(network, applicationDescriptor, applicationName));
+
+                return true;
+            }
+        }
+
+        // failed to connect
+        return false;
+    }
+
     void Server::createStream(const std::string& streamName)
     {
-        for (const auto& sender : senders)
-        {
-            sender->createStream(streamName);
-        }
+        if (application) application->createStream(streamName);
     }
 
     void Server::deleteStream()
     {
-        for (const auto& sender : senders)
-        {
-            sender->deleteStream();
-        }
+        if (application) application->deleteStream();
     }
 
     void Server::unpublishStream()
     {
-        for (const auto& sender : senders)
-        {
-            sender->unpublishStream();
-        }
+        if (application) application->unpublishStream();
     }
 
     void Server::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        for (const auto& sender : senders)
-        {
-            sender->sendAudio(timestamp, audioData);
-        }
+        if (application) application->sendAudio(timestamp, audioData);
     }
 
     void Server::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        for (const auto& sender : senders)
-        {
-            sender->sendVideo(timestamp, videoData);
-        }
+        if (application) application->sendVideo(timestamp, videoData);
     }
 
     void Server::sendMetaData(const amf0::Node& metaData)
     {
-        for (const auto& sender : senders)
-        {
-            sender->sendMetaData(metaData);
-        }
+        if (application) application->sendMetaData(metaData);
     }
 
     void Server::sendTextData(const amf0::Node& textData)
     {
-        for (const auto& sender : senders)
-        {
-            sender->sendTextData(textData);
-        }
+        if (application) application->sendTextData(textData);
     }
 
     void Server::printInfo() const
     {
-        std::cout << "Server listening on " << socket.getPort() << ", application: " << application << std::endl;
-
-        std::cout << "Senders:" << std::endl;
-        for (const auto& sender : senders)
-        {
-            sender->printInfo();
-        }
+        std::cout << "Server listening on " << socket.getPort() << std::endl;
 
         std::cout << "Receivers:" << std::endl;
         for (const auto& receiver : receivers)
         {
             receiver->printInfo();
+        }
+
+        if (application)
+        {
+            application->printInfo();
         }
     }
 }

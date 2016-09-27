@@ -2,6 +2,7 @@ CXXFLAGS=-c -std=c++11 -Wall -I external/cppsocket -I external/yaml-cpp/include
 LDFLAGS=
 
 SOURCES=src/Amf0.cpp \
+	src/Application.cpp \
 	src/main.cpp \
 	src/Receiver.cpp \
 	src/Relay.cpp \

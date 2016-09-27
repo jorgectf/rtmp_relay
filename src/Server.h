@@ -15,22 +15,33 @@
 
 namespace relay
 {
+    struct SenderDescriptor
+    {
+        std::vector<std::string> addresses;
+        bool videoOutput;
+        bool audioOutput;
+        bool dataOutput;
+        std::set<std::string> metaDataBlacklist;
+        float connectionTimeout;
+        float reconnectInterval;
+        uint32_t reconnectCount;
+    };
+
+    struct ApplicationDescriptor
+    {
+        std::string name;
+        std::vector<SenderDescriptor> senderDescriptors;
+    };
+
+    class Application;
+    
     class Server
     {
     public:
-        struct SenderDescriptor
-        {
-            std::vector<std::string> addresses;
-            bool videoOutput;
-            bool audioOutput;
-            bool dataOutput;
-            std::set<std::string> metaDataBlacklist;
-            float connectionTimeout;
-            float reconnectInterval;
-            uint32_t reconnectCount;
-        };
-
-        Server(cppsocket::Network& pNetwork, const std::string& pApplication, uint16_t port, const std::vector<SenderDescriptor>& newSenderDescriptors, float newPingInterval);
+        Server(cppsocket::Network& pNetwork,
+               uint16_t port,
+               float newPingInterval,
+               const std::vector<ApplicationDescriptor>& newApplicationDescriptors);
         ~Server();
         
         Server(const Server&) = delete;
@@ -40,6 +51,8 @@ namespace relay
         Server& operator=(Server&& other) = delete;
         
         void update(float delta);
+
+        bool connect(const std::string& applicationName);
 
         void createStream(const std::string& streamName);
         void deleteStream();
@@ -56,11 +69,11 @@ namespace relay
         
         cppsocket::Network& network;
         cppsocket::Acceptor socket;
-        const std::string application;
-        const std::vector<SenderDescriptor> senderDescriptors;
+        const std::vector<ApplicationDescriptor> applicationDescriptors;
         const float pingInterval;
         
-        std::vector<std::unique_ptr<Sender>> senders;
         std::vector<std::unique_ptr<Receiver>> receivers;
+
+        std::unique_ptr<Application> application;
     };
 }
