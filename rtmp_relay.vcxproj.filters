@@ -102,6 +102,7 @@
     <ClCompile Include="external\yaml-cpp\src\tag.cpp">
       <Filter>yaml-cpp</Filter>
     </ClCompile>
+    <ClCompile Include="src\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Amf0.h" />
@@ -187,6 +188,7 @@
     <ClInclude Include="external\yaml-cpp\src\token.h">
       <Filter>yaml-cpp</Filter>
     </ClInclude>
+    <ClInclude Include="src\Application.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">
