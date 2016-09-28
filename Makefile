@@ -57,10 +57,10 @@ $(EXECUTABLE): $(OBJECTS)
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $< -o $@
 
-prefix=/usr/local
+prefix=/usr/bin
 
 install:
-	install -m 0755 $(BINDIR)/$(EXECUTABLE) $(prefix)/bin
+	install -m 0755 $(BINDIR)/$(EXECUTABLE) $(prefix)
 
 .PHONY: install
 
