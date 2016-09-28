@@ -65,7 +65,7 @@ install:
 .PHONY: install
 
 uninstall:
-	rm -f $(prefix)/bin/$(EXECUTABLE)
+	rm -f $(prefix)/$(EXECUTABLE)
 
 .PHONY: uninstall
 
