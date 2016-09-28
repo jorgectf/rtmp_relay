@@ -68,7 +68,7 @@ $(phony uninstall):
 $(phony clean):
 	rm -rf src/*.o external/cppsocket/*.o external/yaml-cpp/src/*.o $(BINDIR)/$(EXECUTABLE) $(BINDIR)
 
-$(phony directories): ${BINDIR}
+directories: ${BINDIR}
 
 ${BINDIR}: 
 	mkdir -p ${BINDIR}
