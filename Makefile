@@ -58,12 +58,12 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 prefix=/usr/local
-    
+
 $(phony install):
-    install -m 0755 $(BINDIR)/$(EXECUTABLE) $(prefix)/bin
+	install -m 0755 $(BINDIR)/$(EXECUTABLE) $(prefix)/bin
 
 $(phony uninstall):
-    rm -f $(prefix)/bin/$(EXECUTABLE)
+	rm -f $(prefix)/bin/$(EXECUTABLE)
 
 $(phony clean):
 	rm -rf src/*.o external/cppsocket/*.o external/yaml-cpp/src/*.o $(BINDIR)/$(EXECUTABLE) $(BINDIR)
