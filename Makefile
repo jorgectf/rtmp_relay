@@ -59,16 +59,24 @@ $(EXECUTABLE): $(OBJECTS)
 
 prefix=/usr/local
 
-$(phony install):
+install:
 	install -m 0755 $(BINDIR)/$(EXECUTABLE) $(prefix)/bin
 
-$(phony uninstall):
+.PHONY: install
+
+uninstall:
 	rm -f $(prefix)/bin/$(EXECUTABLE)
 
-$(phony clean):
+.PHONY: uninstall
+
+clean:
 	rm -rf src/*.o external/cppsocket/*.o external/yaml-cpp/src/*.o $(BINDIR)/$(EXECUTABLE) $(BINDIR)
 
+.PHONY: clean
+
 directories: ${BINDIR}
+
+.PHONY: directories
 
 ${BINDIR}: 
 	mkdir -p ${BINDIR}
