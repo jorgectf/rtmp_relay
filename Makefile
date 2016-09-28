@@ -60,6 +60,7 @@ $(EXECUTABLE): $(OBJECTS)
 prefix=/usr/bin
 
 install:
+	mkdir -p $(prefix)
 	install -m 0755 $(BINDIR)/$(EXECUTABLE) $(prefix)
 
 .PHONY: install
