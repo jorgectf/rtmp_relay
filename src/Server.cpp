@@ -11,14 +11,14 @@
 namespace relay
 {
     Server::Server(cppsocket::Network& pNetwork,
-                   uint16_t port,
+                   const std::string& address,
                    float newPingInterval,
                    const std::vector<ApplicationDescriptor>& newApplicationDescriptors):
         network(pNetwork), socket(pNetwork), pingInterval(newPingInterval), applicationDescriptors(newApplicationDescriptors)
     {
         socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 
-        socket.startAccept(port);
+        socket.startAccept(address);
     }
 
     Server::~Server()

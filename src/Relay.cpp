@@ -116,10 +116,10 @@ namespace relay
                 applicationDescriptors.push_back(applicationDescriptor);
             }
 
-            uint16_t port = serverObject["port"] ? serverObject["port"].as<uint16_t>() : 1935;
+            std::string address = serverObject["listen"] ? serverObject["listen"].as<std::string>() : "0.0.0.0:1935";
             float pingInterval = serverObject["pingInterval"] ? serverObject["pingInterval"].as<float>() : 60.0f;
 
-            std::unique_ptr<Server> server(new Server(network, port, pingInterval, applicationDescriptors));
+            std::unique_ptr<Server> server(new Server(network, address, pingInterval, applicationDescriptors));
             servers.push_back(std::move(server));
         }
         

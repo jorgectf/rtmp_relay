@@ -39,7 +39,7 @@ namespace relay
     {
     public:
         Server(cppsocket::Network& pNetwork,
-               uint16_t port,
+               const std::string& address,
                float newPingInterval,
                const std::vector<ApplicationDescriptor>& newApplicationDescriptors);
         ~Server();
