@@ -69,8 +69,8 @@ namespace relay
         
         cppsocket::Network& network;
         cppsocket::Acceptor socket;
-        const std::vector<ApplicationDescriptor> applicationDescriptors;
         const float pingInterval;
+        const std::vector<ApplicationDescriptor> applicationDescriptors;
         
         std::vector<std::unique_ptr<Receiver>> receivers;
 
