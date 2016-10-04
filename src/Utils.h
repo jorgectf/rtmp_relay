@@ -104,3 +104,13 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
     
     return sizeof(double);
 }
+
+enum LogLevel
+{
+    LOG_LEVEL_ERROR,
+    LOG_LEVEL_WARNING,
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_VERBOSE
+};
+
+void log(LogLevel level, const char* format, ...);
