@@ -2,6 +2,7 @@
 //  rtmp_relay
 //
 
+#include <cstdarg>
 #if defined(__APPLE__) || defined(__linux__)
 #include <sys/syslog.h>
 #elif defined(_MSC_VER)
