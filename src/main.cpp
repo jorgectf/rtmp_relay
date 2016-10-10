@@ -3,11 +3,14 @@
 //
 
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <signal.h>
 
 #include <sys/stat.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <fcntl.h>
 
 #include "Relay.h"
