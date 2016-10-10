@@ -37,6 +37,8 @@ namespace relay
 
     bool Relay::init(const std::string& config)
     {
+        servers.clear();
+
         YAML::Node document;
 
         try
