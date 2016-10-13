@@ -9,6 +9,8 @@
 #include "RTMP.h"
 #include "Utils.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
     namespace rtmp

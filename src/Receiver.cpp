@@ -12,9 +12,11 @@
 #include "Log.h"
 #include "Utils.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
-    Receiver::Receiver(cppsocket::Socket& pSocket,
+    Receiver::Receiver(Socket& pSocket,
                        Server& pServer,
                        float newPingInterval):
         socket(std::move(pSocket)), generator(rd()), server(pServer), pingInterval(newPingInterval)
@@ -811,7 +813,7 @@ namespace relay
     void Receiver::printInfo() const
     {
         Log log(Log::Level::INFO);
-        log << "\t[" << name << "] " << (socket.isReady() ? "Connected" : "Not connected") << " to: " << cppsocket::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        log << "\t[" << name << "] " << (socket.isReady() ? "Connected" : "Not connected") << " to: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {

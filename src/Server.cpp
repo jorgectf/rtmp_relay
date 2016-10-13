@@ -9,9 +9,11 @@
 #include "Application.h"
 #include "Log.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
-    Server::Server(cppsocket::Network& pNetwork,
+    Server::Server(Network& pNetwork,
                    const std::string& address,
                    float newPingInterval,
                    const std::vector<ApplicationDescriptor>& newApplicationDescriptors):
@@ -48,7 +50,7 @@ namespace relay
         }
     }
 
-    void Server::handleAccept(cppsocket::Socket& clientSocket)
+    void Server::handleAccept(Socket& clientSocket)
     {
         // accept only one input
         if (receivers.empty())

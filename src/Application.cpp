@@ -6,6 +6,8 @@
 #include "Application.h"
 #include "Log.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
     Application::Application(cppsocket::Network& pNetwork,

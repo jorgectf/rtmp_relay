@@ -17,6 +17,7 @@
 #include "Log.h"
 
 using namespace relay;
+using namespace cppsocket;
 
 static std::string config;
 cppsocket::Network network;

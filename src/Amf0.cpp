@@ -8,6 +8,8 @@
 #include "Log.h"
 #include "Utils.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
     namespace amf0

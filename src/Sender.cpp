@@ -12,9 +12,11 @@
 #include "Network.h"
 #include "Utils.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
-    Sender::Sender(cppsocket::Network& pNetwork,
+    Sender::Sender(Network& pNetwork,
                    const std::string& pApplication,
                    const std::vector<std::string>& pAddresses,
                    bool videoOutput,
@@ -808,7 +810,7 @@ namespace relay
     void Sender::printInfo() const
     {
         Log log(Log::Level::INFO);
-        log << "\t[" << name << "] "<< (socket.isReady() ? "Connected" : "Not connected") << " to: " << cppsocket::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        log << "\t[" << name << "] "<< (socket.isReady() ? "Connected" : "Not connected") << " to: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {

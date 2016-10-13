@@ -13,9 +13,11 @@
 #include "Relay.h"
 #include "Server.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
-    Relay::Relay(cppsocket::Network& pNetwork):
+    Relay::Relay(Network& pNetwork):
         network(pNetwork)
     {
         previousTime = std::chrono::steady_clock::now();
