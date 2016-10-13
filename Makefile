@@ -12,6 +12,7 @@ SOURCES=src/Amf0.cpp \
 	src/Utils.cpp \
 	external/cppsocket/Acceptor.cpp \
 	external/cppsocket/Connector.cpp \
+	external/cppsocket/Log.cpp \
 	external/cppsocket/Network.cpp \
 	external/cppsocket/Socket.cpp \
 	external/yaml-cpp/src/binary.cpp \

@@ -10,6 +10,7 @@
 		3009340D1C873DF200CC50D3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3009340C1C873DF200CC50D3 /* main.cpp */; };
 		300934151C874CBA00CC50D3 /* Relay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300934131C874CBA00CC50D3 /* Relay.cpp */; };
 		300934181C8852D800CC50D3 /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300934161C8852D800CC50D3 /* Server.cpp */; };
+		3030D5141DAF8C94007CC8EB /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3030D5121DAF8C94007CC8EB /* Log.cpp */; };
 		304B286D1C9C3ED900BA162D /* RTMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 304B286B1C9C3ED900BA162D /* RTMP.cpp */; };
 		304B28721C9C6AC800BA162D /* Amf0.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 304B28701C9C6AC800BA162D /* Amf0.cpp */; };
 		30563F441D993D2400CE4D04 /* Application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30563F421D993D2400CE4D04 /* Application.cpp */; };
@@ -68,6 +69,8 @@
 		300934141C874CBA00CC50D3 /* Relay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Relay.h; sourceTree = "<group>"; };
 		300934161C8852D800CC50D3 /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cpp; sourceTree = "<group>"; };
 		300934171C8852D800CC50D3 /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
+		3030D5121DAF8C94007CC8EB /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
+		3030D5131DAF8C94007CC8EB /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		304B27821C96DDB700BA162D /* RTMP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RTMP.h; sourceTree = "<group>"; };
 		304B286B1C9C3ED900BA162D /* RTMP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTMP.cpp; sourceTree = "<group>"; };
 		304B28701C9C6AC800BA162D /* Amf0.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Amf0.cpp; sourceTree = "<group>"; };
@@ -201,6 +204,8 @@
 				30BB18B61D47A40B00102062 /* Acceptor.h */,
 				30BB18B71D47A40B00102062 /* Connector.cpp */,
 				30BB18B81D47A40B00102062 /* Connector.h */,
+				3030D5121DAF8C94007CC8EB /* Log.cpp */,
+				3030D5131DAF8C94007CC8EB /* Log.h */,
 				30BB18B91D47A40B00102062 /* Network.cpp */,
 				30BB18BA1D47A40B00102062 /* Network.h */,
 				30BB18BB1D47A40B00102062 /* Socket.cpp */,
@@ -337,6 +342,7 @@
 				30563F441D993D2400CE4D04 /* Application.cpp in Sources */,
 				30FA80E51C8DB57300F2695E /* Receiver.cpp in Sources */,
 				30BB19041D47A43800102062 /* parser.cpp in Sources */,
+				3030D5141DAF8C94007CC8EB /* Log.cpp in Sources */,
 				30BB19071D47A43800102062 /* scanscalar.cpp in Sources */,
 				30BB190B1D47A43800102062 /* singledocparser.cpp in Sources */,
 				30BB18F31D47A43800102062 /* binary.cpp in Sources */,

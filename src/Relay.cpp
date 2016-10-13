@@ -17,7 +17,7 @@ namespace relay
     Relay::Relay(cppsocket::Network& pNetwork):
         network(pNetwork)
     {
-        previousTime = cppsocket::Network::getTime();
+        previousTime = std::chrono::steady_clock::now();
     }
 
     Relay::Relay(Relay&& other):
@@ -139,8 +139,8 @@ namespace relay
         
         for (;;)
         {
-            uint64_t currentTime = cppsocket::Network::getTime();
-            float delta = static_cast<float>((currentTime - previousTime)) / 1000000.0f;
+            auto currentTime = std::chrono::steady_clock::now();
+            float delta = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - previousTime).count() / 1000000.0f;
             previousTime = currentTime;
 
             network.update();

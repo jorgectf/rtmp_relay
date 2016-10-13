@@ -864,7 +864,7 @@ namespace relay
 
     void Receiver::printInfo() const
     {
-        std::cout << "\t[" << name << "] " << (socket.isReady() ? "Connected" : "Not connected") << " to: " << cppsocket::Network::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        std::cout << "\t[" << name << "] " << (socket.isReady() ? "Connected" : "Not connected") << " to: " << cppsocket::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {

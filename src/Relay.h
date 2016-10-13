@@ -34,6 +34,6 @@ namespace relay
     private:
         cppsocket::Network& network;
         std::vector<std::unique_ptr<Server>> servers;
-        uint64_t previousTime;
+        std::chrono::steady_clock::time_point previousTime;
     };
 }
