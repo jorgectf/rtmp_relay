@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "Server.h"
 #include "Application.h"
+#include "Log.h"
 
 namespace relay
 {
@@ -117,9 +118,9 @@ namespace relay
 
     void Server::printInfo() const
     {
-        std::cout << "Server listening on " << socket.getPort() << std::endl;
+        Log(Log::Level::INFO) << "Server listening on " << socket.getPort();
 
-        std::cout << "Receivers:" << std::endl;
+        Log(Log::Level::INFO) << "Receivers:";
         for (const auto& receiver : receivers)
         {
             receiver->printInfo();

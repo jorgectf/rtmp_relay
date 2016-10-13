@@ -14,10 +14,13 @@
 #include <fcntl.h>
 
 #include "Relay.h"
+#include "Log.h"
+
+using namespace relay;
 
 static std::string config;
 cppsocket::Network network;
-relay::Relay rel(network);
+Relay rel(network);
 
 #ifndef _MSC_VER
 static void signalHandler(int signo)
@@ -28,7 +31,7 @@ static void signalHandler(int signo)
             // rehash the server
             if (!rel.init(config))
             {
-                std::cerr << "Failed to reload config" << std::endl;
+                Log(Log::Level::ERR) << "Failed to reload config";
                 exit(EXIT_FAILURE);
             }
             break;
@@ -40,7 +43,7 @@ static void signalHandler(int signo)
             rel.printInfo();
             break;
         case SIGPIPE:
-            std::cerr << "Received SIGPIPE" << std::endl;
+            Log(Log::Level::ERR) << "Received SIGPIPE";
             break;
     }
 }
@@ -52,7 +55,7 @@ static int daemonize(const char* lock_file)
     char str[256] = {0};
     if (pid < 0)
     {
-        std::cerr << "Failed to fork process" << std::endl;
+        Log(Log::Level::ERR) << "Failed to fork process";
         exit(EXIT_FAILURE);
     }
     if (pid > 0) exit(EXIT_SUCCESS); // parent process
@@ -71,13 +74,13 @@ static int daemonize(const char* lock_file)
 
     if (lfp < 0)
     {
-        std::cerr << "Failed to open lock file" << std::endl;
+        Log(Log::Level::ERR) << "Failed to open lock file";
         exit(EXIT_FAILURE);
     }
 
     if (lockf(lfp, F_TLOCK, 0) < 0)
     {
-        std::cerr << "Failed to lock the file" << std::endl;
+        Log(Log::Level::ERR) << "Failed to lock the file";
         exit(EXIT_SUCCESS);
     }
 
@@ -87,25 +90,25 @@ static int daemonize(const char* lock_file)
     // ignore child terminate signal
     if (signal(SIGCHLD, SIG_IGN) == SIG_ERR)
     {
-        std::cerr << "Failed to ignore SIGCHLD" << std::endl;
+        Log(Log::Level::ERR) << "Failed to ignore SIGCHLD";
         exit(EXIT_FAILURE);
     }
 
     // hangup signal
     if (signal(SIGHUP, signalHandler) == SIG_ERR)
     {
-        std::cerr << "Failed to capure SIGHUP" << std::endl;
+        Log(Log::Level::ERR) << "Failed to capure SIGHUP";
         exit(EXIT_FAILURE);
     }
 
     // software termination signal from kill
     if (signal(SIGTERM, signalHandler) == SIG_ERR)
     {
-        std::cerr << "Failed to capure SIGTERM" << std::endl;
+        Log(Log::Level::ERR) << "Failed to capure SIGTERM";
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "Daemon started, pid: " << getpid() << std::endl;
+    Log(Log::Level::INFO) << "Daemon started, pid: " << getpid();
 
     return EXIT_SUCCESS;
 }
@@ -128,21 +131,21 @@ int main(int argc, const char* argv[])
         else if (strcmp(argv[i], "--help") == 0)
         {
             const char* exe = argc >= 1 ? argv[0] : "rtmp_relay";
-            std::cout << "Usage: " << exe << " --config <path to config file>" << std::endl;
+            Log(Log::Level::INFO) << "Usage: " << exe << " --config <path to config file>";
             return EXIT_SUCCESS;
         }
     }
 
     if (config.empty())
     {
-        std::cerr << "No config file" << std::endl;
+        Log(Log::Level::ERR) << "No config file";
         return EXIT_FAILURE;
     }
 
     if (daemon)
     {
 #ifdef _MSC_VER
-        std::cerr << "Daemon not supported on Windows" << std::endl;
+        Log(Log::Level::ERR) << "Daemon not supported on Windows" << std::endl;
         return EXIT_FAILURE;
 #else
         if (daemonize("/var/run/rtmp_relay.pid") == -1) return EXIT_FAILURE;
@@ -152,20 +155,20 @@ int main(int argc, const char* argv[])
 #ifndef _MSC_VER
     if (signal(SIGUSR1, signalHandler) == SIG_ERR)
     {
-        std::cerr << "Failed to capure SIGUSR1" << std::endl;
+        Log(Log::Level::ERR) << "Failed to capure SIGUSR1";
         return EXIT_FAILURE;
     }
 
     if (signal(SIGPIPE, signalHandler) == SIG_ERR)
     {
-        std::cerr << "Failed to capure SIGPIPE" << std::endl;
+        Log(Log::Level::ERR) << "Failed to capure SIGPIPE";
         return EXIT_FAILURE;
     }
 #endif
     
     if (!rel.init(config))
     {
-        std::cerr << "Failed to init relay" << std::endl;
+        Log(Log::Level::ERR) << "Failed to init relay";
         return EXIT_FAILURE;
     }
     

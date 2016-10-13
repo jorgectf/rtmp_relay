@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include "Amf0.h"
 #include "Network.h"
+#include "Log.h"
 #include "Utils.h"
 
 namespace relay
@@ -20,7 +21,7 @@ namespace relay
     {
         if (!socket.setBlocking(false))
         {
-            std::cerr << "[" << name << "] " << "Failed to set socket non-blocking" << std::endl;
+            Log(Log::Level::ERR) << "[" << name << "] " << "Failed to set socket non-blocking";
         }
         
         socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1));
@@ -79,9 +80,7 @@ namespace relay
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Got " << std::to_string(newData.size()) << " bytes" << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Got " << std::to_string(newData.size()) << " bytes";
         
         uint32_t offset = 0;
         
@@ -95,13 +94,11 @@ namespace relay
                     uint8_t version = static_cast<uint8_t>(*(data.data() + offset));
                     offset += sizeof(version);
 
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Got version " << static_cast<uint32_t>(version) << std::endl;
-#endif
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Got version " << static_cast<uint32_t>(version);
                     
                     if (version != 0x03)
                     {
-                        std::cerr << "[" << name << "] " << "Unsuported version, disconnecting" << std::endl;
+                        Log(Log::Level::ERR) << "[" << name << "] " << "Unsuported version, disconnecting";
                         socket.close();
                         break;
                     }
@@ -126,13 +123,11 @@ namespace relay
                     rtmp::Challenge* challenge = reinterpret_cast<rtmp::Challenge*>(data.data() + offset);
                     offset += sizeof(*challenge);
 
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Got challenge message, time: " << challenge->time <<
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Got challenge message, time: " << challenge->time <<
                         ", version: " << static_cast<uint32_t>(challenge->version[0]) << "." <<
                         static_cast<uint32_t>(challenge->version[1]) << "." <<
                         static_cast<uint32_t>(challenge->version[2]) << "." <<
-                        static_cast<uint32_t>(challenge->version[3]) << std::endl;
-#endif
+                        static_cast<uint32_t>(challenge->version[3]);
                     
                     // S1
                     rtmp::Challenge replyChallenge;
@@ -178,14 +173,12 @@ namespace relay
                     rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                     offset += sizeof(*ack);
 
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Got Ack message, time: " << ack->time <<
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Got Ack message, time: " << ack->time <<
                         ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
                         static_cast<uint32_t>(ack->version[1]) << "." <<
                         static_cast<uint32_t>(ack->version[2]) << "." <<
-                        static_cast<uint32_t>(ack->version[3]) << std::endl;
-                    std::cout << "[" << name << "] " << "Handshake done" << std::endl;
-#endif
+                        static_cast<uint32_t>(ack->version[3]);
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Handshake done";
                     
                     state = rtmp::State::HANDSHAKE_DONE;
                 }
@@ -202,9 +195,7 @@ namespace relay
 
                 if (ret > 0)
                 {
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Total packet size: " << ret << std::endl;
-#endif
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Total packet size: " << ret;
                     
                     offset += ret;
 
@@ -219,14 +210,12 @@ namespace relay
 
         if (offset > data.size())
         {
-            std::cout << "[" << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset << std::endl;
+            Log(Log::Level::INFO) << "[" << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
         }
 
         data.erase(data.begin(), data.begin() + offset);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Remaining data " << data.size() << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Remaining data " << data.size();
     }
 
     void Receiver::handleClose()
@@ -236,7 +225,7 @@ namespace relay
 
         reset();
 
-        std::cout << "[" << name << "] " << "Input disconnected" << std::endl;
+        Log(Log::Level::INFO) << "[" << name << "] " << "Input disconnected";
     }
 
     bool Receiver::handlePacket(const rtmp::Packet& packet)
@@ -254,9 +243,7 @@ namespace relay
                     return false;
                 }
 
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "Chunk size: " << inChunkSize << std::endl;
-#endif
+                Log(Log::Level::ALL) << "[" << name << "] " << "Chunk size: " << inChunkSize;
 
                 break;
             }
@@ -272,9 +259,9 @@ namespace relay
                 {
                     return false;
                 }
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "Bytes read: " << bytesRead << std::endl;
-#endif
+
+                Log(Log::Level::ALL) << "[" << name << "] " << "Bytes read: " << bytesRead;
+
                 break;
             }
 
@@ -302,9 +289,8 @@ namespace relay
 
                 offset += ret;
 
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "Ping type: " << pingType << ", param: " << param << std::endl;
-#endif
+                Log(Log::Level::ALL) << "[" << name << "] " << "Ping type: " << pingType << ", param: " << param;
+
                 break;
             }
 
@@ -322,9 +308,7 @@ namespace relay
 
                 offset += ret;
 
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "Server bandwidth: " << bandwidth << std::endl;
-#endif
+                Log(Log::Level::ALL) << "[" << name << "] " << "Server bandwidth: " << bandwidth;
                 
                 break;
             }
@@ -353,9 +337,7 @@ namespace relay
 
                 offset += ret;
 
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type) << std::endl;
-#endif
+                Log(Log::Level::ALL) << "[" << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type);
 
                 break;
             }
@@ -375,10 +357,8 @@ namespace relay
 
                 offset += ret;
 
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "NOTIFY command: ";
+                Log(Log::Level::ALL) << "[" << name << "] " << "NOTIFY command: ";
                 command.dump();
-#endif
 
                 amf0::Node argument1;
 
@@ -386,10 +366,8 @@ namespace relay
                 {
                     offset += ret;
 
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Argument 1: ";
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Argument 1: ";
                     argument1.dump();
-#endif
                 }
 
                 amf0::Node argument2;
@@ -398,10 +376,8 @@ namespace relay
                 {
                     offset += ret;
 
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Argument 2: ";
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Argument 2: ";
                     argument2.dump();
-#endif
                 }
 
                 if (command.asString() == "@setDataFrame" && argument1.asString() == "onMetaData")
@@ -447,10 +423,8 @@ namespace relay
 
                 offset += ret;
 
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "INVOKE command: ";
+                Log(Log::Level::ALL) << "[" << name << "] " << "INVOKE command: ";
                 command.dump();
-#endif
                 
                 amf0::Node transactionId;
 
@@ -463,10 +437,8 @@ namespace relay
 
                 offset += ret;
 
-#ifdef DEBUG
-                std::cout << "[" << name << "] " << "Transaction ID: ";
+                Log(Log::Level::ALL) << "[" << name << "] " << "Transaction ID: ";
                 transactionId.dump();
-#endif
 
                 amf0::Node argument1;
 
@@ -474,10 +446,8 @@ namespace relay
                 {
                     offset += ret;
 
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Argument 1: ";
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Argument 1: ";
                     argument1.dump();
-#endif
                 }
 
                 amf0::Node argument2;
@@ -485,16 +455,14 @@ namespace relay
                 if ((ret = argument2.decode(packet.data, offset)) > 0)
                 {
                     offset += ret;
-                
-#ifdef DEBUG
-                    std::cout << "[" << name << "] " << "Argument 2: ";
+
+                    Log(Log::Level::ALL) << "[" << name << "] " << "Argument 2: ";
                     argument2.dump();
-#endif
                 }
 
                 if (command.asString() == "connect")
                 {
-                    std::cerr << "[" << name << "] " << "Wrong application, disconnecting" << std::endl;
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application, disconnecting";
 
                     if (!server.connect(argument1["app"].asString()))
                     {
@@ -546,7 +514,7 @@ namespace relay
 
                     if (i != invokes.end())
                     {
-                        std::cerr << i->second << " error" << std::endl;
+                        Log(Log::Level::ERR) << i->second << " error";
 
                         invokes.erase(i);
                     }
@@ -557,7 +525,7 @@ namespace relay
 
                     if (i != invokes.end())
                     {
-                        std::cerr << i->second << " result" << std::endl;
+                        Log(Log::Level::ERR) << i->second << " result";
 
                         invokes.erase(i);
                     }
@@ -567,7 +535,7 @@ namespace relay
 
             default:
             {
-                std::cerr << "[" << name << "] " << "Unhandled message: " << static_cast<uint32_t>(packet.messageType) << std::endl;
+                Log(Log::Level::ERR) << "[" << name << "] " << "Unhandled message: " << static_cast<uint32_t>(packet.messageType);
                 break;
             }
         }
@@ -588,9 +556,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending SERVER_BANDWIDTH" << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending SERVER_BANDWIDTH";
 
         socket.send(buffer);
     }
@@ -608,9 +574,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending CLIENT_BANDWIDTH" << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending CLIENT_BANDWIDTH";
 
         socket.send(buffer);
     }
@@ -628,9 +592,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending PING" << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending PING";
 
         socket.send(buffer);
     }
@@ -648,9 +610,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending SET_CHUNK_SIZE" << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending SET_CHUNK_SIZE";
 
         socket.send(buffer);
     }
@@ -683,9 +643,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
 
         socket.send(buffer);
     }
@@ -712,9 +670,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         socket.send(buffer);
 
@@ -740,9 +696,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
 
         socket.send(buffer);
     }
@@ -775,9 +729,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
 
         socket.send(buffer);
     }
@@ -801,9 +753,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
 
         socket.send(buffer);
     }
@@ -821,9 +771,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
 
         socket.send(buffer);
     }
@@ -855,26 +803,23 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-#ifdef DEBUG
-        std::cout << "[" << name << "] " << "Sending INVOKE " << commandName.asString() << std::endl;
-#endif
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
 
         socket.send(buffer);
     }
 
     void Receiver::printInfo() const
     {
-        std::cout << "\t[" << name << "] " << (socket.isReady() ? "Connected" : "Not connected") << " to: " << cppsocket::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
+        Log log(Log::Level::INFO);
+        log << "\t[" << name << "] " << (socket.isReady() ? "Connected" : "Not connected") << " to: " << cppsocket::ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
 
         switch (state)
         {
-            case rtmp::State::UNINITIALIZED: std::cout << "UNINITIALIZED"; break;
-            case rtmp::State::VERSION_RECEIVED: std::cout << "VERSION_RECEIVED"; break;
-            case rtmp::State::VERSION_SENT: std::cout << "VERSION_SENT"; break;
-            case rtmp::State::ACK_SENT: std::cout << "ACK_SENT"; break;
-            case rtmp::State::HANDSHAKE_DONE: std::cout << "HANDSHAKE_DONE"; break;
+            case rtmp::State::UNINITIALIZED: log << "UNINITIALIZED"; break;
+            case rtmp::State::VERSION_RECEIVED: log << "VERSION_RECEIVED"; break;
+            case rtmp::State::VERSION_SENT: log << "VERSION_SENT"; break;
+            case rtmp::State::ACK_SENT: log << "ACK_SENT"; break;
+            case rtmp::State::HANDSHAKE_DONE: log << "HANDSHAKE_DONE"; break;
         }
-
-        std::cout << std::endl;
     }
 }

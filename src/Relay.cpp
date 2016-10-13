@@ -9,6 +9,7 @@
 #include <chrono>
 #include <thread>
 #include "yaml-cpp/yaml.h"
+#include "Log.h"
 #include "Relay.h"
 #include "Server.h"
 
@@ -47,7 +48,7 @@ namespace relay
         }
         catch (std::exception)
         {
-            std::cerr << "Failed to open file" << std::endl;
+            Log(Log::Level::ERR) << "Failed to open file";
             return false;
         }
         

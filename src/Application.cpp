@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "Application.h"
+#include "Log.h"
 
 namespace relay
 {
@@ -97,9 +98,9 @@ namespace relay
 
     void Application::printInfo() const
     {
-        std::cout << "Application: " << name << std::endl;
+        Log(Log::Level::INFO) << "Application: " << name;
 
-        std::cout << "Senders:" << std::endl;
+        Log(Log::Level::INFO) << "Senders:";
         for (const auto& sender : senders)
         {
             sender->printInfo();
