@@ -145,7 +145,7 @@ int main(int argc, const char* argv[])
     if (daemon)
     {
 #ifdef _MSC_VER
-        Log(Log::Level::ERR) << "Daemon not supported on Windows" << std::endl;
+        Log(Log::Level::ERR) << "Daemon not supported on Windows";
         return EXIT_FAILURE;
 #else
         if (daemonize("/var/run/rtmp_relay.pid") == -1) return EXIT_FAILURE;
