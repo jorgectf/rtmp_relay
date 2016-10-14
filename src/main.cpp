@@ -131,9 +131,15 @@ static int killDaemon(const char* lockFile)
 
     pid_t pid = atoi(pidStr);
 
-    kill(pid, SIGTERM);
+    if (kill(pid, SIGTERM) != 0)
+    {
+        Log(Log::Level::ERR) << "Failed to kill daemon";
+        return 0;
+    }
 
     close(lfp);
+
+    Log(Log::Level::INFO) << "Daemon killed";
 
     return pid;
 }
@@ -157,6 +163,7 @@ int main(int argc, const char* argv[])
         {
 #ifndef _MSC_VER
             killDaemon("/var/run/rtmp_relay.pid");
+            return EXIT_SUCCESS;
 #endif
         }
         else if (strcmp(argv[i], "--help") == 0)
