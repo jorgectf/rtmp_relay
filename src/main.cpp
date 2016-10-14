@@ -175,7 +175,7 @@ int main(int argc, const char* argv[])
         else if (strcmp(argv[i], "--help") == 0)
         {
             const char* exe = argc >= 1 ? argv[0] : "rtmp_relay";
-            Log(Log::Level::INFO) << "Usage: " << exe << " --config <path to config file> [--daemon] [--killdaemon]";
+            Log(Log::Level::INFO) << "Usage: " << exe << " --config <path to config file> [--daemon] [--kill-daemon]";
             return EXIT_SUCCESS;
         }
     }
