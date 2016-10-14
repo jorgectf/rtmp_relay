@@ -49,11 +49,10 @@ static void signalHandler(int signo)
     }
 }
 
-static int daemonize(const char* lockFile)
+static int daemonize(const char* lock_file)
 {
-    // drop to having init() as parent
-    int i, pid = fork();
-    char str[256] = {0};
+    pid_t pid = fork();
+
     if (pid < 0)
     {
         Log(Log::Level::ERR) << "Failed to fork process";
@@ -61,30 +60,41 @@ static int daemonize(const char* lockFile)
     }
     if (pid > 0) exit(EXIT_SUCCESS); // parent process
 
-    setsid();
+    pid_t sid = setsid();
 
-    for (i = getdtablesize(); i>=0; i--)
+    if (sid < 0)
+    {
+        Log(Log::Level::ERR) << "Failed to create a session";
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = getdtablesize(); i >= 0; --i)
+    {
         close(i);
+    }
 
-    i = open("/dev/null", O_RDWR);
-    dup(i); // stdout
-    dup(i); // stderr
+    // redirect stdout and stderr to /dev/null
+    int i = open("/dev/null", O_WRONLY);
+    dup2(i, STDOUT_FILENO);
+    dup2(i, STDERR_FILENO);
+
     umask(027);
 
-    int lfp = open(lockFile, O_RDWR|O_CREAT|O_EXCL, 0640);
+    int lfp = open(lock_file, O_RDWR|O_CREAT, 0600);
 
-    if (lfp < 0)
+    if (lfp == -1)
     {
         Log(Log::Level::ERR) << "Failed to open lock file";
         exit(EXIT_FAILURE);
     }
 
-    if (lockf(lfp, F_TLOCK, 0) < 0)
+    if (lockf(lfp, F_TLOCK, 0) == -1)
     {
         Log(Log::Level::ERR) << "Failed to lock the file";
         exit(EXIT_SUCCESS);
     }
 
+    char str[20] = { 0 };
     sprintf(str, "%d\n", getpid());
     write(lfp, str, strlen(str)); // record pid to lockfile
 
@@ -110,7 +120,7 @@ static int daemonize(const char* lockFile)
     }
 
     Log(Log::Level::INFO) << "Daemon started, pid: " << getpid();
-
+    
     return EXIT_SUCCESS;
 }
 
