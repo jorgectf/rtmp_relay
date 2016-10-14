@@ -126,9 +126,6 @@ static int daemonize(const char* lock_file)
 
 static int killDaemon(const char* lockFile)
 {
-    char pidStr[11];
-    memset(pidStr, 0, sizeof(pidStr));
-
     int lfp = open(lockFile, O_RDONLY);
 
     if (lfp == -1)
@@ -137,9 +134,10 @@ static int killDaemon(const char* lockFile)
         return 0;
     }
 
-    read(lfp, pidStr, sizeof(pidStr));
+    char str[20] = { 0 };
+    read(lfp, str, sizeof(str));
 
-    pid_t pid = atoi(pidStr);
+    pid_t pid = atoi(str);
 
     if (kill(pid, SIGTERM) != 0)
     {
@@ -150,7 +148,7 @@ static int killDaemon(const char* lockFile)
     close(lfp);
 
     Log(Log::Level::INFO) << "Daemon killed";
-
+    
     return pid;
 }
 #endif
