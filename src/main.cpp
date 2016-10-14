@@ -49,10 +49,10 @@ static void signalHandler(int signo)
     }
 }
 
-static int daemonize(const char* lock_file)
+static int daemonize(const char* lockFile)
 {
     // drop to having init() as parent
-    int i, lfp, pid = fork();
+    int i, pid = fork();
     char str[256] = {0};
     if (pid < 0)
     {
@@ -71,7 +71,7 @@ static int daemonize(const char* lock_file)
     dup(i); // stderr
     umask(027);
 
-    lfp = open(lock_file, O_RDWR|O_CREAT|O_EXCL, 0640);
+    int lfp = open(lockFile, O_RDWR|O_CREAT|O_EXCL, 0640);
 
     if (lfp < 0)
     {
@@ -113,6 +113,30 @@ static int daemonize(const char* lock_file)
 
     return EXIT_SUCCESS;
 }
+
+static int killDaemon(const char* lockFile)
+{
+    char pidStr[11];
+    memset(pidStr, 0, sizeof(pidStr));
+
+    int lfp = open(lockFile, O_RDONLY);
+
+    if (lfp == -1)
+    {
+        Log(Log::Level::ERR) << "Failed to open lock file";
+        return 0;
+    }
+
+    read(lfp, pidStr, sizeof(pidStr));
+
+    pid_t pid = atoi(pidStr);
+
+    kill(pid, SIGTERM);
+
+    close(lfp);
+
+    return pid;
+}
 #endif
 
 int main(int argc, const char* argv[])
@@ -128,6 +152,10 @@ int main(int argc, const char* argv[])
         else if (strcmp(argv[i], "--daemon") == 0)
         {
             daemon = true;
+        }
+        else if (strcmp(argv[i], "--kill-daemon") == 0)
+        {
+            killDaemon("/var/run/rtmp_relay.pid");
         }
         else if (strcmp(argv[i], "--help") == 0)
         {
