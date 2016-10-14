@@ -155,7 +155,9 @@ int main(int argc, const char* argv[])
         }
         else if (strcmp(argv[i], "--kill-daemon") == 0)
         {
+#ifndef _MSC_VER
             killDaemon("/var/run/rtmp_relay.pid");
+#endif
         }
         else if (strcmp(argv[i], "--help") == 0)
         {
