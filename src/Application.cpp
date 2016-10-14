@@ -19,6 +19,7 @@ namespace relay
         {
             std::unique_ptr<Sender> sender(new Sender(pNetwork,
                                                       name,
+                                                      senderDescriptor.overrideStreamName,
                                                       senderDescriptor.addresses,
                                                       senderDescriptor.videoOutput,
                                                       senderDescriptor.audioOutput,

@@ -18,6 +18,7 @@ namespace relay
 {
     Sender::Sender(Network& pNetwork,
                    const std::string& pApplication,
+                   const std::string& newOverrideStreamName,
                    const std::vector<std::string>& pAddresses,
                    bool videoOutput,
                    bool audioOutput,
@@ -30,6 +31,7 @@ namespace relay
         network(pNetwork),
         socket(network),
         application(pApplication),
+        overrideStreamName(newOverrideStreamName),
         addresses(pAddresses),
         videoStream(videoOutput),
         audioStream(audioOutput),
@@ -824,7 +826,14 @@ namespace relay
 
     void Sender::createStream(const std::string& newStreamName)
     {
-        streamName = newStreamName;
+        if (overrideStreamName.empty())
+        {
+            streamName = newStreamName;
+        }
+        else
+        {
+            streamName = overrideStreamName;
+        }
 
         if (connected && !streamName.empty())
         {

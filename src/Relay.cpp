@@ -80,15 +80,27 @@ namespace relay
 
                     const YAML::Node& pushObject = pushArray[pushIndex];
 
+                    if (pushObject["overrideStreamName"])
+                    {
+                        senderDescriptor.overrideStreamName = pushObject["overrideStreamName"].as<std::string>();
+                    }
+
                     std::vector<std::string> pushAddresses;
 
                     if (pushObject["address"])
                     {
-                        const YAML::Node& addressArray = pushObject["address"];
-
-                        for (size_t index = 0; index < addressArray.size(); ++index)
+                        if (pushObject["address"].IsSequence())
                         {
-                            senderDescriptor.addresses.push_back(addressArray[index].as<std::string>());
+                            const YAML::Node& addressArray = pushObject["address"];
+
+                            for (size_t index = 0; index < addressArray.size(); ++index)
+                            {
+                                senderDescriptor.addresses.push_back(addressArray[index].as<std::string>());
+                            }
+                        }
+                        else
+                        {
+                            senderDescriptor.addresses.push_back(pushObject["address"].as<std::string>());
                         }
                     }
                     else

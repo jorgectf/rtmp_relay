@@ -17,6 +17,7 @@ namespace relay
 {
     struct SenderDescriptor
     {
+        std::string overrideStreamName;
         std::vector<std::string> addresses;
         bool videoOutput;
         bool audioOutput;

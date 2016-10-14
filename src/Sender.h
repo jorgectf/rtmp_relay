@@ -21,6 +21,7 @@ namespace relay
     public:
         Sender(cppsocket::Network& pNetwork,
                const std::string& pApplication,
+               const std::string& newOverrideStreamName,
                const std::vector<std::string>& pAddresses,
                bool videoOutput,
                bool audioOutput,
@@ -80,6 +81,8 @@ namespace relay
         cppsocket::Network& network;
         cppsocket::Connector socket;
         const std::string application;
+        const std::string overrideStreamName;
+
         const std::vector<std::string> addresses;
         uint32_t addressIndex = 0;
         uint32_t connectCount = 0;
