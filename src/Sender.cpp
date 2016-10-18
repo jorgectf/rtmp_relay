@@ -832,7 +832,15 @@ namespace relay
         }
         else
         {
+            std::map<std::string, std::string> tokens = {
+                { "streamName", newStreamName },
+                { "applicationName", application },
+                { "address", cppsocket::ipToString(socket.getIPAddress()) },
+                { "port", std::to_string(socket.getPort()) }
+            };
+
             streamName = overrideStreamName;
+            replaceTokens(streamName, tokens);
         }
 
         if (connected && !streamName.empty())

@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <map>
 
 #define UNUSED(x) (void)(x)
 
@@ -104,3 +105,5 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
     
     return sizeof(double);
 }
+
+size_t replaceTokens(std::string& str, const std::map<std::string, std::string>& tokens);
