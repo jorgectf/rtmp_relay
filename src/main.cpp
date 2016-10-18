@@ -13,6 +13,7 @@
 #endif
 #include <fcntl.h>
 
+#include "Constants.h"
 #include "Relay.h"
 #include "Log.h"
 
@@ -184,6 +185,11 @@ int main(int argc, const char* argv[])
         {
             const char* exe = argc >= 1 ? argv[0] : "rtmp_relay";
             Log(Log::Level::INFO) << "Usage: " << exe << " --config <path to config file> [--daemon] [--kill-daemon]";
+            return EXIT_SUCCESS;
+        }
+        else if (strcmp(argv[i], "--version") == 0)
+        {
+            Log(Log::Level::INFO) << "RTMP relay v" << static_cast<uint32_t>(RTMP_RELAY_VERSION[0]) << "." << static_cast<uint32_t>(RTMP_RELAY_VERSION[1]);
             return EXIT_SUCCESS;
         }
     }
