@@ -22,7 +22,11 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * applications – application object (can be multiple for each server)
  * name – name of the application (optional if server should route all applications)
  * push – array of push destinations
-  * overrideStreamName – string to override the stream name with
+  * overrideStreamName – string to override the stream name with, this string can contain the following patterns:
+   - ${name} – name of the source stream
+   - ${applicationName} – name of the application
+   - ${address} – IP address of the destination
+   - ${port} – destination port
   * addresses – list of addresses to push to
   * video – flag that indicates wether to forward video stream
   * audio – flag that indicates wether to forward audio stream
@@ -39,7 +43,7 @@ Example configuration:
         applications:
           - name: "app/name"
             push:
-              - overrideStreamName: "test"
+              - overrideStreamName: "test_${name}"
                 address: "10.0.1.1:1935"
                 video: true
                 audio: true
