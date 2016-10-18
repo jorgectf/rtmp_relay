@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 static const uint8_t RTMP_RELAY_VERSION[2] = { 0, 1 };
 
 static const uint8_t RTMP_VERSION = 3;
