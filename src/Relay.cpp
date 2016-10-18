@@ -48,9 +48,14 @@ namespace relay
         {
             document = YAML::LoadFile(config);
         }
-        catch (std::exception)
+        catch (YAML::BadFile)
         {
-            Log(Log::Level::ERR) << "Failed to open file";
+            Log(Log::Level::ERR) << "Failed to open " << config;
+            return false;
+        }
+        catch (YAML::ParserException e)
+        {
+            Log(Log::Level::ERR) << "Failed to parse " << config << ", " << e.msg << " on line " << e.mark.line << " column " << e.mark.column;
             return false;
         }
         
