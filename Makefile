@@ -47,9 +47,10 @@ OBJECTS=$(SOURCES:.cpp=.o)
 BINDIR=./bin
 EXECUTABLE=rtmp_relay
 
+all: CXXFLAGS+=-DDEBUG -g -Os
 all: directories $(SOURCES) $(EXECUTABLE)
 
-debug: CXXFLAGS+=-DDEBUG -g
+debug: CXXFLAGS+=-DDEBUG -g -O0
 debug: directories $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
