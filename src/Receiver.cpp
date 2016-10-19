@@ -26,8 +26,8 @@ namespace relay
             Log(Log::Level::ERR) << "[" << name << "] " << "Failed to set socket non-blocking";
         }
         
-        socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1));
-        socket.setCloseCallback(std::bind(&Receiver::handleClose, this));
+        socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+        socket.setCloseCallback(std::bind(&Receiver::handleClose, this, std::placeholders::_1));
         socket.startRead();
     }
 
@@ -78,7 +78,7 @@ namespace relay
         return false;
     }
 
-    void Receiver::handleRead(const std::vector<uint8_t>& newData)
+    void Receiver::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
@@ -220,7 +220,7 @@ namespace relay
         Log(Log::Level::ALL) << "[" << name << "] " << "Remaining data " << data.size();
     }
 
-    void Receiver::handleClose()
+    void Receiver::handleClose(cppsocket::Socket&)
     {
         server.unpublishStream();
         server.deleteStream();

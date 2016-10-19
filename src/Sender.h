@@ -58,8 +58,8 @@ namespace relay
     private:
         void reset();
         void handleConnect();
-        void handleRead(const std::vector<uint8_t>& newData);
-        void handleClose();
+        void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
+        void handleClose(cppsocket::Socket&);
 
         bool handlePacket(const rtmp::Packet& packet);
 

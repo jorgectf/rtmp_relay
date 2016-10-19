@@ -48,8 +48,8 @@ namespace relay
         
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
-        socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1));
-        socket.setCloseCallback(std::bind(&Sender::handleClose, this));
+        socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+        socket.setCloseCallback(std::bind(&Sender::handleClose, this, std::placeholders::_1));
 
         if (!videoOutput)
         {
@@ -185,7 +185,7 @@ namespace relay
         return true;
     }
 
-    void Sender::handleRead(const std::vector<uint8_t>& newData)
+    void Sender::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
@@ -307,7 +307,7 @@ namespace relay
         Log(Log::Level::ALL) << "[" << name << "] " << "Remaining data " << data.size();
     }
 
-    void Sender::handleClose()
+    void Sender::handleClose(cppsocket::Socket&)
     {
         if (active)
         {

@@ -22,8 +22,8 @@ namespace relay
 
     private:
         void handleAccept(cppsocket::Socket& clientSocket);
-        void handleRead(const std::vector<uint8_t>& newData);
-        void handleClose();
+        void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
+        void handleClose(cppsocket::Socket&);
         
         cppsocket::Network& network;
         cppsocket::Acceptor socket;
