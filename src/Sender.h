@@ -42,7 +42,6 @@ namespace relay
         void disconnect();
 
         void update(float delta);
-        void handleConnect();
         
         bool sendPacket(const std::vector<uint8_t>& packet);
 
@@ -58,6 +57,7 @@ namespace relay
         
     private:
         void reset();
+        void handleConnect();
         void handleRead(const std::vector<uint8_t>& newData);
         void handleClose();
 
