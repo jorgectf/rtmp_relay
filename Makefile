@@ -9,6 +9,7 @@ SOURCES=src/Amf0.cpp \
 	src/RTMP.cpp \
 	src/Sender.cpp \
 	src/Server.cpp \
+	src/Status.cpp \
 	src/Utils.cpp \
 	external/cppsocket/Acceptor.cpp \
 	external/cppsocket/Connector.cpp \
