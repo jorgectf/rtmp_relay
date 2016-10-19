@@ -7,7 +7,7 @@
 namespace relay
 {
     Status::Status(cppsocket::Network& aNetwork, Relay& aRelay):
-        network(aNetwork), relay(aRelay), socket(aNetwork)
+        network(aNetwork), socket(aNetwork), relay(aRelay)
     {
         //socket.setConnectTimeout(connectionTimeout);
         socket.setAcceptCallback(std::bind(&Status::handleAccept, this, std::placeholders::_1));
