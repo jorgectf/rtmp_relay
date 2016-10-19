@@ -136,7 +136,11 @@ static int killDaemon(const char* lockFile)
     }
 
     char str[20] = { 0 };
-    read(lfp, str, sizeof(str));
+    if (read(lfp, str, sizeof(str)) == -1)
+    {
+        Log(Log::Level::ERR) << "Failed to read pid from the lock file";
+        return 0;
+    }
 
     pid_t pid = atoi(str);
 
