@@ -106,6 +106,7 @@
     <ClCompile Include="external\cppsocket\Log.cpp">
       <Filter>cppsocket</Filter>
     </ClCompile>
+    <ClCompile Include="src\Status.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Amf0.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="external\cppsocket\Log.h">
       <Filter>cppsocket</Filter>
     </ClInclude>
+    <ClInclude Include="src\Status.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">

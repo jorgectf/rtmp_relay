@@ -59,6 +59,7 @@
     <ClCompile Include="src\RTMP.cpp" />
     <ClCompile Include="src\Sender.cpp" />
     <ClCompile Include="src\Server.cpp" />
+    <ClCompile Include="src\Status.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +97,7 @@
     <ClInclude Include="src\RTMP.h" />
     <ClInclude Include="src\Sender.h" />
     <ClInclude Include="src\Server.h" />
+    <ClInclude Include="src\Status.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
