@@ -144,6 +144,8 @@ namespace relay
 
             std::unique_ptr<Server> server(new Server(network, address, pingInterval, applicationDescriptors));
             servers.push_back(std::move(server));
+
+            status.reset(new Status(network, *this));
         }
         
         return true;
