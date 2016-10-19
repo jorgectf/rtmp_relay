@@ -97,7 +97,12 @@ static int daemonize(const char* lock_file)
 
     char str[20] = { 0 };
     sprintf(str, "%d\n", getpid());
-    write(lfp, str, strlen(str)); // record pid to lockfile
+    // record pid to lockfile
+    if (write(lfp, str, strlen(str)) == -1)
+    {
+        Log(Log::Level::ERR) << "Failed to write pid to lock file";
+        exit(EXIT_FAILURE);
+    }
 
     // ignore child terminate signal
     if (signal(SIGCHLD, SIG_IGN) == SIG_ERR)
