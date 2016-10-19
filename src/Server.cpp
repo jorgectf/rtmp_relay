@@ -13,11 +13,11 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Server::Server(Network& pNetwork,
+    Server::Server(Network& aNetwork,
                    const std::string& address,
-                   float newPingInterval,
-                   const std::vector<ApplicationDescriptor>& newApplicationDescriptors):
-        network(pNetwork), socket(pNetwork), pingInterval(newPingInterval), applicationDescriptors(newApplicationDescriptors)
+                   float aPingInterval,
+                   const std::vector<ApplicationDescriptor>& aApplicationDescriptors):
+        network(aNetwork), socket(aNetwork), pingInterval(aPingInterval), applicationDescriptors(aApplicationDescriptors)
     {
         socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 

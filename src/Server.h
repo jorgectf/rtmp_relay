@@ -39,10 +39,10 @@ namespace relay
     class Server
     {
     public:
-        Server(cppsocket::Network& pNetwork,
+        Server(cppsocket::Network& aNetwork,
                const std::string& address,
-               float newPingInterval,
-               const std::vector<ApplicationDescriptor>& newApplicationDescriptors);
+               float aPingInterval,
+               const std::vector<ApplicationDescriptor>& aApplicationDescriptors);
         ~Server();
         
         Server(const Server&) = delete;

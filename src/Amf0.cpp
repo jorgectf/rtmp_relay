@@ -546,8 +546,8 @@ namespace relay
 
         }
 
-        Node::Node(Marker pMarker):
-            marker(pMarker)
+        Node::Node(Marker aMarker):
+            marker(aMarker)
         {
 
         }

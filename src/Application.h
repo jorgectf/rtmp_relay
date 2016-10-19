@@ -18,9 +18,9 @@ namespace relay
     class Application
     {
     public:
-        Application(cppsocket::Network& pNetwork,
+        Application(cppsocket::Network& aNetwork,
                     const ApplicationDescriptor& applicationDescriptor,
-                    const std::string& pName);
+                    const std::string& aName);
         virtual ~Application() {}
 
         const std::string& getName() const { return name; }

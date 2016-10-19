@@ -19,17 +19,17 @@ namespace relay
     {
         const std::string name = "Sender";
     public:
-        Sender(cppsocket::Network& pNetwork,
-               const std::string& pApplication,
-               const std::string& newOverrideStreamName,
-               const std::vector<std::string>& pAddresses,
+        Sender(cppsocket::Network& aNetwork,
+               const std::string& aApplication,
+               const std::string& aOverrideStreamName,
+               const std::vector<std::string>& aAddresses,
                bool videoOutput,
                bool audioOutput,
                bool dataOutput,
-               const std::set<std::string>& pMetaDataBlacklist,
-               float pConnectionTimeout,
-               float pReconnectInterval,
-               uint32_t pReconnectCount);
+               const std::set<std::string>& aMetaDataBlacklist,
+               float aConnectionTimeout,
+               float aReconnectInterval,
+               uint32_t aReconnectCount);
         ~Sender();
         
         Sender(const Sender&) = delete;

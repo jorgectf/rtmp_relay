@@ -16,10 +16,10 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Receiver::Receiver(Socket& pSocket,
-                       Server& pServer,
-                       float newPingInterval):
-        socket(std::move(pSocket)), generator(rd()), server(pServer), pingInterval(newPingInterval)
+    Receiver::Receiver(Socket& aSocket,
+                       Server& aServer,
+                       float aPingInterval):
+        socket(std::move(aSocket)), generator(rd()), server(aServer), pingInterval(aPingInterval)
     {
         if (!socket.setBlocking(false))
         {

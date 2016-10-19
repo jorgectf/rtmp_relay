@@ -12,11 +12,12 @@
 namespace relay
 {
     class Server;
+    class Status;
 
     class Relay
     {
     public:
-        Relay(cppsocket::Network& pNetwork);
+        Relay(cppsocket::Network& aNetwork);
         ~Relay();
         
         Relay(const Relay&) = delete;
@@ -34,6 +35,7 @@ namespace relay
     private:
         cppsocket::Network& network;
         std::vector<std::unique_ptr<Server>> servers;
+        std::unique_ptr<Status> status;
         std::chrono::steady_clock::time_point previousTime;
     };
 }

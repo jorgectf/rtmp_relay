@@ -16,30 +16,30 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Sender::Sender(Network& pNetwork,
-                   const std::string& pApplication,
-                   const std::string& newOverrideStreamName,
-                   const std::vector<std::string>& pAddresses,
+    Sender::Sender(Network& aNetwork,
+                   const std::string& aApplication,
+                   const std::string& aOverrideStreamName,
+                   const std::vector<std::string>& aAddresses,
                    bool videoOutput,
                    bool audioOutput,
                    bool dataOutput,
-                   const std::set<std::string>& pMetaDataBlacklist,
-                   float pConnectionTimeout,
-                   float pReconnectInterval,
-                   uint32_t pReconnectCount):
+                   const std::set<std::string>& aMetaDataBlacklist,
+                   float aConnectionTimeout,
+                   float aReconnectInterval,
+                   uint32_t aReconnectCount):
         generator(rd()),
-        network(pNetwork),
+        network(aNetwork),
         socket(network),
-        application(pApplication),
-        overrideStreamName(newOverrideStreamName),
-        addresses(pAddresses),
+        application(aApplication),
+        overrideStreamName(aOverrideStreamName),
+        addresses(aAddresses),
         videoStream(videoOutput),
         audioStream(audioOutput),
         dataStream(dataOutput),
-        metaDataBlacklist(pMetaDataBlacklist),
-        connectionTimeout(pConnectionTimeout),
-        reconnectInterval(pReconnectInterval),
-        reconnectCount(pReconnectCount)
+        metaDataBlacklist(aMetaDataBlacklist),
+        connectionTimeout(aConnectionTimeout),
+        reconnectInterval(aReconnectInterval),
+        reconnectCount(aReconnectCount)
     {
         if (!socket.setBlocking(false))
         {

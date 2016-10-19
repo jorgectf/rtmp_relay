@@ -43,7 +43,7 @@ namespace relay
         {
         public:
             Node();
-            Node(Marker pMarker);
+            Node(Marker aMarker);
             Node(double value);
             Node(bool value);
             Node(const std::string& value);

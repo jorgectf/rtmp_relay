@@ -10,14 +10,14 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Application::Application(cppsocket::Network& pNetwork,
+    Application::Application(cppsocket::Network& aNetwork,
                              const ApplicationDescriptor& applicationDescriptor,
-                             const std::string& pName):
-        name(pName)
+                             const std::string& aName):
+        name(aName)
     {
         for (const SenderDescriptor& senderDescriptor : applicationDescriptor.senderDescriptors)
         {
-            std::unique_ptr<Sender> sender(new Sender(pNetwork,
+            std::unique_ptr<Sender> sender(new Sender(aNetwork,
                                                       name,
                                                       senderDescriptor.overrideStreamName,
                                                       senderDescriptor.addresses,

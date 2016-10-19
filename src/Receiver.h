@@ -20,9 +20,9 @@ namespace relay
     {
         const std::string name = "Receiver";
     public:
-        Receiver(cppsocket::Socket& pSocket,
-                 Server& pServer,
-                 float newPingInterval);
+        Receiver(cppsocket::Socket& aSocket,
+                 Server& aServer,
+                 float aPingInterval);
         ~Receiver();
 
         void reset();
