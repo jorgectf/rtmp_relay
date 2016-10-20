@@ -28,14 +28,39 @@ namespace relay
         const char response[] = "HTTP/1.0 200 OK\r\n"
             "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
             "\r\n"
-            "<TITLE>Hello!</TITLE>";
+            "<html><title>Status</title><body>body</body></html>";
 
         std::vector<uint8_t> data(response, response + sizeof(response));
 
         clientSocket.send(data);
+
+        for (auto i = clients.begin(); i != clients.end(); ++i)
+        {
+            if (&(*i) == &clientSocket)
+            {
+                clients.erase(i);
+                break;
+            }
+            else
+            {
+                ++i;
+            }
+        }
     }
 
-    void Status::handleClose(cppsocket::Socket&)
+    void Status::handleClose(cppsocket::Socket& clientSocket)
     {
+        for (auto i = clients.begin(); i != clients.end(); ++i)
+        {
+            if (&(*i) == &clientSocket)
+            {
+                clients.erase(i);
+                break;
+            }
+            else
+            {
+                ++i;
+            }
+        }
     }
 }
