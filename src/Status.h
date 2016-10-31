@@ -12,7 +12,7 @@ namespace relay
     class Status
     {
     public:
-        Status(cppsocket::Network& aNetwork, Relay& aRelay);
+        Status(cppsocket::Network& aNetwork, Relay& aRelay, const std::string& address);
 
         Status(const Status&) = delete;
         Status& operator=(const Status&) = delete;

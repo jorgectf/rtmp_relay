@@ -59,6 +59,11 @@ namespace relay
             Log(Log::Level::ERR) << "Failed to parse " << config << ", " << e.msg << " on line " << e.mark.line << " column " << e.mark.column;
             return false;
         }
+
+        if (document["statusPageAddress"])
+        {
+            status.reset(new Status(network, *this, document["statusPageAddress"].as<std::string>()));
+        }
         
         const YAML::Node& serversArray = document["servers"];
         
@@ -144,8 +149,6 @@ namespace relay
 
             std::unique_ptr<Server> server(new Server(network, address, pingInterval, applicationDescriptors));
             servers.push_back(std::move(server));
-
-            status.reset(new Status(network, *this));
         }
         
         return true;

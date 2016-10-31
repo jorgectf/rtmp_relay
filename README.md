@@ -1,4 +1,4 @@
-# RTMP relay v0.1
+# RTMP relay v0.2
 
 [![Build Status](https://api.travis-ci.org/elnormous/rtmp_relay.svg?branch=master)](https://travis-ci.org/elnormous/rtmp_relay) [![Build Status](https://ci.appveyor.com/api/projects/status/9axwxwyf99dcr11d?svg=true)](https://ci.appveyor.com/project/elnormous/rtmp_relay)
 
@@ -18,6 +18,7 @@ To compile the RTMP relay, just run "make" in the root directory. To launch it, 
 
 RTMP relay configuration files are YAML-based. It must start with servers array. Each server has following attributes:
 
+* *statusPageAddress* – the address of the web status page (optional)
 * *listen* – the address server is listening to
 * *applications* – application object (can be multiple for each server)
  * *name* – name of the application (optional if server should route all applications)
