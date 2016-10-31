@@ -36,6 +36,7 @@ namespace relay
         void sendTextData(const amf0::Node& textData);
 
         void printInfo() const;
+        void getInfo(std::string& str) const;
 
     private:
         std::string name;

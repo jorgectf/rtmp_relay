@@ -824,6 +824,22 @@ namespace relay
         }
     }
 
+    void Sender::getInfo(std::string& str) const
+    {
+        str += "<tr><td>" + name + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+
+        switch (state)
+        {
+            case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+            case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+            case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
+            case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
+            case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+        }
+
+        str += "</td></tr>";
+    }
+
     void Sender::createStream(const std::string& newStreamName)
     {
         if (overrideStreamName.empty())

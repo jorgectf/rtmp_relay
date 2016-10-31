@@ -133,4 +133,20 @@ namespace relay
             application->printInfo();
         }
     }
+
+    void Server::getInfo(std::string& str) const
+    {
+        str += "<h1>Receivers</h1><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+        for (const auto& receiver : receivers)
+        {
+            receiver->getInfo(str);
+        }
+
+        str += "</table>";
+
+        if (application)
+        {
+            application->getInfo(str);
+        }
+    }
 }

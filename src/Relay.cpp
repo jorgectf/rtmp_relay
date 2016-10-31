@@ -184,4 +184,12 @@ namespace relay
             server->printInfo();
         }
     }
+
+    void Relay::getInfo(std::string& str) const
+    {
+        for (const auto& server : servers)
+        {
+            server->getInfo(str);
+        }
+    }
 }

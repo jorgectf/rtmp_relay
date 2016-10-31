@@ -109,4 +109,18 @@ namespace relay
             sender->printInfo();
         }
     }
+
+    void Application::getInfo(std::string& str) const
+    {
+        str += "Application: " + name;
+
+        str += "<h2>Senders</h2><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+
+        for (const auto& sender : senders)
+        {
+            sender->getInfo(str);
+        }
+
+        str += "</table>";
+    }
 }

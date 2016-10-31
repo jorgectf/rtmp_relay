@@ -25,12 +25,15 @@ namespace relay
 
     void Status::handleRead(cppsocket::Socket& clientSocket, const std::vector<uint8_t>&)
     {
-        const char response[] = "HTTP/1.0 200 OK\r\n"
+        std::string info;
+        relay.getInfo(info);
+
+        std::string response = "HTTP/1.0 200 OK\r\n"
             "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
             "\r\n"
-            "<html><title>Status</title><body>body</body></html>";
+            "<html><title>Status</title><body>" + info + "</body></html>";
 
-        std::vector<uint8_t> data(response, response + sizeof(response));
+        std::vector<uint8_t> data(response.begin(), response.end());
 
         clientSocket.send(data);
 

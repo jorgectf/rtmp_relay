@@ -31,6 +31,7 @@ namespace relay
         void run();
 
         void printInfo() const;
+        void getInfo(std::string& str) const;
         
     private:
         cppsocket::Network& network;
