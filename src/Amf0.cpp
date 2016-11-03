@@ -5,7 +5,6 @@
 #include <iostream>
 #include <cstdint>
 #include "Amf0.h"
-#include "Log.h"
 #include "Utils.h"
 
 using namespace cppsocket;
@@ -789,10 +788,8 @@ namespace relay
             vectorValue.push_back(node);
         }
 
-        void Node::dump(const std::string& indent)
+        void Node::dump(cppsocket::Log& log, const std::string& indent)
         {
-            Log log(Log::Level::ALL);
-
             log << "Type: " << markerToString(marker) << "(" << static_cast<uint32_t>(marker) << ")";
 
             if (marker == Marker::Object ||
@@ -806,7 +803,8 @@ namespace relay
                     for (size_t index = 0; index < vectorValue.size(); index++)
                     {
                         log << indent + INDENT << index << ": ";
-                        vectorValue[index].dump(indent + INDENT);
+                        vectorValue[index].dump(log, indent + INDENT);
+                        log << "\n";
                     }
                 }
                 else
@@ -814,7 +812,8 @@ namespace relay
                     for (auto i : mapValue)
                     {
                         log << indent + INDENT << i.first << ": ";
-                        i.second.dump(indent + INDENT);
+                        i.second.dump(log, indent + INDENT);
+                        log << "\n";
                     }
                 }
             }

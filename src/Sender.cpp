@@ -464,7 +464,11 @@ namespace relay
                 offset += ret;
 
                 Log(Log::Level::ALL) << "[" << name << "] " << "INVOKE command: ";
-                command.dump();
+
+                {
+                    Log log(Log::Level::ALL);
+                    command.dump(log);
+                }
 
                 amf0::Node transactionId;
 
@@ -478,7 +482,11 @@ namespace relay
                 offset += ret;
 
                 Log(Log::Level::ALL) << "[" << name << "] " << "Transaction ID: ";
-                transactionId.dump();
+
+                {
+                    Log log(Log::Level::ALL);
+                    transactionId.dump(log);
+                }
 
                 amf0::Node argument1;
 
@@ -487,7 +495,9 @@ namespace relay
                     offset += ret;
 
                     Log(Log::Level::ALL) << "[" << name << "] " << "Argument 1: ";
-                    argument1.dump();
+
+                    Log log(Log::Level::ALL);
+                    argument1.dump(log);
                 }
 
                 amf0::Node argument2;
@@ -497,7 +507,9 @@ namespace relay
                     offset += ret;
 
                     Log(Log::Level::ALL) << "[" << name << "] " << "Argument 2: ";
-                    argument2.dump();
+
+                    Log log(Log::Level::ALL);
+                    argument2.dump(log);
                 }
 
                 if (command.asString() == "onBWDone")

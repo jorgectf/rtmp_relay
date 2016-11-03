@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <map>
+#include "Log.h"
 
 namespace relay
 {
@@ -80,7 +81,7 @@ namespace relay
             bool hasElement(const std::string& key);
             void append(const Node& node);
 
-            void dump(const std::string& indent = "");
+            void dump(cppsocket::Log& log, const std::string& indent = "");
 
         private:
             Marker marker = Marker::Unknown;
