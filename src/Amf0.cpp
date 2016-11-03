@@ -796,24 +796,22 @@ namespace relay
                 marker == Marker::StrictArray ||
                 marker == Marker::ECMAArray)
             {
-                log << ", values: \n";
+                log << ", values:";
 
                 if (marker == Marker::StrictArray)
                 {
                     for (size_t index = 0; index < vectorValue.size(); index++)
                     {
-                        log << indent + INDENT << index << ": ";
+                        log << "\n" << indent + INDENT << index << ": ";
                         vectorValue[index].dump(log, indent + INDENT);
-                        log << "\n";
                     }
                 }
                 else
                 {
                     for (auto i : mapValue)
                     {
-                        log << indent + INDENT << i.first << ": ";
+                        log << "\n" << indent + INDENT << i.first << ": ";
                         i.second.dump(log, indent + INDENT);
-                        log << "\n";
                     }
                 }
             }
