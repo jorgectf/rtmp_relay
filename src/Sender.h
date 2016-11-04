@@ -122,5 +122,6 @@ namespace relay
         float timeSinceConnect = 0.0f;
 
         amf0::Node metaData;
+        bool metaDataSent = false;
     };
 }

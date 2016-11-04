@@ -557,6 +557,11 @@ namespace relay
                             sendPublish();
 
                             streaming = true;
+
+                            if (!metaDataSent)
+                            {
+                                sendMetaData();
+                            }
                         }
 
                         invokes.erase(i);
@@ -944,6 +949,7 @@ namespace relay
     void Sender::setMetaData(const amf0::Node& newMetaData)
     {
         metaData = newMetaData;
+        metaDataSent = false;
 
         sendMetaData();
     }
@@ -987,6 +993,8 @@ namespace relay
             argument2.dump(log);
 
             socket.send(buffer);
+
+            metaDataSent = true;
         }
     }
 
