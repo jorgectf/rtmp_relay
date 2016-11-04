@@ -941,7 +941,14 @@ namespace relay
         }
     }
 
-    void Sender::sendMetaData(const amf0::Node& metaData)
+    void Sender::setMetaData(const amf0::Node& newMetaData)
+    {
+        metaData = newMetaData;
+
+        sendMetaData();
+    }
+
+    void Sender::sendMetaData()
     {
         if (streaming)
         {

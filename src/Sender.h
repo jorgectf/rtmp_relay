@@ -53,10 +53,13 @@ namespace relay
         void unpublishStream();
         void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
         void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
-        void sendMetaData(const amf0::Node& metaData);
         void sendTextData(const amf0::Node& textData);
+
+        void setMetaData(const amf0::Node& newMetaData);
         
     private:
+        void sendMetaData();
+
         void reset();
         void handleConnect();
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
@@ -117,5 +120,7 @@ namespace relay
 
         bool streaming = false;
         float timeSinceConnect = 0.0f;
+
+        amf0::Node metaData;
     };
 }

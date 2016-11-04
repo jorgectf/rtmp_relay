@@ -87,7 +87,7 @@ namespace relay
     {
         for (const auto& sender : senders)
         {
-            sender->sendMetaData(metaData);
+            sender->setMetaData(metaData);
         }
     }
 
