@@ -90,6 +90,10 @@ namespace relay
         streaming = false;
         invokeId = 0;
         invokes.clear();
+
+        metaDataSent = false;
+        videoFrameSent = false;
+        audioFrameSent = false;
     }
 
     bool Sender::connect()
@@ -906,7 +910,8 @@ namespace relay
 
     void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        if (streaming && audioStream)
+        if (streaming && audioStream &&
+            (audioFrameSent || getFrameType(audioData) == FrameType::KEY))
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
@@ -922,12 +927,15 @@ namespace relay
             Log(Log::Level::ALL) << "[" << name << "] " << "Sending audio packet";
 
             socket.send(buffer);
+
+            audioFrameSent = true;
         }
     }
 
     void Sender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        if (streaming && videoStream)
+        if (streaming && videoStream &&
+            (videoFrameSent || getFrameType(videoData) == FrameType::KEY))
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::VIDEO;
@@ -943,6 +951,8 @@ namespace relay
             Log(Log::Level::ALL) << "[" << name << "] " << "Sending video packet";
 
             socket.send(buffer);
+
+            videoFrameSent = true;
         }
     }
 

@@ -11,7 +11,8 @@
 
 #define UNUSED(x) (void)(x)
 
-union IntFloat64 {
+union IntFloat64
+{
     uint64_t i;
     double   f;
 };
@@ -107,3 +108,18 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
 }
 
 size_t replaceTokens(std::string& str, const std::map<std::string, std::string>& tokens);
+
+enum class FrameType
+{
+    NONE = 0,
+    KEY = 1,
+    INTER = 2,
+    DISPOSABLE = 3
+};
+
+inline FrameType getFrameType(const std::vector<uint8_t>& data)
+{
+    if (data.empty()) return FrameType::NONE;
+
+    return static_cast<FrameType>((data[0] & 0xf0) >> 4);
+}
