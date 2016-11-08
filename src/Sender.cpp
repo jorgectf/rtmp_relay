@@ -910,8 +910,7 @@ namespace relay
 
     void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        if (streaming && audioStream &&
-            (audioFrameSent || getFrameType(audioData) == FrameType::KEY))
+        if (streaming && audioStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
@@ -935,7 +934,7 @@ namespace relay
     void Sender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
         if (streaming && videoStream &&
-            (videoFrameSent || getFrameType(videoData) == FrameType::KEY))
+            (videoFrameSent || getVideoFrameType(videoData) == VideoFrameType::KEY))
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::VIDEO;

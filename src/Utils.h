@@ -109,7 +109,7 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
 
 size_t replaceTokens(std::string& str, const std::map<std::string, std::string>& tokens);
 
-enum class FrameType
+enum class VideoFrameType
 {
     NONE = 0,
     KEY = 1,
@@ -117,9 +117,9 @@ enum class FrameType
     DISPOSABLE = 3
 };
 
-inline FrameType getFrameType(const std::vector<uint8_t>& data)
+inline VideoFrameType getVideoFrameType(const std::vector<uint8_t>& data)
 {
-    if (data.empty()) return FrameType::NONE;
+    if (data.empty()) return VideoFrameType::NONE;
 
-    return static_cast<FrameType>((data[0] & 0xf0) >> 4);
+    return static_cast<VideoFrameType>((data[0] & 0xf0) >> 4);
 }
