@@ -562,10 +562,7 @@ namespace relay
 
                             streaming = true;
 
-                            if (!metaDataSent)
-                            {
-                                sendMetaData();
-                            }
+                            sendMetaData();
                         }
 
                         invokes.erase(i);
