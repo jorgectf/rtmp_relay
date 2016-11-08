@@ -406,6 +406,17 @@ namespace relay
 
             case rtmp::MessageType::AUDIO_PACKET:
             {
+                Log log(Log::Level::ALL);
+                log << "[" << name << "] " << "Audio packet: ";
+                switch (getFrameType(packet.data))
+                {
+                    case FrameType::KEY: log << "key frame"; break;
+                    case FrameType::INTER: log << "inter frame"; break;
+                    case FrameType::DISPOSABLE: log << "disposable frame"; break;
+                    default: log << "unknown frame"; break;
+
+                }
+
                 // forward audio packet
                 server.sendAudio(packet.timestamp, packet.data);
                 break;
@@ -413,6 +424,17 @@ namespace relay
 
             case rtmp::MessageType::VIDEO_PACKET:
             {
+                Log log(Log::Level::ALL);
+                log << "[" << name << "] " << "Video packet: ";
+                switch (getFrameType(packet.data))
+                {
+                    case FrameType::KEY: log << "key frame"; break;
+                    case FrameType::INTER: log << "inter frame"; break;
+                    case FrameType::DISPOSABLE: log << "disposable frame"; break;
+                    default: log << "unknown frame"; break;
+
+                }
+
                 // forward video packet
                 server.sendVideo(packet.timestamp, packet.data);
                 break;
