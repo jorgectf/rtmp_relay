@@ -88,6 +88,8 @@ namespace relay
         const float pingInterval;
         float timeSincePing = 0.0f;
 
+        std::vector<uint8_t> audioHeader;
+        std::vector<uint8_t> videoHeader;
         amf0::Node metaData;
     };
 }

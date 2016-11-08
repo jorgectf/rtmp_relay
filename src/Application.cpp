@@ -67,6 +67,22 @@ namespace relay
         }
     }
 
+    void Application::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    {
+        for (const auto& sender : senders)
+        {
+            sender->sendAudioHeader(headerData);
+        }
+    }
+
+    void Application::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    {
+        for (const auto& sender : senders)
+        {
+            sender->sendVideoHeader(headerData);
+        }
+    }
+
     void Application::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         for (const auto& sender : senders)
@@ -87,7 +103,7 @@ namespace relay
     {
         for (const auto& sender : senders)
         {
-            sender->setMetaData(metaData);
+            sender->sendMetaData(metaData);
         }
     }
 

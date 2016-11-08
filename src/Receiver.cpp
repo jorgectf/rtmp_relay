@@ -49,6 +49,8 @@ namespace relay
         invokes.clear();
         receivedPackets.clear();
         sentPackets.clear();
+        audioHeader.clear();
+        videoHeader.clear();
         metaData = amf0::Node();
         timeSincePing = 0.0f;
     }
@@ -412,8 +414,16 @@ namespace relay
                 Log log(Log::Level::ALL);
                 log << "[" << name << "] " << "Audio packet";
 
-                // forward audio packet
-                server.sendAudio(packet.timestamp, packet.data);
+                if (audioHeader.empty())
+                {
+                    audioHeader = packet.data;
+                    server.sendAudioHeader(audioHeader);
+                }
+                else
+                {
+                    // forward audio packet
+                    server.sendAudio(packet.timestamp, packet.data);
+                }
                 break;
             }
 
@@ -430,8 +440,16 @@ namespace relay
 
                 }
 
-                // forward video packet
-                server.sendVideo(packet.timestamp, packet.data);
+                if (videoHeader.empty())
+                {
+                    videoHeader = packet.data;
+                    server.sendVideoHeader(videoHeader);
+                }
+                else
+                {
+                    // forward video packet
+                    server.sendVideo(packet.timestamp, packet.data);
+                }
                 break;
             }
 

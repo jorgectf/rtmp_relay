@@ -91,7 +91,14 @@ namespace relay
         invokeId = 0;
         invokes.clear();
 
+        audioHeaderSent = false;
+        audioHeader.clear();
+        videoHeaderSent = false;
+        videoHeader.clear();
+
         metaDataSent = false;
+        metaData = amf0::Node();
+
         videoFrameSent = false;
         audioFrameSent = false;
     }
@@ -563,6 +570,8 @@ namespace relay
                             streaming = true;
 
                             sendMetaData();
+                            sendAudioHeader();
+                            sendVidioHeader();
                         }
 
                         invokes.erase(i);
@@ -905,6 +914,40 @@ namespace relay
         streaming = false;
     }
 
+    void Sender::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    {
+        audioHeader = headerData;
+        audioHeaderSent = false;
+
+        sendAudioHeader();
+    }
+
+    void Sender::sendAudioHeader()
+    {
+        if (streaming && !audioHeader.empty())
+        {
+            sendAudio(0, audioHeader);
+            audioHeaderSent = true;
+        }
+    }
+
+    void Sender::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    {
+        videoHeader = headerData;
+        videoHeaderSent = false;
+
+        sendVidioHeader();
+    }
+
+    void Sender::sendVidioHeader()
+    {
+        if (streaming && !videoHeader.empty())
+        {
+            sendVideo(0, videoHeader);
+            videoHeaderSent = true;
+        }
+    }
+
     void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         if (streaming && audioStream)
@@ -952,7 +995,7 @@ namespace relay
         }
     }
 
-    void Sender::setMetaData(const amf0::Node& newMetaData)
+    void Sender::sendMetaData(const amf0::Node& newMetaData)
     {
         metaData = newMetaData;
         metaDataSent = false;
@@ -962,7 +1005,7 @@ namespace relay
 
     void Sender::sendMetaData()
     {
-        if (streaming)
+        if (streaming && metaData.getMarker() != amf0::Marker::Unknown)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;

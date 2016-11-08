@@ -98,6 +98,16 @@ namespace relay
         if (application) application->unpublishStream();
     }
 
+    void Server::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    {
+        if (application) application->sendAudioHeader(headerData);
+    }
+
+    void Server::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    {
+        if (application) application->sendVideoHeader(headerData);
+    }
+
     void Server::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         if (application) application->sendAudio(timestamp, audioData);

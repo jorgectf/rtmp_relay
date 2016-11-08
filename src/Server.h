@@ -58,6 +58,9 @@ namespace relay
         void createStream(const std::string& streamName);
         void deleteStream();
         void unpublishStream();
+
+        void sendAudioHeader(const std::vector<uint8_t>& headerData);
+        void sendVideoHeader(const std::vector<uint8_t>& headerData);
         void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
         void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
         void sendMetaData(const amf0::Node& metaData);
