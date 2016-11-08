@@ -109,6 +109,9 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
 
 size_t replaceTokens(std::string& str, const std::map<std::string, std::string>& tokens);
 
+std::string getAudioCodec(uint32_t codecId);
+std::string getVideoCodec(uint32_t codecId);
+
 enum class VideoFrameType
 {
     NONE = 0,
