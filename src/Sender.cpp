@@ -571,7 +571,7 @@ namespace relay
 
                             sendMetaData();
                             sendAudioHeader();
-                            sendVidioHeader();
+                            sendVideoHeader();
                         }
 
                         invokes.erase(i);
@@ -936,10 +936,10 @@ namespace relay
         videoHeader = headerData;
         videoHeaderSent = false;
 
-        sendVidioHeader();
+        sendVideoHeader();
     }
 
-    void Sender::sendVidioHeader()
+    void Sender::sendVideoHeader()
     {
         if (streaming && !videoHeader.empty())
         {

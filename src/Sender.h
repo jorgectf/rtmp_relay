@@ -63,7 +63,7 @@ namespace relay
         
     private:
         void sendAudioHeader();
-        void sendVidioHeader();
+        void sendVideoHeader();
         void sendMetaData();
 
         void reset();
