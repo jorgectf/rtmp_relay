@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "Application.h"
+#include "Server.h"
 #include "Log.h"
 
 using namespace cppsocket;
@@ -15,29 +16,29 @@ namespace relay
                              const std::string& aName):
         name(aName)
     {
-        for (const SenderDescriptor& senderDescriptor : applicationDescriptor.senderDescriptors)
+        for (const PushDescriptor& pushDescriptor : applicationDescriptor.pushDescriptors)
         {
-            std::unique_ptr<Sender> sender(new Sender(aNetwork,
-                                                      name,
-                                                      senderDescriptor.overrideStreamName,
-                                                      senderDescriptor.addresses,
-                                                      senderDescriptor.videoOutput,
-                                                      senderDescriptor.audioOutput,
-                                                      senderDescriptor.dataOutput,
-                                                      senderDescriptor.metaDataBlacklist,
-                                                      senderDescriptor.connectionTimeout,
-                                                      senderDescriptor.reconnectInterval,
-                                                      senderDescriptor.reconnectCount));
+            std::unique_ptr<Push> sender(new Push(aNetwork,
+                                                  name,
+                                                  pushDescriptor.overrideStreamName,
+                                                  pushDescriptor.addresses,
+                                                  pushDescriptor.videoOutput,
+                                                  pushDescriptor.audioOutput,
+                                                  pushDescriptor.dataOutput,
+                                                  pushDescriptor.metaDataBlacklist,
+                                                  pushDescriptor.connectionTimeout,
+                                                  pushDescriptor.reconnectInterval,
+                                                  pushDescriptor.reconnectCount));
 
             sender->connect();
 
-            senders.push_back(std::move(sender));
+            pushSenders.push_back(std::move(sender));
         }
     }
 
     void Application::update(float delta)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->update(delta);
         }
@@ -45,7 +46,7 @@ namespace relay
 
     void Application::createStream(const std::string& streamName)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->createStream(streamName);
         }
@@ -53,7 +54,7 @@ namespace relay
 
     void Application::deleteStream()
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->deleteStream();
         }
@@ -61,7 +62,7 @@ namespace relay
 
     void Application::unpublishStream()
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->unpublishStream();
         }
@@ -69,7 +70,7 @@ namespace relay
 
     void Application::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->sendAudioHeader(headerData);
         }
@@ -77,7 +78,7 @@ namespace relay
 
     void Application::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->sendVideoHeader(headerData);
         }
@@ -85,7 +86,7 @@ namespace relay
 
     void Application::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->sendAudio(timestamp, audioData);
         }
@@ -93,7 +94,7 @@ namespace relay
 
     void Application::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->sendVideo(timestamp, videoData);
         }
@@ -101,7 +102,7 @@ namespace relay
 
     void Application::sendMetaData(const amf0::Node& metaData)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->sendMetaData(metaData);
         }
@@ -109,7 +110,7 @@ namespace relay
 
     void Application::sendTextData(const amf0::Node& textData)
     {
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->sendTextData(textData);
         }
@@ -119,8 +120,8 @@ namespace relay
     {
         Log(Log::Level::INFO) << "Application: " << name;
 
-        Log(Log::Level::INFO) << "Senders:";
-        for (const auto& sender : senders)
+        Log(Log::Level::INFO) << "Push senders:";
+        for (const auto& sender : pushSenders)
         {
             sender->printInfo();
         }
@@ -130,9 +131,9 @@ namespace relay
     {
         str += "Application: " + name;
 
-        str += "<h2>Senders</h2><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+        str += "<h2>Push senders</h2><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
 
-        for (const auto& sender : senders)
+        for (const auto& sender : pushSenders)
         {
             sender->getInfo(str);
         }

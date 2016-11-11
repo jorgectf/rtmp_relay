@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <cstring>
-#include "Sender.h"
+#include "Push.h"
 #include "Constants.h"
 #include "RTMP.h"
 #include "Amf0.h"
@@ -16,17 +16,17 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Sender::Sender(Network& aNetwork,
-                   const std::string& aApplication,
-                   const std::string& aOverrideStreamName,
-                   const std::vector<std::string>& aAddresses,
-                   bool videoOutput,
-                   bool audioOutput,
-                   bool dataOutput,
-                   const std::set<std::string>& aMetaDataBlacklist,
-                   float aConnectionTimeout,
-                   float aReconnectInterval,
-                   uint32_t aReconnectCount):
+    Push::Push(Network& aNetwork,
+               const std::string& aApplication,
+               const std::string& aOverrideStreamName,
+               const std::vector<std::string>& aAddresses,
+               bool videoOutput,
+               bool audioOutput,
+               bool dataOutput,
+               const std::set<std::string>& aMetaDataBlacklist,
+               float aConnectionTimeout,
+               float aReconnectInterval,
+               uint32_t aReconnectCount):
         generator(rd()),
         network(aNetwork),
         socket(network),
@@ -47,9 +47,9 @@ namespace relay
         }
         
         socket.setConnectTimeout(connectionTimeout);
-        socket.setConnectCallback(std::bind(&Sender::handleConnect, this));
-        socket.setReadCallback(std::bind(&Sender::handleRead, this, std::placeholders::_1, std::placeholders::_2));
-        socket.setCloseCallback(std::bind(&Sender::handleClose, this, std::placeholders::_1));
+        socket.setConnectCallback(std::bind(&Push::handleConnect, this));
+        socket.setReadCallback(std::bind(&Push::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+        socket.setCloseCallback(std::bind(&Push::handleClose, this, std::placeholders::_1));
 
         if (!videoOutput)
         {
@@ -72,12 +72,7 @@ namespace relay
         }
     }
 
-    Sender::~Sender()
-    {
-        
-    }
-
-    void Sender::reset()
+    void Push::reset()
     {
         socket.close();
         data.clear();
@@ -103,7 +98,7 @@ namespace relay
         audioFrameSent = false;
     }
 
-    bool Sender::connect()
+    bool Push::connect()
     {
         reset();
         active = true;
@@ -139,7 +134,7 @@ namespace relay
         return true;
     }
 
-    void Sender::disconnect()
+    void Push::disconnect()
     {
         Log(Log::Level::ERR) << "[" << name << "] " << "Disconnecting";
         reset();
@@ -148,7 +143,7 @@ namespace relay
         connectCount = 0;
     }
 
-    void Sender::update(float delta)
+    void Push::update(float delta)
     {
         if (active && !socket.isReady())
         {
@@ -161,7 +156,7 @@ namespace relay
         }
     }
 
-    void Sender::handleConnect()
+    void Push::handleConnect()
     {
         Log(Log::Level::INFO) << "[" << name << "] " << "Connected";
 
@@ -189,14 +184,14 @@ namespace relay
         state = rtmp::State::VERSION_SENT;
     }
 
-    bool Sender::sendPacket(const std::vector<uint8_t>& packet)
+    bool Push::sendPacket(const std::vector<uint8_t>& packet)
     {
         socket.send(packet);
         
         return true;
     }
 
-    void Sender::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
+    void Push::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
@@ -318,7 +313,7 @@ namespace relay
         Log(Log::Level::ALL) << "[" << name << "] " << "Remaining data " << data.size();
     }
 
-    void Sender::handleClose(cppsocket::Socket&)
+    void Push::handleClose(cppsocket::Socket&)
     {
         if (active)
         {
@@ -326,7 +321,7 @@ namespace relay
         }
     }
 
-    bool Sender::handlePacket(const rtmp::Packet& packet)
+    bool Push::handlePacket(const rtmp::Packet& packet)
     {
         switch (packet.messageType)
         {
@@ -449,13 +444,13 @@ namespace relay
 
             case rtmp::MessageType::AUDIO_PACKET:
             {
-                // ignore this, sender should not receive audio data
+                // ignore this, audio data should not be received
                 break;
             }
 
             case rtmp::MessageType::VIDEO_PACKET:
             {
-                // ignore this, sender should not receive video data
+                // ignore this, video data should not be received
                 break;
             }
 
@@ -590,7 +585,7 @@ namespace relay
         return true;
     }
 
-    void Sender::sendConnect()
+    void Push::sendConnect()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -621,7 +616,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::sendSetChunkSize()
+    void Push::sendSetChunkSize()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -638,7 +633,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Sender::sendCheckBW()
+    void Push::sendCheckBW()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -664,7 +659,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::sendCreateStream()
+    void Push::sendCreateStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -690,7 +685,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::sendReleaseStream()
+    void Push::sendReleaseStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -719,7 +714,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::sendDeleteStream()
+    void Push::sendDeleteStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -748,7 +743,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::sendFCPublish()
+    void Push::sendFCPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -777,7 +772,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::sendFCUnpublish()
+    void Push::sendFCUnpublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -806,7 +801,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::sendPublish()
+    void Push::sendPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SOURCE;
@@ -836,7 +831,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Sender::printInfo() const
+    void Push::printInfo() const
     {
         Log log(Log::Level::INFO);
         log << "\t[" << name << "] "<< (socket.isReady() ? "Connected" : "Not connected") << " to: " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << ", state: ";
@@ -851,7 +846,7 @@ namespace relay
         }
     }
 
-    void Sender::getInfo(std::string& str) const
+    void Push::getInfo(std::string& str) const
     {
         str += "<tr><td>" + name + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
 
@@ -867,7 +862,7 @@ namespace relay
         str += "</td></tr>";
     }
 
-    void Sender::createStream(const std::string& newStreamName)
+    void Push::createStream(const std::string& newStreamName)
     {
         if (overrideStreamName.empty())
         {
@@ -894,7 +889,7 @@ namespace relay
         }
     }
 
-    void Sender::deleteStream()
+    void Push::deleteStream()
     {
         if (connected && !streamName.empty())
         {
@@ -904,7 +899,7 @@ namespace relay
         streaming = false;
     }
 
-    void Sender::unpublishStream()
+    void Push::unpublishStream()
     {
         if (connected && !streamName.empty())
         {
@@ -914,7 +909,7 @@ namespace relay
         streaming = false;
     }
 
-    void Sender::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    void Push::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
         audioHeader = headerData;
         audioHeaderSent = false;
@@ -922,7 +917,7 @@ namespace relay
         sendAudioHeader();
     }
 
-    void Sender::sendAudioHeader()
+    void Push::sendAudioHeader()
     {
         if (streaming && !audioHeader.empty())
         {
@@ -931,7 +926,7 @@ namespace relay
         }
     }
 
-    void Sender::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    void Push::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
         videoHeader = headerData;
         videoHeaderSent = false;
@@ -939,7 +934,7 @@ namespace relay
         sendVideoHeader();
     }
 
-    void Sender::sendVideoHeader()
+    void Push::sendVideoHeader()
     {
         if (streaming && !videoHeader.empty())
         {
@@ -948,7 +943,7 @@ namespace relay
         }
     }
 
-    void Sender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    void Push::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         if (streaming && audioStream)
         {
@@ -971,7 +966,7 @@ namespace relay
         }
     }
 
-    void Sender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    void Push::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
         if (streaming && videoStream &&
             (videoFrameSent || getVideoFrameType(videoData) == VideoFrameType::KEY))
@@ -995,7 +990,7 @@ namespace relay
         }
     }
 
-    void Sender::sendMetaData(const amf0::Node& newMetaData)
+    void Push::sendMetaData(const amf0::Node& newMetaData)
     {
         metaData = newMetaData;
         metaDataSent = false;
@@ -1003,7 +998,7 @@ namespace relay
         sendMetaData();
     }
 
-    void Sender::sendMetaData()
+    void Push::sendMetaData()
     {
         if (streaming && metaData.getMarker() != amf0::Marker::Unknown)
         {
@@ -1047,7 +1042,7 @@ namespace relay
         }
     }
 
-    void Sender::sendTextData(const amf0::Node& textData)
+    void Push::sendTextData(const amf0::Node& textData)
     {
         if (streaming && dataStream)
         {

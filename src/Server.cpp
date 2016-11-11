@@ -24,11 +24,6 @@ namespace relay
         socket.startAccept(address);
     }
 
-    Server::~Server()
-    {
-        
-    }
-
     void Server::update(float delta)
     {
         if (application) application->update(delta);

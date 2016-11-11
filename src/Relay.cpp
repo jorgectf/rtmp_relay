@@ -13,6 +13,7 @@
 #include "Relay.h"
 #include "Server.h"
 #include "Status.h"
+#include "Application.h"
 
 using namespace cppsocket;
 
@@ -87,13 +88,13 @@ namespace relay
 
                 for (size_t pushIndex = 0; pushIndex < pushArray.size(); ++pushIndex)
                 {
-                    SenderDescriptor senderDescriptor;
+                    PushDescriptor pushDescriptor;
 
                     const YAML::Node& pushObject = pushArray[pushIndex];
 
                     if (pushObject["overrideStreamName"])
                     {
-                        senderDescriptor.overrideStreamName = pushObject["overrideStreamName"].as<std::string>();
+                        pushDescriptor.overrideStreamName = pushObject["overrideStreamName"].as<std::string>();
                     }
 
                     std::vector<std::string> pushAddresses;
@@ -106,22 +107,22 @@ namespace relay
 
                             for (size_t index = 0; index < addressArray.size(); ++index)
                             {
-                                senderDescriptor.addresses.push_back(addressArray[index].as<std::string>());
+                                pushDescriptor.addresses.push_back(addressArray[index].as<std::string>());
                             }
                         }
                         else
                         {
-                            senderDescriptor.addresses.push_back(pushObject["address"].as<std::string>());
+                            pushDescriptor.addresses.push_back(pushObject["address"].as<std::string>());
                         }
                     }
                     else
                     {
-                        senderDescriptor.addresses.push_back("127.0.0.1:1935");
+                        pushDescriptor.addresses.push_back("127.0.0.1:1935");
                     }
 
-                    senderDescriptor.videoOutput = pushObject["video"] ? pushObject["video"].as<bool>() : true;
-                    senderDescriptor.audioOutput = pushObject["audio"] ? pushObject["audio"].as<bool>() : true;
-                    senderDescriptor.dataOutput = pushObject["data"] ? pushObject["data"].as<bool>() : true;
+                    pushDescriptor.videoOutput = pushObject["video"] ? pushObject["video"].as<bool>() : true;
+                    pushDescriptor.audioOutput = pushObject["audio"] ? pushObject["audio"].as<bool>() : true;
+                    pushDescriptor.dataOutput = pushObject["data"] ? pushObject["data"].as<bool>() : true;
 
                     if (pushObject["metaDataBlacklist"])
                     {
@@ -130,15 +131,15 @@ namespace relay
                         for (size_t index = 0; index < metaDataBlacklistArray.size(); ++index)
                         {
                             const YAML::Node& str = metaDataBlacklistArray[index];
-                            senderDescriptor.metaDataBlacklist.insert(str.as<std::string>());
+                            pushDescriptor.metaDataBlacklist.insert(str.as<std::string>());
                         }
                     }
 
-                    senderDescriptor.connectionTimeout = pushObject["connectionTimeout"] ? pushObject["connectionTimeout"].as<float>() : 5.0f;
-                    senderDescriptor.reconnectInterval = pushObject["reconnectInterval"] ? pushObject["reconnectInterval"].as<float>() : 5.0f;
-                    senderDescriptor.reconnectCount = pushObject["reconnectCount"] ? pushObject["reconnectCount"].as<uint32_t>() : 3;
+                    pushDescriptor.connectionTimeout = pushObject["connectionTimeout"] ? pushObject["connectionTimeout"].as<float>() : 5.0f;
+                    pushDescriptor.reconnectInterval = pushObject["reconnectInterval"] ? pushObject["reconnectInterval"].as<float>() : 5.0f;
+                    pushDescriptor.reconnectCount = pushObject["reconnectCount"] ? pushObject["reconnectCount"].as<uint32_t>() : 3;
                     
-                    applicationDescriptor.senderDescriptors.push_back(senderDescriptor);
+                    applicationDescriptor.pushDescriptors.push_back(pushDescriptor);
                 }
 
                 applicationDescriptors.push_back(applicationDescriptor);
@@ -152,11 +153,6 @@ namespace relay
         }
         
         return true;
-    }
-
-    Relay::~Relay()
-    {
-        
     }
 
     void Relay::run()

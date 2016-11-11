@@ -18,7 +18,6 @@ namespace relay
     {
     public:
         Relay(cppsocket::Network& aNetwork);
-        ~Relay();
         
         Relay(const Relay&) = delete;
         Relay& operator=(const Relay&) = delete;

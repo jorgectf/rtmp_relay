@@ -10,30 +10,11 @@
 #include <set>
 #include <memory>
 #include "Acceptor.h"
-#include "Sender.h"
 #include "Receiver.h"
+#include "Application.h"
 
 namespace relay
 {
-    struct SenderDescriptor
-    {
-        std::string overrideStreamName;
-        std::vector<std::string> addresses;
-        bool videoOutput;
-        bool audioOutput;
-        bool dataOutput;
-        std::set<std::string> metaDataBlacklist;
-        float connectionTimeout;
-        float reconnectInterval;
-        uint32_t reconnectCount;
-    };
-
-    struct ApplicationDescriptor
-    {
-        std::string name;
-        std::vector<SenderDescriptor> senderDescriptors;
-    };
-
     class Application;
     
     class Server
@@ -43,7 +24,6 @@ namespace relay
                const std::string& address,
                float aPingInterval,
                const std::vector<ApplicationDescriptor>& aApplicationDescriptors);
-        ~Server();
         
         Server(const Server&) = delete;
         Server& operator=(const Server&) = delete;

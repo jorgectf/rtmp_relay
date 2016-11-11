@@ -31,11 +31,6 @@ namespace relay
         socket.startRead();
     }
 
-    Receiver::~Receiver()
-    {
-        
-    }
-
     void Receiver::reset()
     {
         socket.close();

@@ -14,7 +14,9 @@
 #include <fcntl.h>
 
 #include "Constants.h"
-#include "Relay.h"
+#include "Status.h"
+#include "Server.h"
+#include "Application.h"
 #include "Log.h"
 
 using namespace relay;

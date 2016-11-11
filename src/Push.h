@@ -15,28 +15,40 @@
 
 namespace relay
 {
-    class Sender
+    struct PushDescriptor
     {
-        const std::string name = "Sender";
+        std::string overrideStreamName;
+        std::vector<std::string> addresses;
+        bool videoOutput;
+        bool audioOutput;
+        bool dataOutput;
+        std::set<std::string> metaDataBlacklist;
+        float connectionTimeout;
+        float reconnectInterval;
+        uint32_t reconnectCount;
+    };
+    
+    class Push
+    {
+        const std::string name = "Push";
     public:
-        Sender(cppsocket::Network& aNetwork,
-               const std::string& aApplication,
-               const std::string& aOverrideStreamName,
-               const std::vector<std::string>& aAddresses,
-               bool videoOutput,
-               bool audioOutput,
-               bool dataOutput,
-               const std::set<std::string>& aMetaDataBlacklist,
-               float aConnectionTimeout,
-               float aReconnectInterval,
-               uint32_t aReconnectCount);
-        ~Sender();
+        Push(cppsocket::Network& aNetwork,
+             const std::string& aApplication,
+             const std::string& aOverrideStreamName,
+             const std::vector<std::string>& aAddresses,
+             bool videoOutput,
+             bool audioOutput,
+             bool dataOutput,
+             const std::set<std::string>& aMetaDataBlacklist,
+             float aConnectionTimeout,
+             float aReconnectInterval,
+             uint32_t aReconnectCount);
         
-        Sender(const Sender&) = delete;
-        Sender& operator=(const Sender&) = delete;
+        Push(const Push&) = delete;
+        Push& operator=(const Push&) = delete;
         
-        Sender(Sender&& other) = delete;
-        Sender& operator=(Sender&& other) = delete;
+        Push(Push&& other) = delete;
+        Push& operator=(Push&& other) = delete;
         
         bool connect();
         void disconnect();

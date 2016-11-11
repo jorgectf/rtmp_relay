@@ -23,7 +23,6 @@ namespace relay
         Receiver(cppsocket::Socket& aSocket,
                  Server& aServer,
                  float aPingInterval);
-        ~Receiver();
 
         void reset();
         

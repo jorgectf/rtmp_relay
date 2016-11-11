@@ -11,17 +11,24 @@
 #include "Network.h"
 #include "Connector.h"
 #include "RTMP.h"
-#include "Server.h"
+#include "Push.h"
+#include "Pull.h"
 
 namespace relay
 {
+    struct ApplicationDescriptor
+    {
+        std::string name;
+        std::vector<PushDescriptor> pushDescriptors;
+        std::vector<PullDescriptor> pullDescriptors;
+    };
+    
     class Application
     {
     public:
         Application(cppsocket::Network& aNetwork,
                     const ApplicationDescriptor& applicationDescriptor,
                     const std::string& aName);
-        virtual ~Application() {}
 
         const std::string& getName() const { return name; }
 
@@ -44,6 +51,7 @@ namespace relay
     private:
         std::string name;
 
-        std::vector<std::unique_ptr<Sender>> senders;
+        std::vector<std::unique_ptr<Push>> pushSenders;
+        std::vector<std::unique_ptr<Pull>> pullSenders;
     };
 }
