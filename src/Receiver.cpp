@@ -415,7 +415,7 @@ namespace relay
                 log << "[" << name << "] " << "Audio packet";
                 if (isCodecHeader(packet.data)) log << "(header)";
 
-                if (audioHeader.empty() && isCodecHeader(packet.data))
+                if (isCodecHeader(packet.data))
                 {
                     audioHeader = packet.data;
                     server.sendAudioHeader(audioHeader);
@@ -442,7 +442,7 @@ namespace relay
 
                 if (isCodecHeader(packet.data)) log << "(header)";
 
-                if (videoHeader.empty() && isCodecHeader(packet.data))
+                if (isCodecHeader(packet.data))
                 {
                     videoHeader = packet.data;
                     server.sendVideoHeader(videoHeader);
