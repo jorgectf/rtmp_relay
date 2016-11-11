@@ -413,8 +413,9 @@ namespace relay
             {
                 Log log(Log::Level::ALL);
                 log << "[" << name << "] " << "Audio packet";
+                if (isCodecHeader(packet.data)) log << "(header)";
 
-                if (audioHeader.empty())
+                if (audioHeader.empty() && isCodecHeader(packet.data))
                 {
                     audioHeader = packet.data;
                     server.sendAudioHeader(audioHeader);
@@ -437,10 +438,11 @@ namespace relay
                     case VideoFrameType::INTER: log << "inter frame"; break;
                     case VideoFrameType::DISPOSABLE: log << "disposable frame"; break;
                     default: log << "unknown frame"; break;
-
                 }
 
-                if (videoHeader.empty())
+                if (isCodecHeader(packet.data)) log << "(header)";
+
+                if (videoHeader.empty() && isCodecHeader(packet.data))
                 {
                     videoHeader = packet.data;
                     server.sendVideoHeader(videoHeader);

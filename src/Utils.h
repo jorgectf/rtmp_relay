@@ -126,3 +126,8 @@ inline VideoFrameType getVideoFrameType(const std::vector<uint8_t>& data)
 
     return static_cast<VideoFrameType>((data[0] & 0xf0) >> 4);
 }
+
+inline bool isCodecHeader(const std::vector<uint8_t>& data)
+{
+    return data.size() >= 2 && data[1] == 0;
+}
