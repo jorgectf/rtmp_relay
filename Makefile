@@ -4,10 +4,11 @@ LDFLAGS=
 SOURCES=src/Amf0.cpp \
 	src/Application.cpp \
 	src/main.cpp \
+	src/Pull.cpp \
+	src/Push.cpp \
 	src/Receiver.cpp \
 	src/Relay.cpp \
 	src/RTMP.cpp \
-	src/Sender.cpp \
 	src/Server.cpp \
 	src/Status.cpp \
 	src/Utils.cpp \
