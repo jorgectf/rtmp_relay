@@ -93,9 +93,6 @@ namespace relay
 
         metaDataSent = false;
         metaData = amf0::Node();
-
-        videoFrameSent = false;
-        audioFrameSent = false;
     }
 
     bool Push::connect()
@@ -961,15 +958,12 @@ namespace relay
             Log(Log::Level::ALL) << "[" << name << "] " << "Sending audio packet";
 
             socket.send(buffer);
-
-            audioFrameSent = true;
         }
     }
 
     void Push::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        if (streaming && videoStream &&
-            (videoFrameSent || getVideoFrameType(videoData) == VideoFrameType::KEY))
+        if (streaming && videoStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::VIDEO;
@@ -985,8 +979,6 @@ namespace relay
             Log(Log::Level::ALL) << "[" << name << "] " << "Sending video packet";
 
             socket.send(buffer);
-
-            videoFrameSent = true;
         }
     }
 

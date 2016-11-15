@@ -146,8 +146,5 @@ namespace relay
 
         amf0::Node metaData;
         bool metaDataSent = false;
-
-        bool videoFrameSent = false;
-        bool audioFrameSent = false;
     };
 }
