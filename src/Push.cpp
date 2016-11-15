@@ -77,6 +77,9 @@ namespace relay
         socket.close();
         data.clear();
 
+        receivedPackets.clear();
+        sentPackets.clear();
+
         state = rtmp::State::UNINITIALIZED;
         inChunkSize = 128;
         outChunkSize = 128;
