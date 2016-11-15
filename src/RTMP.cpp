@@ -57,9 +57,7 @@ namespace relay
                 default: log << "invalid header type"; break;
             };
 
-            log << "(" << static_cast<uint32_t>(header.type) << ")";
-
-            log << ", channel: " << static_cast<uint32_t>(header.channel);
+            log << "(" << static_cast<uint32_t>(header.type) << "), channel: " << static_cast<uint32_t>(header.channel);
 
             header.length  = previousPackets[header.channel].length;
             header.messageType  = previousPackets[header.channel].messageType;
@@ -382,6 +380,69 @@ namespace relay
 
                 start += size;
                 remainingBytes -= size;
+
+                Log log(Log::Level::ALL);
+                log << "Header type: ";
+
+                switch (header.type)
+                {
+                    case Header::Type::TWELVE_BYTE: log << "TWELVE_BYTE"; break;
+                    case Header::Type::EIGHT_BYTE: log << "EIGHT_BYTE"; break;
+                    case Header::Type::FOUR_BYTE: log << "FOUR_BYTE"; break;
+                    case Header::Type::ONE_BYTE: log << "ONE_BYTE"; break;
+                    default: log << "invalid header type"; break;
+                };
+
+                log << "(" << static_cast<uint32_t>(header.type) << "), channel: " << static_cast<uint32_t>(header.channel);
+
+                if (header.type != Header::Type::ONE_BYTE)
+                {
+                    log << ", ts: " << header.ts;
+
+                    if (header.ts == 0xffffff)
+                    {
+                        log << " (extended)";
+                    }
+
+                    if (header.type != Header::Type::FOUR_BYTE)
+                    {
+                        log << ", data length: " << header.length;
+                        log << ", message type: ";
+
+                        switch (header.messageType)
+                        {
+                            case rtmp::MessageType::SET_CHUNK_SIZE: log << "SET_CHUNK_SIZE"; break;
+                            case rtmp::MessageType::BYTES_READ: log << "BYTES_READ"; break;
+                            case rtmp::MessageType::PING: log << "PING"; break;
+                            case rtmp::MessageType::SERVER_BANDWIDTH: log << "SERVER_BANDWIDTH"; break;
+                            case rtmp::MessageType::CLIENT_BANDWIDTH: log << "CLIENT_BANDWIDTH"; break;
+                            case rtmp::MessageType::AUDIO_PACKET: log << "AUDIO_PACKET"; break;
+                            case rtmp::MessageType::VIDEO_PACKET: log << "VIDEO_PACKET"; break;
+                            case rtmp::MessageType::FLEX_STREAM: log << "FLEX_STREAM"; break;
+                            case rtmp::MessageType::FLEX_OBJECT: log << "FLEX_OBJECT"; break;
+                            case rtmp::MessageType::FLEX_MESSAGE: log << "FLEX_MESSAGE"; break;
+                            case rtmp::MessageType::NOTIFY: log << "NOTIFY"; break;
+                            case rtmp::MessageType::SHARED_OBJ: log << "SHARED_OBJ"; break;
+                            case rtmp::MessageType::INVOKE: log << "INVOKE"; break;
+                            default: log << "unknown command";
+                        };
+
+                        log << "(" << static_cast<uint32_t>(header.messageType) << ")";
+
+                        if (header.type != Header::Type::EIGHT_BYTE)
+                        {
+                            log << ", message stream ID: " << header.messageStreamId;
+                        }
+                    }
+                }
+
+                // extended timestamp
+                if (header.ts == 0xffffff)
+                {
+                    log << ", extended timestamp: " << header.timestamp;
+                }
+                
+                log << ", final timestamp: " << header.timestamp;
             }
             
             return static_cast<uint32_t>(data.size()) - originalSize;
