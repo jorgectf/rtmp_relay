@@ -108,11 +108,11 @@ namespace relay
         }
     }
 
-    void Application::sendTextData(const amf0::Node& textData)
+    void Application::sendTextData(uint64_t timestamp, const amf0::Node& textData)
     {
         for (const auto& sender : pushSenders)
         {
-            sender->sendTextData(textData);
+            sender->sendTextData(timestamp, textData);
         }
     }
 

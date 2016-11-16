@@ -118,9 +118,9 @@ namespace relay
         if (application) application->sendMetaData(metaData);
     }
 
-    void Server::sendTextData(const amf0::Node& textData)
+    void Server::sendTextData(uint64_t timestamp, const amf0::Node& textData)
     {
-        if (application) application->sendTextData(textData);
+        if (application) application->sendTextData(timestamp, textData);
     }
 
     void Server::printInfo() const

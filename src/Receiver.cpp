@@ -402,7 +402,7 @@ namespace relay
                 }
                 else if (command.asString() == "onTextData")
                 {
-                    server.sendTextData(argument1);
+                    server.sendTextData(packet.timestamp, argument1);
                 }
                 break;
             }

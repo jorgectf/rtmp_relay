@@ -1037,14 +1037,14 @@ namespace relay
         }
     }
 
-    void Push::sendTextData(const amf0::Node& textData)
+    void Push::sendTextData(uint64_t timestamp, const amf0::Node& textData)
     {
         if (streaming && dataStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
             packet.messageStreamId = 1;
-            packet.timestamp = 0;
+            packet.timestamp = timestamp;
             packet.messageType = rtmp::MessageType::NOTIFY;
 
             amf0::Node commandName = std::string("onTextData");
