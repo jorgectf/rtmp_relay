@@ -18,7 +18,6 @@ To compile the RTMP relay, just run "make" in the root directory. To launch it, 
 
 RTMP relay configuration files are YAML-based. It must start with servers array. Each server has following attributes:
 
-* *statusPageAddress* – the address of the web status page (optional)
 * *listen* – the address server is listening to
 * *applications* – application object (can be multiple for each server)
  * *name* – name of the application (optional if server should route all applications)
@@ -40,8 +39,12 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * ${address} – IP address of the destination
 * ${port} – destination port
 
+Optionally you can specify the address of the status page:
+*statusPageAddress* – the address of the web status page (optional)
+
 Example configuration:
 
+    statusPageAddress: "0.0.0.0:80"
     servers:
       - listen: "127.0.0.1:2200"
         applications:
