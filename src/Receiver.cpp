@@ -525,11 +525,12 @@ namespace relay
 
                 if (command.asString() == "connect")
                 {
-                    Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application, disconnecting";
-
                     if (!connect(argument1["app"].asString()))
                     {
                         socket.close();
+
+                        Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application, disconnecting";
+                        
                         return false;
                     }
 
