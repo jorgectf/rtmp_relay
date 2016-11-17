@@ -18,20 +18,20 @@ namespace relay
     {
     public:
         Relay(cppsocket::Network& aNetwork);
-        
+
         Relay(const Relay&) = delete;
         Relay& operator=(const Relay&) = delete;
-        
+
         Relay(Relay&&);
         Relay& operator=(Relay&&);
-        
+
         bool init(const std::string& config);
-        
+
         void run();
 
         void printInfo() const;
         void getInfo(std::string& str) const;
-        
+
     private:
         cppsocket::Network& network;
         std::vector<std::unique_ptr<Server>> servers;

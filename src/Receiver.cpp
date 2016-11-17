@@ -26,7 +26,7 @@ namespace relay
         {
             Log(Log::Level::ERR) << "[" << name << "] " << "Failed to set socket non-blocking";
         }
-        
+
         socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Receiver::handleClose, this, std::placeholders::_1));
         socket.startRead();
@@ -57,7 +57,7 @@ namespace relay
     void Receiver::update(float delta)
     {
         if (application) application->update(delta);
-        
+
         if (socket.isReady() && pingInterval > 0.0f)
         {
             timeSincePing += delta;
@@ -77,7 +77,7 @@ namespace relay
             packet = data;
             return true;
         }
-        
+
         return false;
     }
 
@@ -86,9 +86,9 @@ namespace relay
         data.insert(data.end(), newData.begin(), newData.end());
 
         Log(Log::Level::ALL) << "[" << name << "] " << "Got " << std::to_string(newData.size()) << " bytes";
-        
+
         uint32_t offset = 0;
-        
+
         while (offset < data.size())
         {
             if (state == rtmp::State::UNINITIALIZED)
@@ -100,19 +100,19 @@ namespace relay
                     offset += sizeof(version);
 
                     Log(Log::Level::ALL) << "[" << name << "] " << "Got version " << static_cast<uint32_t>(version);
-                    
+
                     if (version != 0x03)
                     {
                         Log(Log::Level::ERR) << "[" << name << "] " << "Unsuported version, disconnecting";
                         socket.close();
                         break;
                     }
-                    
+
                     // S0
                     std::vector<uint8_t> reply;
                     reply.push_back(RTMP_VERSION);
                     socket.send(reply);
-                    
+
                     state = rtmp::State::VERSION_SENT;
                 }
                 else
@@ -133,36 +133,36 @@ namespace relay
                         static_cast<uint32_t>(challenge->version[1]) << "." <<
                         static_cast<uint32_t>(challenge->version[2]) << "." <<
                         static_cast<uint32_t>(challenge->version[3]);
-                    
+
                     // S1
                     rtmp::Challenge replyChallenge;
                     replyChallenge.time = 0;
                     memcpy(replyChallenge.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
-                    
+
                     for (size_t i = 0; i < sizeof(replyChallenge.randomBytes); ++i)
                     {
                         uint32_t randomValue = std::uniform_int_distribution<uint32_t>{ 0, 255 }(generator);
                         replyChallenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
                     }
-                    
+
                     std::vector<uint8_t> reply;
                     reply.insert(reply.begin(),
                                  reinterpret_cast<uint8_t*>(&replyChallenge),
                                  reinterpret_cast<uint8_t*>(&replyChallenge) + sizeof(replyChallenge));
                     socket.send(reply);
-                    
+
                     // S2
                     rtmp::Ack ack;
                     ack.time = challenge->time;
                     memcpy(ack.version, challenge->version, sizeof(ack.version));
                     memcpy(ack.randomBytes, challenge->randomBytes, sizeof(ack.randomBytes));
-                    
+
                     std::vector<uint8_t> ackData;
                     ackData.insert(ackData.begin(),
                                    reinterpret_cast<uint8_t*>(&ack),
                                    reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                     socket.send(ackData);
-                    
+
                     state = rtmp::State::ACK_SENT;
                 }
                 else
@@ -184,7 +184,7 @@ namespace relay
                         static_cast<uint32_t>(ack->version[2]) << "." <<
                         static_cast<uint32_t>(ack->version[3]);
                     Log(Log::Level::ALL) << "[" << name << "] " << "Handshake done";
-                    
+
                     state = rtmp::State::HANDSHAKE_DONE;
                 }
                 else
@@ -195,13 +195,13 @@ namespace relay
             else if (state == rtmp::State::HANDSHAKE_DONE)
             {
                 rtmp::Packet packet;
-                
+
                 uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet, receivedPackets);
 
                 if (ret > 0)
                 {
                     Log(Log::Level::ALL) << "[" << name << "] " << "Total packet size: " << ret;
-                    
+
                     offset += ret;
 
                     handlePacket(packet);
@@ -317,7 +317,7 @@ namespace relay
                 offset += ret;
 
                 Log(Log::Level::ALL) << "[" << name << "] " << "Server bandwidth: " << bandwidth;
-                
+
                 break;
             }
 
@@ -480,7 +480,7 @@ namespace relay
                     Log log(Log::Level::ALL);
                     command.dump(log);
                 }
-                
+
                 amf0::Node transactionId;
 
                 ret = transactionId.decode(packet.data, offset);

@@ -22,7 +22,7 @@ namespace relay
         std::vector<PushDescriptor> pushDescriptors;
         std::vector<PullDescriptor> pullDescriptors;
     };
-    
+
     class Application
     {
     public:

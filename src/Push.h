@@ -27,7 +27,7 @@ namespace relay
         float reconnectInterval;
         uint32_t reconnectCount;
     };
-    
+
     class Push
     {
         const std::string name = "Push";
@@ -43,18 +43,18 @@ namespace relay
              float aConnectionTimeout,
              float aReconnectInterval,
              uint32_t aReconnectCount);
-        
+
         Push(const Push&) = delete;
         Push& operator=(const Push&) = delete;
-        
+
         Push(Push&& other) = delete;
         Push& operator=(Push&& other) = delete;
-        
+
         bool connect();
         void disconnect();
 
         void update(float delta);
-        
+
         bool sendPacket(const std::vector<uint8_t>& packet);
 
         void printInfo() const;
@@ -72,7 +72,7 @@ namespace relay
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
         void sendMetaData(const amf0::Node& newMetaData);
-        
+
     private:
         void sendAudioHeader();
         void sendVideoHeader();
@@ -99,7 +99,7 @@ namespace relay
 
         std::random_device rd;
         std::mt19937 generator;
-        
+
         cppsocket::Network& network;
         cppsocket::Connector socket;
         const std::string application;

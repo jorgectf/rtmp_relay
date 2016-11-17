@@ -128,7 +128,7 @@ static int daemonize(const char* lock_file)
     }
 
     Log(Log::Level::INFO) << "Daemon started, pid: " << getpid();
-    
+
     return EXIT_SUCCESS;
 }
 
@@ -160,7 +160,7 @@ static int killDaemon(const char* lockFile)
     close(lfp);
 
     Log(Log::Level::INFO) << "Daemon killed";
-    
+
     return pid;
 }
 #endif
@@ -241,14 +241,14 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 #endif
-    
+
     if (!rel.init(config))
     {
         Log(Log::Level::ERR) << "Failed to init relay";
         return EXIT_FAILURE;
     }
-    
+
     rel.run();
-    
+
     return EXIT_SUCCESS;
 }

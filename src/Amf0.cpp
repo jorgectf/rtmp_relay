@@ -293,7 +293,7 @@ namespace relay
 
             return offset - originalOffset;
         }
-        
+
         static uint32_t readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
         {
             UNUSED(buffer);
@@ -303,14 +303,14 @@ namespace relay
 
             return 0;
         }
-        
+
         static uint32_t readSwitchToAMF3(const std::vector<uint8_t>& buffer, uint32_t& offset)
         {
             UNUSED(buffer);
             UNUSED(offset);
 
             Log(Log::Level::ERR) << "AMF3 is not supported";
-            
+
             return 0;
         }
 
@@ -498,7 +498,7 @@ namespace relay
                 buffer.push_back(static_cast<uint8_t>(i));
                 size += 1;
             }
-            
+
             return size;
         }
 
@@ -521,22 +521,22 @@ namespace relay
 
             return size;
         }
-        
+
         static uint32_t writeTypedObject(std::vector<uint8_t>& buffer)
         {
             UNUSED(buffer);
-            
+
             Log(Log::Level::ERR) << "Typed objects are not supported";
-            
+
             return 0;
         }
-        
+
         static uint32_t writeSwitchToAMF3(std::vector<uint8_t>& buffer)
         {
             UNUSED(buffer);
-            
+
             Log(Log::Level::ERR) << "AMF3 is not supported";
-            
+
             return 0;
         }
 

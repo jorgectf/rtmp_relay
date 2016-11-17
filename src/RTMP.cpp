@@ -18,12 +18,12 @@ namespace relay
         static uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
         {
             uint32_t originalOffset = offset;
-            
+
             if (data.size() - offset < 1)
             {
                 return 0;
             }
-            
+
             uint8_t headerData = *(data.data() + offset);
             offset += 1;
 
@@ -63,7 +63,7 @@ namespace relay
             header.messageType  = previousPackets[header.channel].messageType;
             header.messageStreamId = previousPackets[header.channel].messageStreamId;
             header.ts = previousPackets[header.channel].ts;
-            
+
             if (header.type != Header::Type::ONE_BYTE)
             {
                 uint32_t ret = decodeInt(data, offset, 3, header.ts);
@@ -74,32 +74,32 @@ namespace relay
                 {
                     log << " (extended)";
                 }
-                
+
                 if (!ret)
                 {
                     return 0;
                 }
-                
+
                 offset += ret;
-                
+
                 if (header.type != Header::Type::FOUR_BYTE)
                 {
                     ret = decodeInt(data, offset, 3, header.length);
 
                     log << ", data length: " << header.length;
-                    
+
                     if (!ret)
                     {
                         return 0;
                     }
-                    
+
                     offset += ret;
-                    
+
                     if (data.size() - offset < 1)
                     {
                         return 0;
                     }
-                    
+
                     header.messageType = static_cast<MessageType>(*(data.data() + offset));
                     offset += 1;
 
@@ -122,9 +122,9 @@ namespace relay
                         case rtmp::MessageType::INVOKE: log << "INVOKE"; break;
                         default: log << "unknown command";
                     };
-                    
+
                     log << "(" << static_cast<uint32_t>(header.messageType) << ")";
-                    
+
                     if (header.type != Header::Type::EIGHT_BYTE)
                     {
                         // little endian
@@ -162,14 +162,14 @@ namespace relay
             }
 
             log << ", final timestamp: " << header.timestamp;
-            
+
             return offset - originalOffset;
         }
-        
+
         uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets)
         {
             uint32_t originalOffset = offset;
-            
+
             uint32_t remainingBytes = 0;
 
             packet.data.clear();
@@ -182,12 +182,12 @@ namespace relay
             {
                 Header header;
                 uint32_t ret = decodeHeader(data, offset, header, currentPreviousPackets);
-                
+
                 if (!ret)
                 {
                     return 0;
                 }
-                
+
                 offset += ret;
 
                 if (header.type == Header::Type::FOUR_BYTE ||
@@ -223,7 +223,7 @@ namespace relay
                 }
 
                 packet.data.insert(packet.data.end(), data.begin() + offset, data.begin() + offset + packetSize);
-                
+
                 remainingBytes -= packetSize;
                 offset += packetSize;
             }
@@ -231,10 +231,10 @@ namespace relay
 
             // store previous packet if successfully read packet
             previousPackets = currentPreviousPackets;
-            
+
             return offset - originalOffset;
         }
-        
+
         static uint32_t encodeHeader(std::vector<uint8_t>& data, Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
         {
             uint32_t originalSize = static_cast<uint32_t>(data.size());
@@ -321,7 +321,7 @@ namespace relay
             if (header.type != Header::Type::ONE_BYTE)
             {
                 uint32_t ret = encodeInt(data, 3, header.ts);
-                
+
                 if (!ret)
                 {
                     return 0;
@@ -333,16 +333,16 @@ namespace relay
                 {
                     log << " (extended)";
                 }
-                
+
                 if (header.type != Header::Type::FOUR_BYTE)
                 {
                     ret = encodeInt(data, 3, header.length);
-                    
+
                     if (!ret)
                     {
                         return 0;
                     }
-                    
+
                     data.insert(data.end(), static_cast<uint8_t>(header.messageType));
 
                     log << ", data length: " << header.length;
@@ -395,7 +395,7 @@ namespace relay
 
             return static_cast<uint32_t>(data.size()) - originalSize;
         }
-        
+
         uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets)
         {
             uint32_t originalSize = static_cast<uint32_t>(data.size());
@@ -425,13 +425,13 @@ namespace relay
                 }
 
                 uint32_t size = std::min(remainingBytes, chunkSize);
-                
+
                 data.insert(data.end(), packet.data.begin() + start, packet.data.begin() + start + size);
 
                 start += size;
                 remainingBytes -= size;
             }
-            
+
             return static_cast<uint32_t>(data.size()) - originalSize;
         }
     }

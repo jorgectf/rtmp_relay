@@ -70,9 +70,9 @@ namespace relay
                 status.reset(new Status(network, *this, statusPageObject["listen"].as<std::string>()));
             }
         }
-        
+
         const YAML::Node& serversArray = document["servers"];
-        
+
         for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
             const YAML::Node& serverObject = serversArray[serverIndex];
@@ -143,7 +143,7 @@ namespace relay
                     pushDescriptor.connectionTimeout = pushObject["connectionTimeout"] ? pushObject["connectionTimeout"].as<float>() : 5.0f;
                     pushDescriptor.reconnectInterval = pushObject["reconnectInterval"] ? pushObject["reconnectInterval"].as<float>() : 5.0f;
                     pushDescriptor.reconnectCount = pushObject["reconnectCount"] ? pushObject["reconnectCount"].as<uint32_t>() : 3;
-                    
+
                     applicationDescriptor.pushDescriptors.push_back(pushDescriptor);
                 }
 
@@ -156,14 +156,14 @@ namespace relay
             std::unique_ptr<Server> server(new Server(network, address, pingInterval, applicationDescriptors));
             servers.push_back(std::move(server));
         }
-        
+
         return true;
     }
 
     void Relay::run()
     {
         const std::chrono::microseconds sleepTime(10000);
-        
+
         for (;;)
         {
             auto currentTime = std::chrono::steady_clock::now();
@@ -171,7 +171,7 @@ namespace relay
             previousTime = currentTime;
 
             network.update();
-            
+
             for (const auto& server : servers)
             {
                 server->update(delta);

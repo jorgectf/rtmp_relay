@@ -27,22 +27,22 @@ namespace relay
                  const std::vector<ApplicationDescriptor>& aApplicationDescriptors);
 
         void reset();
-        
+
         Receiver(const Receiver&) = delete;
         Receiver& operator=(const Receiver&) = delete;
-        
+
         Receiver(Receiver&& other) = delete;
         Receiver& operator=(Receiver&& other) = delete;
-        
+
         void update(float delta);
-        
+
         bool getPacket(std::vector<uint8_t>& packet);
-        
+
         bool isConnected() const { return socket.isReady(); }
 
         void printInfo() const;
         void getInfo(std::string& str) const;
-        
+
     protected:
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket&);
@@ -66,15 +66,15 @@ namespace relay
 
         cppsocket::Network& network;
         cppsocket::Socket socket;
-        
+
         std::vector<uint8_t> data;
-        
+
         rtmp::State state = rtmp::State::UNINITIALIZED;
-        
+
         uint32_t inChunkSize = 128;
         uint32_t outChunkSize = 128;
         uint32_t serverBandwidth = 2500000;
-        
+
         std::random_device rd;
         std::mt19937 generator;
 
@@ -85,7 +85,7 @@ namespace relay
 
         std::map<uint32_t, rtmp::Header> receivedPackets;
         std::map<uint32_t, rtmp::Header> sentPackets;
-        
+
         std::string streamName;
         const float pingInterval;
         float timeSincePing = 0.0f;

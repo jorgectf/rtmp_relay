@@ -60,7 +60,7 @@ namespace relay
             PING = 5, // from server to client
             PONG = 6 // from client
         };
-        
+
         struct Header
         {
             enum class Type: uint8_t
@@ -82,7 +82,7 @@ namespace relay
             uint32_t messageStreamId = 0;
             uint64_t timestamp = 0; // final timestamp (either from 3-byte timestamp or extended timestamp fields)
         };
-        
+
         struct Packet
         {
             uint32_t channel = Channel::NONE;
@@ -92,7 +92,7 @@ namespace relay
 
             std::vector<uint8_t> data;
         };
-        
+
         struct Challenge
         {
             uint32_t time;

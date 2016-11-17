@@ -103,7 +103,7 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
     {
         buffer.push_back(static_cast<uint8_t>(data >> 8 * (sizeof(value) - i - 1)));
     }
-    
+
     return sizeof(double);
 }
 

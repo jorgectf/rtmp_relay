@@ -24,7 +24,7 @@ namespace relay
         void handleAccept(cppsocket::Socket& clientSocket);
         void handleRead(cppsocket::Socket& clientSocket, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket& clientSocket);
-        
+
         cppsocket::Network& network;
         cppsocket::Acceptor socket;
         Relay& relay;
