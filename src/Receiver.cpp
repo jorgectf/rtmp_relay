@@ -527,10 +527,9 @@ namespace relay
                 {
                     if (!connect(argument1["app"].asString()))
                     {
-                        socket.close();
-
                         Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application, disconnecting";
-                        
+
+                        socket.close();
                         return false;
                     }
 
