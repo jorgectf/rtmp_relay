@@ -44,16 +44,8 @@ namespace relay
 
     void Server::handleAccept(Socket& clientSocket)
     {
-        // accept only one input
-        if (receivers.empty())
-        {
-            std::unique_ptr<Receiver> receiver(new Receiver(network, clientSocket, pingInterval, applicationDescriptors));
-            receivers.push_back(std::move(receiver));
-        }
-        else
-        {
-            clientSocket.close();
-        }
+        std::unique_ptr<Receiver> receiver(new Receiver(network, clientSocket, pingInterval, applicationDescriptors));
+        receivers.push_back(std::move(receiver));
     }
 
     void Server::printInfo() const
