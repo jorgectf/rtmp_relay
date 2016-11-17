@@ -16,10 +16,11 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Receiver::Receiver(Socket& aSocket,
-                       Server& aServer,
-                       float aPingInterval):
-        socket(std::move(aSocket)), generator(rd()), server(aServer), pingInterval(aPingInterval)
+    Receiver::Receiver(cppsocket::Network& aNetwork,
+                       Socket& aSocket,
+                       float aPingInterval,
+                       const std::vector<ApplicationDescriptor>& aApplicationDescriptors):
+        network(aNetwork), socket(std::move(aSocket)), generator(rd()), pingInterval(aPingInterval), applicationDescriptors(aApplicationDescriptors)
     {
         if (!socket.setBlocking(false))
         {
@@ -55,6 +56,8 @@ namespace relay
 
     void Receiver::update(float delta)
     {
+        if (application) application->update(delta);
+        
         if (socket.isReady() && pingInterval > 0.0f)
         {
             timeSincePing += delta;
@@ -222,8 +225,11 @@ namespace relay
 
     void Receiver::handleClose(cppsocket::Socket&)
     {
-        server.unpublishStream();
-        server.deleteStream();
+        if (application)
+        {
+            application->unpublishStream();
+            application->deleteStream();
+        }
 
         reset();
 
@@ -398,11 +404,11 @@ namespace relay
                     Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument2["videocodecid"].asDouble()));
 
                     // forward notify packet
-                    server.sendMetaData(metaData);
+                    if (application) application->sendMetaData(metaData);
                 }
                 else if (command.asString() == "onTextData")
                 {
-                    server.sendTextData(packet.timestamp, argument1);
+                    if (application) application->sendTextData(packet.timestamp, argument1);
                 }
                 break;
             }
@@ -416,12 +422,12 @@ namespace relay
                 if (isCodecHeader(packet.data))
                 {
                     audioHeader = packet.data;
-                    server.sendAudioHeader(audioHeader);
+                    if (application) application->sendAudioHeader(audioHeader);
                 }
                 else
                 {
                     // forward audio packet
-                    server.sendAudio(packet.timestamp, packet.data);
+                    if (application) application->sendAudio(packet.timestamp, packet.data);
                 }
                 break;
             }
@@ -443,12 +449,12 @@ namespace relay
                 if (isCodecHeader(packet.data))
                 {
                     videoHeader = packet.data;
-                    server.sendVideoHeader(videoHeader);
+                    if (application) application->sendVideoHeader(videoHeader);
                 }
                 else
                 {
                     // forward video packet
-                    server.sendVideo(packet.timestamp, packet.data);
+                    if (application) application->sendVideo(packet.timestamp, packet.data);
                 }
                 break;
             }
@@ -521,7 +527,7 @@ namespace relay
                 {
                     Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application, disconnecting";
 
-                    if (!server.connect(argument1["app"].asString()))
+                    if (!connect(argument1["app"].asString()))
                     {
                         socket.close();
                         return false;
@@ -548,17 +554,17 @@ namespace relay
                 }
                 else if (command.asString() == "deleteStream")
                 {
-                    server.deleteStream();
+                    if (application) application->deleteStream();
                 }
                 else if (command.asString() == "FCPublish")
                 {
                     sendOnFCPublish();
                     streamName = argument2.asString();
-                    server.createStream(streamName);
+                    if (application) application->createStream(streamName);
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
-                    server.unpublishStream();
+                    if (application) application->unpublishStream();
                 }
                 else if (command.asString() == "publish")
                 {
@@ -880,6 +886,11 @@ namespace relay
         }
 
         log << ", name: " << streamName;
+
+        if (application)
+        {
+            application->printInfo();
+        }
     }
 
     void Receiver::getInfo(std::string& str) const
@@ -896,5 +907,27 @@ namespace relay
         }
 
         str += "</td></tr>";
+
+        if (application)
+        {
+            application->getInfo(str);
+        }
+    }
+
+    bool Receiver::connect(const std::string& applicationName)
+    {
+        for (const ApplicationDescriptor& applicationDescriptor : applicationDescriptors)
+        {
+            if (applicationDescriptor.name.empty() ||
+                applicationDescriptor.name == applicationName)
+            {
+                application.reset(new Application(network, applicationDescriptor, applicationName));
+
+                return true;
+            }
+        }
+
+        // failed to connect
+        return false;
     }
 }

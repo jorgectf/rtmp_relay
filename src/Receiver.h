@@ -11,6 +11,7 @@
 #include "Socket.h"
 #include "RTMP.h"
 #include "Amf0.h"
+#include "Application.h"
 
 namespace relay
 {
@@ -20,9 +21,10 @@ namespace relay
     {
         const std::string name = "Receiver";
     public:
-        Receiver(cppsocket::Socket& aSocket,
-                 Server& aServer,
-                 float aPingInterval);
+        Receiver(cppsocket::Network& aNetwork,
+                 cppsocket::Socket& aSocket,
+                 float aPingInterval,
+                 const std::vector<ApplicationDescriptor>& aApplicationDescriptors);
 
         void reset();
         
@@ -60,6 +62,9 @@ namespace relay
         void sendOnFCPublish();
         void sendPublishStatus(double transactionId);
 
+        bool connect(const std::string& applicationName);
+
+        cppsocket::Network& network;
         cppsocket::Socket socket;
         
         std::vector<uint8_t> data;
@@ -80,8 +85,6 @@ namespace relay
 
         std::map<uint32_t, rtmp::Header> receivedPackets;
         std::map<uint32_t, rtmp::Header> sentPackets;
-
-        Server& server;
         
         std::string streamName;
         const float pingInterval;
@@ -90,5 +93,8 @@ namespace relay
         std::vector<uint8_t> audioHeader;
         std::vector<uint8_t> videoHeader;
         amf0::Node metaData;
+
+        std::vector<ApplicationDescriptor> applicationDescriptors;
+        std::unique_ptr<Application> application;
     };
 }

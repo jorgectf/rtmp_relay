@@ -26,8 +26,6 @@ namespace relay
 
     void Server::update(float delta)
     {
-        if (application) application->update(delta);
-        
         for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
         {
             const auto& receiver = *receiverIterator;
@@ -39,7 +37,6 @@ namespace relay
             }
             else
             {
-                application.reset();
                 receiverIterator = receivers.erase(receiverIterator);
             }
         }
@@ -50,77 +47,13 @@ namespace relay
         // accept only one input
         if (receivers.empty())
         {
-            std::unique_ptr<Receiver> receiver(new Receiver(clientSocket, *this, pingInterval));
+            std::unique_ptr<Receiver> receiver(new Receiver(network, clientSocket, pingInterval, applicationDescriptors));
             receivers.push_back(std::move(receiver));
-
-            application.reset();
         }
         else
         {
             clientSocket.close();
         }
-    }
-
-    bool Server::connect(const std::string& applicationName)
-    {
-        for (const ApplicationDescriptor& applicationDescriptor : applicationDescriptors)
-        {
-            if (applicationDescriptor.name.empty() ||
-                applicationDescriptor.name == applicationName)
-            {
-                application.reset(new Application(network, applicationDescriptor, applicationName));
-
-                return true;
-            }
-        }
-
-        // failed to connect
-        return false;
-    }
-
-    void Server::createStream(const std::string& streamName)
-    {
-        if (application) application->createStream(streamName);
-    }
-
-    void Server::deleteStream()
-    {
-        if (application) application->deleteStream();
-    }
-
-    void Server::unpublishStream()
-    {
-        if (application) application->unpublishStream();
-    }
-
-    void Server::sendAudioHeader(const std::vector<uint8_t>& headerData)
-    {
-        if (application) application->sendAudioHeader(headerData);
-    }
-
-    void Server::sendVideoHeader(const std::vector<uint8_t>& headerData)
-    {
-        if (application) application->sendVideoHeader(headerData);
-    }
-
-    void Server::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
-    {
-        if (application) application->sendAudio(timestamp, audioData);
-    }
-
-    void Server::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
-    {
-        if (application) application->sendVideo(timestamp, videoData);
-    }
-
-    void Server::sendMetaData(const amf0::Node& metaData)
-    {
-        if (application) application->sendMetaData(metaData);
-    }
-
-    void Server::sendTextData(uint64_t timestamp, const amf0::Node& textData)
-    {
-        if (application) application->sendTextData(timestamp, textData);
     }
 
     void Server::printInfo() const
@@ -131,11 +64,6 @@ namespace relay
         for (const auto& receiver : receivers)
         {
             receiver->printInfo();
-        }
-
-        if (application)
-        {
-            application->printInfo();
         }
     }
 
@@ -148,10 +76,5 @@ namespace relay
         }
 
         str += "</table>";
-
-        if (application)
-        {
-            application->getInfo(str);
-        }
     }
 }

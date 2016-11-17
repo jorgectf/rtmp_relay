@@ -11,7 +11,6 @@
 #include <memory>
 #include "Acceptor.h"
 #include "Receiver.h"
-#include "Application.h"
 
 namespace relay
 {
@@ -33,19 +32,6 @@ namespace relay
         
         void update(float delta);
 
-        bool connect(const std::string& applicationName);
-
-        void createStream(const std::string& streamName);
-        void deleteStream();
-        void unpublishStream();
-
-        void sendAudioHeader(const std::vector<uint8_t>& headerData);
-        void sendVideoHeader(const std::vector<uint8_t>& headerData);
-        void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
-        void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
-        void sendMetaData(const amf0::Node& metaData);
-        void sendTextData(uint64_t timestamp, const amf0::Node& textData);
-
         void printInfo() const;
         void getInfo(std::string& str) const;
         
@@ -58,7 +44,5 @@ namespace relay
         const std::vector<ApplicationDescriptor> applicationDescriptors;
         
         std::vector<std::unique_ptr<Receiver>> receivers;
-
-        std::unique_ptr<Application> application;
     };
 }
