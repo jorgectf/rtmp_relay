@@ -195,13 +195,20 @@ int main(int argc, const char* argv[])
         else if (strcmp(argv[i], "--help") == 0)
         {
             const char* exe = argc >= 1 ? argv[0] : "rtmp_relay";
-            Log(Log::Level::INFO) << "Usage: " << exe << " --config <path to config file> [--daemon] [--kill-daemon]";
+            Log(Log::Level::INFO) << "Usage: " << exe << " --config <path to config file> [--daemon] [--kill-daemon] [--log <level>]";
             return EXIT_SUCCESS;
         }
         else if (strcmp(argv[i], "--version") == 0)
         {
             Log(Log::Level::INFO) << "RTMP relay v" << static_cast<uint32_t>(RTMP_RELAY_VERSION[0]) << "." << static_cast<uint32_t>(RTMP_RELAY_VERSION[1]);
             return EXIT_SUCCESS;
+        }
+        else if (strcmp(argv[i], "--log") == 0)
+        {
+            if (++i < argc)
+            {
+                Log::threshold = static_cast<Log::Level>(atoi(argv[i]));
+            }
         }
     }
 
