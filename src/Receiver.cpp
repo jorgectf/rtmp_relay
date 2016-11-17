@@ -527,8 +527,6 @@ namespace relay
                 {
                     if (!connect(argument1["app"].asString()))
                     {
-                        Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application, disconnecting";
-
                         socket.close();
                         return false;
                     }
@@ -926,6 +924,8 @@ namespace relay
                 return true;
             }
         }
+
+        Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application";
 
         // failed to connect
         return false;
