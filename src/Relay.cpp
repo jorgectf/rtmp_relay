@@ -61,9 +61,14 @@ namespace relay
             return false;
         }
 
-        if (document["statusPageAddress"])
+        if (document["statusPage"])
         {
-            status.reset(new Status(network, *this, document["statusPageAddress"].as<std::string>()));
+            const YAML::Node& statusPageObject = document["statusPage"];
+
+            if (statusPageObject["listen"])
+            {
+                status.reset(new Status(network, *this, statusPageObject["listen"].as<std::string>()));
+            }
         }
         
         const YAML::Node& serversArray = document["servers"];

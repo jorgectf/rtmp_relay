@@ -39,12 +39,13 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * ${address} – IP address of the destination
 * ${port} – destination port
 
-Optionally you can specify the address of the status page:
-*statusPageAddress* – the address of the web status page (optional)
+Optionally you can add a web status page with "statusPage" object, which has the following attribute:
+*listen* – the address of the web status page
 
 Example configuration:
 
-    statusPageAddress: "0.0.0.0:80"
+    statusPage:
+        listen: "0.0.0.0:80"
     servers:
       - listen: "127.0.0.1:2200"
         applications:
