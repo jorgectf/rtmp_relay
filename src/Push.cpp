@@ -473,6 +473,7 @@ namespace relay
 
                 {
                     Log log(Log::Level::ALL);
+                    log << "[" << name << "] ";
                     command.dump(log);
                 }
 
@@ -491,6 +492,7 @@ namespace relay
 
                 {
                     Log log(Log::Level::ALL);
+                    log << "[" << name << "] ";
                     transactionId.dump(log);
                 }
 
@@ -503,6 +505,7 @@ namespace relay
                     Log(Log::Level::ALL) << "[" << name << "] " << "Argument 1: ";
 
                     Log log(Log::Level::ALL);
+                    log << "[" << name << "] ";
                     argument1.dump(log);
                 }
 
@@ -515,6 +518,7 @@ namespace relay
                     Log(Log::Level::ALL) << "[" << name << "] " << "Argument 2: ";
 
                     Log log(Log::Level::ALL);
+                    log << "[" << name << "] ";
                     argument2.dump(log);
                 }
 
@@ -1029,6 +1033,7 @@ namespace relay
             Log(Log::Level::ALL) << "[" << name << "] " << "Sending meta data " << commandName.asString() << ":";
 
             Log log(Log::Level::ALL);
+            log << "[" << name << "] ";
             argument2.dump(log);
 
             socket.send(buffer);
@@ -1062,7 +1067,11 @@ namespace relay
             Log(Log::Level::ALL) << "[" << name << "] " << "Sending text data";
 
             Log log(Log::Level::ALL);
+            log << "[" << name << "] ";
             argument1.dump(log);
+
+            log = Log(Log::Level::ALL);
+            log << "[" << name << "] ";
             argument2.dump(log);
 
             socket.send(buffer);
