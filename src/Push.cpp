@@ -1058,9 +1058,6 @@ namespace relay
             amf0::Node argument1 = textData;
             argument1.encode(packet.data);
 
-            amf0::Node argument2 = 0.0;
-            argument2.encode(packet.data);
-
             std::vector<uint8_t> buffer;
             encodePacket(buffer, outChunkSize, packet, sentPackets);
 
@@ -1069,10 +1066,6 @@ namespace relay
             Log log(Log::Level::ALL);
             log << "[" << name << "] ";
             argument1.dump(log);
-
-            log = Log(Log::Level::ALL);
-            log << "[" << name << "] ";
-            argument2.dump(log);
 
             socket.send(buffer);
         }
