@@ -1063,6 +1063,7 @@ namespace relay
 
             Log log(Log::Level::ALL);
             argument1.dump(log);
+            argument2.dump(log);
 
             socket.send(buffer);
         }
