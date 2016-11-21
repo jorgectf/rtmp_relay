@@ -636,20 +636,97 @@ namespace relay
 
             switch (marker)
             {
-                case Marker::Number: ret = readNumber(buffer, offset, doubleValue); break;
-                case Marker::Boolean: ret = readBoolean(buffer, offset, boolValue); break;
-                case Marker::String: ret = readString(buffer, offset, stringValue); break;
-                case Marker::Object: ret = readObject(buffer, offset, mapValue); break;
+                case Marker::Number:
+                {
+                    if ((ret = readNumber(buffer, offset, doubleValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::Boolean:
+                {
+                    if ((ret = readBoolean(buffer, offset, boolValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::String:
+                {
+                    if ((ret = readString(buffer, offset, stringValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::Object:
+                {
+                    if ((ret = readObject(buffer, offset, mapValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
                 case Marker::Null: /* Null */; break;
                 case Marker::Undefined: /* Undefined */; break;
-                case Marker::ECMAArray: ret = readECMAArray(buffer, offset, mapValue); break;
+                case Marker::ECMAArray:
+                {
+                    if ((ret = readECMAArray(buffer, offset, mapValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
                 case Marker::ObjectEnd: break; // should not happen
-                case Marker::StrictArray: ret = readStrictArray(buffer, offset, vectorValue); break;
-                case Marker::Date: ret = readDate(buffer, offset, dateValue); break;
-                case Marker::LongString: ret = readLongString(buffer, offset, stringValue); break;
-                case Marker::XMLDocument: ret = readXMLDocument(buffer, offset, stringValue); break;
-                case Marker::TypedObject: ret = readTypedObject(buffer, offset); break;
-                case Marker::SwitchToAMF3: ret = readSwitchToAMF3(buffer, offset); break;
+                case Marker::StrictArray:
+                {
+                    if ((ret = readStrictArray(buffer, offset, vectorValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::Date:
+                {
+                    if ((ret = readDate(buffer, offset, dateValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::LongString:
+                {
+                    if ((ret = readLongString(buffer, offset, stringValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::XMLDocument:
+                {
+                    if ((ret = readXMLDocument(buffer, offset, stringValue)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::TypedObject:
+                {
+                    if ((ret = readTypedObject(buffer, offset)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
+                case Marker::SwitchToAMF3:
+                {
+                    if ((ret = readSwitchToAMF3(buffer, offset)) == 0)
+                    {
+                        return 0;
+                    }
+                    break;
+                }
                 default: return 0;
             }
 
