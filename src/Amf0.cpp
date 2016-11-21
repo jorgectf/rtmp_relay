@@ -158,10 +158,13 @@ namespace relay
 
             offset += ret;
 
-            for (uint32_t i = 0; i < count; ++i)
-            {
-                std::string key;
+            std::string key;
 
+            uint32_t currentCount = 0;
+
+            while (true)
+            {
+                key.clear();
                 ret = readString(buffer, offset, key);
 
                 if (ret == 0)
@@ -171,17 +174,39 @@ namespace relay
 
                 offset += ret;
 
-                Node node;
-                ret = node.decode(buffer, offset);
-
-                if (ret == 0)
+                if (buffer.size() - offset < 1)
                 {
                     return 0;
                 }
 
-                offset += ret;
+                Marker marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
 
-                result[key] = node;
+                if (marker == Marker::ObjectEnd)
+                {
+                    offset += 1;
+                    break;
+                }
+                else
+                {
+                    Node node;
+                    ret = node.decode(buffer, offset);
+
+                    if (ret == 0)
+                    {
+                        return 0;
+                    }
+
+                    offset += ret;
+
+                    result[key] = node;
+
+                    ++currentCount;
+                }
+            }
+
+            if (count != currentCount)
+            {
+                return 0;
             }
 
             return offset - originalOffset;
@@ -375,9 +400,7 @@ namespace relay
                 size += ret;
             }
 
-            ret = writeString(buffer, "");
-
-            if (ret == 0)
+            if ((ret = writeString(buffer, "")) == 0)
             {
                 return 0;
             }
@@ -425,6 +448,18 @@ namespace relay
 
                 size += ret;
             }
+
+            if ((ret = writeString(buffer, "")) == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+
+            Marker marker = Marker::ObjectEnd;
+            buffer.push_back(static_cast<uint8_t>(marker));
+            
+            size += 1;
 
             return size;
         }
