@@ -108,6 +108,7 @@
     <ClCompile Include="src\Status.cpp" />
     <ClCompile Include="src\Pull.cpp" />
     <ClCompile Include="src\Push.cpp" />
+    <ClCompile Include="src\HTTPClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Amf0.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="src\Status.h" />
     <ClInclude Include="src\Pull.h" />
     <ClInclude Include="src\Push.h" />
+    <ClInclude Include="src\HTTPClient.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">

@@ -53,6 +53,7 @@
     <ClCompile Include="external\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="src\Amf0.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\HTTPClient.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Pull.cpp" />
     <ClCompile Include="src\Push.cpp" />
@@ -93,6 +94,7 @@
     <ClInclude Include="src\Amf0.h" />
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Constants.h" />
+    <ClInclude Include="src\HTTPClient.h" />
     <ClInclude Include="src\Pull.h" />
     <ClInclude Include="src\Push.h" />
     <ClInclude Include="src\Receiver.h" />
