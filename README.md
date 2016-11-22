@@ -36,7 +36,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 
 * ${name} – name of the source stream
 * ${applicationName} – name of the application
-* ${address} – IP address of the destination
+* ${ipAddress} – IP address of the destination
 * ${port} – destination port
 
 Optionally you can add a web status page with "statusPage" object, which has the following attribute:
