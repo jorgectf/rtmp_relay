@@ -136,7 +136,7 @@ namespace relay
 
     void Push::disconnect()
     {
-        Log(Log::Level::ERR) << "[" << name << "] " << "Disconnecting";
+        Log(Log::Level::ERR) << "[" << name << "] " << "Disconnecting from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
         reset();
         active = false;
         addressIndex = 0;
@@ -158,7 +158,7 @@ namespace relay
 
     void Push::handleConnect()
     {
-        Log(Log::Level::INFO) << "[" << name << "] " << "Connected";
+        Log(Log::Level::INFO) << "[" << name << "] " << "Connected to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
 
         std::vector<uint8_t> version;
         version.push_back(RTMP_VERSION);

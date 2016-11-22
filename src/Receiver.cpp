@@ -225,6 +225,8 @@ namespace relay
 
     void Receiver::handleClose(cppsocket::Socket&)
     {
+        Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " disconnected";
+
         if (application)
         {
             application->unpublishStream();
@@ -232,8 +234,6 @@ namespace relay
         }
 
         reset();
-
-        Log(Log::Level::INFO) << "[" << name << "] " << "Input disconnected";
     }
 
     bool Receiver::handlePacket(const rtmp::Packet& packet)
@@ -544,6 +544,8 @@ namespace relay
                     sendSetChunkSize();
                     sendConnectResult(transactionId.asDouble());
                     sendBWDone();
+
+                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
                 }
                 else if (command.asString() == "_checkbw")
                 {
@@ -566,10 +568,14 @@ namespace relay
                     sendOnFCPublish();
                     streamName = argument2.asString();
                     if (application) application->createStream(streamName);
+
+                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
                     if (application) application->unpublishStream();
+
+                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " unpublished stream \"" << streamName << "\"";
                 }
                 else if (command.asString() == "publish")
                 {
