@@ -43,7 +43,7 @@ namespace relay
         void printInfo() const;
         void getInfo(std::string& str) const;
 
-    protected:
+    private:
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket&);
 
