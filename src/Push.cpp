@@ -877,7 +877,7 @@ namespace relay
             std::map<std::string, std::string> tokens = {
                 { "streamName", newStreamName },
                 { "applicationName", application },
-                { "address", cppsocket::ipToString(socket.getIPAddress()) },
+                { "ipAddress", cppsocket::ipToString(socket.getIPAddress()) },
                 { "port", std::to_string(socket.getPort()) }
             };
 
