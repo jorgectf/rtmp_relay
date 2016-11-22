@@ -3,6 +3,7 @@ LDFLAGS=
 
 SOURCES=src/Amf0.cpp \
 	src/Application.cpp \
+	src/HTTPClient.cpp \
 	src/main.cpp \
 	src/Pull.cpp \
 	src/Push.cpp \
