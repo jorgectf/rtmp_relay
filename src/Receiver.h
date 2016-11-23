@@ -96,5 +96,11 @@ namespace relay
 
         std::vector<ApplicationDescriptor> applicationDescriptors;
         std::unique_ptr<Application> application;
+
+        float timeSinceMeasure = 0.0f;
+        uint64_t currentAudioBytes = 0;
+        uint64_t currentVideoBytes = 0;
+        uint64_t audioRate = 0;
+        uint64_t videoRate = 0;
     };
 }

@@ -52,6 +52,10 @@ namespace relay
         videoHeader.clear();
         metaData = amf0::Node();
         timeSincePing = 0.0f;
+
+        timeSinceMeasure = 0.0f;
+        currentAudioBytes = 0;
+        currentVideoBytes = 0;
     }
 
     void Receiver::update(float delta)
@@ -67,6 +71,15 @@ namespace relay
                 timeSincePing -= pingInterval;
                 sendPing();
             }
+        }
+
+        timeSinceMeasure += delta;
+
+        if (timeSinceMeasure >= 1.0f)
+        {
+            timeSinceMeasure = 0.0f;
+            audioRate = currentAudioBytes;
+            videoRate = currentVideoBytes;
         }
     }
 
@@ -422,6 +435,8 @@ namespace relay
                 log << "[" << name << "] " << "Audio packet";
                 if (isCodecHeader(packet.data)) log << "(header)";
 
+                currentAudioBytes += packet.data.size();
+
                 if (isCodecHeader(packet.data))
                 {
                     audioHeader = packet.data;
@@ -448,6 +463,8 @@ namespace relay
                 }
 
                 if (isCodecHeader(packet.data)) log << "(header)";
+
+                currentVideoBytes += packet.data.size();
 
                 if (isCodecHeader(packet.data))
                 {
