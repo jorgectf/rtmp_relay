@@ -40,10 +40,19 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * ${port} – destination port
 
 Optionally you can add a web status page with "statusPage" object, which has the following attribute:
-*listen* – the address of the web status page
+* *listen* – the address of the web status page
+
+To configure logging, you can add "log" object to the config file. It has the following attributes
+* *level* – the log threshold level (0 for no logs and 4 for all logs)
+* *syslogIdent* – identification to be passed to openlog (on *NIX only)
+* *syslogFacility* – facility to be passed to openlog (on *NIX only)
 
 Example configuration:
 
+    log:
+        level: 4
+        syslogIdent: relay
+        syslogFacility: "LOG_LOCAL3"
     statusPage:
         listen: "0.0.0.0:80"
     servers:
