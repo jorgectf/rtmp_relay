@@ -832,6 +832,8 @@ namespace relay
         socket.send(buffer);
 
         invokes[invokeId] = commandName.asString();
+
+        Log(Log::Level::INFO) << "[" << name << "] " << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
     }
 
     void Push::printInfo() const
