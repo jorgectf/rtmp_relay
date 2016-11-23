@@ -124,7 +124,7 @@ namespace relay
 
         std::string address = addresses[addressIndex];
 
-        if (!socket.connect(address))
+        if (!socket.connect(address, 1935))
         {
             return false;
         }
