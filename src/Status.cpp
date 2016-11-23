@@ -3,6 +3,7 @@
 //
 
 #include "Status.h"
+#include "Relay.h"
 
 namespace relay
 {
@@ -26,7 +27,7 @@ namespace relay
     void Status::handleRead(cppsocket::Socket& clientSocket, const std::vector<uint8_t>&)
     {
         std::string info;
-        relay.getInfo(info);
+        relay.getInfo(info, ReportType::HTML);
 
         std::string response = "HTTP/1.0 200 OK\r\n"
             "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"

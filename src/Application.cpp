@@ -116,28 +116,30 @@ namespace relay
         }
     }
 
-    void Application::printInfo() const
+    void Application::getInfo(std::string& str, ReportType reportType) const
     {
-        Log(Log::Level::INFO) << "Application: " << name;
-
-        Log(Log::Level::INFO) << "Push senders:";
-        for (const auto& sender : pushSenders)
+        if (reportType == ReportType::TEXT)
         {
-            sender->printInfo();
+            str += "Application: " + name + "\n";
+
+            str += "Push senders:";
+            for (const auto& sender : pushSenders)
+            {
+                sender->getInfo(str, reportType);
+            }
         }
-    }
-
-    void Application::getInfo(std::string& str) const
-    {
-        str += "Application: " + name;
-
-        str += "<h2>Push senders</h2><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
-
-        for (const auto& sender : pushSenders)
+        else if (reportType == ReportType::HTML)
         {
-            sender->getInfo(str);
-        }
+            str += "Application: " + name;
 
-        str += "</table>";
+            str += "<h2>Push senders</h2><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+
+            for (const auto& sender : pushSenders)
+            {
+                sender->getInfo(str, reportType);
+            }
+
+            str += "</table>";
+        }
     }
 }

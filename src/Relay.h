@@ -8,6 +8,7 @@
 #include <memory>
 #include "Network.h"
 #include "Socket.h"
+#include "Status.h"
 
 #if !defined(_MSC_VER)
 #include <sys/syslog.h>
@@ -33,8 +34,7 @@ namespace relay
 
         void run();
 
-        void printInfo() const;
-        void getInfo(std::string& str) const;
+        void getInfo(std::string& str, ReportType reportType) const;
 
         void openLog();
 

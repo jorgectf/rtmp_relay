@@ -14,7 +14,7 @@
 #include <fcntl.h>
 
 #include "Constants.h"
-#include "Status.h"
+#include "Relay.h"
 #include "Server.h"
 #include "Application.h"
 #include "Log.h"
@@ -44,8 +44,12 @@ static void signalHandler(int signo)
             exit(EXIT_SUCCESS);
             break;
         case SIGUSR1:
-            rel.printInfo();
+        {
+            std::string str;
+            rel.getInfo(str, ReportType::TEXT);
+            Log(Log::Level::INFO) << str;
             break;
+        }
         case SIGPIPE:
             Log(Log::Level::ERR) << "Received SIGPIPE";
             break;

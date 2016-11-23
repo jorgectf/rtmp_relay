@@ -40,8 +40,7 @@ namespace relay
 
         bool isConnected() const { return socket.isReady(); }
 
-        void printInfo() const;
-        void getInfo(std::string& str) const;
+        void getInfo(std::string& str, ReportType reportType) const;
 
     private:
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);

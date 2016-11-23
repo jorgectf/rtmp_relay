@@ -32,8 +32,7 @@ namespace relay
 
         void update(float delta);
 
-        void printInfo() const;
-        void getInfo(std::string& str) const;
+        void getInfo(std::string& str, ReportType reportType) const;
 
     private:
         void handleAccept(cppsocket::Socket& clientSocket);

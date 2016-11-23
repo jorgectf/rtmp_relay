@@ -215,19 +215,11 @@ namespace relay
         }
     }
 
-    void Relay::printInfo() const
+    void Relay::getInfo(std::string& str, ReportType reportType) const
     {
         for (const auto& server : servers)
         {
-            server->printInfo();
-        }
-    }
-
-    void Relay::getInfo(std::string& str) const
-    {
-        for (const auto& server : servers)
-        {
-            server->getInfo(str);
+            server->getInfo(str, reportType);
         }
     }
 

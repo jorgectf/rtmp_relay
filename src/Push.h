@@ -12,6 +12,7 @@
 #include "Connector.h"
 #include "RTMP.h"
 #include "Amf0.h"
+#include "Status.h"
 
 namespace relay
 {
@@ -57,8 +58,7 @@ namespace relay
 
         bool sendPacket(const std::vector<uint8_t>& packet);
 
-        void printInfo() const;
-        void getInfo(std::string& str) const;
+        void getInfo(std::string& str, ReportType reportType) const;
 
         void createStream(const std::string& newStreamName);
         void deleteStream();

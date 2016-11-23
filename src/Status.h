@@ -5,10 +5,18 @@
 #pragma once
 
 #include "Acceptor.h"
-#include "Relay.h"
 
 namespace relay
 {
+    class Relay;
+
+    enum class ReportType
+    {
+        TEXT,
+        HTML,
+        JSON
+    };
+
     class Status
     {
     public:

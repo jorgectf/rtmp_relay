@@ -13,6 +13,7 @@
 #include "RTMP.h"
 #include "Push.h"
 #include "Pull.h"
+#include "Status.h"
 
 namespace relay
 {
@@ -45,8 +46,7 @@ namespace relay
         void sendMetaData(const amf0::Node& metaData);
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
-        void printInfo() const;
-        void getInfo(std::string& str) const;
+        void getInfo(std::string& str, ReportType reportType) const;
 
     private:
         std::string name;

@@ -48,25 +48,28 @@ namespace relay
         receivers.push_back(std::move(receiver));
     }
 
-    void Server::printInfo() const
+    void Server::getInfo(std::string& str, ReportType reportType) const
     {
-        Log(Log::Level::INFO) << "Server listening on " << socket.getPort();
-
-        Log(Log::Level::INFO) << "Receivers:";
-        for (const auto& receiver : receivers)
+        if (reportType == ReportType::HTML)
         {
-            receiver->printInfo();
-        }
-    }
+            str += "Server listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
 
-    void Server::getInfo(std::string& str) const
-    {
-        str += "<h1>Receivers</h1><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
-        for (const auto& receiver : receivers)
+            str += "Receivers:\n";
+
+            for (const auto& receiver : receivers)
+            {
+                receiver->getInfo(str, reportType);
+            }
+        }
+        else if (reportType == ReportType::HTML)
         {
-            receiver->getInfo(str);
-        }
+            str += "<h1>Receivers</h1><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+            for (const auto& receiver : receivers)
+            {
+                receiver->getInfo(str, reportType);
+            }
 
-        str += "</table>";
+            str += "</table>";
+        }
     }
 }
