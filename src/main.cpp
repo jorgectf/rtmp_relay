@@ -63,6 +63,8 @@ static int daemonize(const char* lock_file)
     }
     if (pid > 0) exit(EXIT_SUCCESS); // parent process
 
+    rel.openLog();
+
     pid_t sid = setsid();
 
     if (sid < 0)
@@ -202,13 +204,6 @@ int main(int argc, const char* argv[])
         {
             Log(Log::Level::INFO) << "RTMP relay v" << static_cast<uint32_t>(RTMP_RELAY_VERSION[0]) << "." << static_cast<uint32_t>(RTMP_RELAY_VERSION[1]);
             return EXIT_SUCCESS;
-        }
-        else if (strcmp(argv[i], "--log") == 0)
-        {
-            if (++i < argc)
-            {
-                Log::threshold = static_cast<Log::Level>(atoi(argv[i]));
-            }
         }
     }
 

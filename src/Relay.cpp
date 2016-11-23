@@ -61,6 +61,40 @@ namespace relay
             return false;
         }
 
+        if (document["log"])
+        {
+            const YAML::Node& logObject = document["log"];
+
+            if (logObject["level"])
+            {
+                Log::threshold = static_cast<Log::Level>(logObject["level"].as<uint32_t>());
+            }
+
+#if !defined(_MSC_VER)
+            if (logObject["syslogIdent"])
+            {
+                syslogIdent = logObject["syslogIdent"].as<std::string>();
+            }
+
+            if (logObject["syslogFacility"])
+            {
+                std::string facility = logObject["syslogFacility"].as<std::string>();
+
+                if (facility == "LOG_USER") syslogFacility = LOG_USER;
+                else if (facility == "LOG_LOCAL0") syslogFacility = LOG_LOCAL0;
+                else if (facility == "LOG_LOCAL1") syslogFacility = LOG_LOCAL1;
+                else if (facility == "LOG_LOCAL2") syslogFacility = LOG_LOCAL2;
+                else if (facility == "LOG_LOCAL3") syslogFacility = LOG_LOCAL3;
+                else if (facility == "LOG_LOCAL4") syslogFacility = LOG_LOCAL4;
+                else if (facility == "LOG_LOCAL5") syslogFacility = LOG_LOCAL5;
+                else if (facility == "LOG_LOCAL6") syslogFacility = LOG_LOCAL6;
+                else if (facility == "LOG_LOCAL7") syslogFacility = LOG_LOCAL7;
+            }
+#endif
+        }
+
+        openLog();
+
         if (document["statusPage"])
         {
             const YAML::Node& statusPageObject = document["statusPage"];
@@ -195,5 +229,12 @@ namespace relay
         {
             server->getInfo(str);
         }
+    }
+
+    void Relay::openLog()
+    {
+#if !defined(_MSC_VER)
+        openlog(syslogIdent.empty() ? nullptr : syslogIdent.c_str(), 0, syslogFacility);
+#endif
     }
 }
