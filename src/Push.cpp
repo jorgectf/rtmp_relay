@@ -593,7 +593,6 @@ namespace relay
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
-        packet.messageStreamId = 0;
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
@@ -953,7 +952,7 @@ namespace relay
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
-            packet.messageStreamId = 1;
+            packet.messageStreamId = streamId;
             packet.timestamp = timestamp;
             packet.messageType = rtmp::MessageType::AUDIO_PACKET;
 
@@ -974,7 +973,7 @@ namespace relay
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::VIDEO;
-            packet.messageStreamId = 1;
+            packet.messageStreamId = streamId;
             packet.timestamp = timestamp;
             packet.messageType = rtmp::MessageType::VIDEO_PACKET;
 
@@ -1003,7 +1002,7 @@ namespace relay
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
-            packet.messageStreamId = 1;
+            packet.messageStreamId = streamId;
             packet.timestamp = 0;
             packet.messageType = rtmp::MessageType::NOTIFY;
 
@@ -1048,7 +1047,7 @@ namespace relay
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
-            packet.messageStreamId = 1;
+            packet.messageStreamId = streamId;
             packet.timestamp = timestamp;
             packet.messageType = rtmp::MessageType::NOTIFY;
 

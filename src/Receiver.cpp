@@ -640,7 +640,6 @@ namespace relay
         packet.channel = rtmp::Channel::NETWORK;
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
-        packet.messageStreamId = 0;
 
         encodeInt(packet.data, 4, serverBandwidth);
 
@@ -694,7 +693,6 @@ namespace relay
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
-        packet.messageStreamId = 0;
 
         encodeInt(packet.data, 4, outChunkSize);
 
