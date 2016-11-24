@@ -206,6 +206,8 @@ namespace relay
 
             network.update();
 
+            if (status) status->update(delta);
+
             for (const auto& server : servers)
             {
                 server->update(delta);

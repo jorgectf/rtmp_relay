@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <memory>
 #include "Acceptor.h"
+#include "HTTPClient.h"
 
 namespace relay
 {
@@ -28,15 +30,15 @@ namespace relay
         Status(Status&& other) = delete;
         Status& operator=(Status&& other) = delete;
 
+        void update(float delta);
+
     private:
         void handleAccept(cppsocket::Socket& clientSocket);
-        void handleRead(cppsocket::Socket& clientSocket, const std::vector<uint8_t>& newData);
-        void handleClose(cppsocket::Socket& clientSocket);
 
         cppsocket::Network& network;
         cppsocket::Acceptor socket;
         Relay& relay;
 
-        std::vector<cppsocket::Socket> clients;
+        std::vector<std::unique_ptr<HTTPClient>> clients;
     };
 }
