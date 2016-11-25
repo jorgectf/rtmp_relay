@@ -223,6 +223,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
+                str = "Status:\n";
                 for (const auto& server : servers)
                 {
                     server->getInfo(str, reportType);
@@ -244,10 +245,19 @@ namespace relay
             }
             case ReportType::JSON:
             {
+                str = "{\"servers\": [";
+
+                bool first = true;
+
                 for (const auto& server : servers)
                 {
+                    if (!first) str += ", ";
+                    first = false;
                     server->getInfo(str, reportType);
                 }
+
+                str += "]}";
+                
                 break;
             }
         }

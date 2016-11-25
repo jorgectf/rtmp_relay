@@ -100,6 +100,7 @@ namespace relay
                 std::string response = "HTTP/1.1 200 OK\r\n"
                 "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
                 "Content-Type: application/json\r\n"
+                "Content-Length: " + std::to_string(info.length()) + "\r\n"
                 "\r\n" + info;
 
                 std::vector<uint8_t> buffer(response.begin(), response.end());
