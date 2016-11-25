@@ -201,7 +201,7 @@ namespace relay
         for (;;)
         {
             auto currentTime = std::chrono::steady_clock::now();
-            float delta = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - previousTime).count() / 1000000.0f;
+            float delta = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - previousTime).count() / 1000.0f;
             previousTime = currentTime;
 
             network.update();
