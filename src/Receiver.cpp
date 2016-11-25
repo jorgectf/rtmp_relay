@@ -899,44 +899,55 @@ namespace relay
 
     void Receiver::getInfo(std::string& str, ReportType reportType) const
     {
-        if (reportType == ReportType::TEXT)
+        switch (reportType)
         {
-            str += "\t[" + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
-
-            switch (state)
+            case ReportType::TEXT:
             {
-                case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                str += "\t[" + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
+
+                switch (state)
+                {
+                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
+                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                }
+
+                str += ", name: " + streamName + ", video bitrate: " + std::to_string(videoRate * 8) + ", audio bitrate: " + std::to_string(audioRate * 8) + "\n";
+
+                if (application)
+                {
+                    application->getInfo(str, reportType);
+                }
+                break;
             }
-
-            str += ", name: " + streamName + "\n";
-
-            if (application)
+            case ReportType::HTML:
             {
-                application->getInfo(str, reportType);
+                str += "<table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th><th>Video bitrate</th><th>Audio bitrate</th></tr>";
+                str += "<tr><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+
+                switch (state)
+                {
+                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
+                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                }
+
+                str += "</td><td>" + std::to_string(videoRate * 8) + "</td><td>" + std::to_string(audioRate * 8) + "</td></tr>";
+                str += "</table>";
+
+                if (application)
+                {
+                    application->getInfo(str, reportType);
+                }
+                break;
             }
-        }
-        else if (reportType == ReportType::HTML)
-        {
-            str += "<tr><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
-
-            switch (state)
+            case ReportType::JSON:
             {
-                case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
-            }
-
-            str += "</td></tr>";
-
-            if (application)
-            {
-                application->getInfo(str, reportType);
+                break;
             }
         }
     }

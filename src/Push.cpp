@@ -838,34 +838,43 @@ namespace relay
 
     void Push::getInfo(std::string& str, ReportType reportType) const
     {
-        if (reportType == ReportType::TEXT)
+        switch (reportType)
         {
-            str += "\t[" + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
-
-            switch (state)
+            case ReportType::TEXT:
             {
-                case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
-            }
-            str += "\n";
-        }
-        else if (reportType == ReportType::HTML)
-        {
-            str += "<tr><td>" + name + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+                str += "\t[" + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
 
-            switch (state)
+                switch (state)
+                {
+                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
+                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                }
+                str += "\n";
+                break;
+            }
+            case ReportType::HTML:
             {
-                case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
-            }
+                str += "<tr><td>" + name + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
 
-            str += "</td></tr>";
+                switch (state)
+                {
+                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
+                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                }
+
+                str += "</td></tr>";
+                break;
+            }
+            case ReportType::JSON:
+            {
+                break;
+            }
         }
     }
 

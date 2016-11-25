@@ -118,28 +118,37 @@ namespace relay
 
     void Application::getInfo(std::string& str, ReportType reportType) const
     {
-        if (reportType == ReportType::TEXT)
+        switch (reportType)
         {
-            str += "Application: " + name + "\n";
-
-            str += "Push senders:";
-            for (const auto& sender : pushSenders)
+            case ReportType::TEXT:
             {
-                sender->getInfo(str, reportType);
+                str += "Application: " + name + "\n";
+
+                str += "Push senders:";
+                for (const auto& sender : pushSenders)
+                {
+                    sender->getInfo(str, reportType);
+                }
+                break;
             }
-        }
-        else if (reportType == ReportType::HTML)
-        {
-            str += "Application: " + name;
-
-            str += "<h2>Push senders</h2><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
-
-            for (const auto& sender : pushSenders)
+            case ReportType::HTML:
             {
-                sender->getInfo(str, reportType);
-            }
+                str += "Application: " + name;
 
-            str += "</table>";
+                str += "<h2>Push senders</h2><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+
+                for (const auto& sender : pushSenders)
+                {
+                    sender->getInfo(str, reportType);
+                }
+
+                str += "</table>";
+                break;
+            }
+            case ReportType::JSON:
+            {
+                break;
+            }
         }
     }
 }

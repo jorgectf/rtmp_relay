@@ -50,26 +50,33 @@ namespace relay
 
     void Server::getInfo(std::string& str, ReportType reportType) const
     {
-        if (reportType == ReportType::TEXT)
+        switch (reportType)
         {
-            str += "Server listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
-
-            str += "Receivers:\n";
-
-            for (const auto& receiver : receivers)
+            case ReportType::TEXT:
             {
-                receiver->getInfo(str, reportType);
-            }
-        }
-        else if (reportType == ReportType::HTML)
-        {
-            str += "<h1>Receivers</h1><table><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
-            for (const auto& receiver : receivers)
-            {
-                receiver->getInfo(str, reportType);
-            }
+                str += "Server listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
 
-            str += "</table>";
+                str += "Receivers:\n";
+
+                for (const auto& receiver : receivers)
+                {
+                    receiver->getInfo(str, reportType);
+                }
+                break;
+            }
+            case ReportType::HTML:
+            {
+                str += "<h1>Receivers</h1>";
+                for (const auto& receiver : receivers)
+                {
+                    receiver->getInfo(str, reportType);
+                }
+                break;
+            }
+            case ReportType::JSON:
+            {
+                break;
+            }
         }
     }
 }
