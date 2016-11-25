@@ -2,8 +2,13 @@
 //  rtmp_relay
 //
 
+#include <algorithm>
 #include "HTTPClient.h"
 #include "Relay.h"
+#include "Utils.h"
+#include "Log.h"
+
+using namespace cppsocket;
 
 namespace relay
 {
@@ -18,22 +23,81 @@ namespace relay
         socket.setCloseCallback(std::bind(&HTTPClient::handleClose, this, std::placeholders::_1));
     }
 
-    void HTTPClient::handleRead(cppsocket::Socket& clientSocket, const std::vector<uint8_t>&)
+    void HTTPClient::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
-        std::string info;
-        relay.getInfo(info, ReportType::HTML);
+        const std::vector<uint8_t> clrf = { '\r', '\n' };
 
-        std::string response = "HTTP/1.0 200 OK\r\n"
-        "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
-        "\r\n"
-        "<html><title>Status</title><body>" + info + "</body></html>";
+        data.insert(data.end(), newData.begin(), newData.end());
 
-        std::vector<uint8_t> data(response.begin(), response.end());
+        for (;;)
+        {
+            auto i = std::search(data.begin(), data.end(), clrf.begin(), clrf.end());
 
-        clientSocket.send(data);
+            if (i == data.end())
+            {
+                break;
+            }
+
+            std::string line(data.begin(), i);
+
+            if (line.empty()) // end of header
+            {
+                if (!startLine.empty()) // received header
+                {
+                    sendReport();
+                    break;
+                }
+            }
+            else
+            {
+                if (startLine.empty())
+                {
+                    startLine = line;
+                }
+                else
+                {
+                    headers.push_back(line);
+                }
+            }
+
+            data.erase(data.begin(), i + 2);
+        }
     }
 
     void HTTPClient::handleClose(cppsocket::Socket&)
     {
+    }
+
+    void HTTPClient::sendReport()
+    {
+        std::vector<std::string> fields;
+        tokenize(startLine, fields);
+
+        if (fields.size() >= 2 && fields[0] == "GET" && fields[1] == "/stats")
+        {
+            std::string info;
+            relay.getInfo(info, ReportType::HTML);
+
+            std::string response = "HTTP/1.1 200 OK\r\n"
+                "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
+                "\r\n"
+                "<html><title>Status</title><body>" + info + "</body></html>";
+
+            std::vector<uint8_t> buffer(response.begin(), response.end());
+
+            socket.send(buffer);
+        }
+        else
+        {
+            std::string response = "HTTP/1.1 404 Not Found\r\n"
+                "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
+                "\r\n";
+
+            std::vector<uint8_t> buffer(response.begin(), response.end());
+
+            socket.send(buffer);
+        }
+
+        socket.close();
     }
 }

@@ -109,6 +109,30 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
 
 size_t replaceTokens(std::string& str, const std::map<std::string, std::string>& tokens);
 
+inline void tokenize(const std::string& str, std::vector<std::string>& tokens,
+                     const std::string& delimiters = " ",
+                     bool trimEmpty = false)
+{
+    std::string::size_type pos, lastPos = 0, length = str.length();
+
+    while(lastPos < length + 1)
+    {
+        pos = str.find_first_of(delimiters, lastPos);
+        if(pos == std::string::npos)
+        {
+            pos = length;
+        }
+
+        if(pos != lastPos || !trimEmpty)
+        {
+            tokens.push_back(std::string(str.data() + lastPos,
+                                         static_cast<std::vector<std::string>::size_type>(pos) - lastPos));
+        }
+        
+        lastPos = pos + 1;
+    }
+}
+
 std::string getAudioCodec(uint32_t codecId);
 std::string getVideoCodec(uint32_t codecId);
 

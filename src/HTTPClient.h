@@ -23,8 +23,15 @@ namespace relay
         void handleRead(cppsocket::Socket& clientSocket, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket& clientSocket);
 
+        void sendReport();
+
         cppsocket::Network& network;
         cppsocket::Socket socket;
         Relay& relay;
+
+        std::vector<uint8_t> data;
+
+        std::string startLine;
+        std::vector<std::string> headers;
     };
 }

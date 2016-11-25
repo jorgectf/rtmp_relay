@@ -19,16 +19,15 @@ namespace relay
 
     void Status::update(float)
     {
-        for (auto i = clients.begin(); i != clients.end(); ++i)
+        for (auto i = clients.begin(); i != clients.end();)
         {
-            if (!(*i)->isConnected())
+            if ((*i)->isConnected())
             {
-                clients.erase(i);
-                break;
+                ++i;
             }
             else
             {
-                ++i;
+                i = clients.erase(i);
             }
         }
     }
