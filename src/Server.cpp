@@ -50,7 +50,7 @@ namespace relay
 
     void Server::getInfo(std::string& str, ReportType reportType) const
     {
-        if (reportType == ReportType::HTML)
+        if (reportType == ReportType::TEXT)
         {
             str += "Server listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
 
