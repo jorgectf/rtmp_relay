@@ -34,7 +34,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 
 *overrideStream* name can have the following tokens:
 
-* ${name} – name of the source stream
+* ${streamName} – name of the source stream
 * ${applicationName} – name of the application
 * ${ipAddress} – IP address of the destination
 * ${port} – destination port

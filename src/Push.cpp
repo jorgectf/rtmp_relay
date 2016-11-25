@@ -852,12 +852,12 @@ namespace relay
                     case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
                     case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
-                str += "\n";
+                str += ", name: " + streamName + "\n";
                 break;
             }
             case ReportType::HTML:
             {
-                str += "<tr><td>" + name + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+                str += "<tr><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
 
                 switch (state)
                 {
