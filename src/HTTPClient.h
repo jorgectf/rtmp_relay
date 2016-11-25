@@ -24,6 +24,7 @@ namespace relay
         void handleClose(cppsocket::Socket& clientSocket);
 
         void sendReport();
+        void sendError();
 
         cppsocket::Network& network;
         cppsocket::Socket socket;

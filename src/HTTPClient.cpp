@@ -45,6 +45,7 @@ namespace relay
                 if (!startLine.empty()) // received header
                 {
                     sendReport();
+                    socket.close();
                     break;
                 }
             }
@@ -73,31 +74,57 @@ namespace relay
         std::vector<std::string> fields;
         tokenize(startLine, fields);
 
-        if (fields.size() >= 2 && fields[0] == "GET" && fields[1] == "/stats")
+        if (fields.size() >= 2 && fields[0] == "GET")
         {
-            std::string info;
-            relay.getInfo(info, ReportType::HTML);
+            if (fields[1] == "/stats")
+            {
+                std::string info;
+                relay.getInfo(info, ReportType::HTML);
 
-            std::string response = "HTTP/1.1 200 OK\r\n"
+                std::string response = "HTTP/1.1 200 OK\r\n"
+                    "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
+                    "Content-Type: text/html\r\n"
+                    "Content-Length: " + std::to_string(info.length()) + "\r\n"
+                    "\r\n" + info;
+
+
+                std::vector<uint8_t> buffer(response.begin(), response.end());
+
+                socket.send(buffer);
+            }
+            else if (fields[1] == "/stats.json")
+            {
+                std::string info;
+                relay.getInfo(info, ReportType::JSON);
+
+                std::string response = "HTTP/1.1 200 OK\r\n"
                 "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
-                "\r\n"
-                "<html><title>Status</title><body>" + info + "</body></html>";
+                "Content-Type: application/json\r\n"
+                "\r\n" + info;
 
-            std::vector<uint8_t> buffer(response.begin(), response.end());
+                std::vector<uint8_t> buffer(response.begin(), response.end());
 
-            socket.send(buffer);
+                socket.send(buffer);
+            }
+            else
+            {
+                sendError();
+            }
         }
         else
         {
-            std::string response = "HTTP/1.1 404 Not Found\r\n"
-                "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
-                "\r\n";
-
-            std::vector<uint8_t> buffer(response.begin(), response.end());
-
-            socket.send(buffer);
+            sendError();
         }
+    }
 
-        socket.close();
+    void HTTPClient::sendError()
+    {
+        std::string response = "HTTP/1.1 404 Not Found\r\n"
+        "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
+        "\r\n";
+
+        std::vector<uint8_t> buffer(response.begin(), response.end());
+
+        socket.send(buffer);
     }
 }

@@ -219,9 +219,37 @@ namespace relay
 
     void Relay::getInfo(std::string& str, ReportType reportType) const
     {
-        for (const auto& server : servers)
+        switch (reportType)
         {
-            server->getInfo(str, reportType);
+            case ReportType::TEXT:
+            {
+                for (const auto& server : servers)
+                {
+                    server->getInfo(str, reportType);
+                }
+                break;
+            }
+            case ReportType::HTML:
+            {
+                str = "<html><title>Status</title><body>";
+
+                for (const auto& server : servers)
+                {
+                    server->getInfo(str, reportType);
+                }
+
+                str += "</body></html>";
+
+                break;
+            }
+            case ReportType::JSON:
+            {
+                for (const auto& server : servers)
+                {
+                    server->getInfo(str, reportType);
+                }
+                break;
+            }
         }
     }
 
