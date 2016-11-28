@@ -75,9 +75,14 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"receivers\": [";
+                str += "{\"receivers\":[";
+
+                bool first = true;
+
                 for (const auto& receiver : receivers)
                 {
+                    if (!first) str += ", ";
+                    first = false;
                     receiver->getInfo(str, reportType);
                 }
                 str += "]}";

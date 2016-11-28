@@ -245,7 +245,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str = "{\"servers\": [";
+                str = "{\"servers\":[";
 
                 bool first = true;
 
