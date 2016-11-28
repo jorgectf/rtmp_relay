@@ -92,6 +92,21 @@ namespace relay
 
                 socket.send(buffer);
             }
+            else if (fields[1] == "/stats.txt")
+            {
+                std::string info;
+                relay.getInfo(info, ReportType::TEXT);
+
+                std::string response = "HTTP/1.1 200 OK\r\n"
+                "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
+                "Content-Type: text/plain\r\n"
+                "Content-Length: " + std::to_string(info.length()) + "\r\n"
+                "\r\n" + info;
+
+                std::vector<uint8_t> buffer(response.begin(), response.end());
+
+                socket.send(buffer);
+            }
             else if (fields[1] == "/stats.json")
             {
                 std::string info;
