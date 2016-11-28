@@ -873,6 +873,21 @@ namespace relay
             }
             case ReportType::JSON:
             {
+                str += "{\"name\":\"" + streamName + "\"," +
+                "\"connected:\"" + (socket.isReady() ? "true" : "false") + "\"," +
+                "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
+                "\"status\":";
+
+                switch (state)
+                {
+                    case rtmp::State::UNINITIALIZED: str += "\"UNINITIALIZED\","; break;
+                    case rtmp::State::VERSION_RECEIVED: str += "\"VERSION_RECEIVED\","; break;
+                    case rtmp::State::VERSION_SENT: str += "\"VERSION_SENT\","; break;
+                    case rtmp::State::ACK_SENT: str += "\"ACK_SENT\","; break;
+                    case rtmp::State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\","; break;
+                }
+
+                str += "}";
                 break;
             }
         }

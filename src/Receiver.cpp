@@ -962,7 +962,12 @@ namespace relay
                 }
 
                 str += "\"videoBitrate\":" + std::to_string(videoRate * 8) + "," +
-                str += "\"audioBitrate\":" + std::to_string(audioRate * 8) + "}";
+                    "\"audioBitrate\":" + std::to_string(audioRate * 8) + "}";
+
+                if (application)
+                {
+                    application->getInfo(str, reportType);
+                }
                 break;
             }
         }

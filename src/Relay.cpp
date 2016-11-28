@@ -251,7 +251,7 @@ namespace relay
 
                 for (const auto& server : servers)
                 {
-                    if (!first) str += ", ";
+                    if (!first) str += ",";
                     first = false;
                     server->getInfo(str, reportType);
                 }

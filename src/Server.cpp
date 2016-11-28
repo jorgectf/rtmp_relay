@@ -81,7 +81,7 @@ namespace relay
 
                 for (const auto& receiver : receivers)
                 {
-                    if (!first) str += ", ";
+                    if (!first) str += ",";
                     first = false;
                     receiver->getInfo(str, reportType);
                 }

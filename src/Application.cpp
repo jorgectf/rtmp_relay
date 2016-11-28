@@ -147,6 +147,18 @@ namespace relay
             }
             case ReportType::JSON:
             {
+                str += "{\"name\":" + name +
+                    "\"pushSenders\":[";
+
+                bool first = true;
+
+                for (const auto& sender : pushSenders)
+                {
+                    if (!first) str += ",";
+                    first = false;
+                    sender->getInfo(str, reportType);
+                }
+                str += "]}";
                 break;
             }
         }
