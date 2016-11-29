@@ -955,7 +955,7 @@ namespace relay
 
                 for (auto& m : metaData.asMap())
                 {
-                    if (!first) str += " ";
+                    if (!first) str += "<br>";
                     first = false;
 
                     str += m.first + ":" + m.second.toString();
@@ -987,7 +987,7 @@ namespace relay
 
                 str += "\"videoBitrate\":" + std::to_string(videoRate * 8) + "," +
                     "\"audioBitrate\":" + std::to_string(audioRate * 8) + "," +
-                    "\"metaData\":[";
+                    "\"metaData\":{";
 
                 bool first = true;
 
@@ -999,7 +999,7 @@ namespace relay
                     str += "\"" + m.first + "\":\"" + m.second.toString() + "\"";
                 }
 
-                str += "]}";
+                str += "}}";
 
                 if (application)
                 {
