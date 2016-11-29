@@ -914,7 +914,20 @@ namespace relay
                     case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
 
-                str += ", name: " + streamName + ", video bitrate: " + std::to_string(videoRate * 8) + ", audio bitrate: " + std::to_string(audioRate * 8) + "\n";
+                str += ", name: " + streamName + ", video bitrate: " + std::to_string(videoRate * 8) + ", audio bitrate: " + std::to_string(audioRate * 8) +
+                    ", metadata: ";
+
+                bool first = true;
+
+                for (auto& m : metaData.asMap())
+                {
+                    if (!first) str += " ";
+                    first = false;
+
+                    str += m.first + ":" + m.second.toString();
+                }
+
+                str += "\n";
 
                 if (application)
                 {
@@ -924,7 +937,7 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str += "<table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th><th>Video bitrate</th><th>Audio bitrate</th></tr>";
+                str += "<table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th><th>Video bitrate</th><th>Audio bitrate</th><th>Metadata</th></tr>";
                 str += "<tr><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
 
                 switch (state)
@@ -936,8 +949,19 @@ namespace relay
                     case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
 
-                str += "</td><td>" + std::to_string(videoRate * 8) + "</td><td>" + std::to_string(audioRate * 8) + "</td></tr>";
-                str += "</table>";
+                str += "</td><td>" + std::to_string(videoRate * 8) + "</td><td>" + std::to_string(audioRate * 8) + "</td><td>";
+
+                bool first = true;
+
+                for (auto& m : metaData.asMap())
+                {
+                    if (!first) str += " ";
+                    first = false;
+
+                    str += m.first + ":" + m.second.toString();
+                }
+
+                str += "</td></tr></table>";
 
                 if (application)
                 {
@@ -962,7 +986,20 @@ namespace relay
                 }
 
                 str += "\"videoBitrate\":" + std::to_string(videoRate * 8) + "," +
-                    "\"audioBitrate\":" + std::to_string(audioRate * 8) + "}";
+                    "\"audioBitrate\":" + std::to_string(audioRate * 8) + "," +
+                    "\"metaData\":[";
+
+                bool first = true;
+
+                for (auto& m : metaData.asMap())
+                {
+                    if (!first) str += ",";
+                    first = false;
+
+                    str += "\"" + m.first + "\":\"" + m.second.toString() + "\"";
+                }
+
+                str += "]}";
 
                 if (application)
                 {

@@ -843,6 +843,28 @@ namespace relay
             return mapValue;
         }
 
+        std::string Node::toString() const
+        {
+            switch (marker)
+            {
+                case Marker::Number: return std::to_string(doubleValue);
+                case Marker::Boolean: return std::to_string(boolValue);
+                case Marker::String: return stringValue;
+                case Marker::Object: return "object";
+                case Marker::Null: return "null";
+                case Marker::Undefined: return "undefined";
+                case Marker::ECMAArray: return "ECMA array";
+                case Marker::ObjectEnd: return ""; // should not happen
+                case Marker::StrictArray: return "strict array";
+                case Marker::Date: return std::to_string(dateValue.ms) + " +" + std::to_string(dateValue.timezone);
+                case Marker::LongString: return stringValue;
+                case Marker::XMLDocument: return stringValue;
+                case Marker::TypedObject: return "typed object";
+                case Marker::SwitchToAMF3: return "switch to AMF3";
+                default: return "";
+            }
+        }
+
         uint32_t Node::getSize() const
         {
             return static_cast<uint32_t>(vectorValue.size());

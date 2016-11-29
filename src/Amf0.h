@@ -70,6 +70,8 @@ namespace relay
             const std::vector<Node>& asVector() const;
             const std::map<std::string, Node>& asMap() const;
 
+            std::string toString() const;
+
             uint32_t getSize() const;
 
             Node operator[](size_t key) const;
