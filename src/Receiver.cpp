@@ -972,7 +972,7 @@ namespace relay
             case ReportType::JSON:
             {
                 str += "{\"name\":\"" + streamName + "\"," +
-                    "\"connected:\"" + (socket.isReady() ? "true" : "false") + "\"," +
+                    "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
                     "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
                     "\"status\":";
 
@@ -999,12 +999,14 @@ namespace relay
                     str += "\"" + m.first + "\":\"" + m.second.toString() + "\"";
                 }
 
-                str += "}}";
+                str += "},\"application\":";
 
                 if (application)
                 {
                     application->getInfo(str, reportType);
                 }
+
+                str += "}";
                 break;
             }
         }

@@ -147,7 +147,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"name\":" + name +
+                str += "{\"name\":\"" + name + "\"," +
                     "\"pushSenders\":[";
 
                 bool first = true;
