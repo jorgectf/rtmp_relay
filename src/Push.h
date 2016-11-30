@@ -138,6 +138,7 @@ namespace relay
 
         bool streaming = false;
         float timeSinceConnect = 0.0f;
+        float timeSinceHandshake = 0.0f;
 
         std::vector<uint8_t> audioHeader;
         bool audioHeaderSent = false;

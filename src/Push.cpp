@@ -148,8 +148,10 @@ namespace relay
         if (active && !socket.isReady())
         {
             timeSinceConnect += delta;
+            timeSinceHandshake += delta;
 
-            if (timeSinceConnect >= reconnectInterval)
+            if (timeSinceConnect >= reconnectInterval ||
+                (state != rtmp::State::HANDSHAKE_DONE && timeSinceHandshake >= reconnectInterval))
             {
                 connect();
             }
@@ -219,6 +221,8 @@ namespace relay
                     }
 
                     state = rtmp::State::VERSION_RECEIVED;
+
+                    timeSinceHandshake = 0.0f;
                 }
                 else
                 {
@@ -252,6 +256,8 @@ namespace relay
                     socket.send(ackData);
 
                     state = rtmp::State::ACK_SENT;
+
+                    timeSinceHandshake = 0.0f;
                 }
                 else
                 {
@@ -276,6 +282,8 @@ namespace relay
                     state = rtmp::State::HANDSHAKE_DONE;
 
                     sendConnect();
+
+                    timeSinceHandshake = 0.0f;
                 }
                 else
                 {
