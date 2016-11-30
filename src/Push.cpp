@@ -86,6 +86,8 @@ namespace relay
         connected = false;
         streamName.clear();
         streaming = false;
+        timeSinceConnect = 0.0f;
+        timeSinceHandshake = 0.0f;
         invokeId = 0;
         invokes.clear();
 
@@ -102,8 +104,6 @@ namespace relay
     {
         reset();
         active = true;
-
-        timeSinceConnect = 0.0f;
 
         if (addresses.empty())
         {
@@ -145,12 +145,12 @@ namespace relay
 
     void Push::update(float delta)
     {
-        if (active && !socket.isReady())
+        if (active)
         {
             timeSinceConnect += delta;
             timeSinceHandshake += delta;
 
-            if (timeSinceConnect >= reconnectInterval ||
+            if ((!socket.isReady() && timeSinceConnect >= reconnectInterval) ||
                 (state != rtmp::State::HANDSHAKE_DONE && timeSinceHandshake >= reconnectInterval))
             {
                 connect();
