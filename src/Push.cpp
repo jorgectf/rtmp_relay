@@ -74,6 +74,8 @@ namespace relay
 
     void Push::reset()
     {
+        active = false;
+
         socket.close();
         data.clear();
 
