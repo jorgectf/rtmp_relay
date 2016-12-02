@@ -102,10 +102,10 @@ static int daemonize(const char* lock_file)
         exit(EXIT_SUCCESS);
     }
 
-    char str[20] = { 0 };
-    sprintf(str, "%d\n", getpid());
+    std::string str = std::to_string(getpid());
+
     // record pid to lockfile
-    if (write(lfp, str, strlen(str)) == -1)
+    if (write(lfp, str.c_str(), str.length()) == -1)
     {
         Log(Log::Level::ERR) << "Failed to write pid to lock file";
         exit(EXIT_FAILURE);
