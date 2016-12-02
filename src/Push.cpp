@@ -315,12 +315,16 @@ namespace relay
 
         if (offset > data.size())
         {
-            Log(Log::Level::WARN) << "[" << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
+            Log(Log::Level::ERR) << "[" << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
+
+            data.clear();
         }
+        else
+        {
+            data.erase(data.begin(), data.begin() + offset);
 
-        data.erase(data.begin(), data.begin() + offset);
-
-        Log(Log::Level::ALL) << "[" << name << "] " << "Remaining data " << data.size();
+            Log(Log::Level::ALL) << "[" << name << "] " << "Remaining data " << data.size();
+        }
     }
 
     void Push::handleClose(cppsocket::Socket&)
