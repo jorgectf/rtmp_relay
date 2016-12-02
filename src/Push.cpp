@@ -315,7 +315,10 @@ namespace relay
 
         if (offset > data.size())
         {
-            Log(Log::Level::ERR) << "[" << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
+            if (socket.isReady())
+            {
+                Log(Log::Level::ERR) << "[" << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
+            }
 
             data.clear();
         }
