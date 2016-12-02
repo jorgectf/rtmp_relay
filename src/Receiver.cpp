@@ -169,10 +169,8 @@ namespace relay
                     std::copy(challenge->version, challenge->version + sizeof(ack.version), ack.version);
                     std::copy(challenge->randomBytes, challenge->randomBytes + sizeof(ack.randomBytes), ack.randomBytes);
 
-                    std::vector<uint8_t> ackData;
-                    ackData.insert(ackData.begin(),
-                                   reinterpret_cast<uint8_t*>(&ack),
-                                   reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
+                    std::vector<uint8_t> ackData(reinterpret_cast<uint8_t*>(&ack),
+                                                 reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                     socket.send(ackData);
 
                     state = rtmp::State::ACK_SENT;
