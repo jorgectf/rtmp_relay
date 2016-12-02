@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include <cstring>
 #include "Push.h"
 #include "Constants.h"
 #include "RTMP.h"
@@ -170,7 +169,7 @@ namespace relay
 
         rtmp::Challenge challenge;
         challenge.time = 0;
-        memcpy(challenge.version, RTMP_SERVER_VERSION, sizeof(RTMP_SERVER_VERSION));
+        std::copy(RTMP_SERVER_VERSION, RTMP_SERVER_VERSION + sizeof(RTMP_SERVER_VERSION), challenge.version);
 
         for (size_t i = 0; i < sizeof(challenge.randomBytes); ++i)
         {
@@ -248,8 +247,8 @@ namespace relay
                     // C2
                     rtmp::Ack ack;
                     ack.time = challenge->time;
-                    memcpy(ack.version, challenge->version, sizeof(ack.version));
-                    memcpy(ack.randomBytes, challenge->randomBytes, sizeof(ack.randomBytes));
+                    std::copy(challenge->version, challenge->version + sizeof(ack.version), ack.version);
+                    std::copy(challenge->randomBytes, challenge->randomBytes + sizeof(ack.randomBytes), ack.randomBytes);
 
                     std::vector<uint8_t> ackData;
                     ackData.insert(ackData.begin(),
