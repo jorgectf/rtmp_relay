@@ -176,15 +176,15 @@ int main(int argc, const char* argv[])
 
     for (int i = 1; i < argc; ++i)
     {
-        if (strcmp(argv[i], "--config") == 0)
+        if (std::string(argv[i]) == "--config")
         {
             if (++i < argc) config = argv[i];
         }
-        else if (strcmp(argv[i], "--daemon") == 0)
+        else if (std::string(argv[i]) == "--daemon")
         {
             daemon = true;
         }
-        else if (strcmp(argv[i], "--kill-daemon") == 0)
+        else if (std::string(argv[i]) == "--kill-daemon")
         {
 #ifndef _MSC_VER
             if (killDaemon("/var/run/rtmp_relay.pid"))
@@ -197,13 +197,13 @@ int main(int argc, const char* argv[])
             }
 #endif
         }
-        else if (strcmp(argv[i], "--help") == 0)
+        else if (std::string(argv[i]) == "--help")
         {
             const char* exe = argc >= 1 ? argv[0] : "rtmp_relay";
             Log(Log::Level::INFO) << "Usage: " << exe << " --config <path to config file> [--daemon] [--kill-daemon] [--log <level>]";
             return EXIT_SUCCESS;
         }
-        else if (strcmp(argv[i], "--version") == 0)
+        else if (std::string(argv[i]) == "--version")
         {
             Log(Log::Level::INFO) << "RTMP relay v" << static_cast<uint32_t>(RTMP_RELAY_VERSION[0]) << "." << static_cast<uint32_t>(RTMP_RELAY_VERSION[1]);
             return EXIT_SUCCESS;
