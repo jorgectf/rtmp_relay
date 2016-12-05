@@ -92,13 +92,14 @@ namespace relay
         invokeId = 0;
         invokes.clear();
 
-        audioHeaderSent = false;
         audioHeader.clear();
-        videoHeaderSent = false;
+        audioHeaderSent = false;
         videoHeader.clear();
+        videoHeaderSent = false;
+        videoFrameSent = false;
 
-        metaDataSent = false;
         metaData = amf0::Node();
+        metaDataSent = false;
     }
 
     bool Push::connect()
@@ -964,9 +965,9 @@ namespace relay
 
     void Push::sendAudioHeader()
     {
-        if (streaming && !audioHeader.empty())
+        if (streaming && !audioHeader.empty() && audioStream)
         {
-            sendAudio(0, audioHeader);
+            sendAudioData(0, audioHeader);
             audioHeaderSent = true;
         }
     }
@@ -981,9 +982,9 @@ namespace relay
 
     void Push::sendVideoHeader()
     {
-        if (streaming && !videoHeader.empty())
+        if (streaming && !videoHeader.empty() && videoStream)
         {
-            sendVideo(0, videoHeader);
+            sendVideoData(0, videoHeader);
             videoHeaderSent = true;
         }
     }
@@ -992,20 +993,7 @@ namespace relay
     {
         if (streaming && audioStream)
         {
-            rtmp::Packet packet;
-            packet.channel = rtmp::Channel::AUDIO;
-            packet.messageStreamId = streamId;
-            packet.timestamp = timestamp;
-            packet.messageType = rtmp::MessageType::AUDIO_PACKET;
-
-            packet.data = audioData;
-
-            std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-            Log(Log::Level::ALL) << "[" << name << "] " << "Sending audio packet";
-
-            socket.send(buffer);
+            sendAudioData(timestamp, audioData);
         }
     }
 
@@ -1013,20 +1001,11 @@ namespace relay
     {
         if (streaming && videoStream)
         {
-            rtmp::Packet packet;
-            packet.channel = rtmp::Channel::VIDEO;
-            packet.messageStreamId = streamId;
-            packet.timestamp = timestamp;
-            packet.messageType = rtmp::MessageType::VIDEO_PACKET;
-
-            packet.data = videoData;
-
-            std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-            Log(Log::Level::ALL) << "[" << name << "] " << "Sending video packet";
-
-            socket.send(buffer);
+            if (videoFrameSent || getVideoFrameType(videoData) == VideoFrameType::KEY)
+            {
+                sendVideoData(timestamp, videoData);
+                videoFrameSent = true;
+            }
         }
     }
 
@@ -1036,6 +1015,42 @@ namespace relay
         metaDataSent = false;
 
         sendMetaData();
+    }
+
+    void Push::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
+
+        packet.data = audioData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending audio packet";
+
+        socket.send(buffer);
+    }
+
+    void Push::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::VIDEO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+
+        packet.data = videoData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending video packet";
+
+        socket.send(buffer);
     }
 
     void Push::sendMetaData()

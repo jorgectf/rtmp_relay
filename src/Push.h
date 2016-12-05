@@ -78,6 +78,9 @@ namespace relay
         void sendVideoHeader();
         void sendMetaData();
 
+        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+
         void reset();
         void handleConnect();
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
@@ -144,6 +147,7 @@ namespace relay
         bool audioHeaderSent = false;
         std::vector<uint8_t> videoHeader;
         bool videoHeaderSent = false;
+        bool videoFrameSent = false;
 
         amf0::Node metaData;
         bool metaDataSent = false;
