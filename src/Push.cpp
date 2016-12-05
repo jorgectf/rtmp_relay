@@ -73,24 +73,28 @@ namespace relay
 
     void Push::reset()
     {
-        active = false;
-
         socket.close();
         data.clear();
-
-        receivedPackets.clear();
-        sentPackets.clear();
 
         state = rtmp::State::UNINITIALIZED;
         inChunkSize = 128;
         outChunkSize = 128;
+
+        invokeId = 0;
+        invokes.clear();
+
+        streamId = 0;
+
+        receivedPackets.clear();
+        sentPackets.clear();
+
+        active = false;
         connected = false;
+
         streamName.clear();
         streaming = false;
         timeSinceConnect = 0.0f;
         timeSinceHandshake = 0.0f;
-        invokeId = 0;
-        invokes.clear();
 
         audioHeader.clear();
         audioHeaderSent = false;
