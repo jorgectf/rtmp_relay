@@ -47,6 +47,7 @@ namespace relay
 
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Push::handleConnect, this));
+        socket.setConnectErrorCallback(std::bind(&Push::handleConnectError, this));
         socket.setReadCallback(std::bind(&Push::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Push::handleClose, this, std::placeholders::_1));
 
@@ -190,6 +191,10 @@ namespace relay
         socket.send(challengeMessage);
 
         state = rtmp::State::VERSION_SENT;
+    }
+
+    void Push::handleConnectError()
+    {
     }
 
     bool Push::sendPacket(const std::vector<uint8_t>& packet)
