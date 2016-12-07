@@ -131,6 +131,8 @@ namespace relay
 
         std::string address = addresses[addressIndex];
 
+        Log(Log::Level::INFO) << "[" << name << "] " << "Connecting to " << address;
+
         if (!socket.connect(address, 1935))
         {
             return false;
