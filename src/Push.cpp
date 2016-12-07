@@ -160,7 +160,7 @@ namespace relay
             timeSinceHandshake += delta;
 
             if ((!socket.isReady() && timeSinceConnect >= reconnectInterval) ||
-                (state != rtmp::State::HANDSHAKE_DONE && timeSinceHandshake >= reconnectInterval))
+                (socket.isReady() && state != rtmp::State::HANDSHAKE_DONE && timeSinceHandshake >= reconnectInterval))
             {
                 connect();
             }
