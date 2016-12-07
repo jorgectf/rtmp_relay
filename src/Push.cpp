@@ -197,7 +197,7 @@ namespace relay
 
     void Push::handleConnectError()
     {
-        Log(Log::Level::INFO) << "[" << name << "] " << "Failed to connected to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
+        Log(Log::Level::INFO) << "[" << name << "] " << "Failed to connect to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
     }
 
     bool Push::sendPacket(const std::vector<uint8_t>& packet)
