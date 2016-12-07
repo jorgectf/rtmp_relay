@@ -340,7 +340,7 @@ namespace relay
     {
         if (active)
         {
-            connect();
+            reset();
         }
     }
 
