@@ -92,18 +92,14 @@ namespace relay
         active = false;
         connected = false;
 
-        streamName.clear();
         streaming = false;
         timeSinceConnect = 0.0f;
         timeSinceHandshake = 0.0f;
 
-        audioHeader.clear();
         audioHeaderSent = false;
-        videoHeader.clear();
         videoHeaderSent = false;
         videoFrameSent = false;
 
-        metaData = amf0::Node();
         metaDataSent = false;
     }
 
