@@ -106,9 +106,9 @@
       <Filter>cppsocket</Filter>
     </ClCompile>
     <ClCompile Include="src\Status.cpp" />
-    <ClCompile Include="src\Pull.cpp" />
-    <ClCompile Include="src\Push.cpp" />
-    <ClCompile Include="src\HTTPClient.cpp" />
+    <ClCompile Include="src\PullClient.cpp" />
+    <ClCompile Include="src\PushClient.cpp" />
+    <ClCompile Include="src\StatusClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Amf0.h" />
@@ -198,9 +198,9 @@
       <Filter>cppsocket</Filter>
     </ClInclude>
     <ClInclude Include="src\Status.h" />
-    <ClInclude Include="src\Pull.h" />
-    <ClInclude Include="src\Push.h" />
-    <ClInclude Include="src\HTTPClient.h" />
+    <ClInclude Include="src\PullClient.h" />
+    <ClInclude Include="src\PushClient.h" />
+    <ClInclude Include="src\StatusClient.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">
