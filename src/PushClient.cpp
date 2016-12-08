@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "Push.h"
+#include "PushClient.h"
 #include "Constants.h"
 #include "RTMP.h"
 #include "Amf0.h"
@@ -15,17 +15,17 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Push::Push(Network& aNetwork,
-               const std::string& aApplication,
-               const std::string& aOverrideStreamName,
-               const std::vector<std::string>& aAddresses,
-               bool videoOutput,
-               bool audioOutput,
-               bool dataOutput,
-               const std::set<std::string>& aMetaDataBlacklist,
-               float aConnectionTimeout,
-               float aReconnectInterval,
-               uint32_t aReconnectCount):
+    PushClient::PushClient(Network& aNetwork,
+                           const std::string& aApplication,
+                           const std::string& aOverrideStreamName,
+                           const std::vector<std::string>& aAddresses,
+                           bool videoOutput,
+                           bool audioOutput,
+                           bool dataOutput,
+                           const std::set<std::string>& aMetaDataBlacklist,
+                           float aConnectionTimeout,
+                           float aReconnectInterval,
+                           uint32_t aReconnectCount):
         generator(rd()),
         network(aNetwork),
         socket(network),
@@ -46,10 +46,10 @@ namespace relay
         }
 
         socket.setConnectTimeout(connectionTimeout);
-        socket.setConnectCallback(std::bind(&Push::handleConnect, this));
-        socket.setConnectErrorCallback(std::bind(&Push::handleConnectError, this));
-        socket.setReadCallback(std::bind(&Push::handleRead, this, std::placeholders::_1, std::placeholders::_2));
-        socket.setCloseCallback(std::bind(&Push::handleClose, this, std::placeholders::_1));
+        socket.setConnectCallback(std::bind(&PushClient::handleConnect, this));
+        socket.setConnectErrorCallback(std::bind(&PushClient::handleConnectError, this));
+        socket.setReadCallback(std::bind(&PushClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+        socket.setCloseCallback(std::bind(&PushClient::handleClose, this, std::placeholders::_1));
 
         if (!videoOutput)
         {
@@ -72,7 +72,7 @@ namespace relay
         }
     }
 
-    void Push::reset()
+    void PushClient::reset()
     {
         socket.close();
         data.clear();
@@ -103,7 +103,7 @@ namespace relay
         metaDataSent = false;
     }
 
-    bool Push::connect()
+    bool PushClient::connect()
     {
         reset();
         active = true;
@@ -139,7 +139,7 @@ namespace relay
         return true;
     }
 
-    void Push::disconnect()
+    void PushClient::disconnect()
     {
         Log(Log::Level::ERR) << "[" << name << "] " << "Disconnecting from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
         reset();
@@ -148,7 +148,7 @@ namespace relay
         connectCount = 0;
     }
 
-    void Push::update(float delta)
+    void PushClient::update(float delta)
     {
         if (active)
         {
@@ -163,7 +163,7 @@ namespace relay
         }
     }
 
-    void Push::handleConnect()
+    void PushClient::handleConnect()
     {
         Log(Log::Level::INFO) << "[" << name << "] " << "Connected to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
 
@@ -191,19 +191,19 @@ namespace relay
         state = rtmp::State::VERSION_SENT;
     }
 
-    void Push::handleConnectError()
+    void PushClient::handleConnectError()
     {
         Log(Log::Level::INFO) << "[" << name << "] " << "Failed to connect to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
     }
 
-    bool Push::sendPacket(const std::vector<uint8_t>& packet)
+    bool PushClient::sendPacket(const std::vector<uint8_t>& packet)
     {
         socket.send(packet);
 
         return true;
     }
 
-    void Push::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
+    void PushClient::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
@@ -336,7 +336,7 @@ namespace relay
         }
     }
 
-    void Push::handleClose(cppsocket::Socket&)
+    void PushClient::handleClose(cppsocket::Socket&)
     {
         if (active)
         {
@@ -344,7 +344,7 @@ namespace relay
         }
     }
 
-    bool Push::handlePacket(const rtmp::Packet& packet)
+    bool PushClient::handlePacket(const rtmp::Packet& packet)
     {
         switch (packet.messageType)
         {
@@ -612,7 +612,7 @@ namespace relay
         return true;
     }
 
-    void Push::sendConnect()
+    void PushClient::sendConnect()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -642,7 +642,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Push::sendSetChunkSize()
+    void PushClient::sendSetChunkSize()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -659,7 +659,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Push::sendCheckBW()
+    void PushClient::sendCheckBW()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -685,7 +685,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Push::sendCreateStream()
+    void PushClient::sendCreateStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -711,7 +711,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Push::sendReleaseStream()
+    void PushClient::sendReleaseStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -740,7 +740,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Push::sendDeleteStream()
+    void PushClient::sendDeleteStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -769,7 +769,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Push::sendFCPublish()
+    void PushClient::sendFCPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -798,7 +798,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Push::sendFCUnpublish()
+    void PushClient::sendFCUnpublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -827,7 +827,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Push::sendPublish()
+    void PushClient::sendPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SOURCE;
@@ -859,7 +859,7 @@ namespace relay
         Log(Log::Level::INFO) << "[" << name << "] " << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
     }
 
-    void Push::getInfo(std::string& str, ReportType reportType) const
+    void PushClient::getInfo(std::string& str, ReportType reportType) const
     {
         switch (reportType)
         {
@@ -916,7 +916,7 @@ namespace relay
         }
     }
 
-    void Push::createStream(const std::string& newStreamName)
+    void PushClient::createStream(const std::string& newStreamName)
     {
         if (overrideStreamName.empty())
         {
@@ -943,7 +943,7 @@ namespace relay
         }
     }
 
-    void Push::deleteStream()
+    void PushClient::deleteStream()
     {
         if (connected && !streamName.empty())
         {
@@ -953,7 +953,7 @@ namespace relay
         streaming = false;
     }
 
-    void Push::unpublishStream()
+    void PushClient::unpublishStream()
     {
         if (connected && !streamName.empty())
         {
@@ -963,7 +963,7 @@ namespace relay
         streaming = false;
     }
 
-    void Push::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    void PushClient::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
         audioHeader = headerData;
         audioHeaderSent = false;
@@ -971,7 +971,7 @@ namespace relay
         sendAudioHeader();
     }
 
-    void Push::sendAudioHeader()
+    void PushClient::sendAudioHeader()
     {
         if (streaming && !audioHeader.empty() && audioStream)
         {
@@ -980,7 +980,7 @@ namespace relay
         }
     }
 
-    void Push::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    void PushClient::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
         videoHeader = headerData;
         videoHeaderSent = false;
@@ -988,7 +988,7 @@ namespace relay
         sendVideoHeader();
     }
 
-    void Push::sendVideoHeader()
+    void PushClient::sendVideoHeader()
     {
         if (streaming && !videoHeader.empty() && videoStream)
         {
@@ -997,7 +997,7 @@ namespace relay
         }
     }
 
-    void Push::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    void PushClient::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         if (streaming && audioStream)
         {
@@ -1005,7 +1005,7 @@ namespace relay
         }
     }
 
-    void Push::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    void PushClient::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
         if (streaming && videoStream)
         {
@@ -1017,7 +1017,7 @@ namespace relay
         }
     }
 
-    void Push::sendMetaData(const amf0::Node& newMetaData)
+    void PushClient::sendMetaData(const amf0::Node& newMetaData)
     {
         metaData = newMetaData;
         metaDataSent = false;
@@ -1025,7 +1025,7 @@ namespace relay
         sendMetaData();
     }
 
-    void Push::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    void PushClient::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::AUDIO;
@@ -1043,7 +1043,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Push::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    void PushClient::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::VIDEO;
@@ -1061,7 +1061,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Push::sendMetaData()
+    void PushClient::sendMetaData()
     {
         if (streaming && metaData.getMarker() != amf0::Marker::Unknown)
         {
@@ -1106,7 +1106,7 @@ namespace relay
         }
     }
 
-    void Push::sendTextData(uint64_t timestamp, const amf0::Node& textData)
+    void PushClient::sendTextData(uint64_t timestamp, const amf0::Node& textData)
     {
         if (streaming && dataStream)
         {

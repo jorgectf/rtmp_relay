@@ -6,7 +6,7 @@
 
 #include <memory>
 #include "Acceptor.h"
-#include "HTTPClient.h"
+#include "StatusClient.h"
 
 namespace relay
 {
@@ -39,6 +39,6 @@ namespace relay
         cppsocket::Acceptor socket;
         Relay& relay;
 
-        std::vector<std::unique_ptr<HTTPClient>> clients;
+        std::vector<std::unique_ptr<StatusClient>> clients;
     };
 }

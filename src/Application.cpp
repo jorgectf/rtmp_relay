@@ -18,17 +18,17 @@ namespace relay
     {
         for (const PushDescriptor& pushDescriptor : applicationDescriptor.pushDescriptors)
         {
-            std::unique_ptr<Push> sender(new Push(aNetwork,
-                                                  name,
-                                                  pushDescriptor.overrideStreamName,
-                                                  pushDescriptor.addresses,
-                                                  pushDescriptor.videoOutput,
-                                                  pushDescriptor.audioOutput,
-                                                  pushDescriptor.dataOutput,
-                                                  pushDescriptor.metaDataBlacklist,
-                                                  pushDescriptor.connectionTimeout,
-                                                  pushDescriptor.reconnectInterval,
-                                                  pushDescriptor.reconnectCount));
+            std::unique_ptr<PushClient> sender(new PushClient(aNetwork,
+                                                              name,
+                                                              pushDescriptor.overrideStreamName,
+                                                              pushDescriptor.addresses,
+                                                              pushDescriptor.videoOutput,
+                                                              pushDescriptor.audioOutput,
+                                                              pushDescriptor.dataOutput,
+                                                              pushDescriptor.metaDataBlacklist,
+                                                              pushDescriptor.connectionTimeout,
+                                                              pushDescriptor.reconnectInterval,
+                                                              pushDescriptor.reconnectCount));
 
             sender->connect();
 

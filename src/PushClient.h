@@ -29,27 +29,27 @@ namespace relay
         uint32_t reconnectCount;
     };
 
-    class Push
+    class PushClient
     {
         const std::string name = "Push";
     public:
-        Push(cppsocket::Network& aNetwork,
-             const std::string& aApplication,
-             const std::string& aOverrideStreamName,
-             const std::vector<std::string>& aAddresses,
-             bool videoOutput,
-             bool audioOutput,
-             bool dataOutput,
-             const std::set<std::string>& aMetaDataBlacklist,
-             float aConnectionTimeout,
-             float aReconnectInterval,
-             uint32_t aReconnectCount);
+        PushClient(cppsocket::Network& aNetwork,
+                   const std::string& aApplication,
+                   const std::string& aOverrideStreamName,
+                   const std::vector<std::string>& aAddresses,
+                   bool videoOutput,
+                   bool audioOutput,
+                   bool dataOutput,
+                   const std::set<std::string>& aMetaDataBlacklist,
+                   float aConnectionTimeout,
+                   float aReconnectInterval,
+                   uint32_t aReconnectCount);
 
-        Push(const Push&) = delete;
-        Push& operator=(const Push&) = delete;
+        PushClient(const PushClient&) = delete;
+        PushClient& operator=(const PushClient&) = delete;
 
-        Push(Push&& other) = delete;
-        Push& operator=(Push&& other) = delete;
+        PushClient(PushClient&& other) = delete;
+        PushClient& operator=(PushClient&& other) = delete;
 
         bool connect();
         void disconnect();

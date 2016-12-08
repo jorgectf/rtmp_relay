@@ -10,12 +10,12 @@ namespace relay
 {
     class Relay;
 
-    class HTTPClient
+    class StatusClient
     {
     public:
-        HTTPClient(cppsocket::Network& aNetwork,
-                   cppsocket::Socket& aSocket,
-                   Relay& aRelay);
+        StatusClient(cppsocket::Network& aNetwork,
+                     cppsocket::Socket& aSocket,
+                     Relay& aRelay);
 
         bool isConnected() const { return socket.isReady(); }
         

@@ -3,15 +3,15 @@ LDFLAGS=
 
 SOURCES=src/Amf0.cpp \
 	src/Application.cpp \
-	src/HTTPClient.cpp \
 	src/main.cpp \
-	src/Pull.cpp \
-	src/Push.cpp \
+	src/PullClient.cpp \
+	src/PushClient.cpp \
 	src/Receiver.cpp \
 	src/Relay.cpp \
 	src/RTMP.cpp \
 	src/Server.cpp \
 	src/Status.cpp \
+	src/StatusClient.cpp \
 	src/Utils.cpp \
 	external/cppsocket/Acceptor.cpp \
 	external/cppsocket/Connector.cpp \

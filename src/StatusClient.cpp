@@ -3,7 +3,7 @@
 //
 
 #include <algorithm>
-#include "HTTPClient.h"
+#include "StatusClient.h"
 #include "Relay.h"
 #include "Utils.h"
 #include "Log.h"
@@ -12,18 +12,18 @@ using namespace cppsocket;
 
 namespace relay
 {
-    HTTPClient::HTTPClient(cppsocket::Network& aNetwork,
-                           cppsocket::Socket& aSocket,
-                           Relay& aRelay):
+    StatusClient::StatusClient(cppsocket::Network& aNetwork,
+                               cppsocket::Socket& aSocket,
+                               Relay& aRelay):
         network(aNetwork),
         socket(std::move(aSocket)),
         relay(aRelay)
     {
-        socket.setReadCallback(std::bind(&HTTPClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
-        socket.setCloseCallback(std::bind(&HTTPClient::handleClose, this, std::placeholders::_1));
+        socket.setReadCallback(std::bind(&StatusClient::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+        socket.setCloseCallback(std::bind(&StatusClient::handleClose, this, std::placeholders::_1));
     }
 
-    void HTTPClient::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
+    void StatusClient::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         const std::vector<uint8_t> clrf = { '\r', '\n' };
 
@@ -65,11 +65,11 @@ namespace relay
         }
     }
 
-    void HTTPClient::handleClose(cppsocket::Socket&)
+    void StatusClient::handleClose(cppsocket::Socket&)
     {
     }
 
-    void HTTPClient::sendReport()
+    void StatusClient::sendReport()
     {
         std::vector<std::string> fields;
         tokenize(startLine, fields);
@@ -133,7 +133,7 @@ namespace relay
         }
     }
 
-    void HTTPClient::sendError()
+    void StatusClient::sendError()
     {
         std::string response = "HTTP/1.1 404 Not Found\r\n"
         "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"

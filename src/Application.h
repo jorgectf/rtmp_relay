@@ -11,8 +11,8 @@
 #include "Network.h"
 #include "Connector.h"
 #include "RTMP.h"
-#include "Push.h"
-#include "Pull.h"
+#include "PushClient.h"
+#include "PullClient.h"
 #include "Status.h"
 
 namespace relay
@@ -51,7 +51,7 @@ namespace relay
     private:
         std::string name;
 
-        std::vector<std::unique_ptr<Push>> pushSenders;
-        std::vector<std::unique_ptr<Pull>> pullSenders;
+        std::vector<std::unique_ptr<PushClient>> pushSenders;
+        std::vector<std::unique_ptr<PullClient>> pullSenders;
     };
 }

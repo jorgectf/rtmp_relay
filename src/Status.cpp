@@ -4,7 +4,7 @@
 
 #include "Status.h"
 #include "Relay.h"
-#include "HTTPClient.h"
+#include "StatusClient.h"
 
 namespace relay
 {
@@ -34,7 +34,7 @@ namespace relay
 
     void Status::handleAccept(cppsocket::Socket& clientSocket)
     {
-        std::unique_ptr<HTTPClient> client(new HTTPClient(network, clientSocket, relay));
+        std::unique_ptr<StatusClient> client(new StatusClient(network, clientSocket, relay));
         
         clients.push_back(std::move(client));
     }
