@@ -6,7 +6,7 @@
 
 #include <memory>
 #include "Acceptor.h"
-#include "StatusClient.h"
+#include "StatusSender.h"
 
 namespace relay
 {
@@ -39,6 +39,6 @@ namespace relay
         cppsocket::Acceptor socket;
         Relay& relay;
 
-        std::vector<std::unique_ptr<StatusClient>> clients;
+        std::vector<std::unique_ptr<StatusSender>> statusSenders;
     };
 }

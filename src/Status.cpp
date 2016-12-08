@@ -4,7 +4,7 @@
 
 #include "Status.h"
 #include "Relay.h"
-#include "StatusClient.h"
+#include "StatusSender.h"
 
 namespace relay
 {
@@ -19,7 +19,7 @@ namespace relay
 
     void Status::update(float)
     {
-        for (auto i = clients.begin(); i != clients.end();)
+        for (auto i = statusSenders.begin(); i != statusSenders.end();)
         {
             if ((*i)->isConnected())
             {
@@ -27,15 +27,15 @@ namespace relay
             }
             else
             {
-                i = clients.erase(i);
+                i = statusSenders.erase(i);
             }
         }
     }
 
     void Status::handleAccept(cppsocket::Socket& clientSocket)
     {
-        std::unique_ptr<StatusClient> client(new StatusClient(network, clientSocket, relay));
+        std::unique_ptr<StatusSender> statusSender(new StatusSender(network, clientSocket, relay));
         
-        clients.push_back(std::move(client));
+        statusSenders.push_back(std::move(statusSender));
     }
 }

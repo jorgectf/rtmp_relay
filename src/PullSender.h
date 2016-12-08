@@ -20,7 +20,7 @@ namespace relay
         std::set<std::string> metaDataBlacklist;
     };
 
-    class PullClient
+    class PullSender
     {
     public:
     };

@@ -18,7 +18,7 @@ namespace relay
     {
         for (const PushDescriptor& pushDescriptor : applicationDescriptor.pushDescriptors)
         {
-            std::unique_ptr<PushClient> sender(new PushClient(aNetwork,
+            std::unique_ptr<PushSender> sender(new PushSender(aNetwork,
                                                               name,
                                                               pushDescriptor.overrideStreamName,
                                                               pushDescriptor.addresses,

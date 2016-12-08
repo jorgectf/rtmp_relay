@@ -10,10 +10,10 @@ namespace relay
 {
     class Relay;
 
-    class StatusClient
+    class StatusSender
     {
     public:
-        StatusClient(cppsocket::Network& aNetwork,
+        StatusSender(cppsocket::Network& aNetwork,
                      cppsocket::Socket& aSocket,
                      Relay& aRelay);
 

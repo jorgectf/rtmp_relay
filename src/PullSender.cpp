@@ -2,7 +2,7 @@
 //  rtmp_relay
 //
 
-#include "PullClient.h"
+#include "PullSender.h"
 
 namespace relay
 {
