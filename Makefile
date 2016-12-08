@@ -4,14 +4,14 @@ LDFLAGS=
 SOURCES=src/Amf0.cpp \
 	src/Application.cpp \
 	src/main.cpp \
-	src/PullClient.cpp \
-	src/PushClient.cpp \
+	src/PullSender.cpp \
+	src/PushSender.cpp \
 	src/Receiver.cpp \
 	src/Relay.cpp \
 	src/RTMP.cpp \
 	src/Server.cpp \
 	src/Status.cpp \
-	src/StatusClient.cpp \
+	src/StatusSender.cpp \
 	src/Utils.cpp \
 	external/cppsocket/Acceptor.cpp \
 	external/cppsocket/Connector.cpp \

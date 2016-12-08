@@ -54,14 +54,14 @@
     <ClCompile Include="src\Amf0.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\PullClient.cpp" />
-    <ClCompile Include="src\PushClient.cpp" />
+    <ClCompile Include="src\PullSender.cpp" />
+    <ClCompile Include="src\PushSender.cpp" />
     <ClCompile Include="src\Receiver.cpp" />
     <ClCompile Include="src\Relay.cpp" />
     <ClCompile Include="src\RTMP.cpp" />
     <ClCompile Include="src\Server.cpp" />
     <ClCompile Include="src\Status.cpp" />
-    <ClCompile Include="src\StatusClient.cpp" />
+    <ClCompile Include="src\StatusSender.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -94,14 +94,14 @@
     <ClInclude Include="src\Amf0.h" />
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Constants.h" />
-    <ClInclude Include="src\PullClient.h" />
-    <ClInclude Include="src\PushClient.h" />
+    <ClInclude Include="src\PullSender.h" />
+    <ClInclude Include="src\PushSender.h" />
     <ClInclude Include="src\Receiver.h" />
     <ClInclude Include="src\Relay.h" />
     <ClInclude Include="src\RTMP.h" />
     <ClInclude Include="src\Server.h" />
     <ClInclude Include="src\Status.h" />
-    <ClInclude Include="src\StatusClient.h" />
+    <ClInclude Include="src\StatusSender.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
