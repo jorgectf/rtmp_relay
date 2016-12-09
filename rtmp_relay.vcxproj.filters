@@ -109,6 +109,7 @@
     <ClCompile Include="src\PullSender.cpp" />
     <ClCompile Include="src\PushSender.cpp" />
     <ClCompile Include="src\StatusSender.cpp" />
+    <ClCompile Include="src\PullServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Amf0.h" />
@@ -201,6 +202,7 @@
     <ClInclude Include="src\PullSender.h" />
     <ClInclude Include="src\PushSender.h" />
     <ClInclude Include="src\StatusSender.h" />
+    <ClInclude Include="src\PullServer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">

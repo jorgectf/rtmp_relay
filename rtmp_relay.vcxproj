@@ -55,6 +55,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PullSender.cpp" />
+    <ClCompile Include="src\PullServer.cpp" />
     <ClCompile Include="src\PushSender.cpp" />
     <ClCompile Include="src\Receiver.cpp" />
     <ClCompile Include="src\Relay.cpp" />
@@ -95,6 +96,7 @@
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\PullSender.h" />
+    <ClInclude Include="src\PullServer.h" />
     <ClInclude Include="src\PushSender.h" />
     <ClInclude Include="src\Receiver.h" />
     <ClInclude Include="src\Relay.h" />
