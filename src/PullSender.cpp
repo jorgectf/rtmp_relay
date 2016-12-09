@@ -22,4 +22,8 @@ namespace relay
         metaDataBlacklist(aMetaDataBlacklist)
     {
     }
+
+    void PullSender::update(float delta)
+    {
+    }
 }

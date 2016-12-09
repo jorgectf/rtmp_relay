@@ -22,6 +22,10 @@ namespace relay
                    bool dataOutput,
                    const std::set<std::string>& aMetaDataBlacklist);
 
+        void update(float delta);
+
+        bool isConnected() const { return socket.isReady(); }
+
     private:
         cppsocket::Socket& socket;
 

@@ -35,6 +35,8 @@ namespace relay
                    bool dataOutput,
                    const std::set<std::string>& aMetaDataBlacklist);
 
+        void update(float delta);
+
     private:
         void handleAccept(cppsocket::Socket& clientSocket);
         

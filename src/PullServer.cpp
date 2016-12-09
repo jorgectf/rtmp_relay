@@ -29,6 +29,24 @@ namespace relay
         socket.startAccept(address);
     }
 
+    void PullServer::update(float delta)
+    {
+        for (auto senderIterator = pullSenders.begin(); senderIterator != pullSenders.end();)
+        {
+            const auto& pullSender = *senderIterator;
+
+            if (pullSender->isConnected())
+            {
+                pullSender->update(delta);
+                ++senderIterator;
+            }
+            else
+            {
+                senderIterator = pullSenders.erase(senderIterator);
+            }
+        }
+    }
+
     void PullServer::handleAccept(cppsocket::Socket& clientSocket)
     {
         std::auto_ptr<PullSender> pullSender(new PullSender(clientSocket,

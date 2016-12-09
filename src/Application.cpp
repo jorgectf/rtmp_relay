@@ -56,6 +56,11 @@ namespace relay
         {
             sender->update(delta);
         }
+
+        for (const auto& server : pullServers)
+        {
+            server->update(delta);
+        }
     }
 
     void Application::createStream(const std::string& streamName)
