@@ -5,6 +5,7 @@ SOURCES=src/Amf0.cpp \
 	src/Application.cpp \
 	src/main.cpp \
 	src/PullSender.cpp \
+	src/PullServer.cpp \
 	src/PushSender.cpp \
 	src/Receiver.cpp \
 	src/Relay.cpp \

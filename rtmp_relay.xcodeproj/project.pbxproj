@@ -51,6 +51,7 @@
 		30FA80E21C8DA37800F2695E /* PushSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FA80E01C8DA37800F2695E /* PushSender.cpp */; };
 		30FA80E51C8DB57300F2695E /* Receiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FA80E31C8DB57300F2695E /* Receiver.cpp */; };
 		30FA80F81C8F588500F2695E /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FA80F61C8F588500F2695E /* Utils.cpp */; };
+		30FE38481DFB532E00305B3B /* PullServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FE38461DFB532E00305B3B /* PullServer.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -149,6 +150,8 @@
 		30FA80E41C8DB57300F2695E /* Receiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Receiver.h; sourceTree = "<group>"; };
 		30FA80F61C8F588500F2695E /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
 		30FA80F71C8F588500F2695E /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		30FE38461DFB532E00305B3B /* PullServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PullServer.cpp; sourceTree = "<group>"; };
+		30FE38471DFB532E00305B3B /* PullServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullServer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +194,8 @@
 				3009340C1C873DF200CC50D3 /* main.cpp */,
 				3013FAA61DD6257D0069E2BD /* PullSender.cpp */,
 				3013FAA71DD6257D0069E2BD /* PullSender.h */,
+				30FE38461DFB532E00305B3B /* PullServer.cpp */,
+				30FE38471DFB532E00305B3B /* PullServer.h */,
 				30FA80E01C8DA37800F2695E /* PushSender.cpp */,
 				30FA80E11C8DA37800F2695E /* PushSender.h */,
 				30FA80E31C8DB57300F2695E /* Receiver.cpp */,
@@ -359,6 +364,7 @@
 				309B48331DE4A0D700A718C5 /* StatusSender.cpp in Sources */,
 				30BB19041D47A43800102062 /* parser.cpp in Sources */,
 				3030D5141DAF8C94007CC8EB /* Log.cpp in Sources */,
+				30FE38481DFB532E00305B3B /* PullServer.cpp in Sources */,
 				30BB19071D47A43800102062 /* scanscalar.cpp in Sources */,
 				30BB190B1D47A43800102062 /* singledocparser.cpp in Sources */,
 				30BB18F31D47A43800102062 /* binary.cpp in Sources */,
