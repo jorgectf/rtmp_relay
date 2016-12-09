@@ -34,6 +34,20 @@ namespace relay
 
             pushSenders.push_back(std::move(sender));
         }
+
+        for (const PullDescriptor& pullDescriptor : applicationDescriptor.pullDescriptors)
+        {
+            std::unique_ptr<PullServer> server(new PullServer(aNetwork,
+                                                              name,
+                                                              pullDescriptor.overrideStreamName,
+                                                              pullDescriptor.address,
+                                                              pullDescriptor.videoOutput,
+                                                              pullDescriptor.audioOutput,
+                                                              pullDescriptor.dataOutput,
+                                                              pullDescriptor.metaDataBlacklist));
+
+            pullServers.push_back(std::move(server));
+        }
     }
 
     void Application::update(float delta)

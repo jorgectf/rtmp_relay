@@ -12,7 +12,7 @@
 #include "Connector.h"
 #include "RTMP.h"
 #include "PushSender.h"
-#include "PullSender.h"
+#include "PullServer.h"
 #include "Status.h"
 
 namespace relay
@@ -52,6 +52,6 @@ namespace relay
         std::string name;
 
         std::vector<std::unique_ptr<PushSender>> pushSenders;
-        std::vector<std::unique_ptr<PullSender>> pullSenders;
+        std::vector<std::unique_ptr<PullServer>> pullServers;
     };
 }
