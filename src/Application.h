@@ -8,6 +8,7 @@
 #include <set>
 #include <vector>
 #include <map>
+#include <memory>
 #include "Network.h"
 #include "Connector.h"
 #include "RTMP.h"
