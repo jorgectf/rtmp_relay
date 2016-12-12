@@ -43,7 +43,7 @@ namespace relay
 
         bool handlePacket(const rtmp::Packet& packet);
         
-        cppsocket::Socket& socket;
+        cppsocket::Socket socket;
 
         const std::string application;
         const std::string overrideStreamName;

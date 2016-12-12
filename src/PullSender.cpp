@@ -17,7 +17,7 @@ namespace relay
                            bool audioOutput,
                            bool dataOutput,
                            const std::set<std::string>& aMetaDataBlacklist):
-        socket(aSocket),
+        socket(std::move(aSocket)),
         generator(rd()),
         application(aApplication),
         overrideStreamName(aOverrideStreamName),
