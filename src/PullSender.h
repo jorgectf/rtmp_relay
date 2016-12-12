@@ -27,6 +27,12 @@ namespace relay
                    bool dataOutput,
                    const std::set<std::string>& aMetaDataBlacklist);
 
+        PullSender(const PullSender&) = delete;
+        PullSender& operator=(const PullSender&) = delete;
+
+        PullSender(PullSender&& other) = delete;
+        PullSender& operator=(PullSender&& other) = delete;
+
         void update(float delta);
 
         bool isConnected() const { return socket.isReady(); }
