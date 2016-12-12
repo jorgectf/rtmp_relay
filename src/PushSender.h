@@ -31,7 +31,7 @@ namespace relay
 
     class PushSender
     {
-        const std::string name = "Push";
+        const std::string name = "PushSender";
     public:
         PushSender(cppsocket::Network& aNetwork,
                    const std::string& aApplication,

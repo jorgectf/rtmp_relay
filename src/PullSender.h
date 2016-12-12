@@ -17,7 +17,7 @@ namespace relay
 {
     class PullSender
     {
-        const std::string name = "Push";
+        const std::string name = "PullSender";
     public:
         PullSender(cppsocket::Socket& aSocket,
                    const std::string& aApplication,
