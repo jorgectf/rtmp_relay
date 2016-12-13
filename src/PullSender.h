@@ -62,6 +62,7 @@ namespace relay
 
         const std::string application;
         const std::string overrideStreamName;
+        std::string streamName;
         const bool videoStream;
         const bool audioStream;
         const bool dataStream;

@@ -430,6 +430,38 @@ namespace relay
 
                     Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
                 }
+                else if (command.asString() == "_checkbw")
+                {
+                    sendCheckBWResult(transactionId.asDouble());
+                }
+                else if (command.asString() == "createStream")
+                {
+                    sendCreateStreamResult(transactionId.asDouble());
+                }
+                else if (command.asString() == "releaseStream")
+                {
+                    sendReleaseStreamResult(transactionId.asDouble());
+                }
+                else if (command.asString() == "deleteStream")
+                {
+                    // do nothing
+                }
+                else if (command.asString() == "FCPublish")
+                {
+                    sendOnFCPublish();
+                    streamName = argument2.asString();
+
+                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                }
+                else if (command.asString() == "FCUnpublish")
+                {
+                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " unpublished stream \"" << streamName << "\"";
+                }
+                else if (command.asString() == "publish")
+                {
+                    sendPing();
+                    sendPublishStatus(transactionId.asDouble());
+                }
                 else if (command.asString() == "_error")
                 {
                     auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
