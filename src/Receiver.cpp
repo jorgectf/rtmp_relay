@@ -901,6 +901,25 @@ namespace relay
         socket.send(buffer);
     }
 
+    bool Receiver::connect(const std::string& applicationName)
+    {
+        for (const ApplicationDescriptor& applicationDescriptor : applicationDescriptors)
+        {
+            if (applicationDescriptor.name.empty() ||
+                applicationDescriptor.name == applicationName)
+            {
+                application.reset(new Application(network, applicationDescriptor, applicationName));
+
+                return true;
+            }
+        }
+
+        Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application";
+
+        // failed to connect
+        return false;
+    }
+
     void Receiver::getInfo(std::string& str, ReportType reportType) const
     {
         switch (reportType)
@@ -919,7 +938,7 @@ namespace relay
                 }
 
                 str += ", name: " + streamName + ", video bitrate: " + std::to_string(videoRate * 8) + ", audio bitrate: " + std::to_string(audioRate * 8) +
-                    ", metadata: ";
+                ", metadata: ";
 
                 bool first = true;
 
@@ -976,9 +995,9 @@ namespace relay
             case ReportType::JSON:
             {
                 str += "{\"name\":\"" + streamName + "\"," +
-                    "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
-                    "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
-                    "\"status\":";
+                "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
+                "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
+                "\"status\":";
 
                 switch (state)
                 {
@@ -990,8 +1009,8 @@ namespace relay
                 }
 
                 str += "\"videoBitrate\":" + std::to_string(videoRate * 8) + "," +
-                    "\"audioBitrate\":" + std::to_string(audioRate * 8) + "," +
-                    "\"metaData\":{";
+                "\"audioBitrate\":" + std::to_string(audioRate * 8) + "," +
+                "\"metaData\":{";
 
                 bool first = true;
 
@@ -1002,36 +1021,17 @@ namespace relay
 
                     str += "\"" + m.first + "\":\"" + m.second.toString() + "\"";
                 }
-
+                
                 str += "},\"application\":";
-
+                
                 if (application)
                 {
                     application->getInfo(str, reportType);
                 }
-
+                
                 str += "}";
                 break;
             }
         }
-    }
-
-    bool Receiver::connect(const std::string& applicationName)
-    {
-        for (const ApplicationDescriptor& applicationDescriptor : applicationDescriptors)
-        {
-            if (applicationDescriptor.name.empty() ||
-                applicationDescriptor.name == applicationName)
-            {
-                application.reset(new Application(network, applicationDescriptor, applicationName));
-
-                return true;
-            }
-        }
-
-        Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application";
-
-        // failed to connect
-        return false;
     }
 }
