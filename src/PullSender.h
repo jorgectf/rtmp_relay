@@ -37,7 +37,25 @@ namespace relay
 
         bool isConnected() const { return socket.isReady(); }
 
+        void createStream(const std::string& newStreamName);
+        void deleteStream();
+        void unpublishStream();
+
+        void sendAudioHeader(const std::vector<uint8_t>& headerData);
+        void sendVideoHeader(const std::vector<uint8_t>& headerData);
+        void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+        void sendMetaData(const amf0::Node& metaData);
+        void sendTextData(uint64_t timestamp, const amf0::Node& textData);
+
     private:
+        void sendAudioHeader();
+        void sendVideoHeader();
+        void sendMetaData();
+
+        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+        
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket&);
 
@@ -62,7 +80,6 @@ namespace relay
 
         const std::string application;
         const std::string overrideStreamName;
-        std::string streamName;
         const bool videoStream;
         const bool audioStream;
         const bool dataStream;
@@ -86,5 +103,19 @@ namespace relay
 
         std::map<uint32_t, rtmp::Header> receivedPackets;
         std::map<uint32_t, rtmp::Header> sentPackets;
+
+        bool connected = false;
+        std::string streamName;
+
+        bool streaming = false;
+
+        std::vector<uint8_t> audioHeader;
+        bool audioHeaderSent = false;
+        std::vector<uint8_t> videoHeader;
+        bool videoHeaderSent = false;
+        bool videoFrameSent = false;
+
+        amf0::Node metaData;
+        bool metaDataSent = false;
     };
 }

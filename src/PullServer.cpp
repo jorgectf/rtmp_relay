@@ -47,6 +47,78 @@ namespace relay
         }
     }
 
+    void PullServer::createStream(const std::string& streamName)
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->createStream(streamName);
+        }
+    }
+
+    void PullServer::deleteStream()
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->deleteStream();
+        }
+    }
+
+    void PullServer::unpublishStream()
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->unpublishStream();
+        }
+    }
+
+    void PullServer::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->sendAudioHeader(headerData);
+        }
+    }
+
+    void PullServer::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->sendVideoHeader(headerData);
+        }
+    }
+
+    void PullServer::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->sendAudio(timestamp, audioData);
+        }
+    }
+
+    void PullServer::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->sendVideo(timestamp, videoData);
+        }
+    }
+
+    void PullServer::sendMetaData(const amf0::Node& metaData)
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->sendMetaData(metaData);
+        }
+    }
+    
+    void PullServer::sendTextData(uint64_t timestamp, const amf0::Node& textData)
+    {
+        for (const auto& sender : pullSenders)
+        {
+            sender->sendTextData(timestamp, textData);
+        }
+    }
+
     void PullServer::handleAccept(cppsocket::Socket& clientSocket)
     {
         std::auto_ptr<PullSender> pullSender(new PullSender(clientSocket,

@@ -36,7 +36,7 @@ namespace relay
 
         void update(float delta);
 
-        void createStream(const std::string& streamName);
+        void createStream(const std::string& newStreamName);
         void deleteStream();
         void unpublishStream();
 

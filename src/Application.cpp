@@ -63,11 +63,11 @@ namespace relay
         }
     }
 
-    void Application::createStream(const std::string& streamName)
+    void Application::createStream(const std::string& newStreamName)
     {
         for (const auto& sender : pushSenders)
         {
-            sender->createStream(streamName);
+            sender->createStream(newStreamName);
         }
     }
 
