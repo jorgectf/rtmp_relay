@@ -678,6 +678,14 @@ namespace relay
                     sendPing();
                     sendPublishStatus(transactionId.asDouble());
                 }
+                else if (command.asString() == "getStreamLength")
+                {
+                    // TODO: implement
+                }
+                else if (command.asString() == "play")
+                {
+                    // TODO: implement
+                }
                 else if (command.asString() == "_error")
                 {
                     auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
@@ -988,7 +996,7 @@ namespace relay
         amf0::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Publish.Start");
-        argument2["description"] = std::string("wallclock_test_med is now published");
+        argument2["description"] = streamName + " is now published";
         argument2["details"] = std::string("wallclock_test_med");
         argument2["level"] = std::string("status");
         argument2.encode(packet.data);
