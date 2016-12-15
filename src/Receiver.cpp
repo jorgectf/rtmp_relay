@@ -889,7 +889,7 @@ namespace relay
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Publish.Start");
         argument2["description"] = streamName + " is now published";
-        argument2["details"] = std::string("wallclock_test_med");
+        argument2["details"] = streamName;
         argument2["level"] = std::string("status");
         argument2.encode(packet.data);
 

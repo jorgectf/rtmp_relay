@@ -665,8 +665,6 @@ namespace relay
                     sendOnFCPublish();
                     streamName = argument2.asString();
 
-                    streaming = true;
-
                     Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
                 }
                 else if (command.asString() == "FCUnpublish")
@@ -680,11 +678,12 @@ namespace relay
                 }
                 else if (command.asString() == "getStreamLength")
                 {
-                    // TODO: implement
+                    // TODO: implement for streams we know length of
                 }
                 else if (command.asString() == "play")
                 {
-                    // TODO: implement
+                    streaming = true;
+                    sendPlayStatus(transactionId.asDouble());
                 }
                 else if (command.asString() == "_error")
                 {
@@ -997,7 +996,7 @@ namespace relay
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Publish.Start");
         argument2["description"] = streamName + " is now published";
-        argument2["details"] = std::string("wallclock_test_med");
+        argument2["details"] = streamName;
         argument2["level"] = std::string("status");
         argument2.encode(packet.data);
 
@@ -1006,6 +1005,38 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
 
+        socket.send(buffer);
+    }
+
+    void PullSender::sendPlayStatus(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onStatus");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2;
+        argument2["clientid"] = std::string("Lavf57.1.0");
+        argument2["code"] = std::string("NetStream.Publish.Start");
+        argument2["description"] = streamName + " is now published";
+        argument2["details"] = streamName;
+        argument2["level"] = std::string("status");
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
+        
         socket.send(buffer);
     }
 
