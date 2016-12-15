@@ -69,6 +69,11 @@ namespace relay
         {
             sender->createStream(newStreamName);
         }
+
+        for (const auto& server : pullServers)
+        {
+            server->createStream(newStreamName);
+        }
     }
 
     void Application::deleteStream()
@@ -76,6 +81,11 @@ namespace relay
         for (const auto& sender : pushSenders)
         {
             sender->deleteStream();
+        }
+
+        for (const auto& server : pullServers)
+        {
+            server->deleteStream();
         }
     }
 
@@ -85,6 +95,11 @@ namespace relay
         {
             sender->unpublishStream();
         }
+
+        for (const auto& server : pullServers)
+        {
+            server->unpublishStream();
+        }
     }
 
     void Application::sendAudioHeader(const std::vector<uint8_t>& headerData)
@@ -92,6 +107,11 @@ namespace relay
         for (const auto& sender : pushSenders)
         {
             sender->sendAudioHeader(headerData);
+        }
+
+        for (const auto& server : pullServers)
+        {
+            server->sendAudioHeader(headerData);
         }
     }
 
@@ -101,6 +121,11 @@ namespace relay
         {
             sender->sendVideoHeader(headerData);
         }
+
+        for (const auto& server : pullServers)
+        {
+            server->sendVideoHeader(headerData);
+        }
     }
 
     void Application::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
@@ -108,6 +133,11 @@ namespace relay
         for (const auto& sender : pushSenders)
         {
             sender->sendAudio(timestamp, audioData);
+        }
+
+        for (const auto& server : pullServers)
+        {
+            server->sendAudio(timestamp, audioData);
         }
     }
 
@@ -117,6 +147,11 @@ namespace relay
         {
             sender->sendVideo(timestamp, videoData);
         }
+
+        for (const auto& server : pullServers)
+        {
+            server->sendVideo(timestamp, videoData);
+        }
     }
 
     void Application::sendMetaData(const amf0::Node& metaData)
@@ -125,6 +160,11 @@ namespace relay
         {
             sender->sendMetaData(metaData);
         }
+
+        for (const auto& server : pullServers)
+        {
+            server->sendMetaData(metaData);
+        }
     }
 
     void Application::sendTextData(uint64_t timestamp, const amf0::Node& textData)
@@ -132,6 +172,11 @@ namespace relay
         for (const auto& sender : pushSenders)
         {
             sender->sendTextData(timestamp, textData);
+        }
+
+        for (const auto& server : pullServers)
+        {
+            server->sendTextData(timestamp, textData);
         }
     }
 
