@@ -74,6 +74,7 @@ namespace relay
         void sendOnFCPublish();
         void sendPublishStatus(double transactionId);
         void sendPlayStatus(double transactionId);
+        void sendStopStatus(double transactionId);
 
         bool connect(const std::string& applicationName);
         
