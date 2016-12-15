@@ -1026,7 +1026,7 @@ namespace relay
 
         amf0::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
-        argument2["code"] = std::string("NetStream.Publish.Start");
+        argument2["code"] = std::string("NetStream.Play.Start");
         argument2["description"] = streamName + " is now published";
         argument2["details"] = streamName;
         argument2["level"] = std::string("status");
