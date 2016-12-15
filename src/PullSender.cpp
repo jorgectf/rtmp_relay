@@ -56,7 +56,7 @@ namespace relay
         }
     }
 
-    void PullSender::update(float delta)
+    void PullSender::update(float)
     {
     }
 
@@ -684,6 +684,10 @@ namespace relay
                 {
                     streaming = true;
                     sendPlayStatus(transactionId.asDouble());
+
+                    sendMetaData();
+                    sendAudioHeader();
+                    sendVideoHeader();
                 }
                 else if (command.asString() == "stop")
                 {
@@ -708,31 +712,6 @@ namespace relay
                     if (i != invokes.end())
                     {
                         Log(Log::Level::ALL) << "[" << name << "] " << i->second << " result";
-
-                        /*if (i->second == "connect")
-                        {
-                            connected = true;
-                            if (!streamName.empty())
-                            {
-                                sendReleaseStream();
-                                sendFCPublish();
-                                sendCreateStream();
-                            }
-                        }
-                        else if (i->second == "releaseStream")
-                        {
-                        }
-                        else if (i->second == "createStream")
-                        {
-                            streamId = static_cast<uint32_t>(argument2.asDouble());
-                            sendPublish();
-                            
-                            streaming = true;
-                            
-                            sendMetaData();
-                            sendAudioHeader();
-                            sendVideoHeader();
-                        }*/
                         
                         invokes.erase(i);
                     }
