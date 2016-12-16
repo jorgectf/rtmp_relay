@@ -60,218 +60,6 @@ namespace relay
     {
     }
 
-    void PullSender::createStream(const std::string& newStreamName)
-    {
-        if (overrideStreamName.empty())
-        {
-            streamName = newStreamName;
-        }
-        else
-        {
-            std::map<std::string, std::string> tokens = {
-                { "streamName", newStreamName },
-                { "applicationName", application },
-                { "ipAddress", cppsocket::ipToString(socket.getIPAddress()) },
-                { "port", std::to_string(socket.getPort()) }
-            };
-
-            streamName = overrideStreamName;
-            replaceTokens(streamName, tokens);
-        }
-    }
-
-    void PullSender::deleteStream()
-    {
-        if (connected && !streamName.empty())
-        {
-            //sendDeleteStream();
-        }
-
-        streaming = false;
-    }
-
-    void PullSender::unpublishStream()
-    {
-        if (connected && !streamName.empty())
-        {
-            //sendFCUnpublish();
-        }
-
-        streaming = false;
-    }
-
-    void PullSender::sendAudioHeader(const std::vector<uint8_t>& headerData)
-    {
-        audioHeader = headerData;
-        audioHeaderSent = false;
-
-        sendAudioHeader();
-    }
-
-    void PullSender::sendAudioHeader()
-    {
-        if (streaming && !audioHeader.empty() && audioStream)
-        {
-            sendAudioData(0, audioHeader);
-            audioHeaderSent = true;
-        }
-    }
-
-    void PullSender::sendVideoHeader(const std::vector<uint8_t>& headerData)
-    {
-        videoHeader = headerData;
-        videoHeaderSent = false;
-
-        sendVideoHeader();
-    }
-
-    void PullSender::sendVideoHeader()
-    {
-        if (streaming && !videoHeader.empty() && videoStream)
-        {
-            sendVideoData(0, videoHeader);
-            videoHeaderSent = true;
-        }
-    }
-
-    void PullSender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
-    {
-        if (streaming && audioStream)
-        {
-            sendAudioData(timestamp, audioData);
-        }
-    }
-
-    void PullSender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
-    {
-        if (streaming && videoStream)
-        {
-            if (videoFrameSent || getVideoFrameType(videoData) == VideoFrameType::KEY)
-            {
-                sendVideoData(timestamp, videoData);
-                videoFrameSent = true;
-            }
-        }
-    }
-
-    void PullSender::sendMetaData(const amf0::Node& newMetaData)
-    {
-        metaData = newMetaData;
-        metaDataSent = false;
-
-        sendMetaData();
-    }
-
-    void PullSender::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
-    {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::AUDIO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
-
-        packet.data = audioData;
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        Log(Log::Level::ALL) << "[" << name << "] " << "Sending audio packet";
-
-        socket.send(buffer);
-    }
-
-    void PullSender::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
-    {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::VIDEO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
-
-        packet.data = videoData;
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        Log(Log::Level::ALL) << "[" << name << "] " << "Sending video packet";
-
-        socket.send(buffer);
-    }
-
-    void PullSender::sendMetaData()
-    {
-        if (streaming && metaData.getMarker() != amf0::Marker::Unknown)
-        {
-            rtmp::Packet packet;
-            packet.channel = rtmp::Channel::AUDIO;
-            packet.messageStreamId = streamId;
-            packet.timestamp = 0;
-            packet.messageType = rtmp::MessageType::NOTIFY;
-
-            amf0::Node commandName = std::string("@setDataFrame");
-            commandName.encode(packet.data);
-
-            amf0::Node argument1 = std::string("onMetaData");
-            argument1.encode(packet.data);
-
-            amf0::Node filteredMetaData = amf0::Marker::ECMAArray;
-
-            for (auto value : metaData.asMap())
-            {
-                /// not in the blacklist
-                if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
-                {
-                    filteredMetaData[value.first] = value.second;
-                }
-            }
-
-            amf0::Node argument2 = filteredMetaData;
-            argument2.encode(packet.data);
-
-            std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-            Log(Log::Level::ALL) << "[" << name << "] " << "Sending meta data " << commandName.asString() << ":";
-
-            Log log(Log::Level::ALL);
-            log << "[" << name << "] ";
-            argument2.dump(log);
-
-            socket.send(buffer);
-
-            metaDataSent = true;
-        }
-    }
-
-    void PullSender::sendTextData(uint64_t timestamp, const amf0::Node& textData)
-    {
-        if (streaming && dataStream)
-        {
-            rtmp::Packet packet;
-            packet.channel = rtmp::Channel::AUDIO;
-            packet.messageStreamId = streamId;
-            packet.timestamp = timestamp;
-            packet.messageType = rtmp::MessageType::NOTIFY;
-
-            amf0::Node commandName = std::string("onTextData");
-            commandName.encode(packet.data);
-
-            amf0::Node argument1 = textData;
-            argument1.encode(packet.data);
-
-            std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
-            
-            Log(Log::Level::ALL) << "[" << name << "] " << "Sending text data";
-            
-            Log log(Log::Level::ALL);
-            log << "[" << name << "] ";
-            argument1.dump(log);
-            
-            socket.send(buffer);
-        }
-    }
-
     void PullSender::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
@@ -727,6 +515,218 @@ namespace relay
         }
         
         return true;
+    }
+
+    void PullSender::createStream(const std::string& newStreamName)
+    {
+        if (overrideStreamName.empty())
+        {
+            streamName = newStreamName;
+        }
+        else
+        {
+            std::map<std::string, std::string> tokens = {
+                { "streamName", newStreamName },
+                { "applicationName", application },
+                { "ipAddress", cppsocket::ipToString(socket.getIPAddress()) },
+                { "port", std::to_string(socket.getPort()) }
+            };
+
+            streamName = overrideStreamName;
+            replaceTokens(streamName, tokens);
+        }
+    }
+
+    void PullSender::deleteStream()
+    {
+        if (connected && !streamName.empty())
+        {
+            //sendDeleteStream();
+        }
+
+        streaming = false;
+    }
+
+    void PullSender::unpublishStream()
+    {
+        if (connected && !streamName.empty())
+        {
+            //sendFCUnpublish();
+        }
+
+        streaming = false;
+    }
+
+    void PullSender::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    {
+        audioHeader = headerData;
+        audioHeaderSent = false;
+
+        sendAudioHeader();
+    }
+
+    void PullSender::sendAudioHeader()
+    {
+        if (streaming && !audioHeader.empty() && audioStream)
+        {
+            sendAudioData(0, audioHeader);
+            audioHeaderSent = true;
+        }
+    }
+
+    void PullSender::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    {
+        videoHeader = headerData;
+        videoHeaderSent = false;
+
+        sendVideoHeader();
+    }
+
+    void PullSender::sendVideoHeader()
+    {
+        if (streaming && !videoHeader.empty() && videoStream)
+        {
+            sendVideoData(0, videoHeader);
+            videoHeaderSent = true;
+        }
+    }
+
+    void PullSender::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    {
+        if (streaming && audioStream)
+        {
+            sendAudioData(timestamp, audioData);
+        }
+    }
+
+    void PullSender::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    {
+        if (streaming && videoStream)
+        {
+            if (videoFrameSent || getVideoFrameType(videoData) == VideoFrameType::KEY)
+            {
+                sendVideoData(timestamp, videoData);
+                videoFrameSent = true;
+            }
+        }
+    }
+
+    void PullSender::sendMetaData(const amf0::Node& newMetaData)
+    {
+        metaData = newMetaData;
+        metaDataSent = false;
+
+        sendMetaData();
+    }
+
+    void PullSender::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
+
+        packet.data = audioData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending audio packet";
+
+        socket.send(buffer);
+    }
+
+    void PullSender::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::VIDEO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+
+        packet.data = videoData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << name << "] " << "Sending video packet";
+
+        socket.send(buffer);
+    }
+
+    void PullSender::sendMetaData()
+    {
+        if (streaming && metaData.getMarker() != amf0::Marker::Unknown)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = streamId;
+            packet.timestamp = 0;
+            packet.messageType = rtmp::MessageType::NOTIFY;
+
+            amf0::Node commandName = std::string("@setDataFrame");
+            commandName.encode(packet.data);
+
+            amf0::Node argument1 = std::string("onMetaData");
+            argument1.encode(packet.data);
+
+            amf0::Node filteredMetaData = amf0::Marker::ECMAArray;
+
+            for (auto value : metaData.asMap())
+            {
+                /// not in the blacklist
+                if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
+                {
+                    filteredMetaData[value.first] = value.second;
+                }
+            }
+
+            amf0::Node argument2 = filteredMetaData;
+            argument2.encode(packet.data);
+
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+            Log(Log::Level::ALL) << "[" << name << "] " << "Sending meta data " << commandName.asString() << ":";
+
+            Log log(Log::Level::ALL);
+            log << "[" << name << "] ";
+            argument2.dump(log);
+
+            socket.send(buffer);
+
+            metaDataSent = true;
+        }
+    }
+
+    void PullSender::sendTextData(uint64_t timestamp, const amf0::Node& textData)
+    {
+        if (streaming && dataStream)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = streamId;
+            packet.timestamp = timestamp;
+            packet.messageType = rtmp::MessageType::NOTIFY;
+
+            amf0::Node commandName = std::string("onTextData");
+            commandName.encode(packet.data);
+
+            amf0::Node argument1 = textData;
+            argument1.encode(packet.data);
+
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
+            
+            Log(Log::Level::ALL) << "[" << name << "] " << "Sending text data";
+            
+            Log log(Log::Level::ALL);
+            log << "[" << name << "] ";
+            argument1.dump(log);
+            
+            socket.send(buffer);
+        }
     }
 
     void PullSender::sendServerBandwidth()
