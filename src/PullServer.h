@@ -45,7 +45,7 @@ namespace relay
         void sendVideoHeader(const std::vector<uint8_t>& headerData);
         void sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData);
         void sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData);
-        void sendMetaData(const amf0::Node& metaData);
+        void sendMetaData(const amf0::Node& newMetaData);
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
     private:
@@ -63,5 +63,9 @@ namespace relay
         std::set<std::string> metaDataBlacklist;
 
         std::vector<std::unique_ptr<PullSender>> pullSenders;
+
+        std::vector<uint8_t> audioHeader;
+        std::vector<uint8_t> videoHeader;
+        amf0::Node metaData;
     };
 }

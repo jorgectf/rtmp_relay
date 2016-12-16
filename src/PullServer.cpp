@@ -73,6 +73,8 @@ namespace relay
 
     void PullServer::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
+        audioHeader = headerData;
+
         for (const auto& sender : pullSenders)
         {
             sender->sendAudioHeader(headerData);
@@ -81,6 +83,8 @@ namespace relay
 
     void PullServer::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
+        videoHeader = headerData;
+
         for (const auto& sender : pullSenders)
         {
             sender->sendVideoHeader(headerData);
@@ -103,11 +107,13 @@ namespace relay
         }
     }
 
-    void PullServer::sendMetaData(const amf0::Node& metaData)
+    void PullServer::sendMetaData(const amf0::Node& newMetaData)
     {
+        metaData = newMetaData;
+
         for (const auto& sender : pullSenders)
         {
-            sender->sendMetaData(metaData);
+            sender->sendMetaData(newMetaData);
         }
     }
     
@@ -128,6 +134,21 @@ namespace relay
                                                             audioStream,
                                                             dataStream,
                                                             metaDataBlacklist));
+
+        if (!audioHeader.empty())
+        {
+            pullSender->sendAudioHeader(audioHeader);
+        }
+
+        if (!videoHeader.empty())
+        {
+            pullSender->sendVideoHeader(videoHeader);
+        }
+
+        if (metaData.getMarker() != amf0::Marker::Unknown)
+        {
+            pullSender->sendMetaData(metaData);
+        }
 
         pullSenders.push_back(std::move(pullSender));
     }
