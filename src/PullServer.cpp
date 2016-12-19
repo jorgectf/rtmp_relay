@@ -60,7 +60,7 @@ namespace relay
     void PullServer::deleteStream()
     {
         streamName.clear();
-        
+
         for (const auto& sender : pullSenders)
         {
             sender->deleteStream();
