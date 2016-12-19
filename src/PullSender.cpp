@@ -470,6 +470,12 @@ namespace relay
                 }
                 else if (command.asString() == "play")
                 {
+                    if (argument2.asString() != streamName)
+                    {
+                        socket.close();
+                        return false;
+                    }
+
                     streaming = true;
                     sendPlayStatus(transactionId.asDouble());
 
