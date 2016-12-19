@@ -77,6 +77,7 @@ namespace relay
         void sendStopStatus(double transactionId);
 
         bool connect(const std::string& applicationName);
+        bool play(const std::string& stream);
         
         cppsocket::Socket socket;
 

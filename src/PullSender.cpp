@@ -470,7 +470,7 @@ namespace relay
                 }
                 else if (command.asString() == "play")
                 {
-                    if (argument2.asString() != streamName)
+                    if (!play(argument2.asString()))
                     {
                         socket.close();
                         return false;
@@ -1071,6 +1071,19 @@ namespace relay
         
         Log(Log::Level::ERR) << "[" << name << "] " << "Wrong application";
         
+        // failed to connect
+        return false;
+    }
+
+    bool PullSender::play(const std::string& stream)
+    {
+        if (stream == streamName)
+        {
+            return true;
+        }
+
+        Log(Log::Level::ERR) << "[" << name << "] " << "Wrong stream";
+
         // failed to connect
         return false;
     }

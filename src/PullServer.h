@@ -37,7 +37,7 @@ namespace relay
 
         void update(float delta);
 
-        void createStream(const std::string& streamName);
+        void createStream(const std::string& newStreamName);
         void deleteStream();
         void unpublishStream();
 
@@ -61,6 +61,8 @@ namespace relay
         const bool audioStream;
         const bool dataStream;
         std::set<std::string> metaDataBlacklist;
+
+        std::string streamName;
 
         std::vector<std::unique_ptr<PullSender>> pullSenders;
 

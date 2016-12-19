@@ -47,8 +47,10 @@ namespace relay
         }
     }
 
-    void PullServer::createStream(const std::string& streamName)
+    void PullServer::createStream(const std::string& newStreamName)
     {
+        streamName = newStreamName;
+
         for (const auto& sender : pullSenders)
         {
             sender->createStream(streamName);
@@ -134,6 +136,11 @@ namespace relay
                                                             audioStream,
                                                             dataStream,
                                                             metaDataBlacklist));
+
+        if (!streamName.empty())
+        {
+            pullSender->createStream(streamName);
+        }
 
         if (!audioHeader.empty())
         {
