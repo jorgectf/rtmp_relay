@@ -207,6 +207,7 @@ namespace relay
                         pullDescriptor.videoOutput = pullObject["video"] ? pullObject["video"].as<bool>() : true;
                         pullDescriptor.audioOutput = pullObject["audio"] ? pullObject["audio"].as<bool>() : true;
                         pullDescriptor.dataOutput = pullObject["data"] ? pullObject["data"].as<bool>() : true;
+                        pullDescriptor.pingInterval = pullObject["pingInterval"] ? pullObject["pingInterval"].as<float>() : 60.0f;
 
                         const YAML::Node& metaDataBlacklistArray = pullObject["metaDataBlacklist"];
 

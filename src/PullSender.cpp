@@ -17,7 +17,8 @@ namespace relay
                            bool videoOutput,
                            bool audioOutput,
                            bool dataOutput,
-                           const std::set<std::string>& aMetaDataBlacklist):
+                           const std::set<std::string>& aMetaDataBlacklist,
+                           float aPingInterval):
         socket(std::move(aSocket)),
         generator(rd()),
         application(aApplication),
@@ -25,7 +26,8 @@ namespace relay
         videoStream(videoOutput),
         audioStream(audioOutput),
         dataStream(dataOutput),
-        metaDataBlacklist(aMetaDataBlacklist)
+        metaDataBlacklist(aMetaDataBlacklist),
+        pingInterval(aPingInterval)
     {
         if (!socket.setBlocking(false))
         {
@@ -56,8 +58,18 @@ namespace relay
         }
     }
 
-    void PullSender::update(float)
+    void PullSender::update(float delta)
     {
+        if (socket.isReady() && pingInterval > 0.0f)
+        {
+            timeSincePing += delta;
+
+            while (timeSincePing >= pingInterval)
+            {
+                timeSincePing -= pingInterval;
+                sendPing();
+            }
+        }
     }
 
     void PullSender::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)

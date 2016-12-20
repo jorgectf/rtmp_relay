@@ -25,7 +25,8 @@ namespace relay
                    bool videoOutput,
                    bool audioOutput,
                    bool dataOutput,
-                   const std::set<std::string>& aMetaDataBlacklist);
+                   const std::set<std::string>& aMetaDataBlacklist,
+                   float aPingInterval);
 
         PullSender(const PullSender&) = delete;
         PullSender& operator=(const PullSender&) = delete;
@@ -109,6 +110,8 @@ namespace relay
 
         bool connected = false;
         std::string streamName;
+        const float pingInterval;
+        float timeSincePing = 0.0f;
 
         bool streaming = false;
 

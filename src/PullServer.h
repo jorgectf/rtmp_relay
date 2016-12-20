@@ -21,6 +21,7 @@ namespace relay
         bool audioOutput;
         bool dataOutput;
         std::set<std::string> metaDataBlacklist;
+        float pingInterval;
     };
     
     class PullServer
@@ -33,7 +34,8 @@ namespace relay
                    bool videoOutput,
                    bool audioOutput,
                    bool dataOutput,
-                   const std::set<std::string>& aMetaDataBlacklist);
+                   const std::set<std::string>& aMetaDataBlacklist,
+                   float aPingInterval);
 
         void update(float delta);
 
@@ -63,6 +65,7 @@ namespace relay
         std::set<std::string> metaDataBlacklist;
 
         std::string streamName;
+        const float pingInterval;
 
         std::vector<std::unique_ptr<PullSender>> pullSenders;
 

@@ -13,7 +13,8 @@ namespace relay
                            bool videoOutput,
                            bool audioOutput,
                            bool dataOutput,
-                           const std::set<std::string>& aMetaDataBlacklist):
+                           const std::set<std::string>& aMetaDataBlacklist,
+                           float aPingInterval):
         network(aNetwork),
         socket(aNetwork),
         application(aApplication),
@@ -22,7 +23,8 @@ namespace relay
         videoStream(videoOutput),
         audioStream(audioOutput),
         dataStream(dataOutput),
-        metaDataBlacklist(aMetaDataBlacklist)
+        metaDataBlacklist(aMetaDataBlacklist),
+        pingInterval(aPingInterval)
     {
         socket.setAcceptCallback(std::bind(&PullServer::handleAccept, this, std::placeholders::_1));
 
@@ -137,7 +139,8 @@ namespace relay
                                                             videoStream,
                                                             audioStream,
                                                             dataStream,
-                                                            metaDataBlacklist));
+                                                            metaDataBlacklist,
+                                                            pingInterval));
 
         if (!streamName.empty())
         {

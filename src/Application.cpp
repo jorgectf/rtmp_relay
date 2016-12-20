@@ -44,7 +44,8 @@ namespace relay
                                                               pullDescriptor.videoOutput,
                                                               pullDescriptor.audioOutput,
                                                               pullDescriptor.dataOutput,
-                                                              pullDescriptor.metaDataBlacklist));
+                                                              pullDescriptor.metaDataBlacklist,
+                                                              pullDescriptor.pingInterval));
 
             pullServers.push_back(std::move(server));
         }
