@@ -441,7 +441,7 @@ namespace relay
 
                 currentAudioBytes += packet.data.size();
 
-                if (isCodecHeader(packet.data))
+                if (audioHeader.empty() && isCodecHeader(packet.data))
                 {
                     audioHeader = packet.data;
                     if (application) application->sendAudioHeader(audioHeader);
@@ -470,7 +470,7 @@ namespace relay
 
                 currentVideoBytes += packet.data.size();
 
-                if (isCodecHeader(packet.data))
+                if (videoHeader.empty() && isCodecHeader(packet.data))
                 {
                     videoHeader = packet.data;
                     if (application) application->sendVideoHeader(videoHeader);
