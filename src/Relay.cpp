@@ -199,9 +199,9 @@ namespace relay
                             pullDescriptor.overrideStreamName = pullObject["overrideStreamName"].as<std::string>();
                         }
 
-                        if (pullObject["address"])
+                        if (pullObject["listen"])
                         {
-                            pullDescriptor.address = pullObject["address"].as<std::string>();
+                            pullDescriptor.address = pullObject["listen"].as<std::string>();
                         }
 
                         pullDescriptor.videoOutput = pullObject["video"] ? pullObject["video"].as<bool>() : true;
