@@ -552,6 +552,30 @@ namespace relay
                 else if (command.asString() == "onFCPublish")
                 {
                 }
+                else if (command.asString() == "FCPublish")
+                {
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent FCPublish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
+                else if (command.asString() == "FCUnpublish")
+                {
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent FCUnpublish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
+                else if (command.asString() == "publish")
+                {
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent publish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
                 else if (command.asString() == "_error")
                 {
                     auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));

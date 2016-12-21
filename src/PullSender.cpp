@@ -462,19 +462,27 @@ namespace relay
                 }
                 else if (command.asString() == "FCPublish")
                 {
-                    sendOnFCPublish();
-                    streamName = argument2.asString();
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent FCPublish to sender, disconnecting";
 
-                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                    socket.close();
+                    return false;
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
-                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " unpublished stream \"" << streamName << "\"";
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent FCUnpublish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
                 }
                 else if (command.asString() == "publish")
                 {
-                    sendPing();
-                    sendPublishStatus(transactionId.asDouble());
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent publish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
                 }
                 else if (command.asString() == "getStreamLength")
                 {
@@ -951,56 +959,6 @@ namespace relay
 
         amf0::Node argument1(amf0::Marker::Null);
         argument1.encode(packet.data);
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
-
-        socket.send(buffer);
-    }
-
-    void PullSender::sendOnFCPublish()
-    {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::SYSTEM;
-        packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
-
-        amf0::Node commandName = std::string("onFCPublish");
-        commandName.encode(packet.data);
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        Log(Log::Level::ALL) << "[" << name << "] " << "Sending INVOKE " << commandName.asString();
-
-        socket.send(buffer);
-    }
-
-    void PullSender::sendPublishStatus(double transactionId)
-    {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::SYSTEM;
-        packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
-
-        amf0::Node commandName = std::string("onStatus");
-        commandName.encode(packet.data);
-
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
-
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
-
-        amf0::Node argument2;
-        argument2["clientid"] = std::string("Lavf57.1.0");
-        argument2["code"] = std::string("NetStream.Publish.Start");
-        argument2["description"] = streamName + " is now published";
-        argument2["details"] = streamName;
-        argument2["level"] = std::string("status");
-        argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);

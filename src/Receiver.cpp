@@ -603,6 +603,22 @@ namespace relay
                     sendPing();
                     sendPublishStatus(transactionId.asDouble());
                 }
+                else if (command.asString() == "getStreamLength")
+                {
+                    // this is not a sender
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent getStreamLength to receiver, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
+                else if (command.asString() == "play")
+                {
+                    // this is not a sender
+                    Log(Log::Level::ERR) << "[" << name << "] " << "Client sent play to receiver, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
                 else if (command.asString() == "_error")
                 {
                     auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
