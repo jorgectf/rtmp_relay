@@ -19,6 +19,7 @@ To compile the RTMP relay, just run "make" in the root directory. To launch it, 
 RTMP relay configuration files are YAML-based. It must start with servers array. Each server has following attributes:
 
 * *listen* – the address server is listening to
+* *pingInterval* – client ping interval in seconds
 * *applications* – application object (can be multiple for each server)
  * *name* – name of the application (optional if server should route all applications)
  * *push* – array of push destinations
@@ -31,6 +32,12 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
   * *connectionTimeout* – how long should the attempt to connect last
   * *reconnectInterval* – the interval of reconnection
   * *reconnectCount* – amount of connect attempts
+ * *pull* – array of pull destinations
+  * *listen*: the address server is listening to
+  * *video* – flag that indicates wether to forward video stream
+  * *audio* – flag that indicates wether to forward audio stream
+  * *data* – flag that indicates wether to forward data stream
+  * *pingInterval* – client ping interval in seconds
 
 *overrideStream* name can have the following tokens:
 
@@ -75,3 +82,8 @@ Example configuration:
                 connectionTimeout: 5.0
                 reconnectInterval: 5.0
                 reconnectCount: 3
+            pull:
+              - listen: "0.0.0.0:1935"
+                video: true
+                audio: true
+                pingInterval: 60.0
