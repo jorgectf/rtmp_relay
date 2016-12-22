@@ -164,4 +164,52 @@ namespace relay
 
         pullSenders.push_back(std::move(pullSender));
     }
+
+    void PullServer::getInfo(std::string& str, ReportType reportType) const
+    {
+        switch (reportType)
+        {
+            case ReportType::TEXT:
+            {
+                str += "Application: " + application + "\n";
+                str += "Pull senders:";
+                for (const auto& sender : pullSenders)
+                {
+                    sender->getInfo(str, reportType);
+                }
+                break;
+            }
+            case ReportType::HTML:
+            {
+                str += "Application: " + application;
+
+                str += "<h2>Pull senders</h2><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+
+                for (const auto& sender : pullSenders)
+                {
+                    sender->getInfo(str, reportType);
+                }
+
+                str += "</table>";
+                break;
+            }
+            case ReportType::JSON:
+            {
+                str += "{\"application\":\"" + application + "\"," +
+                "\"pullSenders\":[";
+
+                bool first = true;
+
+                for (const auto& sender : pullSenders)
+                {
+                    if (!first) str += ",";
+                    first = false;
+                    sender->getInfo(str, reportType);
+                }
+
+                str += "]}";
+                break;
+            }
+        }
+    }
 }

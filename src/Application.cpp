@@ -194,6 +194,12 @@ namespace relay
                 {
                     sender->getInfo(str, reportType);
                 }
+
+                str += "\nPull servers:";
+                for (const auto& server : pullServers)
+                {
+                    server->getInfo(str, reportType);
+                }
                 break;
             }
             case ReportType::HTML:
@@ -208,6 +214,14 @@ namespace relay
                 }
 
                 str += "</table>";
+
+                str += "<h2>Pull servers</h2>";
+
+                for (const auto& server : pullServers)
+                {
+                    server->getInfo(str, reportType);
+                }
+
                 break;
             }
             case ReportType::JSON:
@@ -223,6 +237,17 @@ namespace relay
                     first = false;
                     sender->getInfo(str, reportType);
                 }
+                str += "],\"pullServers\":[";
+
+                first = true;
+
+                for (const auto& server : pullServers)
+                {
+                    if (!first) str += ",";
+                    first = false;
+                    server->getInfo(str, reportType);
+                }
+
                 str += "]}";
                 break;
             }

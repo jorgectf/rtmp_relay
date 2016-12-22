@@ -50,6 +50,8 @@ namespace relay
         void sendMetaData(const amf0::Node& newMetaData);
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
+        void getInfo(std::string& str, ReportType reportType) const;
+        
     private:
         void handleAccept(cppsocket::Socket& clientSocket);
         

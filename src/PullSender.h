@@ -49,6 +49,8 @@ namespace relay
         void sendMetaData(const amf0::Node& metaData);
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
+        void getInfo(std::string& str, ReportType reportType) const;
+        
     private:
         void sendAudioHeader();
         void sendVideoHeader();
