@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-static const uint8_t RTMP_RELAY_VERSION[2] = { 0, 4 };
+static const uint8_t RTMP_RELAY_VERSION[2] = { 0, 5 };
 
 static const uint8_t RTMP_VERSION = 3;
 static const uint8_t RTMP_SERVER_VERSION[4] = { 2, 0, 0, 0 };
