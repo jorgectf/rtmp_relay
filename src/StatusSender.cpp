@@ -76,7 +76,7 @@ namespace relay
 
         if (fields.size() >= 2 && fields[0] == "GET")
         {
-            if (fields[1] == "/stats")
+            if (fields[1] == "/stats" || fields[1] == "/stats.html")
             {
                 std::string info;
                 relay.getInfo(info, ReportType::HTML);

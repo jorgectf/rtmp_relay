@@ -183,7 +183,7 @@ namespace relay
             {
                 str += "Application: " + application;
 
-                str += "<h2>Pull senders</h2><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+                str += "<h3>Pull senders</h3><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
 
                 for (const auto& sender : pullSenders)
                 {
