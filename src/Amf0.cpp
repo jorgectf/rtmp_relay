@@ -365,11 +365,10 @@ namespace relay
 
             uint32_t size = ret;
 
-            for (char i : value)
-            {
-                buffer.push_back(static_cast<uint8_t>(i));
-                size += 1;
-            }
+            buffer.insert(buffer.end(),
+                          reinterpret_cast<const uint8_t*>(value.data()),
+                          reinterpret_cast<const uint8_t*>(value.data()) + value.length());
+            size += static_cast<uint32_t>(value.length());
 
             return size;
         }
@@ -528,11 +527,10 @@ namespace relay
 
             uint32_t size = ret;
 
-            for (char i : value)
-            {
-                buffer.push_back(static_cast<uint8_t>(i));
-                size += 1;
-            }
+            buffer.insert(buffer.end(),
+                          reinterpret_cast<const uint8_t*>(value.data()),
+                          reinterpret_cast<const uint8_t*>(value.data()) + value.length());
+            size += static_cast<uint32_t>(value.length());
 
             return size;
         }
