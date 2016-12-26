@@ -43,45 +43,189 @@ namespace relay
         class Node
         {
         public:
-            Node();
-            Node(Marker aMarker);
-            Node(double value);
-            Node(bool value);
-            Node(const std::string& value);
-            Node(const Date& value);
+            Node() {}
+            Node(Marker aMarker): marker(aMarker) {}
+            Node(double value): marker(Marker::Number), doubleValue(value) {}
+            Node(bool value): marker(Marker::Boolean), boolValue(value) {}
+            Node(const std::string& value):
+                stringValue(value)
+            {
+                if (value.length() <= UINT16_MAX)
+                {
+                    marker = Marker::String;
+                }
+                else
+                {
+                    marker = Marker::LongString;
+                }
+            }
 
-            Node& operator=(Marker newMarker);
-            Node& operator=(double value);
-            Node& operator=(bool value);
-            Node& operator=(const std::string& value);
-            Node& operator=(const Date& value);
+            Node(const Date& value): marker(Marker::Date), dateValue(value) {}
+
+            Node& operator=(Marker newMarker)
+            {
+                marker = newMarker;
+                return *this;
+            }
+
+            Node& operator=(double value)
+            {
+                marker = Marker::Number;
+                doubleValue = value;
+                return *this;
+            }
+
+            Node& operator=(bool value)
+            {
+                marker = Marker::Boolean;
+                boolValue = value;
+                return *this;
+            }
+
+            Node& operator=(const std::string& value)
+            {
+                stringValue = value;
+                if (value.length() <= UINT16_MAX)
+                {
+                    marker = Marker::String;
+                }
+                else
+                {
+                    marker = Marker::LongString;
+                }
+                return *this;
+            }
+
+            Node& operator=(const Date& value)
+            {
+                marker = Marker::Date;
+                dateValue = value;
+                return *this;
+            }
 
             Marker getMarker() const { return marker; }
 
             uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
             uint32_t encode(std::vector<uint8_t>& buffer) const;
 
-            double asDouble() const;
-            bool asBool() const;
-            const std::string& asString() const;
-            const Date& asDate() const;
-            bool isNull() const;
-            bool isUndefined() const;
-            const std::vector<Node>& asVector() const;
-            const std::map<std::string, Node>& asMap() const;
+            double asDouble() const
+            {
+                return doubleValue;
+            }
 
-            std::string toString() const;
+            bool asBool() const
+            {
+                return boolValue;
+            }
 
-            uint32_t getSize() const;
+            const std::string& asString() const
+            {
+                return stringValue;
+            }
 
-            Node operator[](size_t key) const;
-            Node& operator[](size_t key);
+            const Date& asDate() const
+            {
+                return dateValue;
+            }
 
-            Node operator[](const std::string& key) const;
-            Node& operator[](const std::string& key);
+            bool isNull() const
+            {
+                return marker == Marker::Null;
+            }
 
-            bool hasElement(const std::string& key);
-            void append(const Node& node);
+            bool isUndefined() const
+            {
+                return marker == Marker::Undefined;
+            }
+
+            const std::vector<Node>& asVector() const
+            {
+                return vectorValue;
+            }
+            
+            const std::map<std::string, Node>& asMap() const
+            {
+                return mapValue;
+            }
+
+            std::string toString() const
+            {
+                switch (marker)
+                {
+                    case Marker::Number: return std::to_string(doubleValue);
+                    case Marker::Boolean: return std::to_string(boolValue);
+                    case Marker::String: return stringValue;
+                    case Marker::Object: return "object";
+                    case Marker::Null: return "null";
+                    case Marker::Undefined: return "undefined";
+                    case Marker::ECMAArray: return "ECMA array";
+                    case Marker::ObjectEnd: return ""; // should not happen
+                    case Marker::StrictArray: return "strict array";
+                    case Marker::Date: return std::to_string(dateValue.ms) + " +" + std::to_string(dateValue.timezone);
+                    case Marker::LongString: return stringValue;
+                    case Marker::XMLDocument: return stringValue;
+                    case Marker::TypedObject: return "typed object";
+                    case Marker::SwitchToAMF3: return "switch to AMF3";
+                    default: return "";
+                }
+            }
+
+            uint32_t getSize() const
+            {
+                return static_cast<uint32_t>(vectorValue.size());
+            }
+
+            Node operator[](size_t key) const
+            {
+                if (key >= vectorValue.size())
+                {
+                    return Node();
+                }
+                else
+                {
+                    return vectorValue[key];
+                }
+            }
+
+            Node& operator[](size_t key)
+            {
+                marker = Marker::StrictArray;
+                return vectorValue[key];
+            }
+
+            Node operator[](const std::string& key) const
+            {
+                auto i = mapValue.find(key);
+
+                if (i == mapValue.end())
+                {
+                    return Node();
+                }
+                else
+                {
+                    return i->second;
+                }
+            }
+
+            Node& operator[](const std::string& key)
+            {
+                if (marker != Marker::Object &&
+                    marker != Marker::ECMAArray)
+                {
+                    marker = Marker::Object;
+                }
+                return mapValue[key];
+            }
+
+            bool hasElement(const std::string& key)
+            {
+                return mapValue.find(key) != mapValue.end();
+            }
+            
+            void append(const Node& node)
+            {
+                vectorValue.push_back(node);
+            }
 
             void dump(cppsocket::Log& log, const std::string& indent = "");
 
