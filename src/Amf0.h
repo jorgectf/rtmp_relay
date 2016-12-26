@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <vector>
 #include <map>
 #include "Log.h"
@@ -110,21 +111,29 @@ namespace relay
 
             double asDouble() const
             {
+                assert(marker == Marker::Number);
+
                 return doubleValue;
             }
 
             bool asBool() const
             {
+                assert(marker == Marker::Boolean);
+
                 return boolValue;
             }
 
             const std::string& asString() const
             {
+                assert(marker == Marker::String || marker == Marker::LongString);
+
                 return stringValue;
             }
 
             const Date& asDate() const
             {
+                assert(marker == Marker::Date);
+
                 return dateValue;
             }
 
@@ -140,11 +149,15 @@ namespace relay
 
             const std::vector<Node>& asVector() const
             {
+                assert(marker == Marker::StrictArray);
+
                 return vectorValue;
             }
             
             const std::map<std::string, Node>& asMap() const
             {
+                assert(marker == Marker::Object || marker == Marker::ECMAArray);
+
                 return mapValue;
             }
 
@@ -172,11 +185,15 @@ namespace relay
 
             uint32_t getSize() const
             {
+                assert(marker == Marker::StrictArray);
+
                 return static_cast<uint32_t>(vectorValue.size());
             }
 
             Node operator[](size_t key) const
             {
+                assert(marker == Marker::StrictArray);
+                
                 if (key >= vectorValue.size())
                 {
                     return Node();
@@ -195,6 +212,8 @@ namespace relay
 
             Node operator[](const std::string& key) const
             {
+                assert(marker == Marker::Object || marker == Marker::ECMAArray);
+
                 auto i = mapValue.find(key);
 
                 if (i == mapValue.end())
@@ -219,11 +238,15 @@ namespace relay
 
             bool hasElement(const std::string& key) const
             {
+                assert(marker == Marker::Object || marker == Marker::ECMAArray);
+
                 return mapValue.find(key) != mapValue.end();
             }
             
             void append(const Node& node)
             {
+                assert(marker == Marker::StrictArray);
+
                 vectorValue.push_back(node);
             }
 
