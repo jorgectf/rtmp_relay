@@ -217,7 +217,7 @@ namespace relay
                 return mapValue[key];
             }
 
-            bool hasElement(const std::string& key)
+            bool hasElement(const std::string& key) const
             {
                 return mapValue.find(key) != mapValue.end();
             }
