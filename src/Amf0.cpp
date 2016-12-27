@@ -230,11 +230,14 @@ namespace relay
             for (uint32_t i = 0; i < count; ++i)
             {
                 Node node;
+                ret = node.decode(buffer, offset);
 
-                if (!node.decode(buffer, offset))
+                if (ret == 0)
                 {
                     return 0;
                 }
+
+                offset += ret;
 
                 result.push_back(node);
             }
