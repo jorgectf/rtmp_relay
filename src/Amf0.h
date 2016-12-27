@@ -48,6 +48,8 @@ namespace relay
             Node(Marker aMarker): marker(aMarker) {}
             Node(double value): marker(Marker::Number), doubleValue(value) {}
             Node(bool value): marker(Marker::Boolean), boolValue(value) {}
+            Node(const std::vector<Node>& value): marker(Marker::StrictArray), vectorValue(value) {}
+            Node(const std::map<std::string, Node>& value): marker(Marker::Object), mapValue(value) {}
             Node(const std::string& value):
                 stringValue(value)
             {
@@ -94,6 +96,20 @@ namespace relay
                 {
                     marker = Marker::LongString;
                 }
+                return *this;
+            }
+
+            Node& operator=(const std::vector<Node>& value)
+            {
+                marker = Marker::StrictArray;
+                vectorValue = value;
+                return *this;
+            }
+
+            Node& operator=(const std::map<std::string, Node>& value)
+            {
+                marker = Marker::Object;
+                mapValue = value;
                 return *this;
             }
 
