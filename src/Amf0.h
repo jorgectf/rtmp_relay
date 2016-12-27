@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cassert>
+#include <limits>
 #include <vector>
 #include <map>
 #include "Log.h"
@@ -53,7 +54,7 @@ namespace relay
             Node(const std::string& value):
                 stringValue(value)
             {
-                if (value.length() <= UINT16_MAX)
+                if (value.length() <= std::numeric_limits<uint16_t>::max())
                 {
                     marker = Marker::String;
                 }
@@ -88,7 +89,7 @@ namespace relay
             Node& operator=(const std::string& value)
             {
                 stringValue = value;
-                if (value.length() <= UINT16_MAX)
+                if (value.length() <= std::numeric_limits<uint16_t>::max())
                 {
                     marker = Marker::String;
                 }
