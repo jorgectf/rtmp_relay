@@ -20,13 +20,13 @@ namespace relay
                            const std::set<std::string>& aMetaDataBlacklist,
                            float aPingInterval):
         socket(std::move(aSocket)),
-        generator(rd()),
         application(aApplication),
         overrideStreamName(aOverrideStreamName),
         videoStream(videoOutput),
         audioStream(audioOutput),
         dataStream(dataOutput),
         metaDataBlacklist(aMetaDataBlacklist),
+        generator(rd()),
         pingInterval(aPingInterval)
     {
         if (!socket.setBlocking(false))
