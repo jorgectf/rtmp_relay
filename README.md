@@ -49,10 +49,10 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 Optionally you can add a web status page with "statusPage" object, which has the following attribute:
 * *listen* – the address of the web status page
 Status page can be accessed in the following addresses:
-* <server address>/stats – HTML output
-* <server address>/stats.html – HTML output
-* <server address>/stats.json – JSON output
-* <server address>/stats.txt – text output
+* &lt;server address&gt;/stats – HTML output
+* &lt;server address&gt;/stats.html – HTML output
+* &lt;server address&gt;/stats.json – JSON output
+* &lt;server address&gt;/stats.txt – text output
 
 To configure logging, you can add "log" object to the config file. It has the following attributes
 * *level* – the log threshold level (0 for no logs and 4 for all logs)
