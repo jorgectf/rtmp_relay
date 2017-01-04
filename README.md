@@ -48,6 +48,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 
 Optionally you can add a web status page with "statusPage" object, which has the following attribute:
 * *listen* – the address of the web status page
+
 Status page can be accessed in the following addresses:
 * &lt;server address&gt;/stats – HTML output
 * &lt;server address&gt;/stats.html – HTML output
