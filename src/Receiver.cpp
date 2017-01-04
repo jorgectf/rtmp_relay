@@ -958,12 +958,19 @@ namespace relay
 
                 bool first = true;
 
-                for (auto& m : metaData.asMap())
+                if (metaData.getMarker() != amf0::Marker::Unknown)
                 {
-                    if (!first) str += " ";
-                    first = false;
+                    for (auto& m : metaData.asMap())
+                    {
+                        if (!first) str += " ";
+                        first = false;
 
-                    str += m.first + ":" + m.second.toString();
+                        str += m.first + ":" + m.second.toString();
+                    }
+                }
+                else
+                {
+                    str += "empty";
                 }
 
                 str += "\n";
@@ -992,12 +999,15 @@ namespace relay
 
                 bool first = true;
 
-                for (auto& m : metaData.asMap())
+                if (metaData.getMarker() != amf0::Marker::Unknown)
                 {
-                    if (!first) str += "<br>";
-                    first = false;
+                    for (auto& m : metaData.asMap())
+                    {
+                        if (!first) str += "<br>";
+                        first = false;
 
-                    str += m.first + ":" + m.second.toString();
+                        str += m.first + ":" + m.second.toString();
+                    }
                 }
 
                 str += "</td></tr></table>";
@@ -1030,12 +1040,15 @@ namespace relay
 
                 bool first = true;
 
-                for (auto& m : metaData.asMap())
+                if (metaData.getMarker() != amf0::Marker::Unknown)
                 {
-                    if (!first) str += ",";
-                    first = false;
+                    for (auto& m : metaData.asMap())
+                    {
+                        if (!first) str += ",";
+                        first = false;
 
-                    str += "\"" + m.first + "\":\"" + m.second.toString() + "\"";
+                        str += "\"" + m.first + "\":\"" + m.second.toString() + "\"";
+                    }
                 }
                 
                 str += "},\"application\":";
