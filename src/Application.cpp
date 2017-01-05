@@ -206,7 +206,7 @@ namespace relay
             {
                 str += "Application: " + name;
 
-                str += "<h2>Push senders</h2><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+                str += "<h3>Push senders</h3><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
 
                 for (const auto& sender : pushSenders)
                 {
@@ -215,7 +215,7 @@ namespace relay
 
                 str += "</table>";
 
-                str += "<h2>Pull servers</h2>";
+                str += "<h3>Pull servers</h3>";
 
                 for (const auto& server : pullServers)
                 {

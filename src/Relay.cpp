@@ -275,7 +275,7 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str = "<html><title>Status</title><body>";
+                str = "<html><title>Status</title><body><h1>Servers</h1>";
 
                 for (const auto& server : servers)
                 {

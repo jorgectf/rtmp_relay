@@ -66,7 +66,8 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str += "<h1>Receivers</h1>";
+                str += "Address: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort());
+                str += "<h2>Receivers</h2>";
                 for (const auto& receiver : receivers)
                 {
                     receiver->getInfo(str, reportType);
@@ -75,7 +76,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"receivers\":[";
+                str += "{\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\",\"receivers\":[";
 
                 bool first = true;
 
