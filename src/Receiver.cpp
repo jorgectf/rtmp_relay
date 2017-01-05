@@ -426,6 +426,16 @@ namespace relay
                     // forward notify packet
                     if (application) application->sendMetaData(metaData);
                 }
+                else if (command.asString() == "onMetaData")
+                {
+                    metaData = argument1;
+
+                    Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<uint32_t>(argument1["audiocodecid"].asDouble()));
+                    Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument1["videocodecid"].asDouble()));
+
+                    // forward notify packet
+                    if (application) application->sendMetaData(metaData);
+                }
                 else if (command.asString() == "onTextData")
                 {
                     if (application) application->sendTextData(packet.timestamp, argument1);
