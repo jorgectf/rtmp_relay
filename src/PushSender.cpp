@@ -338,10 +338,9 @@ namespace relay
 
     void PushSender::handleClose(cppsocket::Socket&)
     {
-        if (active)
-        {
-            reset();
-        }
+        Log(Log::Level::ALL) << "[" << name << "] " << "Disconnected";
+
+        reset();
     }
 
     bool PushSender::handlePacket(const rtmp::Packet& packet)
