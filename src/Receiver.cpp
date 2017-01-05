@@ -47,6 +47,9 @@ namespace relay
         invokes.clear();
         receivedPackets.clear();
         sentPackets.clear();
+
+        streaming = false;
+
         audioHeader.clear();
         videoHeader.clear();
         metaData = amf0::Node();
@@ -596,20 +599,37 @@ namespace relay
                 }
                 else if (command.asString() == "FCPublish")
                 {
-                    sendOnFCPublish();
-                    streamName = argument2.asString();
-                    if (application) application->createStream(streamName);
+                    if (!streaming)
+                    {
+                        streamName = argument2.asString();
+                        if (application) application->createStream(streamName);
 
-                    Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                        streaming = true;
+
+                        Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                    }
+
+                    sendOnFCPublish();
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
+                    streaming = false;
                     if (application) application->unpublishStream();
 
                     Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " unpublished stream \"" << streamName << "\"";
                 }
                 else if (command.asString() == "publish")
                 {
+                    if (!streaming)
+                    {
+                        streamName = argument2.asString();
+                        if (application) application->createStream(streamName);
+
+                        streaming = true;
+
+                        Log(Log::Level::INFO) << "[" << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                    }
+
                     sendPing();
                     sendPublishStatus(transactionId.asDouble());
                 }
