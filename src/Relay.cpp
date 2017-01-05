@@ -19,6 +19,8 @@ using namespace cppsocket;
 
 namespace relay
 {
+    uint64_t Relay::currentId = 0;
+
     Relay::Relay(Network& aNetwork):
         network(aNetwork)
     {

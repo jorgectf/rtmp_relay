@@ -80,6 +80,8 @@ namespace relay
 
         bool connect(const std::string& applicationName);
         bool play(const std::string& stream);
+
+        const uint64_t id;
         
         cppsocket::Socket socket;
 

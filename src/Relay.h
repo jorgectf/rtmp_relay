@@ -22,6 +22,8 @@ namespace relay
     class Relay
     {
     public:
+        static uint64_t nextId() { return ++currentId; }
+
         Relay(cppsocket::Network& aNetwork);
 
         Relay(const Relay&) = delete;
@@ -39,6 +41,8 @@ namespace relay
         void openLog();
 
     private:
+        static uint64_t currentId;
+
         cppsocket::Network& network;
         std::vector<std::unique_ptr<Server>> servers;
         std::unique_ptr<Status> status;

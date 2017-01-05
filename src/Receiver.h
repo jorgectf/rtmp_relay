@@ -63,6 +63,8 @@ namespace relay
 
         bool connect(const std::string& applicationName);
 
+        const uint64_t id;
+
         cppsocket::Network& network;
         cppsocket::Socket socket;
 

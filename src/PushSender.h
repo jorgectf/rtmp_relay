@@ -101,6 +101,8 @@ namespace relay
         void sendFCUnpublish();
         void sendPublish();
 
+        const uint64_t id;
+
         std::random_device rd;
         std::mt19937 generator;
 
