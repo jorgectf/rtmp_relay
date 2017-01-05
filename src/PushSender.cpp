@@ -340,7 +340,9 @@ namespace relay
     {
         Log(Log::Level::ALL) << "[" << name << "] " << "Disconnected";
 
+        bool wasActive = active;
         reset();
+        active = wasActive;
     }
 
     bool PushSender::handlePacket(const rtmp::Packet& packet)
