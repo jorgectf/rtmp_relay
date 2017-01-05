@@ -340,7 +340,7 @@ namespace relay
 
     void PushSender::handleClose(cppsocket::Socket&)
     {
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Disconnected";
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Disconnected";
 
         bool wasActive = active;
         reset();
