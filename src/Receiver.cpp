@@ -88,6 +88,9 @@ namespace relay
             timeSinceMeasure = 0.0f;
             audioRate = currentAudioBytes;
             videoRate = currentVideoBytes;
+
+            currentAudioBytes = 0;
+            currentVideoBytes = 0;
         }
     }
 
