@@ -45,6 +45,7 @@ namespace relay
     bool Relay::init(const std::string& config)
     {
         servers.clear();
+        status.reset();
 
         YAML::Node document;
 
@@ -239,6 +240,12 @@ namespace relay
         return true;
     }
 
+    void Relay::close()
+    {
+        servers.clear();
+        status.reset();
+    }
+
     void Relay::run()
     {
         const std::chrono::microseconds sleepTime(10000);
@@ -312,6 +319,13 @@ namespace relay
     {
 #if !defined(_MSC_VER)
         openlog(syslogIdent.empty() ? nullptr : syslogIdent.c_str(), 0, syslogFacility);
+#endif
+    }
+
+    void Relay::closeLog()
+    {
+#if !defined(_MSC_VER)
+        closelog();
 #endif
     }
 }

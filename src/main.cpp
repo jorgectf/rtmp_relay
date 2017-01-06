@@ -40,6 +40,8 @@ static void signalHandler(int signo)
             break;
         case SIGTERM:
             // shutdown the server
+            rel.close();
+            rel.closeLog();
             exit(EXIT_SUCCESS);
             break;
         case SIGUSR1:

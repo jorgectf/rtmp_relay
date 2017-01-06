@@ -33,12 +33,14 @@ namespace relay
         Relay& operator=(Relay&&);
 
         bool init(const std::string& config);
+        void close();
 
         void run();
 
         void getInfo(std::string& str, ReportType reportType) const;
 
         void openLog();
+        void closeLog();
 
     private:
         static uint64_t currentId;
