@@ -1066,7 +1066,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "\t[" + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
+                str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
 
                 switch (state)
                 {
@@ -1097,7 +1097,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"name\":\"" + streamName + "\"," +
+                str += "{\"id\":" + std::to_string(id) + ",\"name\":\"" + streamName + "\"," +
                 "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
                 "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
                 "\"status\":";
