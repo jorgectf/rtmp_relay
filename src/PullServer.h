@@ -26,6 +26,7 @@ namespace relay
     
     class PullServer
     {
+        const std::string name = "PullServer";
     public:
         PullServer(cppsocket::Network& aNetwork,
                    const std::string& aApplication,
@@ -54,6 +55,8 @@ namespace relay
         
     private:
         void handleAccept(cppsocket::Socket& clientSocket);
+
+        const uint64_t id;
         
         cppsocket::Network& network;
         cppsocket::Acceptor socket;

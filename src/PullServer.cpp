@@ -3,6 +3,10 @@
 //
 
 #include "PullServer.h"
+#include "Relay.h"
+#include "Log.h"
+
+using namespace cppsocket;
 
 namespace relay
 {
@@ -15,6 +19,7 @@ namespace relay
                            bool dataOutput,
                            const std::set<std::string>& aMetaDataBlacklist,
                            float aPingInterval):
+        id(Relay::nextId()),
         network(aNetwork),
         socket(aNetwork),
         application(aApplication),
@@ -133,6 +138,8 @@ namespace relay
 
     void PullServer::handleAccept(cppsocket::Socket& clientSocket)
     {
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Client connected";
+
         std::auto_ptr<PullSender> pullSender(new PullSender(clientSocket,
                                                             application,
                                                             overrideStreamName,
@@ -171,6 +178,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
+                str += "ID: " + std::to_string(id) + "\n";
                 str += "Application: " + application + "\n";
                 str += "Pull senders:";
                 for (const auto& sender : pullSenders)
@@ -181,9 +189,10 @@ namespace relay
             }
             case ReportType::HTML:
             {
+                str += "<h4>Pull server " + std::to_string(id) + "</h4>";
                 str += "Application: " + application;
 
-                str += "<h4>Pull senders</h4><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+                str += "<h5>Pull senders</h5><table border=\"1\"><tr><th>ID</th><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
 
                 for (const auto& sender : pullSenders)
                 {
@@ -195,7 +204,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"application\":\"" + application + "\"," +
+                str += "{\"id\":" + std::to_string(id) + ",\"application\":\"" + application + "\"," +
                 "\"pullSenders\":[";
 
                 bool first = true;

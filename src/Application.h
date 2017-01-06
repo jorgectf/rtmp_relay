@@ -50,6 +50,7 @@ namespace relay
         void getInfo(std::string& str, ReportType reportType) const;
 
     private:
+        const uint64_t id;
         std::string name;
 
         std::vector<std::unique_ptr<PushSender>> pushSenders;

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "Application.h"
+#include "Relay.h"
 #include "Server.h"
 #include "Log.h"
 
@@ -14,6 +15,7 @@ namespace relay
     Application::Application(cppsocket::Network& aNetwork,
                              const ApplicationDescriptor& applicationDescriptor,
                              const std::string& aName):
+        id(Relay::nextId()),
         name(aName)
     {
         for (const PushDescriptor& pushDescriptor : applicationDescriptor.pushDescriptors)
@@ -187,6 +189,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
+                str += "ID: " + std::to_string(id) + "\n";
                 str += "Application: " + name + "\n";
 
                 str += "Push senders:";
@@ -204,9 +207,10 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str += "Application: " + name;
+                str += "<h3>Application " + std::to_string(id) + "</h3>";
+                str += "Name: " + name;
 
-                str += "<h3>Push senders</h3><table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
+                str += "<h4>Push senders</h4><table border=\"1\"><tr><th>ID</th><th>Name</th><th>Connected</th><th>Address</th><th>State</th></tr>";
 
                 for (const auto& sender : pushSenders)
                 {
@@ -214,8 +218,6 @@ namespace relay
                 }
 
                 str += "</table>";
-
-                str += "<h3>Pull servers</h3>";
 
                 for (const auto& server : pullServers)
                 {
@@ -226,7 +228,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"name\":\"" + name + "\"," +
+                str += "{\"id\":" + std::to_string(id) + ",\"name\":\"" + name + "\"," +
                     "\"pushSenders\":[";
 
                 bool first = true;

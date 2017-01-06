@@ -6,6 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include "Server.h"
+#include "Relay.h"
 #include "Application.h"
 #include "Log.h"
 
@@ -17,7 +18,11 @@ namespace relay
                    const std::string& address,
                    float aPingInterval,
                    const std::vector<ApplicationDescriptor>& aApplicationDescriptors):
-        network(aNetwork), socket(aNetwork), pingInterval(aPingInterval), applicationDescriptors(aApplicationDescriptors)
+        id(Relay::nextId()),
+        network(aNetwork),
+        socket(aNetwork),
+        pingInterval(aPingInterval),
+        applicationDescriptors(aApplicationDescriptors)
     {
         socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
 
@@ -44,6 +49,8 @@ namespace relay
 
     void Server::handleAccept(Socket& clientSocket)
     {
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input connected";
+
         std::unique_ptr<Receiver> receiver(new Receiver(network, clientSocket, pingInterval, applicationDescriptors));
         receivers.push_back(std::move(receiver));
     }
@@ -54,7 +61,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "Server listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
+                str += "Server " + std::to_string(id) + " listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
 
                 str += "Receivers:\n";
 
@@ -66,8 +73,9 @@ namespace relay
             }
             case ReportType::HTML:
             {
+                str += "<h1>Server " + std::to_string(id) + "</h1>";
                 str += "Address: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort());
-                str += "<h2>Receivers</h2>";
+
                 for (const auto& receiver : receivers)
                 {
                     receiver->getInfo(str, reportType);
@@ -76,7 +84,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\",\"receivers\":[";
+                str += "{\"id\":" + std::to_string(id) + ",\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\",\"receivers\":[";
 
                 bool first = true;
 

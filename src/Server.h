@@ -18,6 +18,7 @@ namespace relay
 
     class Server
     {
+        const std::string name = "Server";
     public:
         Server(cppsocket::Network& aNetwork,
                const std::string& address,
@@ -36,6 +37,8 @@ namespace relay
 
     private:
         void handleAccept(cppsocket::Socket& clientSocket);
+
+        const uint64_t id;
 
         cppsocket::Network& network;
         cppsocket::Acceptor socket;

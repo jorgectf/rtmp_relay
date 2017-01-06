@@ -1019,6 +1019,7 @@ namespace relay
             }
             case ReportType::HTML:
             {
+                str += "<h2>Receiver " + std::to_string(id) + "</h2>";
                 str += "<table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th><th>Video bitrate</th><th>Audio bitrate</th><th>Metadata</th></tr>";
                 str += "<tr><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
 
