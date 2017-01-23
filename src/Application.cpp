@@ -7,6 +7,7 @@
 #include "Relay.h"
 #include "Server.h"
 #include "Log.h"
+#include "Utils.h"
 
 using namespace cppsocket;
 
@@ -18,10 +19,27 @@ namespace relay
         id(Relay::nextId()),
         name(aName)
     {
+        std::string applicationName;
+
+        if (applicationDescriptor.overrideApplicationName.empty())
+        {
+            applicationName = applicationDescriptor.overrideApplicationName;
+        }
+        else
+        {
+            std::map<std::string, std::string> tokens = {
+                {"id", std::to_string(id)},
+                {"name", name}
+            };
+
+            applicationName = applicationDescriptor.overrideApplicationName;
+            replaceTokens(applicationName, tokens);
+        }
+
         for (const PushDescriptor& pushDescriptor : applicationDescriptor.pushDescriptors)
         {
             std::unique_ptr<PushSender> sender(new PushSender(aNetwork,
-                                                              name,
+                                                              applicationName,
                                                               pushDescriptor.overrideStreamName,
                                                               pushDescriptor.addresses,
                                                               pushDescriptor.videoOutput,
@@ -40,7 +58,7 @@ namespace relay
         for (const PullDescriptor& pullDescriptor : applicationDescriptor.pullDescriptors)
         {
             std::unique_ptr<PullServer> server(new PullServer(aNetwork,
-                                                              name,
+                                                              applicationName,
                                                               pullDescriptor.overrideStreamName,
                                                               pullDescriptor.address,
                                                               pullDescriptor.videoOutput,

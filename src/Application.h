@@ -21,6 +21,7 @@ namespace relay
     struct ApplicationDescriptor
     {
         std::string name;
+        std::string overrideApplicationName;
         std::vector<PushDescriptor> pushDescriptors;
         std::vector<PullDescriptor> pullDescriptors;
     };

@@ -125,6 +125,7 @@ namespace relay
                 ApplicationDescriptor applicationDescriptor;
 
                 if (applicationObject["name"]) applicationDescriptor.name = applicationObject["name"].as<std::string>();
+                if (applicationObject["overrideApplicationName"]) applicationDescriptor.overrideApplicationName = applicationObject["overrideApplicationName"].as<std::string>();
 
                 const YAML::Node& pushArray = applicationObject["push"];
 
