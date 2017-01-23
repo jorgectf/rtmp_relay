@@ -4,6 +4,7 @@ LDFLAGS=
 SOURCES=src/Amf0.cpp \
 	src/Application.cpp \
 	src/main.cpp \
+	src/PullReceiver.cpp \
 	src/PullSender.cpp \
 	src/PullServer.cpp \
 	src/PushReceiver.cpp \
