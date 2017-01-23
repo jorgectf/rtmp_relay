@@ -10,6 +10,7 @@
 #include <set>
 #include <memory>
 #include "Acceptor.h"
+#include "PullReceiver.h"
 #include "PushReceiver.h"
 
 namespace relay
@@ -45,6 +46,7 @@ namespace relay
         const float pingInterval;
         const std::vector<ApplicationDescriptor> applicationDescriptors;
 
-        std::vector<std::unique_ptr<PushReceiver>> receivers;
+        std::unique_ptr<PullReceiver> pullReceiver;
+        std::vector<std::unique_ptr<PushReceiver>> pushReceivers;
     };
 }

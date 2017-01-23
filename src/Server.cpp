@@ -31,7 +31,9 @@ namespace relay
 
     void Server::update(float delta)
     {
-        for (auto receiverIterator = receivers.begin(); receiverIterator != receivers.end();)
+        if (pullReceiver) pullReceiver->update(delta);
+
+        for (auto receiverIterator = pushReceivers.begin(); receiverIterator != pushReceivers.end();)
         {
             const auto& receiver = *receiverIterator;
 
@@ -42,7 +44,7 @@ namespace relay
             }
             else
             {
-                receiverIterator = receivers.erase(receiverIterator);
+                receiverIterator = pushReceivers.erase(receiverIterator);
             }
         }
     }
@@ -52,7 +54,7 @@ namespace relay
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input connected";
 
         std::unique_ptr<PushReceiver> receiver(new PushReceiver(network, clientSocket, pingInterval, applicationDescriptors));
-        receivers.push_back(std::move(receiver));
+        pushReceivers.push_back(std::move(receiver));
     }
 
     void Server::getInfo(std::string& str, ReportType reportType) const
@@ -63,9 +65,15 @@ namespace relay
             {
                 str += "Server " + std::to_string(id) + " listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
 
-                str += "Receivers:\n";
+                if (pullReceiver)
+                {
+                    str += "Pull receiver:\n";
+                    pullReceiver->getInfo(str, reportType);
+                }
 
-                for (const auto& receiver : receivers)
+                str += "Push receivers:\n";
+
+                for (const auto& receiver : pushReceivers)
                 {
                     receiver->getInfo(str, reportType);
                 }
@@ -76,7 +84,12 @@ namespace relay
                 str += "<h1>Server " + std::to_string(id) + "</h1>";
                 str += "Address: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort());
 
-                for (const auto& receiver : receivers)
+                if (pullReceiver)
+                {
+                    pullReceiver->getInfo(str, reportType);
+                }
+
+                for (const auto& receiver : pushReceivers)
                 {
                     receiver->getInfo(str, reportType);
                 }
@@ -84,11 +97,19 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"id\":" + std::to_string(id) + ",\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\",\"receivers\":[";
+                str += "{\"id\":" + std::to_string(id) + ",\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"";
+
+                if (pullReceiver)
+                {
+                    str += ",\"pullReceiver\":";
+                    pullReceiver->getInfo(str, reportType);
+                }
+
+                str += ",\"pushReceivers\":[";
 
                 bool first = true;
 
-                for (const auto& receiver : receivers)
+                for (const auto& receiver : pushReceivers)
                 {
                     if (!first) str += ",";
                     first = false;

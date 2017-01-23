@@ -19,7 +19,7 @@ namespace relay
 
     class PushReceiver
     {
-        const std::string name = "Receiver";
+        const std::string name = "PushReceiver";
     public:
         PushReceiver(cppsocket::Network& aNetwork,
                      cppsocket::Socket& aSocket,
