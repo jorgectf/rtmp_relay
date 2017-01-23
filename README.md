@@ -1,4 +1,4 @@
-# RTMP relay v0.7
+# RTMP relay v0.8
 
 [![Build Status](https://api.travis-ci.org/elnormous/rtmp_relay.svg?branch=master)](https://travis-ci.org/elnormous/rtmp_relay) [![Build Status](https://ci.appveyor.com/api/projects/status/9axwxwyf99dcr11d?svg=true)](https://ci.appveyor.com/project/elnormous/rtmp_relay)
 
@@ -22,6 +22,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * *pingInterval* – client ping interval in seconds
 * *applications* – application object (can be multiple for each server)
   * *name* – name of the application (optional if server should route all applications)
+  * *overrideApplicationName* – name of the output application name
   * *push* – array of push destinations
     * *overrideStreamName* – string to override the stream name with
     * *addresses* – list of addresses to push to
@@ -39,8 +40,14 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
     * *data* – flag that indicates wether to forward data stream
     * *pingInterval* – client ping interval in seconds
 
+*overrideApplicationName* can have the following tokens:
+
+* ${id} – id of the application
+* ${streamName} – name of the application
+
 *overrideStream* name can have the following tokens:
 
+* ${id} – id of the sender
 * ${streamName} – name of the source stream
 * ${applicationName} – name of the application
 * ${ipAddress} – IP address of the destination
@@ -72,6 +79,7 @@ Example configuration:
       - listen: "127.0.0.1:2200"
         applications:
           - name: "app/name"
+            overrideApplicationName: "${name}_2"
             push:
               - overrideStreamName: "test_${name}"
                 address: "10.0.1.1:1935"
