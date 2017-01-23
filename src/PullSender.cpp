@@ -14,22 +14,17 @@ namespace relay
 {
     PullSender::PullSender(cppsocket::Socket& aSocket,
                            const std::string& aApplication,
-                           const std::string& aOverrideStreamName,
-                           bool videoOutput,
-                           bool audioOutput,
-                           bool dataOutput,
-                           const std::set<std::string>& aMetaDataBlacklist,
-                           float aPingInterval):
+                           const PullDescriptor& pullDescriptor):
         id(Relay::nextId()),
+        generator(rd()),
         socket(std::move(aSocket)),
         application(aApplication),
-        overrideStreamName(aOverrideStreamName),
-        videoStream(videoOutput),
-        audioStream(audioOutput),
-        dataStream(dataOutput),
-        metaDataBlacklist(aMetaDataBlacklist),
-        generator(rd()),
-        pingInterval(aPingInterval)
+        overrideStreamName(pullDescriptor.overrideStreamName),
+        videoStream(pullDescriptor.videoOutput),
+        audioStream(pullDescriptor.audioOutput),
+        dataStream(pullDescriptor.dataOutput),
+        metaDataBlacklist(pullDescriptor.metaDataBlacklist),
+        pingInterval(pullDescriptor.pingInterval)
     {
         if (!socket.setBlocking(false))
         {
@@ -39,7 +34,7 @@ namespace relay
         socket.setReadCallback(std::bind(&PullSender::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&PullSender::handleClose, this, std::placeholders::_1));
 
-        if (!videoOutput)
+        if (!pullDescriptor.videoOutput)
         {
             metaDataBlacklist.insert("width");
             metaDataBlacklist.insert("height");
@@ -50,7 +45,7 @@ namespace relay
             metaDataBlacklist.insert("gopsize");
         }
 
-        if (!audioOutput)
+        if (!pullDescriptor.audioOutput)
         {
             metaDataBlacklist.insert("audiodatarate");
             metaDataBlacklist.insert("audiosamplerate");

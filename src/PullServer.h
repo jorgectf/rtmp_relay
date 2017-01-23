@@ -13,30 +13,13 @@
 
 namespace relay
 {
-    struct PullDescriptor
-    {
-        std::string overrideStreamName;
-        std::string address;
-        bool videoOutput;
-        bool audioOutput;
-        bool dataOutput;
-        std::set<std::string> metaDataBlacklist;
-        float pingInterval;
-    };
-    
     class PullServer
     {
         const std::string name = "PullServer";
     public:
         PullServer(cppsocket::Network& aNetwork,
                    const std::string& aApplication,
-                   const std::string& aOverrideStreamName,
-                   const std::string& aAddress,
-                   bool videoOutput,
-                   bool audioOutput,
-                   bool dataOutput,
-                   const std::set<std::string>& aMetaDataBlacklist,
-                   float aPingInterval);
+                   const PullDescriptor& aPullDescriptor);
 
         void update(float delta);
 
@@ -57,6 +40,7 @@ namespace relay
         void handleAccept(cppsocket::Socket& clientSocket);
 
         const uint64_t id;
+        PullDescriptor pullDescriptor;
         
         cppsocket::Network& network;
         cppsocket::Acceptor socket;

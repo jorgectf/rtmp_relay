@@ -18,29 +18,21 @@ namespace relay
 {
     PushSender::PushSender(Network& aNetwork,
                            const std::string& aApplication,
-                           const std::string& aOverrideStreamName,
-                           const std::vector<std::string>& aAddresses,
-                           bool videoOutput,
-                           bool audioOutput,
-                           bool dataOutput,
-                           const std::set<std::string>& aMetaDataBlacklist,
-                           float aConnectionTimeout,
-                           float aReconnectInterval,
-                           uint32_t aReconnectCount):
+                           const PushDescriptor& pushDescriptor):
         id(Relay::nextId()),
         generator(rd()),
         network(aNetwork),
         socket(network),
         application(aApplication),
-        overrideStreamName(aOverrideStreamName),
-        addresses(aAddresses),
-        videoStream(videoOutput),
-        audioStream(audioOutput),
-        dataStream(dataOutput),
-        metaDataBlacklist(aMetaDataBlacklist),
-        connectionTimeout(aConnectionTimeout),
-        reconnectInterval(aReconnectInterval),
-        reconnectCount(aReconnectCount)
+        overrideStreamName(pushDescriptor.overrideStreamName),
+        addresses(pushDescriptor.addresses),
+        videoStream(pushDescriptor.videoOutput),
+        audioStream(pushDescriptor.audioOutput),
+        dataStream(pushDescriptor.dataOutput),
+        metaDataBlacklist(pushDescriptor.metaDataBlacklist),
+        connectionTimeout(pushDescriptor.connectionTimeout),
+        reconnectInterval(pushDescriptor.reconnectInterval),
+        reconnectCount(pushDescriptor.reconnectCount)
     {
         if (!socket.setBlocking(false))
         {
@@ -53,7 +45,7 @@ namespace relay
         socket.setReadCallback(std::bind(&PushSender::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&PushSender::handleClose, this, std::placeholders::_1));
 
-        if (!videoOutput)
+        if (!pushDescriptor.videoOutput)
         {
             metaDataBlacklist.insert("width");
             metaDataBlacklist.insert("height");
@@ -64,7 +56,7 @@ namespace relay
             metaDataBlacklist.insert("gopsize");
         }
 
-        if (!audioOutput)
+        if (!pushDescriptor.audioOutput)
         {
             metaDataBlacklist.insert("audiodatarate");
             metaDataBlacklist.insert("audiosamplerate");

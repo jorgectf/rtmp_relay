@@ -15,18 +15,24 @@
 
 namespace relay
 {
+    struct PullDescriptor
+    {
+        std::string overrideStreamName;
+        std::string address;
+        bool videoOutput;
+        bool audioOutput;
+        bool dataOutput;
+        std::set<std::string> metaDataBlacklist;
+        float pingInterval;
+    };
+    
     class PullSender
     {
         const std::string name = "PullSender";
     public:
         PullSender(cppsocket::Socket& aSocket,
                    const std::string& aApplication,
-                   const std::string& aOverrideStreamName,
-                   bool videoOutput,
-                   bool audioOutput,
-                   bool dataOutput,
-                   const std::set<std::string>& aMetaDataBlacklist,
-                   float aPingInterval);
+                   const PullDescriptor& pullDescriptor);
 
         PullSender(const PullSender&) = delete;
         PullSender& operator=(const PullSender&) = delete;
@@ -83,6 +89,9 @@ namespace relay
 
         const uint64_t id;
         
+        std::random_device rd;
+        std::mt19937 generator;
+
         cppsocket::Socket socket;
 
         const std::string application;
@@ -99,9 +108,6 @@ namespace relay
         uint32_t inChunkSize = 128;
         uint32_t outChunkSize = 128;
         uint32_t serverBandwidth = 2500000;
-
-        std::random_device rd;
-        std::mt19937 generator;
 
         uint32_t invokeId = 0;
         std::map<uint32_t, std::string> invokes;

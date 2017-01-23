@@ -35,15 +35,7 @@ namespace relay
     public:
         PushSender(cppsocket::Network& aNetwork,
                    const std::string& aApplication,
-                   const std::string& aOverrideStreamName,
-                   const std::vector<std::string>& aAddresses,
-                   bool videoOutput,
-                   bool audioOutput,
-                   bool dataOutput,
-                   const std::set<std::string>& aMetaDataBlacklist,
-                   float aConnectionTimeout,
-                   float aReconnectInterval,
-                   uint32_t aReconnectCount);
+                   const PushDescriptor& pushDescriptor);
 
         PushSender(const PushSender&) = delete;
         PushSender& operator=(const PushSender&) = delete;

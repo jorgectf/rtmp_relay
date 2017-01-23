@@ -40,15 +40,7 @@ namespace relay
         {
             std::unique_ptr<PushSender> sender(new PushSender(aNetwork,
                                                               applicationName,
-                                                              pushDescriptor.overrideStreamName,
-                                                              pushDescriptor.addresses,
-                                                              pushDescriptor.videoOutput,
-                                                              pushDescriptor.audioOutput,
-                                                              pushDescriptor.dataOutput,
-                                                              pushDescriptor.metaDataBlacklist,
-                                                              pushDescriptor.connectionTimeout,
-                                                              pushDescriptor.reconnectInterval,
-                                                              pushDescriptor.reconnectCount));
+                                                              pushDescriptor));
 
             sender->connect();
 
@@ -59,13 +51,7 @@ namespace relay
         {
             std::unique_ptr<PullServer> server(new PullServer(aNetwork,
                                                               applicationName,
-                                                              pullDescriptor.overrideStreamName,
-                                                              pullDescriptor.address,
-                                                              pullDescriptor.videoOutput,
-                                                              pullDescriptor.audioOutput,
-                                                              pullDescriptor.dataOutput,
-                                                              pullDescriptor.metaDataBlacklist,
-                                                              pullDescriptor.pingInterval));
+                                                              pullDescriptor));
 
             pullServers.push_back(std::move(server));
         }

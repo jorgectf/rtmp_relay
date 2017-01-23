@@ -12,24 +12,19 @@ namespace relay
 {
     PullServer::PullServer(cppsocket::Network& aNetwork,
                            const std::string& aApplication,
-                           const std::string& aOverrideStreamName,
-                           const std::string& aAddress,
-                           bool videoOutput,
-                           bool audioOutput,
-                           bool dataOutput,
-                           const std::set<std::string>& aMetaDataBlacklist,
-                           float aPingInterval):
+                           const PullDescriptor& aPullDescriptor):
         id(Relay::nextId()),
+        pullDescriptor(aPullDescriptor),
         network(aNetwork),
         socket(aNetwork),
         application(aApplication),
-        overrideStreamName(aOverrideStreamName),
-        address(aAddress),
-        videoStream(videoOutput),
-        audioStream(audioOutput),
-        dataStream(dataOutput),
-        metaDataBlacklist(aMetaDataBlacklist),
-        pingInterval(aPingInterval)
+        overrideStreamName(pullDescriptor.overrideStreamName),
+        address(pullDescriptor.address),
+        videoStream(pullDescriptor.videoOutput),
+        audioStream(pullDescriptor.audioOutput),
+        dataStream(pullDescriptor.dataOutput),
+        metaDataBlacklist(pullDescriptor.metaDataBlacklist),
+        pingInterval(pullDescriptor.pingInterval)
     {
         socket.setAcceptCallback(std::bind(&PullServer::handleAccept, this, std::placeholders::_1));
 
@@ -142,12 +137,7 @@ namespace relay
 
         std::auto_ptr<PullSender> pullSender(new PullSender(clientSocket,
                                                             application,
-                                                            overrideStreamName,
-                                                            videoStream,
-                                                            audioStream,
-                                                            dataStream,
-                                                            metaDataBlacklist,
-                                                            pingInterval));
+                                                            pullDescriptor));
 
         if (!streamName.empty())
         {
