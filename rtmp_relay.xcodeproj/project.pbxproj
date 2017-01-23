@@ -49,7 +49,7 @@
 		30BB190C1D47A43800102062 /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30BB18EC1D47A43800102062 /* stream.cpp */; };
 		30BB190D1D47A43800102062 /* tag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30BB18F01D47A43800102062 /* tag.cpp */; };
 		30FA80E21C8DA37800F2695E /* PushSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FA80E01C8DA37800F2695E /* PushSender.cpp */; };
-		30FA80E51C8DB57300F2695E /* Receiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FA80E31C8DB57300F2695E /* Receiver.cpp */; };
+		30FA80E51C8DB57300F2695E /* PushReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FA80E31C8DB57300F2695E /* PushReceiver.cpp */; };
 		30FA80F81C8F588500F2695E /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FA80F61C8F588500F2695E /* Utils.cpp */; };
 		30FE38481DFB532E00305B3B /* PullServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30FE38461DFB532E00305B3B /* PullServer.cpp */; };
 /* End PBXBuildFile section */
@@ -146,8 +146,8 @@
 		30BB18F21D47A43800102062 /* token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = token.h; sourceTree = "<group>"; };
 		30FA80E01C8DA37800F2695E /* PushSender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PushSender.cpp; sourceTree = "<group>"; };
 		30FA80E11C8DA37800F2695E /* PushSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushSender.h; sourceTree = "<group>"; };
-		30FA80E31C8DB57300F2695E /* Receiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Receiver.cpp; sourceTree = "<group>"; };
-		30FA80E41C8DB57300F2695E /* Receiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Receiver.h; sourceTree = "<group>"; };
+		30FA80E31C8DB57300F2695E /* PushReceiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PushReceiver.cpp; sourceTree = "<group>"; };
+		30FA80E41C8DB57300F2695E /* PushReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushReceiver.h; sourceTree = "<group>"; };
 		30FA80F61C8F588500F2695E /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
 		30FA80F71C8F588500F2695E /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		30FE38461DFB532E00305B3B /* PullServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PullServer.cpp; sourceTree = "<group>"; };
@@ -196,10 +196,10 @@
 				3013FAA71DD6257D0069E2BD /* PullSender.h */,
 				30FE38461DFB532E00305B3B /* PullServer.cpp */,
 				30FE38471DFB532E00305B3B /* PullServer.h */,
+				30FA80E31C8DB57300F2695E /* PushReceiver.cpp */,
+				30FA80E41C8DB57300F2695E /* PushReceiver.h */,
 				30FA80E01C8DA37800F2695E /* PushSender.cpp */,
 				30FA80E11C8DA37800F2695E /* PushSender.h */,
-				30FA80E31C8DB57300F2695E /* Receiver.cpp */,
-				30FA80E41C8DB57300F2695E /* Receiver.h */,
 				300934131C874CBA00CC50D3 /* Relay.cpp */,
 				300934141C874CBA00CC50D3 /* Relay.h */,
 				304B286B1C9C3ED900BA162D /* RTMP.cpp */,
@@ -360,7 +360,7 @@
 				30BB18F71D47A43800102062 /* emitfromevents.cpp in Sources */,
 				30BB18C01D47A40B00102062 /* Socket.cpp in Sources */,
 				30563F441D993D2400CE4D04 /* Application.cpp in Sources */,
-				30FA80E51C8DB57300F2695E /* Receiver.cpp in Sources */,
+				30FA80E51C8DB57300F2695E /* PushReceiver.cpp in Sources */,
 				309B48331DE4A0D700A718C5 /* StatusSender.cpp in Sources */,
 				30BB19041D47A43800102062 /* parser.cpp in Sources */,
 				3030D5141DAF8C94007CC8EB /* Log.cpp in Sources */,

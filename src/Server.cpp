@@ -51,7 +51,7 @@ namespace relay
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input connected";
 
-        std::unique_ptr<Receiver> receiver(new Receiver(network, clientSocket, pingInterval, applicationDescriptors));
+        std::unique_ptr<PushReceiver> receiver(new PushReceiver(network, clientSocket, pingInterval, applicationDescriptors));
         receivers.push_back(std::move(receiver));
     }
 

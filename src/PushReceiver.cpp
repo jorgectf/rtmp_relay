@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "Receiver.h"
+#include "PushReceiver.h"
 #include "Relay.h"
 #include "Server.h"
 #include "Constants.h"
@@ -16,10 +16,10 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Receiver::Receiver(cppsocket::Network& aNetwork,
-                       Socket& aSocket,
-                       float aPingInterval,
-                       const std::vector<ApplicationDescriptor>& aApplicationDescriptors):
+    PushReceiver::PushReceiver(cppsocket::Network& aNetwork,
+                               Socket& aSocket,
+                               float aPingInterval,
+                               const std::vector<ApplicationDescriptor>& aApplicationDescriptors):
         id(Relay::nextId()),
         network(aNetwork),
         socket(std::move(aSocket)),
@@ -32,12 +32,12 @@ namespace relay
             Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Failed to set socket non-blocking";
         }
 
-        socket.setReadCallback(std::bind(&Receiver::handleRead, this, std::placeholders::_1, std::placeholders::_2));
-        socket.setCloseCallback(std::bind(&Receiver::handleClose, this, std::placeholders::_1));
+        socket.setReadCallback(std::bind(&PushReceiver::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+        socket.setCloseCallback(std::bind(&PushReceiver::handleClose, this, std::placeholders::_1));
         socket.startRead();
     }
 
-    void Receiver::reset()
+    void PushReceiver::reset()
     {
         socket.close();
         data.clear();
@@ -66,7 +66,7 @@ namespace relay
         currentVideoBytes = 0;
     }
 
-    void Receiver::update(float delta)
+    void PushReceiver::update(float delta)
     {
         if (application) application->update(delta);
 
@@ -94,7 +94,7 @@ namespace relay
         }
     }
 
-    bool Receiver::getPacket(std::vector<uint8_t>& packet)
+    bool PushReceiver::getPacket(std::vector<uint8_t>& packet)
     {
         if (data.size())
         {
@@ -105,7 +105,7 @@ namespace relay
         return false;
     }
 
-    void Receiver::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
+    void PushReceiver::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
@@ -252,7 +252,7 @@ namespace relay
         }
     }
 
-    void Receiver::handleClose(cppsocket::Socket&)
+    void PushReceiver::handleClose(cppsocket::Socket&)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " disconnected";
 
@@ -265,7 +265,7 @@ namespace relay
         reset();
     }
 
-    bool Receiver::handlePacket(const rtmp::Packet& packet)
+    bool PushReceiver::handlePacket(const rtmp::Packet& packet)
     {
         switch (packet.messageType)
         {
@@ -693,7 +693,7 @@ namespace relay
         return true;
     }
 
-    void Receiver::sendServerBandwidth()
+    void PushReceiver::sendServerBandwidth()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
@@ -710,7 +710,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendClientBandwidth()
+    void PushReceiver::sendClientBandwidth()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
@@ -728,7 +728,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendPing()
+    void PushReceiver::sendPing()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
@@ -746,7 +746,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendSetChunkSize()
+    void PushReceiver::sendSetChunkSize()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -763,7 +763,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendConnectResult(double transactionId)
+    void PushReceiver::sendConnectResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -796,7 +796,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendBWDone()
+    void PushReceiver::sendBWDone()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -825,7 +825,7 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
-    void Receiver::sendCheckBWResult(double transactionId)
+    void PushReceiver::sendCheckBWResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -849,7 +849,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendCreateStreamResult(double transactionId)
+    void PushReceiver::sendCreateStreamResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -882,7 +882,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendReleaseStreamResult(double transactionId)
+    void PushReceiver::sendReleaseStreamResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -906,7 +906,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendOnFCPublish()
+    void PushReceiver::sendOnFCPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -924,7 +924,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Receiver::sendPublishStatus(double transactionId)
+    void PushReceiver::sendPublishStatus(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -956,7 +956,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    bool Receiver::connect(const std::string& applicationName)
+    bool PushReceiver::connect(const std::string& applicationName)
     {
         for (const ApplicationDescriptor& applicationDescriptor : applicationDescriptors)
         {
@@ -975,7 +975,7 @@ namespace relay
         return false;
     }
 
-    void Receiver::getInfo(std::string& str, ReportType reportType) const
+    void PushReceiver::getInfo(std::string& str, ReportType reportType) const
     {
         switch (reportType)
         {

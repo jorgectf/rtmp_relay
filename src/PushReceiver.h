@@ -17,22 +17,22 @@ namespace relay
 {
     class Server;
 
-    class Receiver
+    class PushReceiver
     {
         const std::string name = "Receiver";
     public:
-        Receiver(cppsocket::Network& aNetwork,
-                 cppsocket::Socket& aSocket,
-                 float aPingInterval,
-                 const std::vector<ApplicationDescriptor>& aApplicationDescriptors);
+        PushReceiver(cppsocket::Network& aNetwork,
+                     cppsocket::Socket& aSocket,
+                     float aPingInterval,
+                     const std::vector<ApplicationDescriptor>& aApplicationDescriptors);
 
         void reset();
 
-        Receiver(const Receiver&) = delete;
-        Receiver& operator=(const Receiver&) = delete;
+        PushReceiver(const PushReceiver&) = delete;
+        PushReceiver& operator=(const PushReceiver&) = delete;
 
-        Receiver(Receiver&& other) = delete;
-        Receiver& operator=(Receiver&& other) = delete;
+        PushReceiver(PushReceiver&& other) = delete;
+        PushReceiver& operator=(PushReceiver&& other) = delete;
 
         void update(float delta);
 
