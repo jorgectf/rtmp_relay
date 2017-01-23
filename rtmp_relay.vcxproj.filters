@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="src\Amf0.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Receiver.cpp" />
     <ClCompile Include="src\Relay.cpp" />
     <ClCompile Include="src\RTMP.cpp" />
     <ClCompile Include="src\Server.cpp" />
@@ -110,11 +109,12 @@
     <ClCompile Include="src\PushSender.cpp" />
     <ClCompile Include="src\StatusSender.cpp" />
     <ClCompile Include="src\PullServer.cpp" />
+    <ClCompile Include="src\PullReceiver.cpp" />
+    <ClCompile Include="src\PushReceiver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Amf0.h" />
     <ClInclude Include="src\Constants.h" />
-    <ClInclude Include="src\Receiver.h" />
     <ClInclude Include="src\Relay.h" />
     <ClInclude Include="src\RTMP.h" />
     <ClInclude Include="src\Server.h" />
@@ -203,6 +203,8 @@
     <ClInclude Include="src\PushSender.h" />
     <ClInclude Include="src\StatusSender.h" />
     <ClInclude Include="src\PullServer.h" />
+    <ClInclude Include="src\PullReceiver.h" />
+    <ClInclude Include="src\PushReceiver.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">
