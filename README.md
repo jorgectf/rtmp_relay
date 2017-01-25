@@ -74,30 +74,35 @@ Example configuration:
         syslogIdent: relay
         syslogFacility: "LOG_LOCAL3"
     statusPage:
-        listen: "0.0.0.0:80"
+        address: "0.0.0.0:80"
     servers:
-      - listen: "127.0.0.1:2200"
-        applications:
-          - name: "app/name"
-            overrideApplicationName: "${name}_2"
-            push:
-              - overrideStreamName: "test_${name}"
-                address: "10.0.1.1:1935"
-                video: true
-                audio: true
-                connectionTimeout: 5.0
-                reconnectInterval: 5.0
-                reconnectCount: 3
-          - name: "casino/roulette"
-            push:
-              - address: [ "10.0.1.2:1935", "10.0.1.3:1935" ]
-                video: true
-                audio: true
-                connectionTimeout: 5.0
-                reconnectInterval: 5.0
-                reconnectCount: 3
-            pull:
-              - listen: "0.0.0.0:1935"
-                video: true
-                audio: true
-                pingInterval: 60.0
+      - applicationName: "app/name"
+        overrideApplicationName: "${name}_2"
+        address: "127.0.0.1:2200"
+        type: "push"
+        senders:
+          - streamName: "name"
+            overrideStreamName: "test_${name}"
+            address: "10.0.1.1:1935"
+            type: "push"
+            video: true
+            audio: true
+            connectionTimeout: 5.0
+            reconnectInterval: 5.0
+            reconnectCount: 3
+      - applicationName: "casino/roulette"
+        address: "127.0.0.1:2200"
+        type: "pull"
+        senders:
+          - address: [ "10.0.1.2:1935", "10.0.1.3:1935" ]
+            type: "push"
+            video: true
+            audio: true
+            connectionTimeout: 5.0
+            reconnectInterval: 5.0
+            reconnectCount: 3
+          - address: "0.0.0.0:1935"
+            type: "pull"
+            video: true
+            audio: true
+            pingInterval: 60.0
