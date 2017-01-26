@@ -22,6 +22,12 @@ namespace relay
     class Relay
     {
     public:
+        enum class Type
+        {
+            INPUT,
+            OUTPUT
+        };
+
         static uint64_t nextId() { return ++currentId; }
 
         Relay(cppsocket::Network& aNetwork);
@@ -41,6 +47,8 @@ namespace relay
 
         void openLog();
         void closeLog();
+
+        void* getConfig(uint16_t address, Type type, std::string applicationName, std::string streamName);
 
     private:
         static uint64_t currentId;
