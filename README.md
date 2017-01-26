@@ -80,7 +80,7 @@ Example configuration:
         overrideApplicationName: "${name}_2"
         address: "127.0.0.1:2200"
         type: "push"
-        senders:
+        output:
           - streamName: "name"
             overrideStreamName: "test_${name}"
             address: "10.0.1.1:1935"
@@ -93,7 +93,7 @@ Example configuration:
       - applicationName: "casino/roulette"
         address: "127.0.0.1:2200"
         type: "pull"
-        senders:
+        output:
           - address: [ "10.0.1.2:1935", "10.0.1.3:1935" ]
             type: "push"
             video: true

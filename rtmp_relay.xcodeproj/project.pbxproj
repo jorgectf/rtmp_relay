@@ -11,6 +11,9 @@
 		300934151C874CBA00CC50D3 /* Relay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300934131C874CBA00CC50D3 /* Relay.cpp */; };
 		300934181C8852D800CC50D3 /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300934161C8852D800CC50D3 /* Server.cpp */; };
 		3013FAA81DD6257D0069E2BD /* PullSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3013FAA61DD6257D0069E2BD /* PullSender.cpp */; };
+		301457021E3FA0E500BA75DB /* Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301457001E3FA0E500BA75DB /* Connection.cpp */; };
+		301457051E3FA87C00BA75DB /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301457031E3FA87C00BA75DB /* Input.cpp */; };
+		301457081E3FA88600BA75DB /* Output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301457061E3FA88600BA75DB /* Output.cpp */; };
 		3030D5141DAF8C94007CC8EB /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3030D5121DAF8C94007CC8EB /* Log.cpp */; };
 		3030D6E91DB7AADF007CC8EB /* Status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3030D6E71DB7AADE007CC8EB /* Status.cpp */; };
 		304B286D1C9C3ED900BA162D /* RTMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 304B286B1C9C3ED900BA162D /* RTMP.cpp */; };
@@ -76,6 +79,12 @@
 		300934171C8852D800CC50D3 /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
 		3013FAA61DD6257D0069E2BD /* PullSender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PullSender.cpp; sourceTree = "<group>"; };
 		3013FAA71DD6257D0069E2BD /* PullSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullSender.h; sourceTree = "<group>"; };
+		301457001E3FA0E500BA75DB /* Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Connection.cpp; sourceTree = "<group>"; };
+		301457011E3FA0E500BA75DB /* Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Connection.h; sourceTree = "<group>"; };
+		301457031E3FA87C00BA75DB /* Input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
+		301457041E3FA87C00BA75DB /* Input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
+		301457061E3FA88600BA75DB /* Output.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Output.cpp; sourceTree = "<group>"; };
+		301457071E3FA88600BA75DB /* Output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Output.h; sourceTree = "<group>"; };
 		3030D5121DAF8C94007CC8EB /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		3030D5131DAF8C94007CC8EB /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		3030D6E71DB7AADE007CC8EB /* Status.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Status.cpp; sourceTree = "<group>"; };
@@ -217,6 +226,12 @@
 				309B48321DE4A0D700A718C5 /* StatusSender.h */,
 				30FA80F61C8F588500F2695E /* Utils.cpp */,
 				30FA80F71C8F588500F2695E /* Utils.h */,
+				301457001E3FA0E500BA75DB /* Connection.cpp */,
+				301457011E3FA0E500BA75DB /* Connection.h */,
+				301457031E3FA87C00BA75DB /* Input.cpp */,
+				301457041E3FA87C00BA75DB /* Input.h */,
+				301457061E3FA88600BA75DB /* Output.cpp */,
+				301457071E3FA88600BA75DB /* Output.h */,
 			);
 			name = rtmp_relay;
 			path = src;
@@ -366,6 +381,7 @@
 				30BB18C01D47A40B00102062 /* Socket.cpp in Sources */,
 				30563F441D993D2400CE4D04 /* Application.cpp in Sources */,
 				30FA80E51C8DB57300F2695E /* PushReceiver.cpp in Sources */,
+				301457021E3FA0E500BA75DB /* Connection.cpp in Sources */,
 				309B48331DE4A0D700A718C5 /* StatusSender.cpp in Sources */,
 				30BB19041D47A43800102062 /* parser.cpp in Sources */,
 				3030D5141DAF8C94007CC8EB /* Log.cpp in Sources */,
@@ -378,6 +394,7 @@
 				304B286D1C9C3ED900BA162D /* RTMP.cpp in Sources */,
 				30BB190C1D47A43800102062 /* stream.cpp in Sources */,
 				30BB18F61D47A43800102062 /* emit.cpp in Sources */,
+				301457081E3FA88600BA75DB /* Output.cpp in Sources */,
 				30BB18F51D47A43800102062 /* directives.cpp in Sources */,
 				30FA80F81C8F588500F2695E /* Utils.cpp in Sources */,
 				30BB18F81D47A43800102062 /* emitter.cpp in Sources */,
@@ -393,6 +410,7 @@
 				30BB18BF1D47A40B00102062 /* Network.cpp in Sources */,
 				30A7875B1E36424E00FEC2EE /* PullReceiver.cpp in Sources */,
 				3013FAA81DD6257D0069E2BD /* PullSender.cpp in Sources */,
+				301457051E3FA87C00BA75DB /* Input.cpp in Sources */,
 				30BB18BE1D47A40B00102062 /* Connector.cpp in Sources */,
 				30BB19001D47A43800102062 /* nodeevents.cpp in Sources */,
 				3030D6E91DB7AADF007CC8EB /* Status.cpp in Sources */,
