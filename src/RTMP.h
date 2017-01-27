@@ -23,15 +23,6 @@ namespace relay
             SOURCE  = 8,   // channel for a/v invokes
         };
 
-        enum class State
-        {
-            UNINITIALIZED = 0,
-            VERSION_RECEIVED = 1,
-            VERSION_SENT = 2,
-            ACK_SENT = 3,
-            HANDSHAKE_DONE = 4
-        };
-
         enum class MessageType: uint8_t
         {
             NONE = 0,

@@ -21,6 +21,15 @@ namespace relay
     {
         const std::string name = "PushReceiver";
     public:
+        enum class State
+        {
+            UNINITIALIZED = 0,
+            VERSION_RECEIVED = 1,
+            VERSION_SENT = 2,
+            ACK_SENT = 3,
+            HANDSHAKE_DONE = 4
+        };
+        
         PushReceiver(cppsocket::Network& aNetwork,
                      cppsocket::Socket& aSocket,
                      float aPingInterval,
@@ -70,7 +79,7 @@ namespace relay
 
         std::vector<uint8_t> data;
 
-        rtmp::State state = rtmp::State::UNINITIALIZED;
+        State state = State::UNINITIALIZED;
 
         uint32_t inChunkSize = 128;
         uint32_t outChunkSize = 128;

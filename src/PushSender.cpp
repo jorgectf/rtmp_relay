@@ -71,7 +71,7 @@ namespace relay
         socket.close();
         data.clear();
 
-        state = rtmp::State::UNINITIALIZED;
+        state = State::UNINITIALIZED;
         inChunkSize = 128;
         outChunkSize = 128;
 
@@ -150,7 +150,7 @@ namespace relay
             timeSinceHandshake += delta;
 
             if ((!socket.isReady() && timeSinceConnect >= reconnectInterval) ||
-                (socket.isReady() && state != rtmp::State::HANDSHAKE_DONE && timeSinceHandshake >= reconnectInterval))
+                (socket.isReady() && state != State::HANDSHAKE_DONE && timeSinceHandshake >= reconnectInterval))
             {
                 connect();
             }
@@ -182,7 +182,7 @@ namespace relay
                                 reinterpret_cast<uint8_t*>(&challenge) + sizeof(challenge));
         socket.send(challengeMessage);
 
-        state = rtmp::State::VERSION_SENT;
+        state = State::VERSION_SENT;
     }
 
     void PushSender::handleConnectError()
@@ -207,7 +207,7 @@ namespace relay
 
         while (offset < data.size())
         {
-            if (state == rtmp::State::VERSION_SENT)
+            if (state == State::VERSION_SENT)
             {
                 if (data.size() - offset >= sizeof(uint8_t))
                 {
@@ -224,7 +224,7 @@ namespace relay
                         break;
                     }
 
-                    state = rtmp::State::VERSION_RECEIVED;
+                    state = State::VERSION_RECEIVED;
 
                     timeSinceHandshake = 0.0f;
                 }
@@ -233,7 +233,7 @@ namespace relay
                     break;
                 }
             }
-            else if (state == rtmp::State::VERSION_RECEIVED)
+            else if (state == State::VERSION_RECEIVED)
             {
                 if (data.size() - offset >= sizeof(rtmp::Challenge))
                 {
@@ -257,7 +257,7 @@ namespace relay
                                                  reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                     socket.send(ackData);
 
-                    state = rtmp::State::ACK_SENT;
+                    state = State::ACK_SENT;
 
                     timeSinceHandshake = 0.0f;
                 }
@@ -266,7 +266,7 @@ namespace relay
                     break;
                 }
             }
-            else if (state == rtmp::State::ACK_SENT)
+            else if (state == State::ACK_SENT)
             {
                 if (data.size() - offset >= sizeof(rtmp::Ack))
                 {
@@ -281,7 +281,7 @@ namespace relay
                         static_cast<uint32_t>(ack->version[3]);
                     Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Handshake done";
 
-                    state = rtmp::State::HANDSHAKE_DONE;
+                    state = State::HANDSHAKE_DONE;
 
                     sendConnect();
 
@@ -292,7 +292,7 @@ namespace relay
                     break;
                 }
             }
-            else if (state == rtmp::State::HANDSHAKE_DONE)
+            else if (state == State::HANDSHAKE_DONE)
             {
                 rtmp::Packet packet;
 
@@ -1108,11 +1108,11 @@ namespace relay
 
                 switch (state)
                 {
-                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                    case State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case State::ACK_SENT: str += "ACK_SENT"; break;
+                    case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
                 str += ", name: " + streamName + "\n";
                 break;
@@ -1123,11 +1123,11 @@ namespace relay
 
                 switch (state)
                 {
-                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                    case State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case State::ACK_SENT: str += "ACK_SENT"; break;
+                    case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
 
                 str += "</td></tr>";
@@ -1142,11 +1142,11 @@ namespace relay
 
                 switch (state)
                 {
-                    case rtmp::State::UNINITIALIZED: str += "\"UNINITIALIZED\""; break;
-                    case rtmp::State::VERSION_RECEIVED: str += "\"VERSION_RECEIVED\""; break;
-                    case rtmp::State::VERSION_SENT: str += "\"VERSION_SENT\""; break;
-                    case rtmp::State::ACK_SENT: str += "\"ACK_SENT\","; break;
-                    case rtmp::State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\""; break;
+                    case State::UNINITIALIZED: str += "\"UNINITIALIZED\""; break;
+                    case State::VERSION_RECEIVED: str += "\"VERSION_RECEIVED\""; break;
+                    case State::VERSION_SENT: str += "\"VERSION_SENT\""; break;
+                    case State::ACK_SENT: str += "\"ACK_SENT\","; break;
+                    case State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\""; break;
                 }
 
                 str += "}";

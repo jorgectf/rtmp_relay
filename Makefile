@@ -3,6 +3,7 @@ LDFLAGS=
 
 SOURCES=src/Amf0.cpp \
 	src/Application.cpp \
+	src/Connection.cpp \
 	src/main.cpp \
 	src/PullReceiver.cpp \
 	src/PullSender.cpp \

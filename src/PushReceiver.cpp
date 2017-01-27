@@ -43,7 +43,7 @@ namespace relay
         receivedPackets.clear();
         sentPackets.clear();
 
-        state = rtmp::State::UNINITIALIZED;
+        state = State::UNINITIALIZED;
         inChunkSize = 128;
         outChunkSize = 128;
         streamName.clear();
@@ -113,7 +113,7 @@ namespace relay
 
         while (offset < data.size())
         {
-            if (state == rtmp::State::UNINITIALIZED)
+            if (state == State::UNINITIALIZED)
             {
                 if (data.size() - offset >= sizeof(uint8_t))
                 {
@@ -135,14 +135,14 @@ namespace relay
                     reply.push_back(RTMP_VERSION);
                     socket.send(reply);
 
-                    state = rtmp::State::VERSION_SENT;
+                    state = State::VERSION_SENT;
                 }
                 else
                 {
                     break;
                 }
             }
-            else if (state == rtmp::State::VERSION_SENT)
+            else if (state == State::VERSION_SENT)
             {
                 if (data.size() - offset >= sizeof(rtmp::Challenge))
                 {
@@ -183,14 +183,14 @@ namespace relay
                                                  reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                     socket.send(ackData);
 
-                    state = rtmp::State::ACK_SENT;
+                    state = State::ACK_SENT;
                 }
                 else
                 {
                     break;
                 }
             }
-            else  if (state == rtmp::State::ACK_SENT)
+            else  if (state == State::ACK_SENT)
             {
                 if (data.size() - offset >= sizeof(rtmp::Ack))
                 {
@@ -205,14 +205,14 @@ namespace relay
                         static_cast<uint32_t>(ack->version[3]);
                     Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Handshake done";
 
-                    state = rtmp::State::HANDSHAKE_DONE;
+                    state = State::HANDSHAKE_DONE;
                 }
                 else
                 {
                     break;
                 }
             }
-            else if (state == rtmp::State::HANDSHAKE_DONE)
+            else if (state == State::HANDSHAKE_DONE)
             {
                 rtmp::Packet packet;
 
@@ -983,11 +983,11 @@ namespace relay
 
                 switch (state)
                 {
-                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                    case State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case State::ACK_SENT: str += "ACK_SENT"; break;
+                    case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
 
                 str += ", name: " + streamName + ", video bitrate: " + std::to_string(videoRate * 8) + ", audio bitrate: " + std::to_string(audioRate * 8) +
@@ -1026,11 +1026,11 @@ namespace relay
 
                 switch (state)
                 {
-                    case rtmp::State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                    case rtmp::State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                    case rtmp::State::VERSION_SENT: str += "VERSION_SENT"; break;
-                    case rtmp::State::ACK_SENT: str += "ACK_SENT"; break;
-                    case rtmp::State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                    case State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case State::ACK_SENT: str += "ACK_SENT"; break;
+                    case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
 
                 str += "</td><td>" + std::to_string(videoRate * 8) + "</td><td>" + std::to_string(audioRate * 8) + "</td><td>";
@@ -1065,11 +1065,11 @@ namespace relay
 
                 switch (state)
                 {
-                    case rtmp::State::UNINITIALIZED: str += "\"UNINITIALIZED\","; break;
-                    case rtmp::State::VERSION_RECEIVED: str += "\"VERSION_RECEIVED\","; break;
-                    case rtmp::State::VERSION_SENT: str += "\"VERSION_SENT\","; break;
-                    case rtmp::State::ACK_SENT: str += "\"ACK_SENT\","; break;
-                    case rtmp::State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\","; break;
+                    case State::UNINITIALIZED: str += "\"UNINITIALIZED\","; break;
+                    case State::VERSION_RECEIVED: str += "\"VERSION_RECEIVED\","; break;
+                    case State::VERSION_SENT: str += "\"VERSION_SENT\","; break;
+                    case State::ACK_SENT: str += "\"ACK_SENT\","; break;
+                    case State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\","; break;
                 }
 
                 str += "\"videoBitrate\":" + std::to_string(videoRate * 8) + "," +
