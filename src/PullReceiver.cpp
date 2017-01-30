@@ -18,12 +18,12 @@ namespace relay
                                Socket& aSocket,
                                float aPingInterval,
                                const std::vector<ApplicationDescriptor>& aApplicationDescriptors):
-    id(Relay::nextId()),
-    network(aNetwork),
-    socket(std::move(aSocket)),
-    generator(rd()),
-    pingInterval(aPingInterval),
-    applicationDescriptors(aApplicationDescriptors)
+        id(Relay::nextId()),
+        network(aNetwork),
+        socket(std::move(aSocket)),
+        generator(rd()),
+        pingInterval(aPingInterval),
+        applicationDescriptors(aApplicationDescriptors)
     {
         if (!socket.setBlocking(false))
         {

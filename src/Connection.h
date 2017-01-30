@@ -5,7 +5,9 @@
 #pragma once
 
 #include <random>
+#include <map>
 #include "Socket.h"
+#include "RTMP.h"
 
 namespace relay
 {
@@ -33,6 +35,9 @@ namespace relay
         void update();
 
     private:
+        void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
+        void handleClose(cppsocket::Socket&);
+
         const uint64_t id;
 
         std::random_device rd;
@@ -41,5 +46,12 @@ namespace relay
         Type type;
         State state;
         cppsocket::Socket& socket;
+
+        std::vector<uint8_t> data;
+
+        uint32_t inChunkSize = 128;
+        uint32_t outChunkSize = 128;
+
+        std::map<uint32_t, rtmp::Header> receivedPackets;
     };
 }
