@@ -40,8 +40,8 @@ namespace relay
         }
 
         socket.setConnectTimeout(connectionTimeout);
-        socket.setConnectCallback(std::bind(&PushSender::handleConnect, this));
-        socket.setConnectErrorCallback(std::bind(&PushSender::handleConnectError, this));
+        socket.setConnectCallback(std::bind(&PushSender::handleConnect, this, std::placeholders::_1));
+        socket.setConnectErrorCallback(std::bind(&PushSender::handleConnectError, this, std::placeholders::_1));
         socket.setReadCallback(std::bind(&PushSender::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&PushSender::handleClose, this, std::placeholders::_1));
 
@@ -157,7 +157,7 @@ namespace relay
         }
     }
 
-    void PushSender::handleConnect()
+    void PushSender::handleConnect(cppsocket::Socket&)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
 
@@ -185,7 +185,7 @@ namespace relay
         state = State::VERSION_SENT;
     }
 
-    void PushSender::handleConnectError()
+    void PushSender::handleConnectError(cppsocket::Socket&)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Failed to connect to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
     }

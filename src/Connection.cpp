@@ -5,6 +5,8 @@
 #include "Connection.h"
 #include "Relay.h"
 #include "Constants.h"
+#include "Amf0.h"
+#include "Utils.h"
 #include "Log.h"
 
 using namespace cppsocket;
@@ -22,6 +24,10 @@ namespace relay
             Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Failed to set socket non-blocking";
         }
 
+        // TODO: implement
+        // socket.setConnectTimeout(connectionTimeout);
+        //socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
+        //socket.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
 
@@ -59,6 +65,14 @@ namespace relay
     {
     }
 
+    void Connection::handleConnect(cppsocket::Socket&)
+    {
+    }
+
+    void Connection::handleConnectError(cppsocket::Socket&)
+    {
+    }
+
     void Connection::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
@@ -81,8 +95,7 @@ namespace relay
 
                     offset += ret;
 
-                    // TODO: implement
-                    //handlePacket(packet);
+                    handlePacket(packet);
                 }
                 else
                 {
@@ -304,5 +317,300 @@ namespace relay
 
     void Connection::handleClose(cppsocket::Socket&)
     {
+    }
+
+    bool Connection::handlePacket(const rtmp::Packet& packet)
+    {
+        switch (packet.messageType)
+        {
+            case rtmp::MessageType::SET_CHUNK_SIZE:
+            {
+                uint32_t offset = 0;
+
+                uint32_t ret = decodeInt(packet.data, offset, 4, inChunkSize);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Chunk size: " << inChunkSize;
+
+                // TODO: implement
+                //sendSetChunkSize();
+
+                break;
+            }
+
+            case rtmp::MessageType::BYTES_READ:
+            {
+                uint32_t offset = 0;
+                uint32_t bytesRead;
+
+                uint32_t ret = decodeInt(packet.data, offset, 4, bytesRead);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Bytes read: " << bytesRead;
+
+                break;
+            }
+
+            case rtmp::MessageType::PING:
+            {
+                uint32_t offset = 0;
+
+                uint16_t pingType;
+                uint32_t ret = decodeInt(packet.data, offset, 2, pingType);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+                uint32_t param;
+                ret = decodeInt(packet.data, offset, 4, param);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Ping type: " << pingType << ", param: " << param;
+
+                break;
+            }
+
+            case rtmp::MessageType::SERVER_BANDWIDTH:
+            {
+                uint32_t offset = 0;
+
+                uint32_t bandwidth;
+                uint32_t ret = decodeInt(packet.data, offset, 4, bandwidth);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Server bandwidth: " << bandwidth;
+
+                break;
+            }
+
+            case rtmp::MessageType::CLIENT_BANDWIDTH:
+            {
+                uint32_t offset = 0;
+
+                uint32_t bandwidth;
+                uint32_t ret = decodeInt(packet.data, offset, 4, bandwidth);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+                uint8_t type;
+                ret = decodeInt(packet.data, offset, 1, type);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type);
+
+                break;
+            }
+
+            case rtmp::MessageType::NOTIFY:
+            {
+                break;
+            }
+
+            case rtmp::MessageType::AUDIO_PACKET:
+            {
+                // ignore this, audio data should not be received
+                break;
+            }
+
+            case rtmp::MessageType::VIDEO_PACKET:
+            {
+                // ignore this, video data should not be received
+                break;
+            }
+
+            case rtmp::MessageType::INVOKE:
+            {
+                uint32_t offset = 0;
+
+                amf0::Node command;
+
+                uint32_t ret = command.decode(packet.data, offset);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "INVOKE command: ";
+
+                {
+                    Log log(Log::Level::ALL);
+                    log << "[" << id << ", " << name << "] ";
+                    command.dump(log);
+                }
+
+                amf0::Node transactionId;
+
+                ret = transactionId.decode(packet.data, offset);
+
+                if (ret == 0)
+                {
+                    return false;
+                }
+
+                offset += ret;
+
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Transaction ID: ";
+
+                {
+                    Log log(Log::Level::ALL);
+                    log << "[" << id << ", " << name << "] ";
+                    transactionId.dump(log);
+                }
+
+                amf0::Node argument1;
+
+                if ((ret = argument1.decode(packet.data, offset)) > 0)
+                {
+                    offset += ret;
+
+                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Argument 1: ";
+
+                    Log log(Log::Level::ALL);
+                    log << "[" << id << ", " << name << "] ";
+                    argument1.dump(log);
+                }
+
+                amf0::Node argument2;
+
+                if ((ret = argument2.decode(packet.data, offset)) > 0)
+                {
+                    offset += ret;
+
+                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Argument 2: ";
+
+                    Log log(Log::Level::ALL);
+                    log << "[" << id << ", " << name << "] ";
+                    argument2.dump(log);
+                }
+
+                if (command.asString() == "onBWDone")
+                {
+                    // TODO: implement
+                    //sendCheckBW();
+                }
+                else if (command.asString() == "onFCPublish")
+                {
+                }
+                else if (command.asString() == "FCPublish")
+                {
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent FCPublish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
+                else if (command.asString() == "FCUnpublish")
+                {
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent FCUnpublish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
+                else if (command.asString() == "publish")
+                {
+                    // this is not a receiver
+                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent publish to sender, disconnecting";
+
+                    socket.close();
+                    return false;
+                }
+                else if (command.asString() == "_error")
+                {
+                    auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
+
+                    if (i != invokes.end())
+                    {
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << " error";
+
+                        invokes.erase(i);
+                    }
+                }
+                else if (command.asString() == "_result")
+                {
+                    auto i = invokes.find(static_cast<uint32_t>(transactionId.asDouble()));
+
+                    if (i != invokes.end())
+                    {
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << " result";
+
+                        // TODO: implement
+                        /*if (i->second == "connect")
+                        {
+                            connected = true;
+                            if (!streamName.empty())
+                            {
+                                sendReleaseStream();
+                                sendFCPublish();
+                                sendCreateStream();
+                            }
+                        }
+                        else if (i->second == "releaseStream")
+                        {
+                        }
+                        else if (i->second == "createStream")
+                        {
+                            streamId = static_cast<uint32_t>(argument2.asDouble());
+                            sendPublish();
+                            
+                            streaming = true;
+                            
+                            sendMetaData();
+                            sendAudioHeader();
+                            sendVideoHeader();
+                        }*/
+                        
+                        invokes.erase(i);
+                    }
+                }
+                break;
+            }
+                
+            default:
+            {
+                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unhandled message: " << static_cast<uint32_t>(packet.messageType);
+                break;
+            }
+        }
+
+        return true;
     }
 }

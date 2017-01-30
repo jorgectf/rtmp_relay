@@ -35,8 +35,12 @@ namespace relay
         void update();
 
     private:
+        void handleConnect(cppsocket::Socket&);
+        void handleConnectError(cppsocket::Socket&);
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket&);
+
+        bool handlePacket(const rtmp::Packet& packet);
 
         const uint64_t id;
 
@@ -53,5 +57,8 @@ namespace relay
         uint32_t outChunkSize = 128;
 
         std::map<uint32_t, rtmp::Header> receivedPackets;
+
+        uint32_t invokeId = 0;
+        std::map<uint32_t, std::string> invokes;
     };
 }
