@@ -163,7 +163,7 @@ namespace relay
 
                     for (size_t i = 0; i < sizeof(replyChallenge.randomBytes); ++i)
                     {
-                        uint32_t randomValue = std::uniform_int_distribution<uint32_t>{ 0, 255 }(generator);
+                        uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
                         replyChallenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
                     }
 
@@ -362,8 +362,8 @@ namespace relay
 
                 offset += ret;
 
-                uint8_t type;
-                ret = decodeInt(packet.data, offset, 1, type);
+                uint8_t bandwidthType;
+                ret = decodeInt(packet.data, offset, 1, bandwidthType);
 
                 if (ret == 0)
                 {
@@ -372,7 +372,7 @@ namespace relay
 
                 offset += ret;
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type);
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << bandwidthType;
 
                 break;
             }

@@ -42,6 +42,33 @@ namespace relay
 
         bool handlePacket(const rtmp::Packet& packet);
 
+        void sendServerBandwidth();
+        void sendClientBandwidth();
+        void sendPing();
+        void sendSetChunkSize();
+        void sendCheckBW();
+
+        void sendFCPublish();
+        void sendFCUnpublish();
+        void sendPublish();
+
+        void sendConnect();
+        void sendConnectResult(double transactionId);
+
+        void sendBWDone();
+        void sendCheckBWResult(double transactionId);
+
+        void sendCreateStream();
+        void sendCreateStreamResult(double transactionId);
+
+        void sendReleaseStream();
+        void sendReleaseStreamResult(double transactionId);
+
+        void sendPlayStatus(double transactionId);
+        void sendStopStatus(double transactionId);
+
+        void sendDeleteStream();
+
         const uint64_t id;
 
         std::random_device rd;
@@ -55,8 +82,10 @@ namespace relay
 
         uint32_t inChunkSize = 128;
         uint32_t outChunkSize = 128;
+        uint32_t serverBandwidth = 2500000;
 
         std::map<uint32_t, rtmp::Header> receivedPackets;
+        std::map<uint32_t, rtmp::Header> sentPackets;
 
         uint32_t invokeId = 0;
         std::map<uint32_t, std::string> invokes;

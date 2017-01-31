@@ -154,7 +154,7 @@ namespace relay
 
                         for (size_t i = 0; i < sizeof(replyChallenge.randomBytes); ++i)
                         {
-                            uint32_t randomValue = std::uniform_int_distribution<uint32_t>{ 0, 255 }(generator);
+                            uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
                             replyChallenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
                         }
 
@@ -336,8 +336,7 @@ namespace relay
 
                 Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Chunk size: " << inChunkSize;
 
-                // TODO: implement
-                //sendSetChunkSize();
+                sendSetChunkSize();
 
                 break;
             }
@@ -421,8 +420,8 @@ namespace relay
 
                 offset += ret;
 
-                uint8_t type;
-                ret = decodeInt(packet.data, offset, 1, type);
+                uint8_t bandwidthType;
+                ret = decodeInt(packet.data, offset, 1, bandwidthType);
 
                 if (ret == 0)
                 {
@@ -431,7 +430,7 @@ namespace relay
 
                 offset += ret;
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << static_cast<uint32_t>(type);
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << bandwidthType;
 
                 break;
             }
@@ -612,5 +611,75 @@ namespace relay
         }
 
         return true;
+    }
+
+    void Connection::sendServerBandwidth()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::NETWORK;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
+
+        encodeInt(packet.data, 4, serverBandwidth);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SERVER_BANDWIDTH";
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendClientBandwidth()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::NETWORK;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
+
+        encodeInt(packet.data, 4, serverBandwidth);
+        encodeInt(packet.data, 1, 2); // dynamic
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending CLIENT_BANDWIDTH";
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendPing()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::NETWORK;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::PING;
+
+        encodeInt(packet.data, 2, 0); // ping type
+        encodeInt(packet.data, 4, 0); // ping param
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending PING";
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendSetChunkSize()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
+
+        encodeInt(packet.data, 4, outChunkSize);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SET_CHUNK_SIZE";
+        
+        socket.send(buffer);
     }
 }
