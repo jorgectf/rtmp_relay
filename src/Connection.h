@@ -64,9 +64,9 @@ namespace relay
 
         void sendCreateStream();
         void sendCreateStreamResult(double transactionId);
-
         void sendReleaseStream();
         void sendReleaseStreamResult(double transactionId);
+        void sendDeleteStream();
 
         void sendFCPublish();
         void sendOnFCPublish();
@@ -74,10 +74,13 @@ namespace relay
         void sendPublish();
         void sendPublishStatus(double transactionId);
 
-        void sendPlayStatus(double transactionId);
-        void sendStopStatus(double transactionId);
+        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
 
-        void sendDeleteStream();
+        void sendPlay();
+        void sendPlayStatus(double transactionId);
+        void sendStop();
+        void sendStopStatus(double transactionId);
 
         const uint64_t id;
 
@@ -101,8 +104,9 @@ namespace relay
         std::map<uint32_t, std::string> invokes;
 
         uint32_t streamId = 0;
-        
+
         StreamType streamType = StreamType::NONE;
+        std::string applicationName;
         std::string streamName;
 
         std::vector<uint8_t> audioHeader;

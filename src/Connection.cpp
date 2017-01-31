@@ -1029,4 +1029,361 @@ namespace relay
         
         invokes[invokeId] = commandName.asString();
     }
+
+    void Connection::sendConnect()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("connect");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1;
+        argument1["app"] = applicationName;
+        argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
+        argument1["tcUrl"] = std::string("rtmp://127.0.0.1:") + std::to_string(socket.getPort()) + "/" + applicationName;
+        argument1["type"] = std::string("nonprivate");
+        argument1.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendConnectResult(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("_result");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1;
+        argument1["fmsVer"] = std::string("FMS/3,0,1,123");
+        argument1["capabilities"] = 31.0;
+        argument1.encode(packet.data);
+
+        amf0::Node argument2;
+        argument2["level"] = std::string("status");
+        argument2["code"] = std::string("NetConnection.Connect.Success");
+        argument2["description"] = std::string("Connection succeeded.");
+        argument2["objectEncoding"] = 0.0;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        
+        socket.send(buffer);
+    }
+
+    void Connection::sendOnFCPublish()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onFCPublish");
+        commandName.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendFCPublish()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("FCPublish");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendFCUnpublish()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("FCUnpublish");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendPublish()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SOURCE;
+        packet.messageStreamId = streamId;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("publish");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
+    }
+
+    void Connection::sendPublishStatus(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onStatus");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2;
+        argument2["clientid"] = std::string("Lavf57.1.0");
+        argument2["code"] = std::string("NetStream.Publish.Start");
+        argument2["description"] = streamName + " is now published";
+        argument2["details"] = streamName;
+        argument2["level"] = std::string("status");
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        
+        socket.send(buffer);
+    }
+
+    void Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
+
+        packet.data = audioData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::VIDEO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+
+        packet.data = videoData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
+        
+        socket.send(buffer);
+    }
+
+    void Connection::sendPlay()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("play");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendPlayStatus(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onStatus");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2;
+        argument2["clientid"] = std::string("Lavf57.1.0");
+        argument2["code"] = std::string("NetStream.Play.Start");
+        argument2["description"] = streamName + " is now published";
+        argument2["details"] = streamName;
+        argument2["level"] = std::string("status");
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendStop()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("stop");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendStopStatus(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onStatus");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2;
+        argument2["clientid"] = std::string("Lavf57.1.0");
+        argument2["code"] = std::string("NetStream.Play.Stop");
+        argument2["description"] = streamName + " is now stopped";
+        argument2["details"] = streamName;
+        argument2["level"] = std::string("status");
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        
+        socket.send(buffer);
+    }
 }
