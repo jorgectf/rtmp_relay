@@ -8,6 +8,7 @@
 #include <map>
 #include "Socket.h"
 #include "RTMP.h"
+#include "Amf0.h"
 
 namespace relay
 {
@@ -15,10 +16,17 @@ namespace relay
     {
         const std::string name = "Connection";
     public:
-        enum class Type
+        enum class ConnectionType
         {
             PUSH,
             PULL
+        };
+
+        enum class StreamType
+        {
+            NONE,
+            INPUT,
+            OUTPUT
         };
 
         enum class State
@@ -30,7 +38,7 @@ namespace relay
             HANDSHAKE_DONE = 4
         };
 
-        Connection(cppsocket::Socket& aSocket, Type aType);
+        Connection(cppsocket::Socket& aSocket, ConnectionType aConnectionType);
 
         void update();
 
@@ -46,23 +54,25 @@ namespace relay
         void sendClientBandwidth();
         void sendPing();
         void sendSetChunkSize();
-        void sendCheckBW();
 
-        void sendFCPublish();
-        void sendFCUnpublish();
-        void sendPublish();
+        void sendBWDone();
+        void sendCheckBW();
+        void sendCheckBWResult(double transactionId);
 
         void sendConnect();
         void sendConnectResult(double transactionId);
-
-        void sendBWDone();
-        void sendCheckBWResult(double transactionId);
 
         void sendCreateStream();
         void sendCreateStreamResult(double transactionId);
 
         void sendReleaseStream();
         void sendReleaseStreamResult(double transactionId);
+
+        void sendFCPublish();
+        void sendOnFCPublish();
+        void sendFCUnpublish();
+        void sendPublish();
+        void sendPublishStatus(double transactionId);
 
         void sendPlayStatus(double transactionId);
         void sendStopStatus(double transactionId);
@@ -74,7 +84,7 @@ namespace relay
         std::random_device rd;
         std::mt19937 generator;
         
-        Type type;
+        ConnectionType connectionType;
         State state;
         cppsocket::Socket& socket;
 
@@ -89,5 +99,20 @@ namespace relay
 
         uint32_t invokeId = 0;
         std::map<uint32_t, std::string> invokes;
+
+        uint32_t streamId = 0;
+        
+        StreamType streamType = StreamType::NONE;
+        std::string streamName;
+
+        std::vector<uint8_t> audioHeader;
+        std::vector<uint8_t> videoHeader;
+        amf0::Node metaData;
+
+        float timeSinceMeasure = 0.0f;
+        uint64_t currentAudioBytes = 0;
+        uint64_t currentVideoBytes = 0;
+        uint64_t audioRate = 0;
+        uint64_t videoRate = 0;
     };
 }

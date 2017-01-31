@@ -5,7 +5,6 @@
 #include "Connection.h"
 #include "Relay.h"
 #include "Constants.h"
-#include "Amf0.h"
 #include "Utils.h"
 #include "Log.h"
 
@@ -13,11 +12,11 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Connection::Connection(cppsocket::Socket& aSocket, Type aType):
+    Connection::Connection(cppsocket::Socket& aSocket, ConnectionType aConnectionType):
         id(Relay::nextId()),
         generator(rd()),
         socket(aSocket),
-        type(aType)
+        connectionType(aConnectionType)
     {
         if (!socket.setBlocking(false))
         {
@@ -32,7 +31,7 @@ namespace relay
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
 
         // handshake
-        if (type == Type::PUSH)
+        if (connectionType == ConnectionType::PUSH)
         {
             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
 
@@ -102,7 +101,7 @@ namespace relay
                     break;
                 }
             }
-            else if (type == Type::PULL)
+            else if (connectionType == ConnectionType::PULL)
             {
                 if (state == State::UNINITIALIZED)
                 {
@@ -204,7 +203,7 @@ namespace relay
                     }
                 }
             }
-            else if (type == Type::PUSH)
+            else if (connectionType == ConnectionType::PUSH)
             {
                 if (state == State::VERSION_SENT)
                 {
@@ -437,18 +436,146 @@ namespace relay
 
             case rtmp::MessageType::NOTIFY:
             {
+                // only input can receive notify packets
+                if (streamType == StreamType::INPUT)
+                {
+                    uint32_t offset = 0;
+
+                    amf0::Node command;
+
+                    uint32_t ret = command.decode(packet.data, offset);
+
+                    if (ret == 0)
+                    {
+                        return false;
+                    }
+
+                    offset += ret;
+
+                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "NOTIFY command: ";
+
+                    {
+                        Log log(Log::Level::ALL);
+                        log << "[" << id << ", " << name << "] ";
+                        command.dump(log);
+                    }
+
+                    amf0::Node argument1;
+
+                    if ((ret = argument1.decode(packet.data, offset))  > 0)
+                    {
+                        offset += ret;
+
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Argument 1: ";
+
+                        Log log(Log::Level::ALL);
+                        log << "[" << id << ", " << name << "] ";
+                        argument1.dump(log);
+                    }
+
+                    amf0::Node argument2;
+
+                    if ((ret = argument2.decode(packet.data, offset)) > 0)
+                    {
+                        offset += ret;
+
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Argument 2: ";
+
+                        Log log(Log::Level::ALL);
+                        log << "[" << id << ", " << name << "] ";
+                        argument2.dump(log);
+                    }
+
+                    if (command.asString() == "@setDataFrame" && argument1.asString() == "onMetaData")
+                    {
+                        metaData = argument2;
+
+                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<uint32_t>(argument2["audiocodecid"].asDouble()));
+                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument2["videocodecid"].asDouble()));
+
+                        // forward notify packet
+                        // TODO: implement
+                        //if (application) application->sendMetaData(metaData);
+                    }
+                    else if (command.asString() == "onMetaData")
+                    {
+                        metaData = argument1;
+
+                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<uint32_t>(argument1["audiocodecid"].asDouble()));
+                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument1["videocodecid"].asDouble()));
+
+                        // forward notify packet
+                        // TODO: implement
+                        //if (application) application->sendMetaData(metaData);
+                    }
+                    else if (command.asString() == "onTextData")
+                    {
+                        // TODO: implement
+                        //if (application) application->sendTextData(packet.timestamp, argument1);
+                    }
+                }
                 break;
             }
 
             case rtmp::MessageType::AUDIO_PACKET:
             {
-                // ignore this, audio data should not be received
+                // only input can receive audio packets
+                if (streamType == StreamType::INPUT)
+                {
+                    Log log(Log::Level::ALL);
+                    log << "[" << id << ", " << name << "] " << "Audio packet";
+                    if (isCodecHeader(packet.data)) log << "(header)";
+
+                    currentAudioBytes += packet.data.size();
+
+                    if (audioHeader.empty() && isCodecHeader(packet.data))
+                    {
+                        audioHeader = packet.data;
+                        // TODO: implement
+                        //if (application) application->sendAudioHeader(audioHeader);
+                    }
+                    else
+                    {
+                        // forward audio packet
+                        // TODO: implement
+                        //if (application) application->sendAudio(packet.timestamp, packet.data);
+                    }
+                }
                 break;
             }
 
             case rtmp::MessageType::VIDEO_PACKET:
             {
-                // ignore this, video data should not be received
+                // only input can receive video packets
+                if (streamType == StreamType::INPUT)
+                {
+                    Log log(Log::Level::ALL);
+                    log << "[" << id << ", " << name << "] " << "Video packet: ";
+                    switch (getVideoFrameType(packet.data))
+                    {
+                        case VideoFrameType::KEY: log << "key frame"; break;
+                        case VideoFrameType::INTER: log << "inter frame"; break;
+                        case VideoFrameType::DISPOSABLE: log << "disposable frame"; break;
+                        default: log << "unknown frame"; break;
+                    }
+
+                    if (isCodecHeader(packet.data)) log << "(header)";
+
+                    currentVideoBytes += packet.data.size();
+
+                    if (videoHeader.empty() && isCodecHeader(packet.data))
+                    {
+                        videoHeader = packet.data;
+                        // TODO: implement
+                        //if (application) application->sendVideoHeader(videoHeader);
+                    }
+                    else
+                    {
+                        // forward video packet
+                        // TODO: implement
+                        //if (application) application->sendVideo(packet.timestamp, packet.data);
+                    }
+                }
                 break;
             }
 
@@ -681,5 +808,225 @@ namespace relay
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SET_CHUNK_SIZE";
         
         socket.send(buffer);
+    }
+
+    void Connection::sendBWDone()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onBWDone");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = 0.0;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendCheckBW()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("_checkbw");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendCheckBWResult(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("_result");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        
+        socket.send(buffer);
+    }
+
+    void Connection::sendCreateStream()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("createStream");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendCreateStreamResult(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("_result");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        ++streamId;
+        if (streamId == 0 || streamId == 2) // streams 0 and 2 are reserved
+        {
+            ++streamId;
+        }
+
+        amf0::Node argument2 = static_cast<double>(streamId);
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendReleaseStream()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("releaseStream");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendReleaseStreamResult(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("_result");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendDeleteStream()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("deleteStream");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = 1.0;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        
+        socket.send(buffer);
+        
+        invokes[invokeId] = commandName.asString();
     }
 }
