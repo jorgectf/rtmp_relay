@@ -36,7 +36,7 @@ namespace relay
         Connection(connector, ConnectionType::PUSH)
     {
         // TODO: implement
-        // connect()
+        // connect();
 
         // TODO: implement
         //connector.setConnectTimeout(connectionTimeout);
@@ -530,6 +530,12 @@ namespace relay
                         //if (application) application->sendTextData(packet.timestamp, argument1);
                     }
                 }
+                else
+                {
+                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent notify packet to sender, disconnecting";
+                    socket.close();
+                    return false;
+                }
                 break;
             }
 
@@ -556,6 +562,12 @@ namespace relay
                         // TODO: implement
                         //if (application) application->sendAudio(packet.timestamp, packet.data);
                     }
+                }
+                else
+                {
+                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent audio packet to sender, disconnecting";
+                    socket.close();
+                    return false;
                 }
                 break;
             }
@@ -591,6 +603,12 @@ namespace relay
                         // TODO: implement
                         //if (application) application->sendVideo(packet.timestamp, packet.data);
                     }
+                }
+                else
+                {
+                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent video packet to sender, disconnecting";
+                    socket.close();
+                    return false;
                 }
                 break;
             }
@@ -667,32 +685,164 @@ namespace relay
                 {
                     sendCheckBW();
                 }
+                else if (command.asString() == "_checkbw")
+                {
+                    sendCheckBWResult(transactionId.asDouble());
+                }
+                else if (command.asString() == "createStream")
+                {
+                    sendCreateStreamResult(transactionId.asDouble());
+                }
+                else if (command.asString() == "releaseStream")
+                {
+                    sendReleaseStreamResult(transactionId.asDouble());
+                }
+                else if (command.asString() == "deleteStream")
+                {
+                    // TODO: implement
+                    //if (application) application->deleteStream();
+                }
+                if (command.asString() == "connect")
+                {
+                    // TODO: implement
+                    /*if (!connect(argument1["app"].asString()))
+                    {
+                        socket.close();
+                        return false;
+                    }*/
+
+                    sendServerBandwidth();
+                    sendClientBandwidth();
+                    sendPing();
+                    sendSetChunkSize();
+                    sendConnectResult(transactionId.asDouble());
+                    sendBWDone();
+
+                    //connected = true;
+
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                }
                 else if (command.asString() == "onFCPublish")
                 {
                 }
                 else if (command.asString() == "FCPublish")
                 {
-                    // this is not a receiver
-                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent FCPublish to sender, disconnecting";
+                    if (streamType == StreamType::NONE)
+                    {
+                        streamName = argument2.asString();
 
-                    socket.close();
-                    return false;
+                        // TODO: implement
+                        //if (application) application->createStream(streamName);
+
+                        streamType = StreamType::INPUT;
+
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                    }
+                    else
+                    {
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid FCPublish, disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
-                    // this is not a receiver
-                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent FCUnpublish to sender, disconnecting";
+                    if (streamType == StreamType::INPUT)
+                    {
+                        streamType = StreamType::NONE;
 
-                    socket.close();
-                    return false;
+                        // TODO: implement
+                        //if (application) application->unpublishStream();
+
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " unpublished stream \"" << streamName << "\"";
+                    }
+                    else
+                    {
+                        // this is not a receiver
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid FCUnpublish, disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "publish")
                 {
-                    // this is not a receiver
-                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent publish to sender, disconnecting";
+                    if (streamType == StreamType::NONE)
+                    {
+                        streamName = argument2.asString();
 
-                    socket.close();
-                    return false;
+                        // TODO: implement
+                        //if (application) application->createStream(streamName);
+
+                        streamType = StreamType::INPUT;
+
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                    }
+                    else
+                    {
+                        // this is not a receiver
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid publish, disconnecting";
+                        socket.close();
+                        return false;
+                    }
+                }
+                else if (command.asString() == "getStreamLength")
+                {
+                    if (streamType == StreamType::INPUT)
+                    {
+                        // ignore this
+                    }
+                    else
+                    {
+                        // this is not a sender
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid getStreamLength, disconnecting";
+
+                        socket.close();
+                        return false;
+                    }
+                }
+                else if (command.asString() == "play")
+                {
+                    if (streamType == StreamType::NONE)
+                    {
+                        // TODO: implement
+                        /*if (!play(argument2.asString()))
+                        {
+                            socket.close();
+                            return false;
+                        }*/
+
+                        streamType = StreamType::OUTPUT;
+                        sendPlayStatus(transactionId.asDouble());
+
+                        // TODO: implement
+                        /*sendMetaData();
+                        sendAudioHeader();
+                        sendVideoHeader();*/
+                    }
+                    else
+                    {
+                        // this is not a sender
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid play, disconnecting";
+
+                        socket.close();
+                        return false;
+                    }
+                }
+                else if (command.asString() == "stop")
+                {
+                    if (streamType == StreamType::OUTPUT)
+                    {
+                        streamType = StreamType::NONE;
+                        sendStopStatus(transactionId.asDouble());
+                    }
+                    else
+                    {
+                        // this is not a sender
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid stop, disconnecting";
+
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "_error")
                 {
