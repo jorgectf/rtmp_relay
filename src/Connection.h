@@ -7,6 +7,7 @@
 #include <random>
 #include <map>
 #include "Socket.h"
+#include "Connector.h"
 #include "RTMP.h"
 #include "Amf0.h"
 
@@ -39,6 +40,8 @@ namespace relay
         };
 
         Connection(cppsocket::Socket& aSocket, ConnectionType aConnectionType);
+        Connection(cppsocket::Socket& client);
+        Connection(cppsocket::Connector& connector);
 
         void update();
 

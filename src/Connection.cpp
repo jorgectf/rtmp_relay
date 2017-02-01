@@ -23,13 +23,30 @@ namespace relay
             Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Failed to set socket non-blocking";
         }
 
-        // TODO: implement
-        // socket.setConnectTimeout(connectionTimeout);
-        //socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
-        //socket.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
+    }
 
+    Connection::Connection(cppsocket::Socket& client):
+        Connection(client, ConnectionType::PULL)
+    {
+    }
+
+    Connection::Connection(cppsocket::Connector& connector):
+        Connection(connector, ConnectionType::PUSH)
+    {
+        // TODO: implement
+        // connect()
+
+        // TODO: implement
+        //connector.setConnectTimeout(connectionTimeout);
+
+        connector.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
+        connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
+    }
+
+    void Connection::handleConnect(cppsocket::Socket&)
+    {
         // handshake
         if (connectionType == ConnectionType::PUSH)
         {
@@ -60,15 +77,11 @@ namespace relay
         }
     }
 
-    void Connection::update()
-    {
-    }
-
-    void Connection::handleConnect(cppsocket::Socket&)
-    {
-    }
-
     void Connection::handleConnectError(cppsocket::Socket&)
+    {
+    }
+
+    void Connection::update()
     {
     }
 
@@ -316,6 +329,9 @@ namespace relay
 
     void Connection::handleClose(cppsocket::Socket&)
     {
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " disconnected";
+
+        // TODO: implement
     }
 
     bool Connection::handlePacket(const rtmp::Packet& packet)
@@ -649,8 +665,7 @@ namespace relay
 
                 if (command.asString() == "onBWDone")
                 {
-                    // TODO: implement
-                    //sendCheckBW();
+                    sendCheckBW();
                 }
                 else if (command.asString() == "onFCPublish")
                 {
@@ -698,16 +713,16 @@ namespace relay
                     {
                         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << " result";
 
-                        // TODO: implement
-                        /*if (i->second == "connect")
+                        if (i->second == "connect")
                         {
-                            connected = true;
+                            // TODO: implement
+                            /*connected = true;
                             if (!streamName.empty())
                             {
                                 sendReleaseStream();
                                 sendFCPublish();
                                 sendCreateStream();
-                            }
+                            }*/
                         }
                         else if (i->second == "releaseStream")
                         {
@@ -716,13 +731,14 @@ namespace relay
                         {
                             streamId = static_cast<uint32_t>(argument2.asDouble());
                             sendPublish();
-                            
-                            streaming = true;
+
+                            // TODO: implement
+                            /*streaming = true;
                             
                             sendMetaData();
                             sendAudioHeader();
-                            sendVideoHeader();
-                        }*/
+                            sendVideoHeader();*/
+                        }
                         
                         invokes.erase(i);
                     }
@@ -1315,7 +1331,7 @@ namespace relay
         amf0::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Play.Start");
-        argument2["description"] = streamName + " is now published";
+        argument2["description"] = streamName + " is now playing";
         argument2["details"] = streamName;
         argument2["level"] = std::string("status");
         argument2.encode(packet.data);
