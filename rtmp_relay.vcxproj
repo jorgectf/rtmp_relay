@@ -53,6 +53,7 @@
     <ClCompile Include="external\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="src\Amf0.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Connection.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PullReceiver.cpp" />
     <ClCompile Include="src\PullSender.cpp" />
@@ -95,6 +96,7 @@
     <ClInclude Include="external\yaml-cpp\src\token.h" />
     <ClInclude Include="src\Amf0.h" />
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Connection.h" />
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\PullReceiver.h" />
     <ClInclude Include="src\PullSender.h" />
