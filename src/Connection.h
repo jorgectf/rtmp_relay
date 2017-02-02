@@ -13,6 +13,8 @@
 
 namespace relay
 {
+    class Relay;
+    
     class Connection
     {
         const std::string name = "Connection";
@@ -39,9 +41,9 @@ namespace relay
             HANDSHAKE_DONE = 4
         };
 
-        Connection(cppsocket::Socket& aSocket, ConnectionType aConnectionType);
-        Connection(cppsocket::Socket& client);
-        Connection(cppsocket::Connector& connector);
+        Connection(Relay& aRelay, cppsocket::Socket& aSocket, ConnectionType aConnectionType);
+        Connection(Relay& aRelay, cppsocket::Socket& client);
+        Connection(Relay& aRelay, cppsocket::Connector& connector);
 
         void update();
 
@@ -85,6 +87,7 @@ namespace relay
         void sendStop();
         void sendStopStatus(double transactionId);
 
+        Relay& relay;
         const uint64_t id;
 
         std::random_device rd;

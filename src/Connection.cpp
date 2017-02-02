@@ -12,7 +12,8 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Connection::Connection(cppsocket::Socket& aSocket, ConnectionType aConnectionType):
+    Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, ConnectionType aConnectionType):
+        relay(aRelay),
         id(Relay::nextId()),
         generator(rd()),
         socket(aSocket),
@@ -27,13 +28,13 @@ namespace relay
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
     }
 
-    Connection::Connection(cppsocket::Socket& client):
-        Connection(client, ConnectionType::PULL)
+    Connection::Connection(Relay& aRelay, cppsocket::Socket& client):
+        Connection(aRelay, client, ConnectionType::PULL)
     {
     }
 
-    Connection::Connection(cppsocket::Connector& connector):
-        Connection(connector, ConnectionType::PUSH)
+    Connection::Connection(Relay& aRelay, cppsocket::Connector& connector):
+        Connection(aRelay, connector, ConnectionType::PUSH)
     {
         // TODO: implement
         // connect();
@@ -296,8 +297,7 @@ namespace relay
                         
                         state = State::HANDSHAKE_DONE;
 
-                        // TODO: implement
-                        //sendConnect();
+                        sendConnect();
 
                         // TODO: implement
                         //timeSinceHandshake = 0.0f;
@@ -704,12 +704,7 @@ namespace relay
                 }
                 if (command.asString() == "connect")
                 {
-                    // TODO: implement
-                    /*if (!connect(argument1["app"].asString()))
-                    {
-                        socket.close();
-                        return false;
-                    }*/
+                    applicationName = argument1["app"].asString();
 
                     sendServerBandwidth();
                     sendClientBandwidth();
@@ -866,13 +861,13 @@ namespace relay
                         if (i->second == "connect")
                         {
                             // TODO: implement
-                            /*connected = true;
+                            //connected = true;
                             if (!streamName.empty())
                             {
                                 sendReleaseStream();
                                 sendFCPublish();
                                 sendCreateStream();
-                            }*/
+                            }
                         }
                         else if (i->second == "releaseStream")
                         {
