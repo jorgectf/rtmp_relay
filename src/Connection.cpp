@@ -86,6 +86,120 @@ namespace relay
     {
     }
 
+    void Connection::getInfo(std::string& str, ReportType reportType) const
+    {
+        switch (reportType)
+        {
+            case ReportType::TEXT:
+            {
+                str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") +
+                    " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) +
+                    ", connection type: ";
+
+                switch (connectionType)
+                {
+                    case ConnectionType::PUSH: str += "PUSH"; break;
+                    case ConnectionType::PULL: str += "PULL"; break;
+                }
+
+                str += ", state: ";
+
+                switch (state)
+                {
+                    case State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case State::ACK_SENT: str += "ACK_SENT"; break;
+                    case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                }
+                str += ", application: " + applicationName +
+                    ", name: " + streamName;
+
+                str += ", stream type: ";
+
+                switch (streamType)
+                {
+                    case StreamType::NONE: str += "NONE"; break;
+                    case StreamType::INPUT: str += "INPUT"; break;
+                    case StreamType::OUTPUT: str += "OUTPUT"; break;
+                }
+
+                str += "\n";
+
+                break;
+            }
+            case ReportType::HTML:
+            {
+                str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+
+                switch (connectionType)
+                {
+                    case ConnectionType::PUSH: str += "PUSH"; break;
+                    case ConnectionType::PULL: str += "PULL"; break;
+                }
+
+                str += "</td><td>";
+
+                switch (state)
+                {
+                    case State::UNINITIALIZED: str += "UNINITIALIZED"; break;
+                    case State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
+                    case State::VERSION_SENT: str += "VERSION_SENT"; break;
+                    case State::ACK_SENT: str += "ACK_SENT"; break;
+                    case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                }
+
+                str += "</td><td>";
+
+                switch (streamType)
+                {
+                    case StreamType::NONE: str += "NONE"; break;
+                    case StreamType::INPUT: str += "INPUT"; break;
+                    case StreamType::OUTPUT: str += "OUTPUT"; break;
+                }
+
+                str += "</td></tr>";
+                break;
+            }
+            case ReportType::JSON:
+            {
+                str += "{\"id\":" + std::to_string(id)  +",\"name\":\"" + streamName + "\"," +
+                    "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
+                    "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
+                    "\"connectionType:\"";
+
+                switch (connectionType)
+                {
+                    case ConnectionType::PUSH: str += "\"PUSH\""; break;
+                    case ConnectionType::PULL: str += "\"PULL\""; break;
+                }
+
+                str += ",\"status\":";
+
+                switch (state)
+                {
+                    case State::UNINITIALIZED: str += "\"UNINITIALIZED\""; break;
+                    case State::VERSION_RECEIVED: str += "\"VERSION_RECEIVED\""; break;
+                    case State::VERSION_SENT: str += "\"VERSION_SENT\""; break;
+                    case State::ACK_SENT: str += "\"ACK_SENT\","; break;
+                    case State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\""; break;
+                }
+
+                str += ",\"streamType\":";
+
+                switch (streamType)
+                {
+                    case StreamType::NONE: str += "\"NONE\""; break;
+                    case StreamType::INPUT: str += "\"INPUT\""; break;
+                    case StreamType::OUTPUT: str += "\"OUTPUT\""; break;
+                }
+
+                str += "}";
+                break;
+            }
+        }
+    }
+
     void Connection::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());

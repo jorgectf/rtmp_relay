@@ -10,6 +10,7 @@
 #include "Connector.h"
 #include "RTMP.h"
 #include "Amf0.h"
+#include "Status.h"
 
 namespace relay
 {
@@ -48,6 +49,8 @@ namespace relay
         void update();
 
     private:
+        void getInfo(std::string& str, ReportType reportType) const;
+        
         void handleConnect(cppsocket::Socket&);
         void handleConnectError(cppsocket::Socket&);
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
