@@ -266,6 +266,11 @@ namespace relay
                 server->update(delta);
             }
 
+            for (const auto& connection : connections)
+            {
+                connection->update();
+            }
+
             std::this_thread::sleep_for(sleepTime);
         }
     }

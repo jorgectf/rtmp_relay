@@ -9,6 +9,7 @@
 #include "Network.h"
 #include "Socket.h"
 #include "Status.h"
+#include "Connection.h"
 
 #if !defined(_MSC_VER)
 #include <sys/syslog.h>
@@ -57,6 +58,8 @@ namespace relay
         std::vector<std::unique_ptr<Server>> servers;
         std::unique_ptr<Status> status;
         std::chrono::steady_clock::time_point previousTime;
+
+        std::vector<std::unique_ptr<Connection>> connections;
 
 #if !defined(_MSC_VER)
         std::string syslogIdent;
