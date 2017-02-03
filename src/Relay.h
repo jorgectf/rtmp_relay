@@ -51,6 +51,11 @@ namespace relay
 
         void* getConfig(uint16_t address, Type type, std::string applicationName, std::string streamName);
 
+        std::vector<Connection*> getConnections(Connection::StreamType streamType,
+                                                const std::string& address,
+                                                const std::string& applicationName,
+                                                const std::string& streamName);
+
     private:
         static uint64_t currentId;
 

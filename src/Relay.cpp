@@ -238,7 +238,24 @@ namespace relay
             servers.push_back(std::move(server));
         }
 
+        // TODO: create one connection instance for every connection in config
+
         return true;
+    }
+
+    std::vector<Connection*> Relay::getConnections(Connection::StreamType streamType,
+                                                   const std::string& address,
+                                                   const std::string& applicationName,
+                                                   const std::string& streamName)
+    {
+        std::vector<Connection*> result;
+
+        for (const auto& connection : connections)
+        {
+            // TODO: check if connection matches the request
+        }
+
+        return result;
     }
 
     void Relay::close()
