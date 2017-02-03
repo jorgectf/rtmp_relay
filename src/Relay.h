@@ -58,6 +58,7 @@ namespace relay
 
     private:
         static uint64_t currentId;
+        bool active = true;
 
         cppsocket::Network& network;
         std::vector<std::unique_ptr<Server>> servers;

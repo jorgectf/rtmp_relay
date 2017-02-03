@@ -262,13 +262,14 @@ namespace relay
     {
         servers.clear();
         status.reset();
+        active = false;
     }
 
     void Relay::run()
     {
         const std::chrono::microseconds sleepTime(10000);
 
-        for (;;)
+        while (active)
         {
             auto currentTime = std::chrono::steady_clock::now();
             float delta = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - previousTime).count() / 1000.0f;
