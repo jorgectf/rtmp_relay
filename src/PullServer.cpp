@@ -26,7 +26,7 @@ namespace relay
         metaDataBlacklist(pullDescriptor.metaDataBlacklist),
         pingInterval(pullDescriptor.pingInterval)
     {
-        socket.setAcceptCallback(std::bind(&PullServer::handleAccept, this, std::placeholders::_1));
+        socket.setAcceptCallback(std::bind(&PullServer::handleAccept, this, std::placeholders::_1, std::placeholders::_2));
 
         socket.startAccept(address);
     }
@@ -131,7 +131,7 @@ namespace relay
         }
     }
 
-    void PullServer::handleAccept(cppsocket::Socket& clientSocket)
+    void PullServer::handleAccept(cppsocket::Acceptor&, cppsocket::Socket& clientSocket)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Client connected";
 

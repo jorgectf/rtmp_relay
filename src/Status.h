@@ -33,7 +33,7 @@ namespace relay
         void update(float delta);
 
     private:
-        void handleAccept(cppsocket::Socket& clientSocket);
+        void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);
 
         cppsocket::Network& network;
         cppsocket::Acceptor socket;

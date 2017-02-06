@@ -83,8 +83,8 @@ namespace relay
         void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
 
         void reset();
-        void handleConnect(cppsocket::Socket&);
-        void handleConnectError(cppsocket::Socket&);
+        void handleConnect(cppsocket::Connector&);
+        void handleConnectError(cppsocket::Connector&);
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket&);
 

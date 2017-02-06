@@ -12,7 +12,7 @@ namespace relay
         network(aNetwork), socket(aNetwork), relay(aRelay)
     {
         //socket.setConnectTimeout(connectionTimeout);
-        socket.setAcceptCallback(std::bind(&Status::handleAccept, this, std::placeholders::_1));
+        socket.setAcceptCallback(std::bind(&Status::handleAccept, this, std::placeholders::_1, std::placeholders::_2));
 
         socket.startAccept(address);
     }
@@ -32,7 +32,7 @@ namespace relay
         }
     }
 
-    void Status::handleAccept(cppsocket::Socket& clientSocket)
+    void Status::handleAccept(cppsocket::Acceptor&, cppsocket::Socket& clientSocket)
     {
         std::unique_ptr<StatusSender> statusSender(new StatusSender(network, clientSocket, relay));
         

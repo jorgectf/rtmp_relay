@@ -24,7 +24,7 @@ namespace relay
         pingInterval(aPingInterval),
         applicationDescriptors(aApplicationDescriptors)
     {
-        socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1));
+        socket.setAcceptCallback(std::bind(&Server::handleAccept, this, std::placeholders::_1, std::placeholders::_2));
 
         socket.startAccept(address);
     }
@@ -49,7 +49,7 @@ namespace relay
         }
     }
 
-    void Server::handleAccept(Socket& clientSocket)
+    void Server::handleAccept(cppsocket::Acceptor&, Socket& clientSocket)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input connected";
 

@@ -37,7 +37,7 @@ namespace relay
         void getInfo(std::string& str, ReportType reportType) const;
 
     private:
-        void handleAccept(cppsocket::Socket& clientSocket);
+        void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);
 
         const uint64_t id;
 

@@ -157,7 +157,7 @@ namespace relay
         }
     }
 
-    void PushSender::handleConnect(cppsocket::Socket&)
+    void PushSender::handleConnect(cppsocket::Connector&)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
 
@@ -185,7 +185,7 @@ namespace relay
         state = State::VERSION_SENT;
     }
 
-    void PushSender::handleConnectError(cppsocket::Socket&)
+    void PushSender::handleConnectError(cppsocket::Connector&)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Failed to connect to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
     }

@@ -51,8 +51,8 @@ namespace relay
     private:
         void getInfo(std::string& str, ReportType reportType) const;
         
-        void handleConnect(cppsocket::Socket&);
-        void handleConnectError(cppsocket::Socket&);
+        void handleConnect(cppsocket::Connector&);
+        void handleConnectError(cppsocket::Connector&);
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket&);
 

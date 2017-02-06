@@ -46,7 +46,7 @@ namespace relay
         connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
     }
 
-    void Connection::handleConnect(cppsocket::Socket&)
+    void Connection::handleConnect(cppsocket::Connector&)
     {
         // handshake
         if (connectionType == ConnectionType::PUSH)
@@ -78,7 +78,7 @@ namespace relay
         }
     }
 
-    void Connection::handleConnectError(cppsocket::Socket&)
+    void Connection::handleConnectError(cppsocket::Connector&)
     {
     }
 
