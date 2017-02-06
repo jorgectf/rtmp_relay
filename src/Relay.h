@@ -57,6 +57,8 @@ namespace relay
                                                 const std::string& streamName);
 
     private:
+        void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);
+
         static uint64_t currentId;
         bool active = true;
 

@@ -14,6 +14,7 @@
 #include "Server.h"
 #include "Status.h"
 #include "Application.h"
+#include "Connection.h"
 
 using namespace cppsocket;
 
@@ -351,5 +352,12 @@ namespace relay
 #if !defined(_MSC_VER)
         closelog();
 #endif
+    }
+
+    void Relay::handleAccept(cppsocket::Acceptor&, cppsocket::Socket& clientSocket)
+    {
+        std::unique_ptr<Connection> connection(new Connection(*this, clientSocket));
+
+        connections.push_back(std::move(connection));
     }
 }
