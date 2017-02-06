@@ -63,7 +63,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "Server " + std::to_string(id) + " listening on " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\n";
+                str += "Server " + std::to_string(id) + " listening on " + ipToString(socket.getLocalIPAddress()) + ":" + std::to_string(socket.getLocalPort()) + "\n";
 
                 if (pullReceiver)
                 {
@@ -82,7 +82,7 @@ namespace relay
             case ReportType::HTML:
             {
                 str += "<h1>Server " + std::to_string(id) + "</h1>";
-                str += "Address: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort());
+                str += "Address: " + ipToString(socket.getLocalIPAddress()) + ":" + std::to_string(socket.getLocalPort());
 
                 if (pullReceiver)
                 {
@@ -97,7 +97,7 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"id\":" + std::to_string(id) + ",\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"";
+                str += "{\"id\":" + std::to_string(id) + ",\"address\":\"" + ipToString(socket.getLocalIPAddress()) + ":" + std::to_string(socket.getLocalPort()) + "\"";
 
                 if (pullReceiver)
                 {

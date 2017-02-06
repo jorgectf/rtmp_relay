@@ -218,7 +218,7 @@ namespace relay
 
     void PullSender::handleClose(cppsocket::Socket&)
     {
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " disconnected";
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
     }
 
     bool PullSender::handlePacket(const rtmp::Packet& packet)
@@ -439,7 +439,7 @@ namespace relay
 
                     connected = true;
 
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
                 }
                 else if (command.asString() == "_checkbw")
                 {
@@ -552,8 +552,8 @@ namespace relay
                 {"id", std::to_string(id)},
                 {"streamName", newStreamName},
                 {"applicationName", application},
-                {"ipAddress", cppsocket::ipToString(socket.getIPAddress())},
-                {"port", std::to_string(socket.getPort())}
+                {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                {"port", std::to_string(socket.getRemotePort())}
             };
 
             streamName = overrideStreamName;
@@ -1062,7 +1062,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
+                str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + ", state: ";
 
                 switch (state)
                 {
@@ -1077,7 +1077,7 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+                str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "</td><td>";
 
                 switch (state)
                 {
@@ -1095,7 +1095,7 @@ namespace relay
             {
                 str += "{\"id\":" + std::to_string(id) + ",\"name\":\"" + streamName + "\"," +
                 "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
-                "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
+                "\"address\":\"" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "\"," +
                 "\"status\":";
 
                 switch (state)

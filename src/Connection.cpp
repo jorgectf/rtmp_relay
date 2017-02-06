@@ -51,7 +51,7 @@ namespace relay
         // handshake
         if (connectionType == ConnectionType::PUSH)
         {
-            Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
+            Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
 
             std::vector<uint8_t> version;
             version.push_back(RTMP_VERSION);
@@ -93,7 +93,7 @@ namespace relay
             case ReportType::TEXT:
             {
                 str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") +
-                    " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) +
+                    " to: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) +
                     ", connection type: ";
 
                 switch (connectionType)
@@ -130,7 +130,7 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+                str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "</td><td>";
 
                 switch (connectionType)
                 {
@@ -165,7 +165,7 @@ namespace relay
             {
                 str += "{\"id\":" + std::to_string(id)  +",\"name\":\"" + streamName + "\"," +
                     "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
-                    "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
+                    "\"address\":\"" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "\"," +
                     "\"connectionType:\"";
 
                 switch (connectionType)
@@ -443,7 +443,7 @@ namespace relay
 
     void Connection::handleClose(cppsocket::Socket&)
     {
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " disconnected";
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
 
         // TODO: implement
     }
@@ -829,7 +829,7 @@ namespace relay
 
                     //connected = true;
 
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
                 }
                 else if (command.asString() == "onFCPublish")
                 {
@@ -845,7 +845,7 @@ namespace relay
 
                         streamType = StreamType::INPUT;
 
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                     }
                     else
                     {
@@ -863,7 +863,7 @@ namespace relay
                         // TODO: implement
                         //if (application) application->unpublishStream();
 
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " unpublished stream \"" << streamName << "\"";
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
                     }
                     else
                     {
@@ -884,7 +884,7 @@ namespace relay
 
                         streamType = StreamType::INPUT;
 
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                     }
                     else
                     {
@@ -1321,7 +1321,7 @@ namespace relay
         amf0::Node argument1;
         argument1["app"] = applicationName;
         argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
-        argument1["tcUrl"] = std::string("rtmp://127.0.0.1:") + std::to_string(socket.getPort()) + "/" + applicationName;
+        argument1["tcUrl"] = std::string("rtmp://127.0.0.1:") + std::to_string(socket.getRemotePort()) + "/" + applicationName;
         argument1["type"] = std::string("nonprivate");
         argument1.encode(packet.data);
 
@@ -1473,7 +1473,7 @@ namespace relay
 
         invokes[invokeId] = commandName.asString();
 
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getIPAddress()) << ":" << socket.getPort();
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
     }
 
     void Connection::sendPublishStatus(double transactionId)

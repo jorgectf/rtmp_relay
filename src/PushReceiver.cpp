@@ -252,7 +252,7 @@ namespace relay
 
     void PushReceiver::handleClose(cppsocket::Socket&)
     {
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " disconnected";
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
 
         if (application)
         {
@@ -586,7 +586,7 @@ namespace relay
                     sendConnectResult(transactionId.asDouble());
                     sendBWDone();
 
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
                 }
                 else if (command.asString() == "_checkbw")
                 {
@@ -613,7 +613,7 @@ namespace relay
 
                         streaming = true;
 
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                     }
 
                     sendOnFCPublish();
@@ -623,7 +623,7 @@ namespace relay
                     streaming = false;
                     if (application) application->unpublishStream();
 
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " unpublished stream \"" << streamName << "\"";
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
                 }
                 else if (command.asString() == "publish")
                 {
@@ -634,7 +634,7 @@ namespace relay
 
                         streaming = true;
 
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getIPAddress()) << ":" << socket.getPort() << " published stream \"" << streamName << "\"";
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                     }
 
                     sendPing();
@@ -979,7 +979,7 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + ", state: ";
+                str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") + " to: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + ", state: ";
 
                 switch (state)
                 {
@@ -1022,7 +1022,7 @@ namespace relay
             {
                 str += "<h2>Receiver " + std::to_string(id) + "</h2>" +
                     "<table border=\"1\"><tr><th>Name</th><th>Connected</th><th>Address</th><th>State</th><th>Video bitrate</th><th>Audio bitrate</th><th>Metadata</th></tr>" +
-                    "<tr><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "</td><td>";
+                    "<tr><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "</td><td>";
 
                 switch (state)
                 {
@@ -1060,7 +1060,7 @@ namespace relay
             {
                 str += "{\"id\":" + std::to_string(id) + ",\"name\":\"" + streamName + "\"," +
                     "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
-                    "\"address\":\"" + ipToString(socket.getIPAddress()) + ":" + std::to_string(socket.getPort()) + "\"," +
+                    "\"address\":\"" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "\"," +
                     "\"status\":";
 
                 switch (state)
