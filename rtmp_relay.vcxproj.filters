@@ -5,7 +5,6 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Relay.cpp" />
     <ClCompile Include="src\RTMP.cpp" />
-    <ClCompile Include="src\Server.cpp" />
     <ClCompile Include="src\Utils.cpp" />
     <ClCompile Include="external\cppsocket\Acceptor.cpp">
       <Filter>cppsocket</Filter>
@@ -100,17 +99,11 @@
     <ClCompile Include="external\yaml-cpp\src\tag.cpp">
       <Filter>yaml-cpp</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="external\cppsocket\Log.cpp">
       <Filter>cppsocket</Filter>
     </ClCompile>
     <ClCompile Include="src\Status.cpp" />
-    <ClCompile Include="src\PullSender.cpp" />
-    <ClCompile Include="src\PushSender.cpp" />
     <ClCompile Include="src\StatusSender.cpp" />
-    <ClCompile Include="src\PullServer.cpp" />
-    <ClCompile Include="src\PullReceiver.cpp" />
-    <ClCompile Include="src\PushReceiver.cpp" />
     <ClCompile Include="src\Connection.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -118,7 +111,6 @@
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Relay.h" />
     <ClInclude Include="src\RTMP.h" />
-    <ClInclude Include="src\Server.h" />
     <ClInclude Include="src\Utils.h" />
     <ClInclude Include="external\cppsocket\Acceptor.h">
       <Filter>cppsocket</Filter>
@@ -195,17 +187,11 @@
     <ClInclude Include="external\yaml-cpp\src\token.h">
       <Filter>yaml-cpp</Filter>
     </ClInclude>
-    <ClInclude Include="src\Application.h" />
     <ClInclude Include="external\cppsocket\Log.h">
       <Filter>cppsocket</Filter>
     </ClInclude>
     <ClInclude Include="src\Status.h" />
-    <ClInclude Include="src\PullSender.h" />
-    <ClInclude Include="src\PushSender.h" />
     <ClInclude Include="src\StatusSender.h" />
-    <ClInclude Include="src\PullServer.h" />
-    <ClInclude Include="src\PullReceiver.h" />
-    <ClInclude Include="src\PushReceiver.h" />
     <ClInclude Include="src\Connection.h" />
   </ItemGroup>
   <ItemGroup>
