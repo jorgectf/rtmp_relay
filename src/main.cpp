@@ -14,8 +14,6 @@
 
 #include "Constants.h"
 #include "Relay.h"
-#include "Server.h"
-#include "Application.h"
 #include "Log.h"
 
 using namespace relay;

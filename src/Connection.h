@@ -48,9 +48,9 @@ namespace relay
 
         void update();
 
-    private:
         void getInfo(std::string& str, ReportType reportType) const;
-        
+
+    private:
         void handleConnect(cppsocket::Connector&);
         void handleConnectError(cppsocket::Connector&);
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);

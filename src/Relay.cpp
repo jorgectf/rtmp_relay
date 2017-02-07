@@ -11,9 +11,7 @@
 #include "yaml-cpp/yaml.h"
 #include "Log.h"
 #include "Relay.h"
-#include "Server.h"
 #include "Status.h"
-#include "Application.h"
 #include "Connection.h"
 
 using namespace cppsocket;
@@ -30,22 +28,22 @@ namespace relay
 
     Relay::Relay(Relay&& other):
         network(other.network),
-        servers(std::move(other.servers)),
-        previousTime(other.previousTime)
+        previousTime(other.previousTime),
+        connections(std::move(other.connections))
     {
     }
 
     Relay& Relay::operator=(Relay&& other)
     {
-        servers = std::move(other.servers);
         previousTime = other.previousTime;
+        connections = std::move(other.connections);
 
         return *this;
     }
 
     bool Relay::init(const std::string& config)
     {
-        servers.clear();
+        connections.clear();
         status.reset();
 
         YAML::Node document;
@@ -111,7 +109,7 @@ namespace relay
 
         const YAML::Node& serversArray = document["servers"];
 
-        for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
+        /*for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
             const YAML::Node& serverObject = serversArray[serverIndex];
 
@@ -237,7 +235,7 @@ namespace relay
 
             std::unique_ptr<Server> server(new Server(network, address, pingInterval, applicationDescriptors));
             servers.push_back(std::move(server));
-        }
+        }*/
 
         // TODO: create one connection instance for every connection in config
 
@@ -261,7 +259,7 @@ namespace relay
 
     void Relay::close()
     {
-        servers.clear();
+        connections.clear();
         status.reset();
         active = false;
     }
@@ -280,11 +278,6 @@ namespace relay
 
             if (status) status->update(delta);
 
-            for (const auto& server : servers)
-            {
-                server->update(delta);
-            }
-
             for (const auto& connection : connections)
             {
                 connection->update();
@@ -300,10 +293,10 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str = "Status:\n";
-                for (const auto& server : servers)
+                str = "Connections:\n";
+                for (const auto& connection : connections)
                 {
-                    server->getInfo(str, reportType);
+                    connection->getInfo(str, reportType);
                 }
                 break;
             }
@@ -311,9 +304,9 @@ namespace relay
             {
                 str = "<html><title>Status</title><body>";
 
-                for (const auto& server : servers)
+                for (const auto& connection : connections)
                 {
-                    server->getInfo(str, reportType);
+                    connection->getInfo(str, reportType);
                 }
 
                 str += "</body></html>";
@@ -326,11 +319,11 @@ namespace relay
 
                 bool first = true;
 
-                for (const auto& server : servers)
+                for (const auto& connection : connections)
                 {
                     if (!first) str += ",";
                     first = false;
-                    server->getInfo(str, reportType);
+                    connection->getInfo(str, reportType);
                 }
 
                 str += "]}";

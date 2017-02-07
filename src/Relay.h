@@ -17,7 +17,6 @@
 
 namespace relay
 {
-    class Server;
     class Status;
 
     class Relay
@@ -63,7 +62,6 @@ namespace relay
         bool active = true;
 
         cppsocket::Network& network;
-        std::vector<std::unique_ptr<Server>> servers;
         std::unique_ptr<Status> status;
         std::chrono::steady_clock::time_point previousTime;
 

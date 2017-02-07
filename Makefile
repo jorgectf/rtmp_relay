@@ -2,17 +2,10 @@ CXXFLAGS=-c -std=c++11 -Wall -DLOG_SYSLOG -I external/cppsocket -I external/yaml
 LDFLAGS=
 
 SOURCES=src/Amf0.cpp \
-	src/Application.cpp \
 	src/Connection.cpp \
 	src/main.cpp \
-	src/PullReceiver.cpp \
-	src/PullSender.cpp \
-	src/PullServer.cpp \
-	src/PushReceiver.cpp \
-	src/PushSender.cpp \
 	src/Relay.cpp \
 	src/RTMP.cpp \
-	src/Server.cpp \
 	src/Status.cpp \
 	src/StatusSender.cpp \
 	src/Utils.cpp \
