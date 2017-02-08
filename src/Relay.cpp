@@ -107,135 +107,26 @@ namespace relay
             }
         }
 
-        const YAML::Node& serversArray = document["servers"];
+        const YAML::Node& applicationsArray = document["applications"];
 
-        /*for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
+        for (size_t applicationIndex = 0; applicationIndex < applicationsArray.size(); ++applicationIndex)
         {
-            const YAML::Node& serverObject = serversArray[serverIndex];
+            const YAML::Node& applicationObject = applicationsArray[applicationIndex];
 
-            std::vector<ApplicationDescriptor> applicationDescriptors;
+            const YAML::Node& inputArray = applicationObject["inputs"];
 
-            const YAML::Node& applicationArray = serverObject["applications"];
-
-            for (size_t applicationIndex = 0; applicationIndex < applicationArray.size(); ++applicationIndex)
+            for (size_t inputIndex = 0; inputIndex < inputArray.size(); ++inputIndex)
             {
-                const YAML::Node& applicationObject = applicationArray[applicationIndex];
-
-                ApplicationDescriptor applicationDescriptor;
-
-                if (applicationObject["name"]) applicationDescriptor.name = applicationObject["name"].as<std::string>();
-                if (applicationObject["overrideApplicationName"]) applicationDescriptor.overrideApplicationName = applicationObject["overrideApplicationName"].as<std::string>();
-
-                const YAML::Node& pushArray = applicationObject["push"];
-
-                if (pushArray)
-                {
-                    for (size_t pushIndex = 0; pushIndex < pushArray.size(); ++pushIndex)
-                    {
-                        PushDescriptor pushDescriptor;
-
-                        const YAML::Node& pushObject = pushArray[pushIndex];
-
-                        if (pushObject["overrideStreamName"])
-                        {
-                            pushDescriptor.overrideStreamName = pushObject["overrideStreamName"].as<std::string>();
-                        }
-
-                        std::vector<std::string> pushAddresses;
-
-                        if (pushObject["address"])
-                        {
-                            if (pushObject["address"].IsSequence())
-                            {
-                                const YAML::Node& addressArray = pushObject["address"];
-
-                                for (size_t index = 0; index < addressArray.size(); ++index)
-                                {
-                                    pushDescriptor.addresses.push_back(addressArray[index].as<std::string>());
-                                }
-                            }
-                            else
-                            {
-                                pushDescriptor.addresses.push_back(pushObject["address"].as<std::string>());
-                            }
-                        }
-                        else
-                        {
-                            pushDescriptor.addresses.push_back("127.0.0.1:1935");
-                        }
-
-                        pushDescriptor.videoOutput = pushObject["video"] ? pushObject["video"].as<bool>() : true;
-                        pushDescriptor.audioOutput = pushObject["audio"] ? pushObject["audio"].as<bool>() : true;
-                        pushDescriptor.dataOutput = pushObject["data"] ? pushObject["data"].as<bool>() : true;
-
-                        const YAML::Node& metaDataBlacklistArray = pushObject["metaDataBlacklist"];
-
-                        if (metaDataBlacklistArray)
-                        {
-                            for (size_t index = 0; index < metaDataBlacklistArray.size(); ++index)
-                            {
-                                const YAML::Node& str = metaDataBlacklistArray[index];
-                                pushDescriptor.metaDataBlacklist.insert(str.as<std::string>());
-                            }
-                        }
-
-                        pushDescriptor.connectionTimeout = pushObject["connectionTimeout"] ? pushObject["connectionTimeout"].as<float>() : 5.0f;
-                        pushDescriptor.reconnectInterval = pushObject["reconnectInterval"] ? pushObject["reconnectInterval"].as<float>() : 5.0f;
-                        pushDescriptor.reconnectCount = pushObject["reconnectCount"] ? pushObject["reconnectCount"].as<uint32_t>() : 3;
-
-                        applicationDescriptor.pushDescriptors.push_back(pushDescriptor);
-                    }
-                }
-
-                const YAML::Node& pullArray = applicationObject["pull"];
-
-                if (pullArray)
-                {
-                    for (size_t pullIndex = 0; pullIndex < pullArray.size(); ++pullIndex)
-                    {
-                        PullDescriptor pullDescriptor;
-
-                        const YAML::Node& pullObject = pullArray[pullIndex];
-
-                        if (pullObject["overrideStreamName"])
-                        {
-                            pullDescriptor.overrideStreamName = pullObject["overrideStreamName"].as<std::string>();
-                        }
-
-                        if (pullObject["listen"])
-                        {
-                            pullDescriptor.address = pullObject["listen"].as<std::string>();
-                        }
-
-                        pullDescriptor.videoOutput = pullObject["video"] ? pullObject["video"].as<bool>() : true;
-                        pullDescriptor.audioOutput = pullObject["audio"] ? pullObject["audio"].as<bool>() : true;
-                        pullDescriptor.dataOutput = pullObject["data"] ? pullObject["data"].as<bool>() : true;
-                        pullDescriptor.pingInterval = pullObject["pingInterval"] ? pullObject["pingInterval"].as<float>() : 60.0f;
-
-                        const YAML::Node& metaDataBlacklistArray = pullObject["metaDataBlacklist"];
-
-                        if (metaDataBlacklistArray)
-                        {
-                            for (size_t index = 0; index < metaDataBlacklistArray.size(); ++index)
-                            {
-                                const YAML::Node& str = metaDataBlacklistArray[index];
-                                pullDescriptor.metaDataBlacklist.insert(str.as<std::string>());
-                            }
-                        }
-
-                        applicationDescriptor.pullDescriptors.push_back(pullDescriptor);
-                    }
-                }
-
-                applicationDescriptors.push_back(applicationDescriptor);
+                const YAML::Node& inputObject = inputArray[inputIndex];
             }
 
-            std::string address = serverObject["listen"] ? serverObject["listen"].as<std::string>() : "0.0.0.0:1935";
-            float pingInterval = serverObject["pingInterval"] ? serverObject["pingInterval"].as<float>() : 60.0f;
+            const YAML::Node& outputArray = applicationObject["outputs"];
 
-            std::unique_ptr<Server> server(new Server(network, address, pingInterval, applicationDescriptors));
-            servers.push_back(std::move(server));
-        }*/
+            for (size_t outputIndex = 0; outputIndex < outputArray.size(); ++outputIndex)
+            {
+                const YAML::Node& outputObject = outputArray[outputIndex];
+            }
+        }
 
         // TODO: create one connection instance for every connection in config
 

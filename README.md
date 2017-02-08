@@ -20,25 +20,32 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 
 * *listen* – the address server is listening to
 * *pingInterval* – client ping interval in seconds
-* *applications* – application object (can be multiple for each server)
-  * *name* – name of the application (optional if server should route all applications)
-  * *overrideApplicationName* – name of the output application name
-  * *push* – array of push destinations
-    * *overrideStreamName* – string to override the stream name with
-    * *addresses* – list of addresses to push to
+* *servers* – application object (can be multiple for each server)
+  * *inputs* – array of input destinations
+    * *applicationName* – name of the application (optional if server should route all applications)
+    * *listen*: the address server is listening to (optional)
+    * *addresses* – list of addresses to push to (optional)
     * *video* – flag that indicates wether to forward video stream
     * *audio* – flag that indicates wether to forward audio stream
     * *data* – flag that indicates wether to forward data stream
     * *metaDataBlacklist* – list of metadata fields that should not be forwarded
+    * *pingInterval* – client ping interval in seconds
     * *connectionTimeout* – how long should the attempt to connect last
     * *reconnectInterval* – the interval of reconnection
     * *reconnectCount* – amount of connect attempts
-  * *pull* – array of pull destinations
-    * *listen*: the address server is listening to
+  * *outputs* – array of output destinations
+    * *overrideApplicationName* – name of the output application name
+    * *overrideStreamName* – string to override the stream name with
+    * *listen*: the address server is listening to (optional)
+    * *addresses* – list of addresses to push to (optional)
     * *video* – flag that indicates wether to forward video stream
     * *audio* – flag that indicates wether to forward audio stream
     * *data* – flag that indicates wether to forward data stream
+    * *metaDataBlacklist* – list of metadata fields that should not be forwarded
     * *pingInterval* – client ping interval in seconds
+    * *connectionTimeout* – how long should the attempt to connect last
+    * *reconnectInterval* – the interval of reconnection
+    * *reconnectCount* – amount of connect attempts
 
 *overrideApplicationName* can have the following tokens:
 
