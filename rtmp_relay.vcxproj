@@ -56,6 +56,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Relay.cpp" />
     <ClCompile Include="src\RTMP.cpp" />
+    <ClCompile Include="src\Server.cpp" />
     <ClCompile Include="src\Status.cpp" />
     <ClCompile Include="src\StatusSender.cpp" />
     <ClCompile Include="src\Utils.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Relay.h" />
     <ClInclude Include="src\RTMP.h" />
+    <ClInclude Include="src\Server.h" />
     <ClInclude Include="src\Status.h" />
     <ClInclude Include="src\StatusSender.h" />
     <ClInclude Include="src\Utils.h" />
