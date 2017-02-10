@@ -9,6 +9,7 @@
 #include <chrono>
 #include <thread>
 #include "yaml-cpp/yaml.h"
+#include "Acceptor.h"
 #include "Log.h"
 #include "Relay.h"
 #include "Status.h"
@@ -107,13 +108,15 @@ namespace relay
             }
         }
 
+        std::set<std::string> listenAddresses;
+
         const YAML::Node& serversArray = document["servers"];
 
         for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
             const YAML::Node& serverObject = serversArray[serverIndex];
 
-            ServerDescription serverDescription;
+            Server::Description serverDescription;
 
             const YAML::Node& inputArray = serverObject["inputs"];
 
@@ -121,7 +124,7 @@ namespace relay
             {
                 const YAML::Node& inputObject = inputArray[inputIndex];
 
-                InputDescription inputDescription;
+                Server::InputDescription inputDescription;
 
                 Connection::Description connectionDescription;
                 if (inputObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
@@ -133,7 +136,14 @@ namespace relay
 
                     for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
                     {
-                        connectionDescription.addresses.push_back(addressArray[addressIndex].as<std::string>());
+                        std::string address = addressArray[addressIndex].as<std::string>();
+
+                        connectionDescription.addresses.push_back(address);
+
+                        if (connectionDescription.type == Connection::Type::HOST)
+                        {
+                            listenAddresses.insert(address);
+                        }
                     }
                 }
                 else
@@ -156,7 +166,7 @@ namespace relay
             {
                 const YAML::Node& outputObject = outputArray[outputIndex];
 
-                OutputDescription outputDescription;
+                Server::OutputDescription outputDescription;
 
                 Connection::Description connectionDescription;
                 if (outputObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
@@ -168,7 +178,14 @@ namespace relay
 
                     for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
                     {
-                        connectionDescription.addresses.push_back(addressArray[addressIndex].as<std::string>());
+                        std::string address = addressArray[addressIndex].as<std::string>();
+
+                        connectionDescription.addresses.push_back(address);
+
+                        if (connectionDescription.type == Connection::Type::HOST)
+                        {
+                            listenAddresses.insert(address);
+                        }
                     }
                 }
                 else
@@ -185,30 +202,22 @@ namespace relay
                 serverDescription.outputDescriptions.push_back(outputDescription);
             }
 
-            serverDescriptions.push_back(serverDescription);
+            servers.push_back(std::unique_ptr<Server>(new Server(serverDescription)));
         }
 
-        for (const ServerDescription& serverDescription : serverDescriptions)
+        for (const std::string& address : listenAddresses)
         {
-            
+            cppsocket::Acceptor acceptor(network);
+            acceptor.startAccept(address);
+            acceptors.push_back(std::move(acceptor));
         }
 
         return true;
     }
 
-    std::vector<Connection*> Relay::getConnections(Connection::StreamType streamType,
-                                                   const std::string& address,
-                                                   const std::string& applicationName,
-                                                   const std::string& streamName)
+    Server* Relay::getServer(uint16_t address, Connection::StreamType type, std::string applicationName, std::string streamName)
     {
-        std::vector<Connection*> result;
-
-        for (const auto& connection : connections)
-        {
-            // TODO: check if connection matches the request
-        }
-
-        return result;
+        return nullptr;
     }
 
     void Relay::close()

@@ -9,7 +9,7 @@
 #include "Network.h"
 #include "Socket.h"
 #include "Status.h"
-#include "Connection.h"
+#include "Server.h"
 
 #if !defined(_MSC_VER)
 #include <sys/syslog.h>
@@ -19,41 +19,9 @@ namespace relay
 {
     class Status;
 
-    struct InputDescription
-    {
-        Connection::Description connectionDescription;
-        bool video = true;
-        bool audio = true;
-        bool data = true;
-        std::string applicationName;
-        std::string streamName;
-    };
-
-    struct OutputDescription
-    {
-        Connection::Description connectionDescription;
-        bool video = true;
-        bool audio = true;
-        bool data = true;
-        std::string overrideApplicationName;
-        std::string overrideStreamName;
-    };
-
-    struct ServerDescription
-    {
-        std::vector<InputDescription> inputDescriptions;
-        std::vector<OutputDescription> outputDescriptions;
-    };
-
     class Relay
     {
     public:
-        enum class Type
-        {
-            INPUT,
-            OUTPUT
-        };
-
         static uint64_t nextId() { return ++currentId; }
 
         Relay(cppsocket::Network& aNetwork);
@@ -74,12 +42,7 @@ namespace relay
         void openLog();
         void closeLog();
 
-        void* getConfig(uint16_t address, Type type, std::string applicationName, std::string streamName);
-
-        std::vector<Connection*> getConnections(Connection::StreamType streamType,
-                                                const std::string& address,
-                                                const std::string& applicationName,
-                                                const std::string& streamName);
+        Server* getServer(uint16_t address, Connection::StreamType type, std::string applicationName, std::string streamName);
 
     private:
         void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);
@@ -91,8 +54,10 @@ namespace relay
         std::unique_ptr<Status> status;
         std::chrono::steady_clock::time_point previousTime;
 
-        std::vector<ServerDescription> serverDescriptions;
+        std::vector<std::unique_ptr<Server>> servers;
         std::vector<std::unique_ptr<Connection>> connections;
+
+        std::vector<cppsocket::Acceptor> acceptors;
 
 #if !defined(_MSC_VER)
         std::string syslogIdent;
