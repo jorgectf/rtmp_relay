@@ -15,15 +15,25 @@
 namespace relay
 {
     class Relay;
-    
+
     class Connection
     {
         const std::string name = "Connection";
     public:
-        enum class ConnectionType
+        enum class Type
         {
-            PUSH,
-            PULL
+            HOST,
+            CLIENT
+        };
+
+        struct Description
+        {
+            Type type;
+            std::vector<std::string> addresses;
+            float connectionTimeout = 0.0f;
+            float reconnectInterval = 0.0f;
+            float reconnectCount = 0.0f;
+            float pingInterval = 0.0f;
         };
 
         enum class StreamType
@@ -42,7 +52,7 @@ namespace relay
             HANDSHAKE_DONE = 4
         };
 
-        Connection(Relay& aRelay, cppsocket::Socket& aSocket, ConnectionType aConnectionType);
+        Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aConnectionType);
         Connection(Relay& aRelay, cppsocket::Socket& client);
         Connection(Relay& aRelay, cppsocket::Connector& connector);
 
@@ -96,7 +106,7 @@ namespace relay
         std::random_device rd;
         std::mt19937 generator;
         
-        ConnectionType connectionType;
+        Type connectionType;
         State state;
         cppsocket::Socket& socket;
 

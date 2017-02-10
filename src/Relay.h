@@ -19,6 +19,32 @@ namespace relay
 {
     class Status;
 
+    struct InputDescription
+    {
+        Connection::Description connectionDescription;
+        bool video = true;
+        bool audio = true;
+        bool data = true;
+        std::string applicationName;
+        std::string streamName;
+    };
+
+    struct OutputDescription
+    {
+        Connection::Description connectionDescription;
+        bool video = true;
+        bool audio = true;
+        bool data = true;
+        std::string overrideApplicationName;
+        std::string overrideStreamName;
+    };
+
+    struct ServerDescription
+    {
+        std::vector<InputDescription> inputDescriptions;
+        std::vector<OutputDescription> outputDescriptions;
+    };
+
     class Relay
     {
     public:
@@ -65,6 +91,7 @@ namespace relay
         std::unique_ptr<Status> status;
         std::chrono::steady_clock::time_point previousTime;
 
+        std::vector<ServerDescription> serverDescriptions;
         std::vector<std::unique_ptr<Connection>> connections;
 
 #if !defined(_MSC_VER)

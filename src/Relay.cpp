@@ -107,25 +107,85 @@ namespace relay
             }
         }
 
-        const YAML::Node& applicationsArray = document["applications"];
+        const YAML::Node& serversArray = document["servers"];
 
-        for (size_t applicationIndex = 0; applicationIndex < applicationsArray.size(); ++applicationIndex)
+        for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
-            const YAML::Node& applicationObject = applicationsArray[applicationIndex];
+            const YAML::Node& serverObject = serversArray[serverIndex];
 
-            const YAML::Node& inputArray = applicationObject["inputs"];
+            ServerDescription serverDescription;
+
+            const YAML::Node& inputArray = serverObject["inputs"];
 
             for (size_t inputIndex = 0; inputIndex < inputArray.size(); ++inputIndex)
             {
                 const YAML::Node& inputObject = inputArray[inputIndex];
+
+                InputDescription inputDescription;
+
+                Connection::Description connectionDescription;
+                if (inputObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
+                else if (inputObject["type"].as<std::string>() == "client") connectionDescription.type = Connection::Type::CLIENT;
+
+                if (inputObject["address"].IsSequence())
+                {
+                    const YAML::Node& addressArray = inputObject["address"];
+
+                    for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
+                    {
+                        connectionDescription.addresses.push_back(addressArray[addressIndex].as<std::string>());
+                    }
+                }
+                else
+                {
+                    connectionDescription.addresses.push_back(inputObject["address"].as<std::string>());
+                }
+
+                if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
+                if (inputObject["streamName"]) inputDescription.streamName = inputObject["streamName"].as<std::string>();
+                if (inputObject["video"]) inputDescription.video = inputObject["video"].as<bool>();
+                if (inputObject["audio"]) inputDescription.audio = inputObject["audio"].as<bool>();
+                if (inputObject["data"]) inputDescription.data = inputObject["data"].as<bool>();
+
+                serverDescription.inputDescriptions.push_back(inputDescription);
             }
 
-            const YAML::Node& outputArray = applicationObject["outputs"];
+            const YAML::Node& outputArray = serverObject["outputs"];
 
             for (size_t outputIndex = 0; outputIndex < outputArray.size(); ++outputIndex)
             {
                 const YAML::Node& outputObject = outputArray[outputIndex];
+
+                OutputDescription outputDescription;
+
+                Connection::Description connectionDescription;
+                if (outputObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
+                else if (outputObject["type"].as<std::string>() == "client") connectionDescription.type = Connection::Type::CLIENT;
+
+                if (outputObject["address"].IsSequence())
+                {
+                    const YAML::Node& addressArray = outputObject["address"];
+
+                    for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
+                    {
+                        connectionDescription.addresses.push_back(addressArray[addressIndex].as<std::string>());
+                    }
+                }
+                else
+                {
+                    connectionDescription.addresses.push_back(outputObject["address"].as<std::string>());
+                }
+
+                if (outputObject["overrideApplicationName"]) outputDescription.overrideApplicationName = outputObject["overrideApplicationName"].as<std::string>();
+                if (outputObject["overrideStreamName"]) outputDescription.overrideStreamName = outputObject["overrideStreamName"].as<std::string>();
+                if (outputObject["video"]) outputDescription.video = outputObject["video"].as<bool>();
+                if (outputObject["audio"]) outputDescription.audio = outputObject["audio"].as<bool>();
+                if (outputObject["data"]) outputDescription.data = outputObject["data"].as<bool>();
+
+                serverDescription.outputDescriptions.push_back(outputDescription);
             }
+
+            serverDescriptions.push_back(serverDescription);
         }
 
         // TODO: create one connection instance for every connection in config

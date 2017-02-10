@@ -12,7 +12,7 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, ConnectionType aConnectionType):
+    Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aConnectionType):
         relay(aRelay),
         id(Relay::nextId()),
         generator(rd()),
@@ -29,12 +29,12 @@ namespace relay
     }
 
     Connection::Connection(Relay& aRelay, cppsocket::Socket& client):
-        Connection(aRelay, client, ConnectionType::PULL)
+        Connection(aRelay, client, Type::HOST)
     {
     }
 
     Connection::Connection(Relay& aRelay, cppsocket::Connector& connector):
-        Connection(aRelay, connector, ConnectionType::PUSH)
+        Connection(aRelay, connector, Type::CLIENT)
     {
         // TODO: implement
         // connect();
@@ -49,7 +49,7 @@ namespace relay
     void Connection::handleConnect(cppsocket::Connector&)
     {
         // handshake
-        if (connectionType == ConnectionType::PUSH)
+        if (connectionType == Type::CLIENT)
         {
             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
 
@@ -98,8 +98,8 @@ namespace relay
 
                 switch (connectionType)
                 {
-                    case ConnectionType::PUSH: str += "PUSH"; break;
-                    case ConnectionType::PULL: str += "PULL"; break;
+                    case Type::HOST: str += "HOST"; break;
+                    case Type::CLIENT: str += "CLIENT"; break;
                 }
 
                 str += ", state: ";
@@ -134,8 +134,8 @@ namespace relay
 
                 switch (connectionType)
                 {
-                    case ConnectionType::PUSH: str += "PUSH"; break;
-                    case ConnectionType::PULL: str += "PULL"; break;
+                    case Type::HOST: str += "HOST"; break;
+                    case Type::CLIENT: str += "CLIENT"; break;
                 }
 
                 str += "</td><td>";
@@ -170,8 +170,8 @@ namespace relay
 
                 switch (connectionType)
                 {
-                    case ConnectionType::PUSH: str += "\"PUSH\""; break;
-                    case ConnectionType::PULL: str += "\"PULL\""; break;
+                    case Type::HOST: str += "\"HOST\""; break;
+                    case Type::CLIENT: str += "\"CLIENT\""; break;
                 }
 
                 str += ",\"status\":";
@@ -229,7 +229,7 @@ namespace relay
                     break;
                 }
             }
-            else if (connectionType == ConnectionType::PULL)
+            else if (connectionType == Type::HOST)
             {
                 if (state == State::UNINITIALIZED)
                 {
@@ -331,7 +331,7 @@ namespace relay
                     }
                 }
             }
-            else if (connectionType == ConnectionType::PUSH)
+            else if (connectionType == Type::CLIENT)
             {
                 if (state == State::VERSION_SENT)
                 {
