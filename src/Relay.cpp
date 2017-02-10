@@ -215,8 +215,9 @@ namespace relay
         return true;
     }
 
-    Server* Relay::getServer(uint16_t address, Connection::StreamType type, std::string applicationName, std::string streamName)
+    Server* Relay::getServer(uint32_t address, uint16_t port, Connection::StreamType type, std::string applicationName, std::string streamName)
     {
+        // TODO: find server, that matches all the parameters
         return nullptr;
     }
 

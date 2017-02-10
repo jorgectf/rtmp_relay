@@ -41,6 +41,8 @@ namespace relay
 
         const Server::Description& getDescription() const { return description; }
 
+        // TODO: implement packet forwarding
+
     private:
         Server::Description description;
     };

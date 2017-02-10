@@ -4,6 +4,7 @@
 
 #include "Connection.h"
 #include "Relay.h"
+#include "Server.h"
 #include "Constants.h"
 #include "Utils.h"
 #include "Log.h"
@@ -839,11 +840,19 @@ namespace relay
                     if (streamType == StreamType::NONE)
                     {
                         streamName = argument2.asString();
+                        streamType = StreamType::INPUT;
+
+                        server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
+
+                        if (!server)
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
+                            socket.close();
+                            return false;
+                        }
 
                         // TODO: implement
                         //if (application) application->createStream(streamName);
-
-                        streamType = StreamType::INPUT;
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                     }
@@ -913,14 +922,17 @@ namespace relay
                 {
                     if (streamType == StreamType::NONE)
                     {
-                        // TODO: implement
-                        /*if (!play(argument2.asString()))
+                        streamType = StreamType::OUTPUT;
+
+                        server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
+
+                        if (!server)
                         {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
                             socket.close();
                             return false;
-                        }*/
+                        }
 
-                        streamType = StreamType::OUTPUT;
                         sendPlayStatus(transactionId.asDouble());
 
                         // TODO: implement

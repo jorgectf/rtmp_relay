@@ -15,6 +15,7 @@
 namespace relay
 {
     class Relay;
+    class Server;
 
     class Connection
     {
@@ -137,5 +138,7 @@ namespace relay
         uint64_t currentVideoBytes = 0;
         uint64_t audioRate = 0;
         uint64_t videoRate = 0;
+
+        Server* server = nullptr;
     };
 }
