@@ -188,7 +188,10 @@ namespace relay
             serverDescriptions.push_back(serverDescription);
         }
 
-        // TODO: create one connection instance for every connection in config
+        for (const ServerDescription& serverDescription : serverDescriptions)
+        {
+            
+        }
 
         return true;
     }

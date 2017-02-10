@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		300569DC1E4E364B005F9950 /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300569DA1E4E364B005F9950 /* Server.cpp */; };
 		3009340D1C873DF200CC50D3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3009340C1C873DF200CC50D3 /* main.cpp */; };
 		300934151C874CBA00CC50D3 /* Relay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 300934131C874CBA00CC50D3 /* Relay.cpp */; };
 		301457021E3FA0E500BA75DB /* Connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301457001E3FA0E500BA75DB /* Connection.cpp */; };
@@ -62,6 +63,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		300569DA1E4E364B005F9950 /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cpp; sourceTree = "<group>"; };
+		300569DB1E4E364B005F9950 /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
 		300934091C873DF200CC50D3 /* rtmp_relay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rtmp_relay; sourceTree = BUILT_PRODUCTS_DIR; };
 		3009340C1C873DF200CC50D3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		300934131C874CBA00CC50D3 /* Relay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Relay.cpp; sourceTree = "<group>"; };
@@ -181,6 +184,8 @@
 				300934141C874CBA00CC50D3 /* Relay.h */,
 				304B286B1C9C3ED900BA162D /* RTMP.cpp */,
 				304B27821C96DDB700BA162D /* RTMP.h */,
+				300569DA1E4E364B005F9950 /* Server.cpp */,
+				300569DB1E4E364B005F9950 /* Server.h */,
 				3030D6E71DB7AADE007CC8EB /* Status.cpp */,
 				3030D6E81DB7AADE007CC8EB /* Status.h */,
 				309B48311DE4A0D700A718C5 /* StatusSender.cpp */,
@@ -353,6 +358,7 @@
 				30BB18FA1D47A43800102062 /* emitterutils.cpp in Sources */,
 				304B28721C9C6AC800BA162D /* Amf0.cpp in Sources */,
 				30BB19051D47A43800102062 /* regex_yaml.cpp in Sources */,
+				300569DC1E4E364B005F9950 /* Server.cpp in Sources */,
 				30BB19081D47A43800102062 /* scantag.cpp in Sources */,
 				30BB18FB1D47A43800102062 /* exp.cpp in Sources */,
 				30BB19091D47A43800102062 /* scantoken.cpp in Sources */,

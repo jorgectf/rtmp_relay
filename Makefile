@@ -5,6 +5,7 @@ SOURCES=src/Amf0.cpp \
 	src/Connection.cpp \
 	src/main.cpp \
 	src/Relay.cpp \
+	src/Server.cpp \
 	src/RTMP.cpp \
 	src/Status.cpp \
 	src/StatusSender.cpp \
