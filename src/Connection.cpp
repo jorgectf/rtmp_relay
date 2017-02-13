@@ -1010,6 +1010,49 @@ namespace relay
         return true;
     }
 
+    void Connection::createStream(const std::string& newStreamName)
+    {
+        if (overrideStreamName.empty())
+        {
+            streamName = newStreamName;
+        }
+        else
+        {
+            std::map<std::string, std::string> tokens = {
+                {"id", std::to_string(id)},
+                {"streamName", newStreamName},
+                {"applicationName", applicationName},
+                {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                {"port", std::to_string(socket.getRemotePort())}
+            };
+
+            streamName = overrideStreamName;
+            replaceTokens(streamName, tokens);
+        }
+    }
+
+    void Connection::deleteStream()
+    {
+        // TODO: implement
+        //if (connected && !streamName.empty())
+        {
+            //sendDeleteStream();
+        }
+
+        //streaming = false;
+    }
+
+    void Connection::unpublishStream()
+    {
+        // TODO: implement
+        //if (connected && !streamName.empty())
+        {
+            //sendFCUnpublish();
+        }
+
+        //streaming = false;
+    }
+
     void Connection::sendServerBandwidth()
     {
         rtmp::Packet packet;

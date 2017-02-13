@@ -15,7 +15,7 @@ namespace relay
     {
         for (Connection* connection : connections)
         {
-            //connection->createStream(newStreamName);
+            connection->createStream(newStreamName);
         }
     }
 
@@ -23,7 +23,7 @@ namespace relay
     {
         for (Connection* connection : connections)
         {
-            //connection->deleteStream();
+            connection->deleteStream();
         }
     }
 
@@ -31,7 +31,7 @@ namespace relay
     {
         for (Connection* connection : connections)
         {
-            //connection->unpublishStream();
+            connection->unpublishStream();
         }
     }
 

@@ -65,6 +65,10 @@ namespace relay
 
         void getInfo(std::string& str, ReportType reportType) const;
 
+        void createStream(const std::string& newStreamName);
+        void deleteStream();
+        void unpublishStream();
+
         void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
         void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
         void sendMetaData(const amf0::Node metaData);
@@ -134,6 +138,8 @@ namespace relay
         StreamType streamType = StreamType::NONE;
         std::string applicationName;
         std::string streamName;
+        std::string overrideApplicationName;
+        std::string overrideStreamName;
 
         float timeSinceMeasure = 0.0f;
         uint64_t currentAudioBytes = 0;
