@@ -13,7 +13,7 @@ namespace relay
 
     void Server::createStream(const std::string& newStreamName)
     {
-        for (const Connection* connection : connections)
+        for (Connection* connection : connections)
         {
             //connection->createStream(newStreamName);
         }
@@ -21,7 +21,7 @@ namespace relay
 
     void Server::deleteStream()
     {
-        for (const Connection* connection : connections)
+        for (Connection* connection : connections)
         {
             //connection->deleteStream();
         }
@@ -29,7 +29,7 @@ namespace relay
 
     void Server::unpublishStream()
     {
-        for (const Connection* connection : connections)
+        for (Connection* connection : connections)
         {
             //connection->unpublishStream();
         }
@@ -37,49 +37,55 @@ namespace relay
 
     void Server::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
-        for (const Connection* connection : connections)
+        audioHeader = headerData;
+
+        for (Connection* connection : connections)
         {
-            //connection->sendAudioHeader(headerData);
+            connection->sendAudioData(0, headerData);
         }
     }
 
     void Server::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
-        for (const Connection* connection : connections)
+        videoHeader = headerData;
+
+        for (Connection* connection : connections)
         {
-            //connection->sendVideoHeader(headerData);
+            connection->sendVideoData(0, headerData);
         }
     }
 
     void Server::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        for (const Connection* connection : connections)
+        for (Connection* connection : connections)
         {
-            //connection->sendAudio(timestamp, audioData);
+            connection->sendAudioData(timestamp, audioData);
         }
     }
 
     void Server::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        for (const Connection* connection : connections)
+        for (Connection* connection : connections)
         {
-            //connection->sendVideo(timestamp, videoData);
+            connection->sendVideoData(timestamp, videoData);
         }
     }
 
-    void Server::sendMetaData(const amf0::Node& metaData)
+    void Server::sendMetaData(const amf0::Node& newMetaData)
     {
-        for (const Connection* connection : connections)
+        metaData = newMetaData;
+
+        for (Connection* connection : connections)
         {
-            //connection->sendMetaData(metaData);
+            connection->sendMetaData(metaData);
         }
     }
 
     void Server::sendTextData(uint64_t timestamp, const amf0::Node& textData)
     {
-        for (const Connection* connection : connections)
+        for (Connection* connection : connections)
         {
-            //connection->sendTextData(timestamp, textData);
+            connection->sendTextData(timestamp, textData);
         }
     }
 

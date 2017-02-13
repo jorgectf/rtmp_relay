@@ -619,23 +619,19 @@ namespace relay
 
                     if (command.asString() == "@setDataFrame" && argument1.asString() == "onMetaData")
                     {
-                        metaData = argument2;
-
                         Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<uint32_t>(argument2["audiocodecid"].asDouble()));
                         Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument2["videocodecid"].asDouble()));
 
                         // forward notify packet
-                        if (server) server->sendMetaData(metaData);
+                        if (server) server->sendMetaData(argument2);
                     }
                     else if (command.asString() == "onMetaData")
                     {
-                        metaData = argument1;
-
                         Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<uint32_t>(argument1["audiocodecid"].asDouble()));
                         Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument1["videocodecid"].asDouble()));
 
                         // forward notify packet
-                        if (server) server->sendMetaData(metaData);
+                        if (server) server->sendMetaData(argument2);
                     }
                     else if (command.asString() == "onTextData")
                     {
@@ -662,10 +658,9 @@ namespace relay
 
                     currentAudioBytes += packet.data.size();
 
-                    if (audioHeader.empty() && isCodecHeader(packet.data))
+                    if (packet.data.empty() && isCodecHeader(packet.data))
                     {
-                        audioHeader = packet.data;
-                        if (server) server->sendAudioHeader(audioHeader);
+                        if (server) server->sendAudioHeader(packet.data);
                     }
                     else
                     {
@@ -701,10 +696,9 @@ namespace relay
 
                     currentVideoBytes += packet.data.size();
 
-                    if (videoHeader.empty() && isCodecHeader(packet.data))
+                    if (packet.data.empty() && isCodecHeader(packet.data))
                     {
-                        videoHeader = packet.data;
-                        if (server) server->sendVideoHeader(videoHeader);
+                        if (server) server->sendVideoHeader(packet.data);
                     }
                     else
                     {
@@ -1541,6 +1535,72 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
+        
+        socket.send(buffer);
+    }
+
+    void Connection::sendMetaData(const amf0::Node metaData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::NOTIFY;
+
+        amf0::Node commandName = std::string("@setDataFrame");
+        commandName.encode(packet.data);
+
+        amf0::Node argument1 = std::string("onMetaData");
+        argument1.encode(packet.data);
+
+        amf0::Node filteredMetaData = amf0::Marker::ECMAArray;
+
+        for (auto value : metaData.asMap())
+        {
+            /// not in the blacklist
+            if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
+            {
+                filteredMetaData[value.first] = value.second;
+            }
+        }
+
+        amf0::Node argument2 = filteredMetaData;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ":";
+
+        Log log(Log::Level::ALL);
+        log << "[" << id << ", " << name << "] ";
+        argument2.dump(log);
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendTextData(uint64_t timestamp, const amf0::Node& textData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::NOTIFY;
+
+        amf0::Node commandName = std::string("onTextData");
+        commandName.encode(packet.data);
+
+        amf0::Node argument1 = textData;
+        argument1.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending text data";
+
+        Log log(Log::Level::ALL);
+        log << "[" << id << ", " << name << "] ";
+        argument1.dump(log);
         
         socket.send(buffer);
     }

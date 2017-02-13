@@ -6,6 +6,7 @@
 
 #include <random>
 #include <map>
+#include <set>
 #include "Socket.h"
 #include "Connector.h"
 #include "RTMP.h"
@@ -64,6 +65,11 @@ namespace relay
 
         void getInfo(std::string& str, ReportType reportType) const;
 
+        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+        void sendMetaData(const amf0::Node metaData);
+        void sendTextData(uint64_t timestamp, const amf0::Node& textData);
+
     private:
         void handleConnect(cppsocket::Connector&);
         void handleConnectError(cppsocket::Connector&);
@@ -95,9 +101,6 @@ namespace relay
         void sendFCUnpublish();
         void sendPublish();
         void sendPublishStatus(double transactionId);
-
-        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
-        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
 
         void sendPlay();
         void sendPlayStatus(double transactionId);
@@ -132,10 +135,6 @@ namespace relay
         std::string applicationName;
         std::string streamName;
 
-        std::vector<uint8_t> audioHeader;
-        std::vector<uint8_t> videoHeader;
-        amf0::Node metaData;
-
         float timeSinceMeasure = 0.0f;
         uint64_t currentAudioBytes = 0;
         uint64_t currentVideoBytes = 0;
@@ -143,5 +142,7 @@ namespace relay
         uint64_t videoRate = 0;
 
         Server* server = nullptr;
+        std::set<std::string> metaDataBlacklist;
+
     };
 }
