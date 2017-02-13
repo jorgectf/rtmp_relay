@@ -13,12 +13,12 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aConnectionType):
+    Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType):
         relay(aRelay),
         id(Relay::nextId()),
         generator(rd()),
         socket(aSocket),
-        connectionType(aConnectionType)
+        type(aType)
     {
         if (!socket.setBlocking(false))
         {
@@ -50,7 +50,7 @@ namespace relay
     void Connection::handleConnect(cppsocket::Connector&)
     {
         // handshake
-        if (connectionType == Type::CLIENT)
+        if (type == Type::CLIENT)
         {
             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
 
@@ -97,7 +97,7 @@ namespace relay
                     " to: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) +
                     ", connection type: ";
 
-                switch (connectionType)
+                switch (type)
                 {
                     case Type::HOST: str += "HOST"; break;
                     case Type::CLIENT: str += "CLIENT"; break;
@@ -133,7 +133,7 @@ namespace relay
             {
                 str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "</td><td>";
 
-                switch (connectionType)
+                switch (type)
                 {
                     case Type::HOST: str += "HOST"; break;
                     case Type::CLIENT: str += "CLIENT"; break;
@@ -169,7 +169,7 @@ namespace relay
                     "\"address\":\"" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "\"," +
                     "\"connectionType:\"";
 
-                switch (connectionType)
+                switch (type)
                 {
                     case Type::HOST: str += "\"HOST\""; break;
                     case Type::CLIENT: str += "\"CLIENT\""; break;
@@ -230,7 +230,7 @@ namespace relay
                     break;
                 }
             }
-            else if (connectionType == Type::HOST)
+            else if (type == Type::HOST)
             {
                 if (state == State::UNINITIALIZED)
                 {
@@ -332,7 +332,7 @@ namespace relay
                     }
                 }
             }
-            else if (connectionType == Type::CLIENT)
+            else if (type == Type::CLIENT)
             {
                 if (state == State::VERSION_SENT)
                 {
@@ -625,8 +625,7 @@ namespace relay
                         Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument2["videocodecid"].asDouble()));
 
                         // forward notify packet
-                        // TODO: implement
-                        //if (application) application->sendMetaData(metaData);
+                        if (server) server->sendMetaData(metaData);
                     }
                     else if (command.asString() == "onMetaData")
                     {
@@ -636,13 +635,11 @@ namespace relay
                         Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument1["videocodecid"].asDouble()));
 
                         // forward notify packet
-                        // TODO: implement
-                        //if (application) application->sendMetaData(metaData);
+                        if (server) server->sendMetaData(metaData);
                     }
                     else if (command.asString() == "onTextData")
                     {
-                        // TODO: implement
-                        //if (application) application->sendTextData(packet.timestamp, argument1);
+                        if (server) server->sendTextData(packet.timestamp, argument1);
                     }
                 }
                 else
@@ -668,14 +665,12 @@ namespace relay
                     if (audioHeader.empty() && isCodecHeader(packet.data))
                     {
                         audioHeader = packet.data;
-                        // TODO: implement
-                        //if (application) application->sendAudioHeader(audioHeader);
+                        if (server) server->sendAudioHeader(audioHeader);
                     }
                     else
                     {
                         // forward audio packet
-                        // TODO: implement
-                        //if (application) application->sendAudio(packet.timestamp, packet.data);
+                        if (server) server->sendAudio(packet.timestamp, packet.data);
                     }
                 }
                 else
@@ -709,14 +704,12 @@ namespace relay
                     if (videoHeader.empty() && isCodecHeader(packet.data))
                     {
                         videoHeader = packet.data;
-                        // TODO: implement
-                        //if (application) application->sendVideoHeader(videoHeader);
+                        if (server) server->sendVideoHeader(videoHeader);
                     }
                     else
                     {
                         // forward video packet
-                        // TODO: implement
-                        //if (application) application->sendVideo(packet.timestamp, packet.data);
+                        if (server) server->sendVideo(packet.timestamp, packet.data);
                     }
                 }
                 else
@@ -814,8 +807,7 @@ namespace relay
                 }
                 else if (command.asString() == "deleteStream")
                 {
-                    // TODO: implement
-                    //if (application) application->deleteStream();
+                    if (server) server->deleteStream();
                 }
                 if (command.asString() == "connect")
                 {
@@ -851,8 +843,7 @@ namespace relay
                             return false;
                         }
 
-                        // TODO: implement
-                        //if (application) application->createStream(streamName);
+                        if (server) server->createStream(streamName);
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                     }
@@ -869,8 +860,7 @@ namespace relay
                     {
                         streamType = StreamType::NONE;
 
-                        // TODO: implement
-                        //if (application) application->unpublishStream();
+                        if (server) server->unpublishStream();
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
                     }
@@ -888,8 +878,7 @@ namespace relay
                     {
                         streamName = argument2.asString();
 
-                        // TODO: implement
-                        //if (application) application->createStream(streamName);
+                        if (server) server->createStream(streamName);
 
                         streamType = StreamType::INPUT;
 

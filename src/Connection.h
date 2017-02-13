@@ -53,9 +53,12 @@ namespace relay
             HANDSHAKE_DONE = 4
         };
 
-        Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aConnectionType);
+        Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType);
         Connection(Relay& aRelay, cppsocket::Socket& client);
         Connection(Relay& aRelay, cppsocket::Connector& connector);
+
+        Type getType() const { return type; }
+        StreamType getStreamType() const { return streamType; }
 
         void update();
 
@@ -107,7 +110,7 @@ namespace relay
         std::random_device rd;
         std::mt19937 generator;
         
-        Type connectionType;
+        Type type;
         State state;
         cppsocket::Socket& socket;
 
