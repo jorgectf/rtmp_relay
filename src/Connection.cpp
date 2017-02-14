@@ -352,9 +352,6 @@ namespace relay
                         }
 
                         state = State::VERSION_RECEIVED;
-
-                        // TODO: implement
-                        //timeSinceHandshake = 0.0f;
                     }
                     else
                     {
@@ -386,9 +383,6 @@ namespace relay
                         socket.send(ackData);
 
                         state = State::ACK_SENT;
-
-                        // TODO: implement
-                        //timeSinceHandshake = 0.0f;
                     }
                     else
                     {
@@ -413,9 +407,6 @@ namespace relay
                         state = State::HANDSHAKE_DONE;
 
                         sendConnect();
-
-                        // TODO: implement
-                        //timeSinceHandshake = 0.0f;
                     }
                     else
                     {
@@ -814,7 +805,7 @@ namespace relay
                     sendConnectResult(transactionId.asDouble());
                     sendBWDone();
 
-                    //connected = true;
+                    connected = true;
 
                     Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
                 }
@@ -857,6 +848,8 @@ namespace relay
                         if (server) server->unpublishStream();
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
+
+                        streamName.clear();
                     }
                     else
                     {
@@ -870,13 +863,22 @@ namespace relay
                 {
                     if (streamType == StreamType::NONE)
                     {
+                        streamType = StreamType::INPUT;
                         streamName = argument2.asString();
 
-                        if (server) server->createStream(streamName);
+                        server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
 
-                        streamType = StreamType::INPUT;
+                        if (!server)
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                            socket.close();
+                            return false;
+                        }
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
+
+                        if (server) server->createStream(streamName);
+                        // TODO: add to server
                     }
                     else
                     {
@@ -906,22 +908,20 @@ namespace relay
                     if (streamType == StreamType::NONE)
                     {
                         streamType = StreamType::OUTPUT;
+                        streamName = argument2.asString();
 
                         server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
 
                         if (!server)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
                             socket.close();
                             return false;
                         }
 
                         sendPlayStatus(transactionId.asDouble());
 
-                        // TODO: implement
-                        /*sendMetaData();
-                        sendAudioHeader();
-                        sendVideoHeader();*/
+                        // TODO: add to server
                     }
                     else
                     {
@@ -969,8 +969,8 @@ namespace relay
 
                         if (i->second == "connect")
                         {
-                            // TODO: implement
-                            //connected = true;
+                            connected = true;
+
                             if (!streamName.empty())
                             {
                                 sendReleaseStream();

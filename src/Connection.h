@@ -140,6 +140,7 @@ namespace relay
         std::string streamName;
         std::string overrideApplicationName;
         std::string overrideStreamName;
+        bool connected = false;
 
         float timeSinceMeasure = 0.0f;
         uint64_t currentAudioBytes = 0;
