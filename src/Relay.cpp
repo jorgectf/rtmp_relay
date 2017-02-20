@@ -223,7 +223,7 @@ namespace relay
         return true;
     }
 
-    Server* Relay::getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName)
+    Server* Relay::getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const
     {
         for (const std::unique_ptr<Server>& server : servers)
         {

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <memory>
 #include "Network.h"
@@ -42,7 +43,7 @@ namespace relay
         void openLog();
         void closeLog();
 
-        Server* getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName);
+        Server* getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const;
 
     private:
         void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);

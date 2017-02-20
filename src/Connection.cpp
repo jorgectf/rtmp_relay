@@ -17,8 +17,8 @@ namespace relay
         relay(aRelay),
         id(Relay::nextId()),
         generator(rd()),
-        socket(aSocket),
-        type(aType)
+        type(aType),
+        socket(aSocket)
     {
         if (!socket.setBlocking(false))
         {
