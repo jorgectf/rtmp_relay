@@ -42,7 +42,7 @@ namespace relay
         void openLog();
         void closeLog();
 
-        Server* getServer(uint32_t address, uint16_t port, Connection::StreamType type, std::string applicationName, std::string streamName);
+        Server* getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName);
 
     private:
         void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);

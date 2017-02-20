@@ -223,7 +223,7 @@ namespace relay
         return true;
     }
 
-    Server* Relay::getServer(uint32_t address, uint16_t port, Connection::StreamType type, std::string applicationName, std::string streamName)
+    Server* Relay::getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName)
     {
         for (const std::unique_ptr<Server>& server : servers)
         {
@@ -236,6 +236,27 @@ namespace relay
                     if ((inputDescription.applicationName.empty() || inputDescription.applicationName == applicationName) &&
                         (inputDescription.streamName.empty() || inputDescription.streamName == streamName))
                     {
+                        if (type == Connection::StreamType::INPUT)
+                        {
+                            if (std::find(inputDescription.connectionDescription.addresses.begin(),
+                                          inputDescription.connectionDescription.addresses.end(),
+                                          address) != inputDescription.connectionDescription.addresses.end())
+                            {
+                                return server.get();
+                            }
+                        }
+                        else if (type == Connection::StreamType::OUTPUT)
+                        {
+                            for (const Server::OutputDescription& outputDescription : serverDescription.outputDescriptions)
+                            {
+                                if (std::find(outputDescription.connectionDescription.addresses.begin(),
+                                              outputDescription.connectionDescription.addresses.end(),
+                                              address) != outputDescription.connectionDescription.addresses.end())
+                                {
+                                    return server.get();
+                                }
+                            }
+                        }
                     }
                 }
             }
