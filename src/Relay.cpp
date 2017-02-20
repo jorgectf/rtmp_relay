@@ -137,8 +137,9 @@ namespace relay
                     for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
                     {
                         std::string address = addressArray[addressIndex].as<std::string>();
+                        std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        connectionDescription.addresses.push_back(address);
+                        connectionDescription.addresses.push_back(addr);
 
                         if (connectionDescription.type == Connection::Type::HOST)
                         {
@@ -148,7 +149,10 @@ namespace relay
                 }
                 else
                 {
-                    connectionDescription.addresses.push_back(inputObject["address"].as<std::string>());
+                    std::string address = inputObject["address"].as<std::string>();
+                    std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
+
+                    connectionDescription.addresses.push_back(addr);
                 }
 
                 if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
@@ -179,8 +183,9 @@ namespace relay
                     for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
                     {
                         std::string address = addressArray[addressIndex].as<std::string>();
+                        std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        connectionDescription.addresses.push_back(address);
+                        connectionDescription.addresses.push_back(addr);
 
                         if (connectionDescription.type == Connection::Type::HOST)
                         {
@@ -190,7 +195,10 @@ namespace relay
                 }
                 else
                 {
-                    connectionDescription.addresses.push_back(outputObject["address"].as<std::string>());
+                    std::string address = outputObject["address"].as<std::string>();
+                    std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
+
+                    connectionDescription.addresses.push_back(addr);
                 }
 
                 if (outputObject["overrideApplicationName"]) outputDescription.overrideApplicationName = outputObject["overrideApplicationName"].as<std::string>();
@@ -217,7 +225,24 @@ namespace relay
 
     Server* Relay::getServer(uint32_t address, uint16_t port, Connection::StreamType type, std::string applicationName, std::string streamName)
     {
-        // TODO: find server, that matches all the parameters
+        for (const std::unique_ptr<Server>& server : servers)
+        {
+            const Server::Description& serverDescription = server->getDescription();
+
+            if (type == Connection::StreamType::INPUT)
+            {
+                for (const Server::InputDescription& inputDescription : serverDescription.inputDescriptions)
+                {
+                    if ((inputDescription.applicationName.empty() || inputDescription.applicationName == applicationName) &&
+                        (inputDescription.streamName.empty() || inputDescription.streamName == streamName))
+                    {
+                    }
+                }
+            }
+
+            // TODO: find server, that matches all the parameters
+        }
+
         return nullptr;
     }
 

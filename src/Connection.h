@@ -31,7 +31,7 @@ namespace relay
         struct Description
         {
             Type type;
-            std::vector<std::string> addresses;
+            std::vector<std::pair<uint32_t, uint16_t>> addresses;
             float connectionTimeout = 0.0f;
             float reconnectInterval = 0.0f;
             float reconnectCount = 0.0f;
