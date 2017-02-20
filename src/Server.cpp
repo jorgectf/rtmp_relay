@@ -2,6 +2,7 @@
 //  rtmp_relay
 //
 
+#include <algorithm>
 #include "Server.h"
 
 namespace relay
@@ -11,27 +12,41 @@ namespace relay
     {
     }
 
-    void Server::createStream(const std::string& newStreamName)
+    void Server::addConnection(Connection& connection)
     {
-        for (Connection* connection : connections)
+        connections.push_back(&connection);
+
+        if (connection.getStreamType() == Connection::StreamType::INPUT)
         {
-            connection->createStream(newStreamName);
+            for (Connection* currentConnection : connections)
+            {
+                if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
+                {
+                    currentConnection->createStream(connection.getStreamName());
+                }
+            }
         }
     }
 
-    void Server::deleteStream()
+    void Server::removeConnection(Connection& connection)
     {
-        for (Connection* connection : connections)
-        {
-            connection->deleteStream();
-        }
-    }
+        auto i = std::find(connections.begin(), connections.end(), &connection);
 
-    void Server::unpublishStream()
-    {
-        for (Connection* connection : connections)
+        if (i != connections.end())
         {
-            connection->unpublishStream();
+            connections.erase(i);
+        }
+
+        if (connection.getStreamType() == Connection::StreamType::INPUT)
+        {
+            for (Connection* currentConnection : connections)
+            {
+                if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
+                {
+                    currentConnection->deleteStream();
+                    currentConnection->unpublishStream();
+                }
+            }
         }
     }
 
@@ -41,7 +56,10 @@ namespace relay
 
         for (Connection* connection : connections)
         {
-            connection->sendAudioData(0, headerData);
+            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            {
+                connection->sendAudioData(0, headerData);
+            }
         }
     }
 
@@ -51,7 +69,10 @@ namespace relay
 
         for (Connection* connection : connections)
         {
-            connection->sendVideoData(0, headerData);
+            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            {
+                connection->sendVideoData(0, headerData);
+            }
         }
     }
 
@@ -59,7 +80,10 @@ namespace relay
     {
         for (Connection* connection : connections)
         {
-            connection->sendAudioData(timestamp, audioData);
+            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            {
+                connection->sendAudioData(timestamp, audioData);
+            }
         }
     }
 
@@ -67,7 +91,10 @@ namespace relay
     {
         for (Connection* connection : connections)
         {
-            connection->sendVideoData(timestamp, videoData);
+            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            {
+                connection->sendVideoData(timestamp, videoData);
+            }
         }
     }
 
@@ -77,7 +104,10 @@ namespace relay
 
         for (Connection* connection : connections)
         {
-            connection->sendMetaData(metaData);
+            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            {
+                connection->sendMetaData(metaData);
+            }
         }
     }
 
@@ -85,8 +115,10 @@ namespace relay
     {
         for (Connection* connection : connections)
         {
-            connection->sendTextData(timestamp, textData);
+            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            {
+                connection->sendTextData(timestamp, textData);
+            }
         }
     }
-
 }

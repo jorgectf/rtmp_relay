@@ -39,11 +39,10 @@ namespace relay
 
         Server(const Server::Description& aDescription);
 
-        const Server::Description& getDescription() const { return description; }
+        void addConnection(Connection& connection);
+        void removeConnection(Connection& connection);
 
-        void createStream(const std::string& newStreamName);
-        void deleteStream();
-        void unpublishStream();
+        const Server::Description& getDescription() const { return description; }
 
         void sendAudioHeader(const std::vector<uint8_t>& headerData);
         void sendVideoHeader(const std::vector<uint8_t>& headerData);

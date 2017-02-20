@@ -47,6 +47,14 @@ namespace relay
         connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
     }
 
+    Connection::~Connection()
+    {
+        if (server)
+        {
+            server->removeConnection(*this);
+        }
+    }
+
     void Connection::handleConnect(cppsocket::Connector&)
     {
         // handshake
@@ -792,7 +800,11 @@ namespace relay
                 }
                 else if (command.asString() == "deleteStream")
                 {
-                    if (server) server->deleteStream();
+                    if (server)
+                    {
+                        server->removeConnection(*this);
+                        server = nullptr;
+                    }
                 }
                 if (command.asString() == "connect")
                 {
@@ -816,23 +828,28 @@ namespace relay
                 {
                     if (streamType == StreamType::NONE)
                     {
-                        streamName = argument2.asString();
-                        streamType = StreamType::INPUT;
-
-                        server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
-
                         if (!server)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
-                            socket.close();
-                            return false;
+                            streamName = argument2.asString();
+                            streamType = StreamType::INPUT;
+
+                            server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
+
+                            if (!server)
+                            {
+                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
+                                socket.close();
+                                return false;
+                            }
+
+                            server->addConnection(*this);
+
+                            Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
+
+                            sendOnFCPublish();
                         }
-
-                        if (server) server->createStream(streamName);
-
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                     }
-                    else
+                    else if (streamType == StreamType::OUTPUT)
                     {
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid FCPublish, disconnecting";
                         socket.close();
@@ -845,7 +862,11 @@ namespace relay
                     {
                         streamType = StreamType::NONE;
 
-                        if (server) server->unpublishStream();
+                        if (server)
+                        {
+                            server->removeConnection(*this);
+                            server = nullptr;
+                        }
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
 
@@ -863,24 +884,29 @@ namespace relay
                 {
                     if (streamType == StreamType::NONE)
                     {
-                        streamType = StreamType::INPUT;
-                        streamName = argument2.asString();
-
-                        server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
-
                         if (!server)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
-                            socket.close();
-                            return false;
+                            streamType = StreamType::INPUT;
+                            streamName = argument2.asString();
+
+                            server = relay.getServer(socket.getLocalIPAddress(), socket.getLocalPort(), streamType, applicationName, streamName);
+
+                            if (!server)
+                            {
+                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                                socket.close();
+                                return false;
+                            }
+
+                            server->addConnection(*this);
+
+                            Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
+
+                            sendPing();
+                            sendPublishStatus(transactionId.asDouble());
                         }
-
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
-
-                        if (server) server->createStream(streamName);
-                        // TODO: add to server
                     }
-                    else
+                    else if (streamType == StreamType::OUTPUT)
                     {
                         // this is not a receiver
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid publish, disconnecting";
@@ -918,6 +944,8 @@ namespace relay
                             socket.close();
                             return false;
                         }
+
+                        server->addConnection(*this);
 
                         sendPlayStatus(transactionId.asDouble());
 
