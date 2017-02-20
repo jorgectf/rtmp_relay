@@ -238,9 +238,9 @@ namespace relay
                     {
                         if (type == Connection::StreamType::INPUT)
                         {
-                            if (std::find(inputDescription.connectionDescription.addresses.begin(),
-                                          inputDescription.connectionDescription.addresses.end(),
-                                          address) != inputDescription.connectionDescription.addresses.end())
+                            if (std::find<std::vector<std::pair<uint32_t, uint16_t>>::const_iterator, std::pair<uint32_t, uint16_t>>(inputDescription.connectionDescription.addresses.begin(),
+                                                                                                                                     inputDescription.connectionDescription.addresses.end(),
+                                                                                                                                     address) != inputDescription.connectionDescription.addresses.end())
                             {
                                 return server.get();
                             }
@@ -249,9 +249,9 @@ namespace relay
                         {
                             for (const Server::OutputDescription& outputDescription : serverDescription.outputDescriptions)
                             {
-                                if (std::find(outputDescription.connectionDescription.addresses.begin(),
-                                              outputDescription.connectionDescription.addresses.end(),
-                                              address) != outputDescription.connectionDescription.addresses.end())
+                                if (std::find<std::vector<std::pair<uint32_t, uint16_t>>::const_iterator, std::pair<uint32_t, uint16_t>>(outputDescription.connectionDescription.addresses.begin(),
+                                                                                                                                         outputDescription.connectionDescription.addresses.end(),
+                                                                                                                                         address) != outputDescription.connectionDescription.addresses.end())
                                 {
                                     return server.get();
                                 }
