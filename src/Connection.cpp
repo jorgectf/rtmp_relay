@@ -833,7 +833,7 @@ namespace relay
                             streamName = argument2.asString();
                             streamType = StreamType::INPUT;
 
-                            server = relay.getServer(Address(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                            server = relay.getServer(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
                             if (!server)
                             {
@@ -889,7 +889,7 @@ namespace relay
                             streamType = StreamType::INPUT;
                             streamName = argument2.asString();
 
-                            server = relay.getServer(Address(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                            server = relay.getServer(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
                             if (!server)
                             {
@@ -936,7 +936,7 @@ namespace relay
                         streamType = StreamType::OUTPUT;
                         streamName = argument2.asString();
 
-                        server = relay.getServer(Address(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        server = relay.getServer(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
                         if (!server)
                         {
