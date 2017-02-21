@@ -11,6 +11,7 @@
 #include "Socket.h"
 #include "Status.h"
 #include "Server.h"
+#include "Connection.h"
 
 #if !defined(_MSC_VER)
 #include <sys/syslog.h>
@@ -43,7 +44,7 @@ namespace relay
         void openLog();
         void closeLog();
 
-        Server* getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const;
+        Server* getServer(const Connection::Address& address, Connection::StreamType type, std::string applicationName, std::string streamName) const;
 
     private:
         void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);

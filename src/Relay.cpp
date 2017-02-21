@@ -139,7 +139,7 @@ namespace relay
                         std::string address = addressArray[addressIndex].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        connectionDescription.addresses.push_back(addr);
+                        connectionDescription.addresses.push_back(Connection::Address(addr.first, addr.second));
 
                         if (connectionDescription.type == Connection::Type::HOST)
                         {
@@ -152,7 +152,7 @@ namespace relay
                     std::string address = inputObject["address"].as<std::string>();
                     std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                    connectionDescription.addresses.push_back(addr);
+                    connectionDescription.addresses.push_back(Connection::Address(addr.first, addr.second));
                 }
 
                 if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
@@ -185,7 +185,7 @@ namespace relay
                         std::string address = addressArray[addressIndex].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        connectionDescription.addresses.push_back(addr);
+                        connectionDescription.addresses.push_back(Connection::Address(addr.first, addr.second));
 
                         if (connectionDescription.type == Connection::Type::HOST)
                         {
@@ -198,7 +198,7 @@ namespace relay
                     std::string address = outputObject["address"].as<std::string>();
                     std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                    connectionDescription.addresses.push_back(addr);
+                    connectionDescription.addresses.push_back(Connection::Address(addr.first, addr.second));
                 }
 
                 if (outputObject["overrideApplicationName"]) outputDescription.overrideApplicationName = outputObject["overrideApplicationName"].as<std::string>();
@@ -223,7 +223,7 @@ namespace relay
         return true;
     }
 
-    Server* Relay::getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const
+    Server* Relay::getServer(const Connection::Address& address, Connection::StreamType type, std::string applicationName, std::string streamName) const
     {
         for (const std::unique_ptr<Server>& server : servers)
         {
@@ -238,9 +238,9 @@ namespace relay
                     {
                         if (type == Connection::StreamType::INPUT)
                         {
-                            if (std::find<std::vector<std::pair<uint32_t, uint16_t>>::const_iterator, std::pair<uint32_t, uint16_t>>(inputDescription.connectionDescription.addresses.begin(),
-                                                                                                                                     inputDescription.connectionDescription.addresses.end(),
-                                                                                                                                     address) != inputDescription.connectionDescription.addresses.end())
+                            if (std::find(inputDescription.connectionDescription.addresses.begin(),
+                                          inputDescription.connectionDescription.addresses.end(),
+                                          address) != inputDescription.connectionDescription.addresses.end())
                             {
                                 return server.get();
                             }
@@ -249,9 +249,9 @@ namespace relay
                         {
                             for (const Server::OutputDescription& outputDescription : serverDescription.outputDescriptions)
                             {
-                                if (std::find<std::vector<std::pair<uint32_t, uint16_t>>::const_iterator, std::pair<uint32_t, uint16_t>>(outputDescription.connectionDescription.addresses.begin(),
-                                                                                                                                         outputDescription.connectionDescription.addresses.end(),
-                                                                                                                                         address) != outputDescription.connectionDescription.addresses.end())
+                                if (std::find(outputDescription.connectionDescription.addresses.begin(),
+                                              outputDescription.connectionDescription.addresses.end(),
+                                              address) != outputDescription.connectionDescription.addresses.end())
                                 {
                                     return server.get();
                                 }

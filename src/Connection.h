@@ -28,10 +28,32 @@ namespace relay
             CLIENT
         };
 
+        struct Address
+        {
+            Address(uint32_t aAddress, uint16_t aPort):
+                address(aAddress), port(aPort)
+            {
+            }
+
+            uint32_t address = cppsocket::ANY_ADDRESS;
+            uint16_t port = cppsocket::ANY_PORT;
+
+            bool operator==(const Address& other) const
+            {
+                return address == other.address && port == other.port;
+            }
+
+            bool operator<(const Address& other) const
+            {
+                if (address != other.address) return address < other.address;
+                else return port < other.port;
+            }
+        };
+
         struct Description
         {
             Type type;
-            std::vector<std::pair<uint32_t, uint16_t>> addresses;
+            std::vector<Address> addresses;
             float connectionTimeout = 0.0f;
             float reconnectInterval = 0.0f;
             float reconnectCount = 0.0f;
