@@ -14,16 +14,23 @@ namespace relay
 
     void Server::addConnection(Connection& connection)
     {
-        connections.push_back(&connection);
+        auto i = std::find(connections.begin(), connections.end(), &connection);
 
-        if (connection.getStreamType() == Connection::StreamType::INPUT)
+        if (i == connections.end())
         {
-            for (Connection* currentConnection : connections)
+            connections.push_back(&connection);
+
+            if (connection.getStreamType() == Connection::StreamType::INPUT)
             {
-                if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
+                for (Connection* currentConnection : connections)
                 {
-                    currentConnection->createStream(connection.getStreamName());
+                    if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
+                    {
+                        currentConnection->createStream(connection.getStreamName());
+                    }
                 }
+
+                // TODO: create all push connections
             }
         }
     }
@@ -35,17 +42,19 @@ namespace relay
         if (i != connections.end())
         {
             connections.erase(i);
-        }
 
-        if (connection.getStreamType() == Connection::StreamType::INPUT)
-        {
-            for (Connection* currentConnection : connections)
+            if (connection.getStreamType() == Connection::StreamType::INPUT)
             {
-                if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
+                for (Connection* currentConnection : connections)
                 {
-                    currentConnection->deleteStream();
-                    currentConnection->unpublishStream();
+                    if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
+                    {
+                        currentConnection->deleteStream();
+                        currentConnection->unpublishStream();
+                    }
                 }
+
+                // TODO: release all push connections
             }
         }
     }
