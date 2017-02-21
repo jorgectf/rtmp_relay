@@ -4,6 +4,7 @@
 
 #include <ctime>
 #include <memory>
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <chrono>
