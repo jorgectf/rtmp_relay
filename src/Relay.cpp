@@ -261,8 +261,6 @@ namespace relay
                     }
                 }
             }
-
-            // TODO: find server, that matches all the parameters
         }
 
         return nullptr;
