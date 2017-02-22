@@ -60,7 +60,8 @@ namespace relay
                    cppsocket::Connector& connector,
                    StreamType aStreamType,
                    const std::string& aApplicationName,
-                   const std::string& aStreamName);
+                   const std::string& aStreamName,
+                   float connectionTimeout);
         ~Connection();
 
         Type getType() const { return type; }
