@@ -56,7 +56,11 @@ namespace relay
 
         Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType);
         Connection(Relay& aRelay, cppsocket::Socket& client);
-        Connection(Relay& aRelay, cppsocket::Connector& connector);
+        Connection(Relay& aRelay,
+                   cppsocket::Connector& connector,
+                   StreamType aStreamType,
+                   const std::string& aApplicationName,
+                   const std::string& aStreamName);
         ~Connection();
 
         Type getType() const { return type; }

@@ -34,11 +34,16 @@ namespace relay
     {
     }
 
-    Connection::Connection(Relay& aRelay, cppsocket::Connector& connector):
+    Connection::Connection(Relay& aRelay,
+                           cppsocket::Connector& connector,
+                           StreamType aStreamType,
+                           const std::string& aApplicationName,
+                           const std::string& aStreamName):
         Connection(aRelay, connector, Type::CLIENT)
     {
-        // TODO: implement
-        // connect();
+        applicationName = aApplicationName;
+        streamName = aStreamName;
+        streamType = aStreamType;
 
         // TODO: implement
         //connector.setConnectTimeout(connectionTimeout);
@@ -1001,9 +1006,20 @@ namespace relay
 
                             if (!streamName.empty())
                             {
-                                sendReleaseStream();
-                                sendFCPublish();
-                                sendCreateStream();
+                                if (streamType == StreamType::INPUT)
+                                {
+                                    sendPlay();
+                                }
+                                else if (streamType == StreamType::OUTPUT)
+                                {
+                                    sendReleaseStream();
+                                    sendFCPublish();
+                                    sendCreateStream();
+                                }
+                                else
+                                {
+                                    return false;
+                                }
                             }
                         }
                         else if (i->second == "releaseStream")
