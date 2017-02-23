@@ -19,8 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="external\cppsocket\Acceptor.cpp" />
-    <ClCompile Include="external\cppsocket\Connector.cpp" />
     <ClCompile Include="external\cppsocket\Log.cpp" />
     <ClCompile Include="external\cppsocket\Network.cpp" />
     <ClCompile Include="external\cppsocket\Socket.cpp" />
@@ -62,8 +60,6 @@
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="external\cppsocket\Acceptor.h" />
-    <ClInclude Include="external\cppsocket\Connector.h" />
     <ClInclude Include="external\cppsocket\Log.h" />
     <ClInclude Include="external\cppsocket\Network.h" />
     <ClInclude Include="external\cppsocket\Socket.h" />

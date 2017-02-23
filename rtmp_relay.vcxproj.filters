@@ -6,12 +6,6 @@
     <ClCompile Include="src\Relay.cpp" />
     <ClCompile Include="src\RTMP.cpp" />
     <ClCompile Include="src\Utils.cpp" />
-    <ClCompile Include="external\cppsocket\Acceptor.cpp">
-      <Filter>cppsocket</Filter>
-    </ClCompile>
-    <ClCompile Include="external\cppsocket\Connector.cpp">
-      <Filter>cppsocket</Filter>
-    </ClCompile>
     <ClCompile Include="external\cppsocket\Network.cpp">
       <Filter>cppsocket</Filter>
     </ClCompile>
@@ -113,12 +107,6 @@
     <ClInclude Include="src\Relay.h" />
     <ClInclude Include="src\RTMP.h" />
     <ClInclude Include="src\Utils.h" />
-    <ClInclude Include="external\cppsocket\Acceptor.h">
-      <Filter>cppsocket</Filter>
-    </ClInclude>
-    <ClInclude Include="external\cppsocket\Connector.h">
-      <Filter>cppsocket</Filter>
-    </ClInclude>
     <ClInclude Include="external\cppsocket\Network.h">
       <Filter>cppsocket</Filter>
     </ClInclude>
