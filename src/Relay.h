@@ -46,7 +46,7 @@ namespace relay
         Server* getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const;
 
     private:
-        void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);
+        void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
 
         static uint64_t currentId;
         bool active = true;
@@ -58,7 +58,7 @@ namespace relay
         std::vector<std::unique_ptr<Server>> servers;
         std::vector<std::unique_ptr<Connection>> connections;
 
-        std::vector<cppsocket::Acceptor> acceptors;
+        std::vector<cppsocket::Socket> acceptors;
 
 #if !defined(_MSC_VER)
         std::string syslogIdent;

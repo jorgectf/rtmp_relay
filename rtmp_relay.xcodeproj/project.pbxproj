@@ -16,8 +16,6 @@
 		304B286D1C9C3ED900BA162D /* RTMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 304B286B1C9C3ED900BA162D /* RTMP.cpp */; };
 		304B28721C9C6AC800BA162D /* Amf0.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 304B28701C9C6AC800BA162D /* Amf0.cpp */; };
 		309B48331DE4A0D700A718C5 /* StatusSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 309B48311DE4A0D700A718C5 /* StatusSender.cpp */; };
-		30BB18BD1D47A40B00102062 /* Acceptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30BB18B51D47A40B00102062 /* Acceptor.cpp */; };
-		30BB18BE1D47A40B00102062 /* Connector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30BB18B71D47A40B00102062 /* Connector.cpp */; };
 		30BB18BF1D47A40B00102062 /* Network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30BB18B91D47A40B00102062 /* Network.cpp */; };
 		30BB18C01D47A40B00102062 /* Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30BB18BB1D47A40B00102062 /* Socket.cpp */; };
 		30BB18F31D47A43800102062 /* binary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 30BB18C31D47A43800102062 /* binary.cpp */; };
@@ -82,10 +80,6 @@
 		307A9A261C92311B00B4984A /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		309B48311DE4A0D700A718C5 /* StatusSender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StatusSender.cpp; sourceTree = "<group>"; };
 		309B48321DE4A0D700A718C5 /* StatusSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusSender.h; sourceTree = "<group>"; };
-		30BB18B51D47A40B00102062 /* Acceptor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Acceptor.cpp; sourceTree = "<group>"; };
-		30BB18B61D47A40B00102062 /* Acceptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acceptor.h; sourceTree = "<group>"; };
-		30BB18B71D47A40B00102062 /* Connector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Connector.cpp; sourceTree = "<group>"; };
-		30BB18B81D47A40B00102062 /* Connector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Connector.h; sourceTree = "<group>"; };
 		30BB18B91D47A40B00102062 /* Network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Network.cpp; sourceTree = "<group>"; };
 		30BB18BA1D47A40B00102062 /* Network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Network.h; sourceTree = "<group>"; };
 		30BB18BB1D47A40B00102062 /* Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Socket.cpp; sourceTree = "<group>"; };
@@ -200,10 +194,6 @@
 		30513E281D37C61100F9B4BA /* cppsocket */ = {
 			isa = PBXGroup;
 			children = (
-				30BB18B51D47A40B00102062 /* Acceptor.cpp */,
-				30BB18B61D47A40B00102062 /* Acceptor.h */,
-				30BB18B71D47A40B00102062 /* Connector.cpp */,
-				30BB18B81D47A40B00102062 /* Connector.h */,
 				3030D5121DAF8C94007CC8EB /* Log.cpp */,
 				3030D5131DAF8C94007CC8EB /* Log.h */,
 				30BB18B91D47A40B00102062 /* Network.cpp */,
@@ -333,7 +323,6 @@
 				30BB19011D47A43800102062 /* null.cpp in Sources */,
 				300934151C874CBA00CC50D3 /* Relay.cpp in Sources */,
 				30BB190D1D47A43800102062 /* tag.cpp in Sources */,
-				30BB18BD1D47A40B00102062 /* Acceptor.cpp in Sources */,
 				30BB19061D47A43800102062 /* scanner.cpp in Sources */,
 				30BB18F91D47A43800102062 /* emitterstate.cpp in Sources */,
 				30BB18F71D47A43800102062 /* emitfromevents.cpp in Sources */,
@@ -363,7 +352,6 @@
 				30BB18FB1D47A43800102062 /* exp.cpp in Sources */,
 				30BB19091D47A43800102062 /* scantoken.cpp in Sources */,
 				30BB18BF1D47A40B00102062 /* Network.cpp in Sources */,
-				30BB18BE1D47A40B00102062 /* Connector.cpp in Sources */,
 				30BB19001D47A43800102062 /* nodeevents.cpp in Sources */,
 				3030D6E91DB7AADF007CC8EB /* Status.cpp in Sources */,
 				30BB18FE1D47A43800102062 /* node.cpp in Sources */,

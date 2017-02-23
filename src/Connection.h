@@ -8,7 +8,6 @@
 #include <map>
 #include <set>
 #include "Socket.h"
-#include "Connector.h"
 #include "RTMP.h"
 #include "Amf0.h"
 #include "Status.h"
@@ -57,7 +56,7 @@ namespace relay
         Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType);
         Connection(Relay& aRelay, cppsocket::Socket& client);
         Connection(Relay& aRelay,
-                   cppsocket::Connector& connector,
+                   cppsocket::Socket& connector,
                    StreamType aStreamType,
                    const std::string& aApplicationName,
                    const std::string& aStreamName,
@@ -83,8 +82,8 @@ namespace relay
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
     private:
-        void handleConnect(cppsocket::Connector&);
-        void handleConnectError(cppsocket::Connector&);
+        void handleConnect(cppsocket::Socket&);
+        void handleConnectError(cppsocket::Socket&);
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
         void handleClose(cppsocket::Socket&);
 
@@ -127,7 +126,7 @@ namespace relay
         
         Type type;
         State state;
-        cppsocket::Socket& socket;
+        cppsocket::Socket socket;
 
         std::vector<uint8_t> data;
 

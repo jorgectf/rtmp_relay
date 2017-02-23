@@ -32,7 +32,7 @@ namespace relay
         }
     }
 
-    void Status::handleAccept(cppsocket::Acceptor&, cppsocket::Socket& clientSocket)
+    void Status::handleAccept(cppsocket::Socket&, cppsocket::Socket& clientSocket)
     {
         std::unique_ptr<StatusSender> statusSender(new StatusSender(network, clientSocket, relay));
         

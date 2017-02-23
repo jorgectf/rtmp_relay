@@ -10,7 +10,6 @@
 #include <chrono>
 #include <thread>
 #include "yaml-cpp/yaml.h"
-#include "Acceptor.h"
 #include "Log.h"
 #include "Relay.h"
 #include "Status.h"
@@ -216,7 +215,7 @@ namespace relay
 
         for (const std::string& address : listenAddresses)
         {
-            cppsocket::Acceptor acceptor(network);
+            cppsocket::Socket acceptor(network);
             acceptor.startAccept(address);
             acceptors.push_back(std::move(acceptor));
         }
@@ -356,7 +355,7 @@ namespace relay
 #endif
     }
 
-    void Relay::handleAccept(cppsocket::Acceptor&, cppsocket::Socket& clientSocket)
+    void Relay::handleAccept(cppsocket::Socket&, cppsocket::Socket& clientSocket)
     {
         std::unique_ptr<Connection> connection(new Connection(*this, clientSocket));
 

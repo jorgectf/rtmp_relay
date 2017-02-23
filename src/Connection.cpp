@@ -18,7 +18,7 @@ namespace relay
         id(Relay::nextId()),
         generator(rd()),
         type(aType),
-        socket(aSocket)
+        socket(std::move(aSocket))
     {
         if (!socket.setBlocking(false))
         {
@@ -35,7 +35,7 @@ namespace relay
     }
 
     Connection::Connection(Relay& aRelay,
-                           cppsocket::Connector& connector,
+                           cppsocket::Socket& connector,
                            StreamType aStreamType,
                            const std::string& aApplicationName,
                            const std::string& aStreamName,
@@ -60,7 +60,7 @@ namespace relay
         }
     }
 
-    void Connection::handleConnect(cppsocket::Connector&)
+    void Connection::handleConnect(cppsocket::Socket&)
     {
         // handshake
         if (type == Type::CLIENT)
@@ -92,7 +92,7 @@ namespace relay
         }
     }
 
-    void Connection::handleConnectError(cppsocket::Connector&)
+    void Connection::handleConnectError(cppsocket::Socket&)
     {
     }
 

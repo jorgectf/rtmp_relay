@@ -5,7 +5,6 @@
 #pragma once
 
 #include <memory>
-#include "Acceptor.h"
 #include "StatusSender.h"
 
 namespace relay
@@ -33,10 +32,10 @@ namespace relay
         void update(float delta);
 
     private:
-        void handleAccept(cppsocket::Acceptor& acceptor, cppsocket::Socket& clientSocket);
+        void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
 
         cppsocket::Network& network;
-        cppsocket::Acceptor socket;
+        cppsocket::Socket socket;
         Relay& relay;
 
         std::vector<std::unique_ptr<StatusSender>> statusSenders;
