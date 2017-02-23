@@ -126,9 +126,8 @@ namespace relay
 
                 Server::InputDescription inputDescription;
 
-                Connection::Description connectionDescription;
-                if (inputObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
-                else if (inputObject["type"].as<std::string>() == "client") connectionDescription.type = Connection::Type::CLIENT;
+                if (inputObject["type"].as<std::string>() == "host") inputDescription.connectionDescription.type = Connection::Type::HOST;
+                else if (inputObject["type"].as<std::string>() == "client") inputDescription.connectionDescription.type = Connection::Type::CLIENT;
 
                 if (inputObject["address"].IsSequence())
                 {
@@ -139,9 +138,9 @@ namespace relay
                         std::string address = addressArray[addressIndex].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                        inputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
 
-                        if (connectionDescription.type == Connection::Type::HOST)
+                        if (inputDescription.connectionDescription.type == Connection::Type::HOST)
                         {
                             listenAddresses.insert(address);
                         }
@@ -152,7 +151,7 @@ namespace relay
                     std::string address = inputObject["address"].as<std::string>();
                     std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                    connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                    inputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
                 }
 
                 if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
@@ -172,9 +171,8 @@ namespace relay
 
                 Server::OutputDescription outputDescription;
 
-                Connection::Description connectionDescription;
-                if (outputObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
-                else if (outputObject["type"].as<std::string>() == "client") connectionDescription.type = Connection::Type::CLIENT;
+                if (outputObject["type"].as<std::string>() == "host") outputDescription.connectionDescription.type = Connection::Type::HOST;
+                else if (outputObject["type"].as<std::string>() == "client") outputDescription.connectionDescription.type = Connection::Type::CLIENT;
 
                 if (outputObject["address"].IsSequence())
                 {
@@ -185,9 +183,9 @@ namespace relay
                         std::string address = addressArray[addressIndex].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                        outputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
 
-                        if (connectionDescription.type == Connection::Type::HOST)
+                        if (outputDescription.connectionDescription.type == Connection::Type::HOST)
                         {
                             listenAddresses.insert(address);
                         }
@@ -198,9 +196,11 @@ namespace relay
                     std::string address = outputObject["address"].as<std::string>();
                     std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                    connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                    outputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
                 }
 
+                if (outputObject["applicationName"]) outputDescription.applicationName = outputObject["applicationName"].as<std::string>();
+                if (outputObject["streamName"]) outputDescription.streamName = outputObject["streamName"].as<std::string>();
                 if (outputObject["overrideApplicationName"]) outputDescription.overrideApplicationName = outputObject["overrideApplicationName"].as<std::string>();
                 if (outputObject["overrideStreamName"]) outputDescription.overrideStreamName = outputObject["overrideStreamName"].as<std::string>();
                 if (outputObject["video"]) outputDescription.video = outputObject["video"].as<bool>();
@@ -210,7 +210,33 @@ namespace relay
                 serverDescription.outputDescriptions.push_back(outputDescription);
             }
 
-            servers.push_back(std::unique_ptr<Server>(new Server(serverDescription)));
+            std::unique_ptr<Server> server(new Server(serverDescription));
+
+            for (const Server::InputDescription& inputDescription : serverDescription.inputDescriptions)
+            {
+                if (inputDescription.connectionDescription.type == Connection::Type::CLIENT)
+                {
+                    for (const std::pair<uint32_t, uint16_t>& address : inputDescription.connectionDescription.addresses)
+                    {
+                        Socket socket(network);
+                        socket.setConnectTimeout(inputDescription.connectionDescription.connectionTimeout);
+
+                        socket.connect(address.first, address.second);
+
+                        std::unique_ptr<Connection> connection(new Connection(*this,
+                                                                              socket,
+                                                                              Connection::StreamType::INPUT,
+                                                                              inputDescription.applicationName,
+                                                                              inputDescription.streamName));
+
+                        server->addConnection(*connection);
+
+                        connections.push_back(std::move(connection));
+                    }
+                }
+            }
+
+            servers.push_back(std::move(server));
         }
 
         for (const std::string& address : listenAddresses)

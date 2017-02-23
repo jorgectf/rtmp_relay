@@ -38,15 +38,12 @@ namespace relay
                            cppsocket::Socket& connector,
                            StreamType aStreamType,
                            const std::string& aApplicationName,
-                           const std::string& aStreamName,
-                           float connectionTimeout):
+                           const std::string& aStreamName):
         Connection(aRelay, connector, Type::CLIENT)
     {
         streamType = aStreamType;
         applicationName = aApplicationName;
         streamName = aStreamName;
-
-        connector.setConnectTimeout(connectionTimeout);
 
         connector.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
         connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));

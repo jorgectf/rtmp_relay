@@ -27,6 +27,8 @@ namespace relay
             bool video = true;
             bool audio = true;
             bool data = true;
+            std::string applicationName;
+            std::string streamName;
             std::string overrideApplicationName;
             std::string overrideStreamName;
         };
