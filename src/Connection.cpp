@@ -37,10 +37,12 @@ namespace relay
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
                            StreamType aStreamType,
+                           Server& aServer,
                            const std::string& aApplicationName,
                            const std::string& aStreamName):
         Connection(aRelay, connector, Type::CLIENT)
     {
+        server = &aServer;
         streamType = aStreamType;
         applicationName = aApplicationName;
         streamName = aStreamName;
@@ -53,7 +55,8 @@ namespace relay
     {
         if (server)
         {
-            server->removeConnection(*this);
+            server->stopStreaming(*this);
+            server->stopReceiving(*this);
         }
     }
 
@@ -804,7 +807,8 @@ namespace relay
                 {
                     if (server)
                     {
-                        server->removeConnection(*this);
+                        server->stopReceiving(*this);
+                        server->stopStreaming(*this);
                         server = nullptr;
                     }
                 }
@@ -844,7 +848,7 @@ namespace relay
                                 return false;
                             }
 
-                            server->addConnection(*this);
+                            server->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
 
@@ -866,7 +870,8 @@ namespace relay
 
                         if (server)
                         {
-                            server->removeConnection(*this);
+                            server->stopReceiving(*this);
+                            server->stopStreaming(*this);
                             server = nullptr;
                         }
 
@@ -900,7 +905,7 @@ namespace relay
                                 return false;
                             }
 
-                            server->addConnection(*this);
+                            server->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
 
@@ -947,7 +952,7 @@ namespace relay
                             return false;
                         }
 
-                        server->addConnection(*this);
+                        server->startReceiving(*this);
 
                         sendPlayStatus(transactionId.asDouble());
 
@@ -977,6 +982,38 @@ namespace relay
                         socket.close();
                         return false;
                     }
+                }
+                else if (command.asString() == "onStatus")
+                {
+                    if (argument2["code"].asString() == "NetStream.Publish.Start")
+                    {
+                        if (streamType == StreamType::OUTPUT)
+                        {
+                            server->startReceiving(*this);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status received, disconnecting";
+
+                            socket.close();
+                            return false;
+                        }
+                    }
+                    else if (argument2["code"].asString() == "NetStream.Play.Start")
+                    {
+                        if (streamType == StreamType::INPUT)
+                        {
+                            server->startStreaming(*this);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status received, disconnecting";
+
+                            socket.close();
+                            return false;
+                        }
+                    }
+
                 }
                 else if (command.asString() == "_error")
                 {

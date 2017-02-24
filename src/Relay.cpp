@@ -226,10 +226,9 @@ namespace relay
                         std::unique_ptr<Connection> connection(new Connection(*this,
                                                                               socket,
                                                                               Connection::StreamType::INPUT,
+                                                                              *server,
                                                                               inputDescription.applicationName,
                                                                               inputDescription.streamName));
-
-                        server->addConnection(*connection);
 
                         connections.push_back(std::move(connection));
                     }

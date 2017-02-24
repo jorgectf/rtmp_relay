@@ -41,8 +41,11 @@ namespace relay
 
         Server(const Server::Description& aDescription);
 
-        void addConnection(Connection& connection);
-        void removeConnection(Connection& connection);
+        void startStreaming(Connection& connection);
+        void stopStreaming(Connection& connection);
+
+        void startReceiving(Connection& connection);
+        void stopReceiving(Connection& connection);
 
         const Server::Description& getDescription() const { return description; }
 
@@ -56,10 +59,16 @@ namespace relay
     private:
         Server::Description description;
 
+        Connection* inputConnection = nullptr;
+        std::vector<Connection*> outputConnections;
+
+        std::string applicationName;
+        std::string streamName;
+
         std::vector<uint8_t> audioHeader;
         std::vector<uint8_t> videoHeader;
         amf0::Node metaData;
 
-        std::vector<Connection*> connections;
+        std::vector<std::unique_ptr<Connection>> managedConnections;
     };
 }

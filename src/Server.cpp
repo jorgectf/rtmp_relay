@@ -12,50 +12,49 @@ namespace relay
     {
     }
 
-    void Server::addConnection(Connection& connection)
+    void Server::startStreaming(Connection& connection)
     {
-        auto i = std::find(connections.begin(), connections.end(), &connection);
+        inputConnection = &connection;
 
-        if (i == connections.end())
+        for (Connection* outputConnection : outputConnections)
         {
-            connections.push_back(&connection);
+            outputConnection->createStream(inputConnection->getStreamName());
+        }
 
-            if (connection.getStreamType() == Connection::StreamType::INPUT)
+        // TODO: create all push connections
+    }
+
+    void Server::stopStreaming(Connection& connection)
+    {
+        if (&connection == inputConnection)
+        {
+            for (Connection* outputConnection : outputConnections)
             {
-                for (Connection* currentConnection : connections)
-                {
-                    if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
-                    {
-                        currentConnection->createStream(connection.getStreamName());
-                    }
-                }
-
-                // TODO: create all push connections
+                outputConnection->deleteStream();
+                outputConnection->unpublishStream();
             }
+
+            // TODO: release all push connections
         }
     }
 
-    void Server::removeConnection(Connection& connection)
+    void Server::startReceiving(Connection& connection)
     {
-        auto i = std::find(connections.begin(), connections.end(), &connection);
+        auto i = std::find(outputConnections.begin(), outputConnections.end(), &connection);
 
-        if (i != connections.end())
+        if (i == outputConnections.end())
         {
-            connections.erase(i);
+            outputConnections.push_back(&connection);
+        }
+    }
 
-            if (connection.getStreamType() == Connection::StreamType::INPUT)
-            {
-                for (Connection* currentConnection : connections)
-                {
-                    if (currentConnection->getStreamType() == Connection::StreamType::OUTPUT)
-                    {
-                        currentConnection->deleteStream();
-                        currentConnection->unpublishStream();
-                    }
-                }
+    void Server::stopReceiving(Connection& connection)
+    {
+        auto i = std::find(outputConnections.begin(), outputConnections.end(), &connection);
 
-                // TODO: release all push connections
-            }
+        if (i != outputConnections.end())
+        {
+            outputConnections.erase(i);
         }
     }
 
@@ -63,11 +62,11 @@ namespace relay
     {
         audioHeader = headerData;
 
-        for (Connection* connection : connections)
+        for (Connection* outputConnection : outputConnections)
         {
-            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                connection->sendAudioData(0, headerData);
+                outputConnection->sendAudioData(0, headerData);
             }
         }
     }
@@ -76,33 +75,33 @@ namespace relay
     {
         videoHeader = headerData;
 
-        for (Connection* connection : connections)
+        for (Connection* outputConnection : outputConnections)
         {
-            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                connection->sendVideoData(0, headerData);
+                outputConnection->sendVideoData(0, headerData);
             }
         }
     }
 
     void Server::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        for (Connection* connection : connections)
+        for (Connection* outputConnection : outputConnections)
         {
-            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                connection->sendAudioData(timestamp, audioData);
+                outputConnection->sendAudioData(timestamp, audioData);
             }
         }
     }
 
     void Server::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        for (Connection* connection : connections)
+        for (Connection* outputConnection : outputConnections)
         {
-            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                connection->sendVideoData(timestamp, videoData);
+                outputConnection->sendVideoData(timestamp, videoData);
             }
         }
     }
@@ -111,22 +110,22 @@ namespace relay
     {
         metaData = newMetaData;
 
-        for (Connection* connection : connections)
+        for (Connection* outputConnection : outputConnections)
         {
-            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                connection->sendMetaData(metaData);
+                outputConnection->sendMetaData(metaData);
             }
         }
     }
 
     void Server::sendTextData(uint64_t timestamp, const amf0::Node& textData)
     {
-        for (Connection* connection : connections)
+        for (Connection* outputConnection : outputConnections)
         {
-            if (connection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                connection->sendTextData(timestamp, textData);
+                outputConnection->sendTextData(timestamp, textData);
             }
         }
     }

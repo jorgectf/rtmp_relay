@@ -58,6 +58,7 @@ namespace relay
         Connection(Relay& aRelay,
                    cppsocket::Socket& connector,
                    StreamType aStreamType,
+                   Server& aServer,
                    const std::string& aApplicationName,
                    const std::string& aStreamName);
         ~Connection();
