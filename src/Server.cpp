@@ -5,9 +5,15 @@
 #include <algorithm>
 #include "Server.h"
 
+using namespace cppsocket;
+
 namespace relay
 {
-    Server::Server(const Server::Description& aDescription):
+    Server::Server(Relay& aRelay,
+                   cppsocket::Network& aNetwork,
+                   const Server::Description& aDescription):
+        relay(aRelay),
+        network(aNetwork),
         description(aDescription)
     {
     }
@@ -21,7 +27,25 @@ namespace relay
             outputConnection->createStream(inputConnection->getStreamName());
         }
 
-        // TODO: create all push connections
+        for (const OutputDescription& outputDescription : description.outputDescriptions)
+        {
+            for (const std::pair<uint32_t, uint16_t>& address : outputDescription.connectionDescription.addresses)
+            {
+                Socket socket(network);
+                socket.setConnectTimeout(outputDescription.connectionDescription.connectionTimeout);
+
+                socket.connect(address.first, address.second);
+
+                std::unique_ptr<Connection> newConnection(new Connection(relay,
+                                                                         socket,
+                                                                         Connection::StreamType::OUTPUT,
+                                                                         *this,
+                                                                         outputDescription.applicationName,
+                                                                         outputDescription.streamName));
+
+                connections.push_back(std::move(newConnection));
+            }
+        }
     }
 
     void Server::stopStreaming(Connection& connection)
@@ -34,7 +58,7 @@ namespace relay
                 outputConnection->unpublishStream();
             }
 
-            // TODO: release all push connections
+            connections.clear();
         }
     }
 

@@ -210,7 +210,7 @@ namespace relay
                 serverDescription.outputDescriptions.push_back(outputDescription);
             }
 
-            std::unique_ptr<Server> server(new Server(serverDescription));
+            std::unique_ptr<Server> server(new Server(*this, network, serverDescription));
 
             for (const Server::InputDescription& inputDescription : serverDescription.inputDescriptions)
             {

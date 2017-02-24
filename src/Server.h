@@ -39,7 +39,9 @@ namespace relay
             std::vector<OutputDescription> outputDescriptions;
         };
 
-        Server(const Server::Description& aDescription);
+        Server(Relay& aRelay,
+               cppsocket::Network& aNetwork,
+               const Server::Description& aDescription);
 
         void startStreaming(Connection& connection);
         void stopStreaming(Connection& connection);
@@ -57,6 +59,8 @@ namespace relay
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
     private:
+        Relay& relay;
+        cppsocket::Network& network;
         Server::Description description;
 
         Connection* inputConnection = nullptr;
@@ -69,6 +73,6 @@ namespace relay
         std::vector<uint8_t> videoHeader;
         amf0::Node metaData;
 
-        std::vector<std::unique_ptr<Connection>> managedConnections;
+        std::vector<std::unique_ptr<Connection>> connections;
     };
 }
