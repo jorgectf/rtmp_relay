@@ -34,7 +34,7 @@ namespace relay
             float connectionTimeout = 5.0f;
             float reconnectInterval = 5.0f;
             uint32_t reconnectCount = 0;
-            float pingInterval = 0.0f;
+            float pingInterval = 60.0f;
         };
 
         enum class StreamType
@@ -133,7 +133,7 @@ namespace relay
         Type type;
         State state;
         std::vector<std::pair<uint32_t, uint16_t>> addresses;
-        float pingInterval = 5.0f;
+        float pingInterval = 60.0f;
         float connectionTimeout = 5.0f;
         float reconnectInterval = 5.0f;
         uint32_t reconnectCount = 0;
