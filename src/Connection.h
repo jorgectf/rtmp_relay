@@ -66,7 +66,9 @@ namespace relay
                    StreamType aStreamType,
                    Server& aServer,
                    const std::string& aApplicationName,
-                   const std::string& aStreamName);
+                   const std::string& aStreamName,
+                   const std::string& aOverrideApplicationName,
+                   const std::string& aOverrideStreamName);
         ~Connection();
 
         Type getType() const { return type; }

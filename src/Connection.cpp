@@ -46,7 +46,9 @@ namespace relay
                            StreamType aStreamType,
                            Server& aServer,
                            const std::string& aApplicationName,
-                           const std::string& aStreamName):
+                           const std::string& aStreamName,
+                           const std::string& aOverrideApplicationName,
+                           const std::string& aOverrideStreamName):
         Connection(aRelay, connector, Type::CLIENT)
     {
         addresses = aAddresses;
@@ -55,8 +57,43 @@ namespace relay
         reconnectCount = aReconnectCount;
         streamType = aStreamType;
         server = &aServer;
-        applicationName = aApplicationName;
-        streamName = aStreamName;
+        overrideApplicationName = aOverrideApplicationName;
+        overrideStreamName = aOverrideStreamName;
+
+        if (overrideApplicationName.empty())
+        {
+            applicationName = aApplicationName;
+        }
+        else
+        {
+            std::map<std::string, std::string> tokens = {
+                {"id", std::to_string(id)},
+                {"applicationName", aApplicationName},
+                {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                {"port", std::to_string(socket.getRemotePort())}
+            };
+
+            applicationName = overrideApplicationName;
+            replaceTokens(applicationName, tokens);
+        }
+
+        if (overrideStreamName.empty())
+        {
+            streamName = aStreamName;
+        }
+        else
+        {
+            std::map<std::string, std::string> tokens = {
+                {"id", std::to_string(id)},
+                {"streamName", aStreamName},
+                {"applicationName", applicationName},
+                {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                {"port", std::to_string(socket.getRemotePort())}
+            };
+
+            streamName = overrideStreamName;
+            replaceTokens(streamName, tokens);
+        }
 
         if (!addresses.empty())
         {

@@ -19,6 +19,8 @@ namespace relay
             bool data = true;
             std::string applicationName;
             std::string streamName;
+            std::string overrideApplicationName;
+            std::string overrideStreamName;
         };
 
         struct OutputDescription

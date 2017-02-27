@@ -40,7 +40,9 @@ namespace relay
                                                                      Connection::StreamType::OUTPUT,
                                                                      *this,
                                                                      outputDescription.applicationName,
-                                                                     outputDescription.streamName));
+                                                                     outputDescription.streamName,
+                                                                     outputDescription.overrideApplicationName,
+                                                                     outputDescription.overrideStreamName));
 
             connections.push_back(std::move(newConnection));
         }

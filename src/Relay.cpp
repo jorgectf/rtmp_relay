@@ -165,6 +165,8 @@ namespace relay
 
                 if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
                 if (inputObject["streamName"]) inputDescription.streamName = inputObject["streamName"].as<std::string>();
+                if (inputObject["overrideApplicationName"]) inputDescription.overrideApplicationName = inputObject["overrideApplicationName"].as<std::string>();
+                if (inputObject["overrideStreamName"]) inputDescription.overrideStreamName = inputObject["overrideStreamName"].as<std::string>();
                 if (inputObject["video"]) inputDescription.video = inputObject["video"].as<bool>();
                 if (inputObject["audio"]) inputDescription.audio = inputObject["audio"].as<bool>();
                 if (inputObject["data"]) inputDescription.data = inputObject["data"].as<bool>();
@@ -240,7 +242,9 @@ namespace relay
                                                                           Connection::StreamType::INPUT,
                                                                           *server,
                                                                           inputDescription.applicationName,
-                                                                          inputDescription.streamName));
+                                                                          inputDescription.streamName,
+                                                                          inputDescription.overrideApplicationName,
+                                                                          inputDescription.overrideStreamName));
 
                     connections.push_back(std::move(connection));
                 }
@@ -393,7 +397,9 @@ namespace relay
 
     void Relay::handleAccept(cppsocket::Socket&, cppsocket::Socket& clientSocket)
     {
-        std::unique_ptr<Connection> connection(new Connection(*this, clientSocket, pingInterval));
+        std::unique_ptr<Connection> connection(new Connection(*this,
+                                                              clientSocket,
+                                                              pingInterval));
 
         connections.push_back(std::move(connection));
     }
