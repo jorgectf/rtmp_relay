@@ -27,9 +27,17 @@ namespace relay
             CLIENT
         };
 
+        enum class StreamType
+        {
+            NONE,
+            INPUT,
+            OUTPUT
+        };
+
         struct Description
         {
             Type type;
+            StreamType streamType;
             std::vector<std::pair<uint32_t, uint16_t>> addresses;
             float connectionTimeout = 5.0f;
             float reconnectInterval = 5.0f;
@@ -43,13 +51,8 @@ namespace relay
             std::string streamName;
             std::string overrideApplicationName;
             std::string overrideStreamName;
-        };
 
-        enum class StreamType
-        {
-            NONE,
-            INPUT,
-            OUTPUT
+            Server* server = nullptr;
         };
 
         enum class State
@@ -67,16 +70,7 @@ namespace relay
                    float aPingInterval);
         Connection(Relay& aRelay,
                    cppsocket::Socket& connector,
-                   const std::vector<std::pair<uint32_t, uint16_t>>& aAddresses,
-                   float aConnectionTimeout,
-                   float aReconnectInterval,
-                   uint32_t aReconnectCount,
-                   StreamType aStreamType,
-                   Server& aServer,
-                   const std::string& aApplicationName,
-                   const std::string& aStreamName,
-                   const std::string& aOverrideApplicationName,
-                   const std::string& aOverrideStreamName);
+                   const Description& description);
         ~Connection();
 
         Type getType() const { return type; }

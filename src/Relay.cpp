@@ -30,6 +30,7 @@ namespace relay
     Relay::Relay(Relay&& other):
         network(other.network),
         previousTime(other.previousTime),
+        servers(std::move(other.servers)),
         connections(std::move(other.connections))
     {
     }
@@ -37,6 +38,7 @@ namespace relay
     Relay& Relay::operator=(Relay&& other)
     {
         previousTime = other.previousTime;
+        servers = std::move(other.servers);
         connections = std::move(other.connections);
 
         return *this;
@@ -44,6 +46,7 @@ namespace relay
 
     bool Relay::init(const std::string& config)
     {
+        servers.clear();
         connections.clear();
         status.reset();
 
@@ -121,7 +124,7 @@ namespace relay
         {
             const YAML::Node& serverObject = serversArray[serverIndex];
 
-            Server::Description serverDescription;
+            std::vector<Connection::Description> connectionDescriptions;
 
             const YAML::Node& inputArray = serverObject["inputs"];
 
@@ -130,6 +133,7 @@ namespace relay
                 const YAML::Node& inputObject = inputArray[inputIndex];
 
                 Connection::Description inputDescription;
+                inputDescription.streamType = Connection::StreamType::INPUT;
 
                 if (inputObject["type"].as<std::string>() == "host") inputDescription.type = Connection::Type::HOST;
                 else if (inputObject["type"].as<std::string>() == "client") inputDescription.type = Connection::Type::CLIENT;
@@ -171,7 +175,7 @@ namespace relay
                 if (inputObject["audio"]) inputDescription.audio = inputObject["audio"].as<bool>();
                 if (inputObject["data"]) inputDescription.data = inputObject["data"].as<bool>();
 
-                serverDescription.inputDescriptions.push_back(inputDescription);
+                connectionDescriptions.push_back(inputDescription);
             }
 
             const YAML::Node& outputArray = serverObject["outputs"];
@@ -181,6 +185,7 @@ namespace relay
                 const YAML::Node& outputObject = outputArray[outputIndex];
 
                 Connection::Description outputDescription;
+                outputDescription.streamType = Connection::StreamType::OUTPUT;
 
                 if (outputObject["type"].as<std::string>() == "host") outputDescription.type = Connection::Type::HOST;
                 else if (outputObject["type"].as<std::string>() == "client") outputDescription.type = Connection::Type::CLIENT;
@@ -222,33 +227,17 @@ namespace relay
                 if (outputObject["audio"]) outputDescription.audio = outputObject["audio"].as<bool>();
                 if (outputObject["data"]) outputDescription.data = outputObject["data"].as<bool>();
 
-                serverDescription.outputDescriptions.push_back(outputDescription);
+                connectionDescriptions.push_back(outputDescription);
             }
 
-            std::unique_ptr<Server> server(new Server(*this, network, serverDescription));
+            std::unique_ptr<Server> server(new Server(*this, network));
 
-            for (const Connection::Description& inputDescription : serverDescription.inputDescriptions)
+            for (Connection::Description& description : connectionDescriptions)
             {
-                if (inputDescription.type == Connection::Type::CLIENT)
-                {
-                    Socket socket(network);
-
-                    std::unique_ptr<Connection> connection(new Connection(*this,
-                                                                          socket,
-                                                                          inputDescription.addresses,
-                                                                          inputDescription.connectionTimeout,
-                                                                          inputDescription.reconnectInterval,
-                                                                          inputDescription.reconnectCount,
-                                                                          Connection::StreamType::INPUT,
-                                                                          *server,
-                                                                          inputDescription.applicationName,
-                                                                          inputDescription.streamName,
-                                                                          inputDescription.overrideApplicationName,
-                                                                          inputDescription.overrideStreamName));
-
-                    connections.push_back(std::move(connection));
-                }
+                description.server = server.get();
             }
+
+            server->start(connectionDescriptions);
 
             servers.push_back(std::move(server));
         }
@@ -263,39 +252,24 @@ namespace relay
         return true;
     }
 
-    Server* Relay::getServer(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const
+    const Connection::Description* Relay::getConnectionDescription(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const
     {
         for (const std::unique_ptr<Server>& server : servers)
         {
-            const Server::Description& serverDescription = server->getDescription();
+            const std::vector<Connection::Description>& serverDescription = server->getConnectionDescriptions();
 
-            if (type == Connection::StreamType::INPUT)
+            for (const Connection::Description& connectionDescription : serverDescription)
             {
-                for (const Connection::Description& inputDescription : serverDescription.inputDescriptions)
+                if ((connectionDescription.applicationName.empty() || connectionDescription.applicationName == applicationName) &&
+                    (connectionDescription.streamName.empty() || connectionDescription.streamName == streamName))
                 {
-                    if ((inputDescription.applicationName.empty() || inputDescription.applicationName == applicationName) &&
-                        (inputDescription.streamName.empty() || inputDescription.streamName == streamName))
+                    if (connectionDescription.streamType == type)
                     {
-                        if (type == Connection::StreamType::INPUT)
+                        if (std::find(connectionDescription.addresses.begin(),
+                                      connectionDescription.addresses.end(),
+                                      address) != connectionDescription.addresses.end())
                         {
-                            if (std::find(inputDescription.addresses.begin(),
-                                          inputDescription.addresses.end(),
-                                          address) != inputDescription.addresses.end())
-                            {
-                                return server.get();
-                            }
-                        }
-                        else if (type == Connection::StreamType::OUTPUT)
-                        {
-                            for (const Connection::Description& outputDescription : serverDescription.outputDescriptions)
-                            {
-                                if (std::find(outputDescription.addresses.begin(),
-                                              outputDescription.addresses.end(),
-                                              address) != outputDescription.addresses.end())
-                                {
-                                    return server.get();
-                                }
-                            }
+                            return &connectionDescription;
                         }
                     }
                 }
@@ -325,6 +299,11 @@ namespace relay
             network.update();
 
             if (status) status->update(delta);
+
+            for (const auto& server : servers)
+            {
+                server->update(delta);
+            }
 
             for (const auto& connection : connections)
             {

@@ -10,12 +10,38 @@ using namespace cppsocket;
 namespace relay
 {
     Server::Server(Relay& aRelay,
-                   cppsocket::Network& aNetwork,
-                   const Server::Description& aDescription):
+                   cppsocket::Network& aNetwork):
         relay(aRelay),
-        network(aNetwork),
-        description(aDescription)
+        network(aNetwork)
     {
+    }
+
+    void Server::start(const std::vector<Connection::Description>& aConnectionDescriptions)
+    {
+        connectionDescriptions = aConnectionDescriptions;
+
+        for (const Connection::Description& connectionDescription : connectionDescriptions)
+        {
+            if (connectionDescription.type == Connection::Type::CLIENT &&
+                connectionDescription.streamType == Connection::StreamType::INPUT)
+            {
+                Socket socket(network);
+
+                std::unique_ptr<Connection> connection(new Connection(relay,
+                                                                      socket,
+                                                                      connectionDescription));
+
+                connections.push_back(std::move(connection));
+            }
+        }
+    }
+
+    void Server::update(float delta)
+    {
+        for (const auto& connection : connections)
+        {
+            connection->update(delta);
+        }
     }
 
     void Server::startStreaming(Connection& connection)
@@ -27,24 +53,18 @@ namespace relay
             outputConnection->createStream(inputConnection->getStreamName());
         }
 
-        for (const Connection::Description& outputDescription : description.outputDescriptions)
+        for (const Connection::Description& connectionDescription : connectionDescriptions)
         {
-            Socket socket(network);
+            if (connectionDescription.streamType == Connection::StreamType::OUTPUT)
+            {
+                Socket socket(network);
 
-            std::unique_ptr<Connection> newConnection(new Connection(relay,
-                                                                     socket,
-                                                                     outputDescription.addresses,
-                                                                     outputDescription.connectionTimeout,
-                                                                     outputDescription.reconnectInterval,
-                                                                     outputDescription.reconnectCount,
-                                                                     Connection::StreamType::OUTPUT,
-                                                                     *this,
-                                                                     outputDescription.applicationName,
-                                                                     outputDescription.streamName,
-                                                                     outputDescription.overrideApplicationName,
-                                                                     outputDescription.overrideStreamName));
+                std::unique_ptr<Connection> newConnection(new Connection(relay,
+                                                                         socket,
+                                                                         connectionDescription));
 
-            connections.push_back(std::move(newConnection));
+                connections.push_back(std::move(newConnection));
+            }
         }
     }
 

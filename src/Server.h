@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <vector>
 #include "Connection.h"
 
 namespace relay
@@ -11,15 +12,11 @@ namespace relay
     class Server
     {
     public:
-        struct Description
-        {
-            std::vector<Connection::Description> inputDescriptions;
-            std::vector<Connection::Description> outputDescriptions;
-        };
+        Server(Relay& aRelay, cppsocket::Network& aNetwork);
 
-        Server(Relay& aRelay,
-               cppsocket::Network& aNetwork,
-               const Server::Description& aDescription);
+        void start(const std::vector<Connection::Description>& aConnectionDescriptions);
+
+        void update(float delta);
 
         void startStreaming(Connection& connection);
         void stopStreaming(Connection& connection);
@@ -27,7 +24,7 @@ namespace relay
         void startReceiving(Connection& connection);
         void stopReceiving(Connection& connection);
 
-        const Server::Description& getDescription() const { return description; }
+        const std::vector<Connection::Description>& getConnectionDescriptions() const { return connectionDescriptions; }
 
         void sendAudioHeader(const std::vector<uint8_t>& headerData);
         void sendVideoHeader(const std::vector<uint8_t>& headerData);
@@ -39,7 +36,7 @@ namespace relay
     private:
         Relay& relay;
         cppsocket::Network& network;
-        Server::Description description;
+        std::vector<Connection::Description> connectionDescriptions;
 
         Connection* inputConnection = nullptr;
         std::vector<Connection*> outputConnections;

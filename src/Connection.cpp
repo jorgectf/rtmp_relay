@@ -39,36 +39,27 @@ namespace relay
 
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
-                           const std::vector<std::pair<uint32_t, uint16_t>>& aAddresses,
-                           float aConnectionTimeout,
-                           float aReconnectInterval,
-                           uint32_t aReconnectCount,
-                           StreamType aStreamType,
-                           Server& aServer,
-                           const std::string& aApplicationName,
-                           const std::string& aStreamName,
-                           const std::string& aOverrideApplicationName,
-                           const std::string& aOverrideStreamName):
+                           const Description& description):
         Connection(aRelay, connector, Type::CLIENT)
     {
-        addresses = aAddresses;
-        connectionTimeout = aConnectionTimeout;
-        reconnectInterval = aReconnectInterval;
-        reconnectCount = aReconnectCount;
-        streamType = aStreamType;
-        server = &aServer;
-        overrideApplicationName = aOverrideApplicationName;
-        overrideStreamName = aOverrideStreamName;
+        addresses = description.addresses;
+        connectionTimeout = description.connectionTimeout;
+        reconnectInterval = description.reconnectInterval;
+        reconnectCount = description.reconnectCount;
+        streamType = description.streamType;
+        server = description.server;
+        overrideApplicationName = description.overrideApplicationName;
+        overrideStreamName = description.overrideStreamName;
 
         if (overrideApplicationName.empty())
         {
-            applicationName = aApplicationName;
+            applicationName = description.applicationName;
         }
         else
         {
             std::map<std::string, std::string> tokens = {
                 {"id", std::to_string(id)},
-                {"applicationName", aApplicationName},
+                {"applicationName", description.applicationName},
                 {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
                 {"port", std::to_string(socket.getRemotePort())}
             };
@@ -79,14 +70,14 @@ namespace relay
 
         if (overrideStreamName.empty())
         {
-            streamName = aStreamName;
+            streamName = description.streamName;
         }
         else
         {
             std::map<std::string, std::string> tokens = {
                 {"id", std::to_string(id)},
-                {"streamName", aStreamName},
-                {"applicationName", applicationName},
+                {"streamName", description.streamName},
+                {"applicationName", description.applicationName},
                 {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
                 {"port", std::to_string(socket.getRemotePort())}
             };
@@ -953,15 +944,16 @@ namespace relay
                             streamName = argument2.asString();
                             streamType = StreamType::INPUT;
 
-                            server = relay.getServer(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                            const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
-                            if (!server)
+                            if (!connectionDescription)
                             {
                                 Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
                                 socket.close();
                                 return false;
                             }
 
+                            server = connectionDescription->server;
                             server->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
@@ -1010,7 +1002,7 @@ namespace relay
                             streamType = StreamType::INPUT;
                             streamName = argument2.asString();
 
-                            server = relay.getServer(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                            const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
                             if (!server)
                             {
@@ -1019,6 +1011,7 @@ namespace relay
                                 return false;
                             }
 
+                            server = connectionDescription->server;
                             server->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
@@ -1057,7 +1050,7 @@ namespace relay
                         streamType = StreamType::OUTPUT;
                         streamName = argument2.asString();
 
-                        server = relay.getServer(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
                         if (!server)
                         {
@@ -1066,6 +1059,7 @@ namespace relay
                             return false;
                         }
 
+                        server = connectionDescription->server;
                         server->startReceiving(*this);
 
                         sendPlayStatus(transactionId.asDouble());
