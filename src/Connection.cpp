@@ -29,24 +29,35 @@ namespace relay
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
     }
 
-    Connection::Connection(Relay& aRelay, cppsocket::Socket& client):
+    Connection::Connection(Relay& aRelay,
+                           cppsocket::Socket& client,
+                           float aPingInterval):
         Connection(aRelay, client, Type::HOST)
     {
+        pingInterval = aPingInterval;
     }
 
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
+                           const std::pair<uint32_t, uint16_t>& aAddress,
+                           float aConnectionTimeout,
+                           float aReconnectInterval,
                            StreamType aStreamType,
                            Server& aServer,
                            const std::string& aApplicationName,
                            const std::string& aStreamName):
         Connection(aRelay, connector, Type::CLIENT)
     {
-        server = &aServer;
+        address = aAddress;
+        connectionTimeout = aConnectionTimeout;
+        reconnectInterval = aReconnectInterval;
         streamType = aStreamType;
+        server = &aServer;
         applicationName = aApplicationName;
         streamName = aStreamName;
 
+        socket.setConnectTimeout(connectionTimeout);
+        socket.connect(address.first, address.second);
         connector.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
         connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
     }
@@ -60,8 +71,50 @@ namespace relay
         }
     }
 
-    void Connection::update()
+    void Connection::update(float delta)
     {
+        if (type == Type::HOST)
+        {
+            if (connected && pingInterval > 0.0f)
+            {
+                timeSincePing += delta;
+
+                if (timeSincePing >= pingInterval)
+                {
+                    timeSincePing = 0.0f;
+                    sendPing();
+                }
+            }
+        }
+        else if (type == Type::CLIENT)
+        {
+            if (socket.isReady() && state != State::HANDSHAKE_DONE)
+            {
+                timeSinceConnect = 0.0f;
+            }
+            else
+            {
+                timeSinceConnect += delta;
+
+                if (timeSinceConnect >= reconnectInterval)
+                {
+                    state = State::UNINITIALIZED;
+                    socket.connect(address.first, address.second);
+                }
+            }
+        }
+
+        timeSinceMeasure += delta;
+
+        if (timeSinceMeasure >= 1.0f)
+        {
+            timeSinceMeasure = 0.0f;
+            audioRate = currentAudioBytes;
+            videoRate = currentVideoBytes;
+
+            currentAudioBytes = 0;
+            currentVideoBytes = 0;
+        }
     }
 
     void Connection::getInfo(std::string& str, ReportType reportType) const

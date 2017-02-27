@@ -108,6 +108,11 @@ namespace relay
             }
         }
 
+        if (document["pingInterval"])
+        {
+            pingInterval = document["pingInterval"].as<float>();
+        }
+
         std::set<std::string> listenAddresses;
 
         const YAML::Node& serversArray = document["servers"];
@@ -154,6 +159,10 @@ namespace relay
                     inputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
                 }
 
+                if (inputObject["connectionTimeout"]) inputDescription.connectionDescription.connectionTimeout = inputObject["connectionTimeout"].as<float>();
+                if (inputObject["reconnectInterval"]) inputDescription.connectionDescription.reconnectInterval = inputObject["reconnectInterval"].as<float>();
+                if (inputObject["reconnectCount"]) inputDescription.connectionDescription.reconnectCount = inputObject["reconnectCount"].as<uint32_t>();
+
                 if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
                 if (inputObject["streamName"]) inputDescription.streamName = inputObject["streamName"].as<std::string>();
                 if (inputObject["video"]) inputDescription.video = inputObject["video"].as<bool>();
@@ -199,6 +208,10 @@ namespace relay
                     outputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
                 }
 
+                if (outputObject["connectionTimeout"]) outputDescription.connectionDescription.connectionTimeout = outputObject["connectionTimeout"].as<float>();
+                if (outputObject["reconnectInterval"]) outputDescription.connectionDescription.reconnectInterval = outputObject["reconnectInterval"].as<float>();
+                if (outputObject["reconnectCount"]) outputDescription.connectionDescription.reconnectCount = outputObject["reconnectCount"].as<uint32_t>();
+
                 if (outputObject["applicationName"]) outputDescription.applicationName = outputObject["applicationName"].as<std::string>();
                 if (outputObject["streamName"]) outputDescription.streamName = outputObject["streamName"].as<std::string>();
                 if (outputObject["overrideApplicationName"]) outputDescription.overrideApplicationName = outputObject["overrideApplicationName"].as<std::string>();
@@ -219,12 +232,12 @@ namespace relay
                     for (const std::pair<uint32_t, uint16_t>& address : inputDescription.connectionDescription.addresses)
                     {
                         Socket socket(network);
-                        socket.setConnectTimeout(inputDescription.connectionDescription.connectionTimeout);
-
-                        socket.connect(address.first, address.second);
 
                         std::unique_ptr<Connection> connection(new Connection(*this,
                                                                               socket,
+                                                                              address,
+                                                                              inputDescription.connectionDescription.connectionTimeout,
+                                                                              inputDescription.connectionDescription.reconnectInterval,
                                                                               Connection::StreamType::INPUT,
                                                                               *server,
                                                                               inputDescription.applicationName,
@@ -313,7 +326,7 @@ namespace relay
 
             for (const auto& connection : connections)
             {
-                connection->update();
+                connection->update(delta);
             }
 
             std::this_thread::sleep_for(sleepTime);
@@ -382,7 +395,7 @@ namespace relay
 
     void Relay::handleAccept(cppsocket::Socket&, cppsocket::Socket& clientSocket)
     {
-        std::unique_ptr<Connection> connection(new Connection(*this, clientSocket));
+        std::unique_ptr<Connection> connection(new Connection(*this, clientSocket, pingInterval));
 
         connections.push_back(std::move(connection));
     }

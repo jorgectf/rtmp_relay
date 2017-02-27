@@ -32,12 +32,12 @@ namespace relay
             for (const std::pair<uint32_t, uint16_t>& address : outputDescription.connectionDescription.addresses)
             {
                 Socket socket(network);
-                socket.setConnectTimeout(outputDescription.connectionDescription.connectionTimeout);
-
-                socket.connect(address.first, address.second);
 
                 std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                          socket,
+                                                                         address,
+                                                                         outputDescription.connectionDescription.connectionTimeout,
+                                                                         outputDescription.connectionDescription.reconnectInterval,
                                                                          Connection::StreamType::OUTPUT,
                                                                          *this,
                                                                          outputDescription.applicationName,
