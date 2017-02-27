@@ -59,9 +59,10 @@ namespace relay
                    float aPingInterval);
         Connection(Relay& aRelay,
                    cppsocket::Socket& connector,
-                   const std::pair<uint32_t, uint16_t>& aAddress,
+                   const std::vector<std::pair<uint32_t, uint16_t>>& aAddresses,
                    float aConnectionTimeout,
                    float aReconnectInterval,
+                   uint32_t aReconnectCount,
                    StreamType aStreamType,
                    Server& aServer,
                    const std::string& aApplicationName,
@@ -131,14 +132,17 @@ namespace relay
         
         Type type;
         State state;
-        std::pair<uint32_t, uint16_t> address;
+        std::vector<std::pair<uint32_t, uint16_t>> addresses;
         float pingInterval = 5.0f;
         float connectionTimeout = 5.0f;
         float reconnectInterval = 5.0f;
+        uint32_t reconnectCount = 0;
         cppsocket::Socket socket;
 
         float timeSincePing = 0.0f;
         float timeSinceConnect = 0.0f;
+        uint32_t connectCount = 0;
+        uint32_t addressIndex = 0;
 
         std::vector<uint8_t> data;
 

@@ -229,22 +229,20 @@ namespace relay
             {
                 if (inputDescription.connectionDescription.type == Connection::Type::CLIENT)
                 {
-                    for (const std::pair<uint32_t, uint16_t>& address : inputDescription.connectionDescription.addresses)
-                    {
-                        Socket socket(network);
+                    Socket socket(network);
 
-                        std::unique_ptr<Connection> connection(new Connection(*this,
-                                                                              socket,
-                                                                              address,
-                                                                              inputDescription.connectionDescription.connectionTimeout,
-                                                                              inputDescription.connectionDescription.reconnectInterval,
-                                                                              Connection::StreamType::INPUT,
-                                                                              *server,
-                                                                              inputDescription.applicationName,
-                                                                              inputDescription.streamName));
+                    std::unique_ptr<Connection> connection(new Connection(*this,
+                                                                          socket,
+                                                                          inputDescription.connectionDescription.addresses,
+                                                                          inputDescription.connectionDescription.connectionTimeout,
+                                                                          inputDescription.connectionDescription.reconnectInterval,
+                                                                          inputDescription.connectionDescription.reconnectCount,
+                                                                          Connection::StreamType::INPUT,
+                                                                          *server,
+                                                                          inputDescription.applicationName,
+                                                                          inputDescription.streamName));
 
-                        connections.push_back(std::move(connection));
-                    }
+                    connections.push_back(std::move(connection));
                 }
             }
 

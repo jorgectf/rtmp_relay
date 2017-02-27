@@ -29,22 +29,20 @@ namespace relay
 
         for (const OutputDescription& outputDescription : description.outputDescriptions)
         {
-            for (const std::pair<uint32_t, uint16_t>& address : outputDescription.connectionDescription.addresses)
-            {
-                Socket socket(network);
+            Socket socket(network);
 
-                std::unique_ptr<Connection> newConnection(new Connection(relay,
-                                                                         socket,
-                                                                         address,
-                                                                         outputDescription.connectionDescription.connectionTimeout,
-                                                                         outputDescription.connectionDescription.reconnectInterval,
-                                                                         Connection::StreamType::OUTPUT,
-                                                                         *this,
-                                                                         outputDescription.applicationName,
-                                                                         outputDescription.streamName));
+            std::unique_ptr<Connection> newConnection(new Connection(relay,
+                                                                     socket,
+                                                                     outputDescription.connectionDescription.addresses,
+                                                                     outputDescription.connectionDescription.connectionTimeout,
+                                                                     outputDescription.connectionDescription.reconnectInterval,
+                                                                     outputDescription.connectionDescription.reconnectCount,
+                                                                     Connection::StreamType::OUTPUT,
+                                                                     *this,
+                                                                     outputDescription.applicationName,
+                                                                     outputDescription.streamName));
 
-                connections.push_back(std::move(newConnection));
-            }
+            connections.push_back(std::move(newConnection));
         }
     }
 

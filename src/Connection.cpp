@@ -39,27 +39,32 @@ namespace relay
 
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
-                           const std::pair<uint32_t, uint16_t>& aAddress,
+                           const std::vector<std::pair<uint32_t, uint16_t>>& aAddresses,
                            float aConnectionTimeout,
                            float aReconnectInterval,
+                           uint32_t aReconnectCount,
                            StreamType aStreamType,
                            Server& aServer,
                            const std::string& aApplicationName,
                            const std::string& aStreamName):
         Connection(aRelay, connector, Type::CLIENT)
     {
-        address = aAddress;
+        addresses = aAddresses;
         connectionTimeout = aConnectionTimeout;
         reconnectInterval = aReconnectInterval;
+        reconnectCount = aReconnectCount;
         streamType = aStreamType;
         server = &aServer;
         applicationName = aApplicationName;
         streamName = aStreamName;
 
-        socket.setConnectTimeout(connectionTimeout);
-        socket.connect(address.first, address.second);
-        connector.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
-        connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
+        if (!addresses.empty())
+        {
+            socket.setConnectTimeout(connectionTimeout);
+            socket.connect(addresses[0].first, addresses[0].second);
+            connector.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
+            connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
+        }
     }
 
     Connection::~Connection()
@@ -98,8 +103,24 @@ namespace relay
 
                 if (timeSinceConnect >= reconnectInterval)
                 {
+                    timeSinceConnect = 0.0f;
                     state = State::UNINITIALIZED;
-                    socket.connect(address.first, address.second);
+
+                    if (connectCount >= reconnectCount)
+                    {
+                        connectCount = 0;
+                        ++addressIndex;
+                    }
+
+                    if (addressIndex >= addresses.size())
+                    {
+                        addressIndex = 0;
+                    }
+
+                    if (addressIndex < addresses.size())
+                    {
+                        socket.connect(addresses[addressIndex].first, addresses[addressIndex].second);
+                    }
                 }
             }
         }
@@ -265,7 +286,6 @@ namespace relay
 
     void Connection::handleConnectError(cppsocket::Socket&)
     {
-        // TODO: reconnect
     }
 
     void Connection::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
