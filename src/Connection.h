@@ -35,6 +35,14 @@ namespace relay
             float reconnectInterval = 5.0f;
             uint32_t reconnectCount = 0;
             float pingInterval = 60.0f;
+
+            bool video = true;
+            bool audio = true;
+            bool data = true;
+            std::string applicationName;
+            std::string streamName;
+            std::string overrideApplicationName;
+            std::string overrideStreamName;
         };
 
         enum class StreamType

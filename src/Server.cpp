@@ -27,16 +27,16 @@ namespace relay
             outputConnection->createStream(inputConnection->getStreamName());
         }
 
-        for (const OutputDescription& outputDescription : description.outputDescriptions)
+        for (const Connection::Description& outputDescription : description.outputDescriptions)
         {
             Socket socket(network);
 
             std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                      socket,
-                                                                     outputDescription.connectionDescription.addresses,
-                                                                     outputDescription.connectionDescription.connectionTimeout,
-                                                                     outputDescription.connectionDescription.reconnectInterval,
-                                                                     outputDescription.connectionDescription.reconnectCount,
+                                                                     outputDescription.addresses,
+                                                                     outputDescription.connectionTimeout,
+                                                                     outputDescription.reconnectInterval,
+                                                                     outputDescription.reconnectCount,
                                                                      Connection::StreamType::OUTPUT,
                                                                      *this,
                                                                      outputDescription.applicationName,

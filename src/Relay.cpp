@@ -129,10 +129,10 @@ namespace relay
             {
                 const YAML::Node& inputObject = inputArray[inputIndex];
 
-                Server::InputDescription inputDescription;
+                Connection::Description inputDescription;
 
-                if (inputObject["type"].as<std::string>() == "host") inputDescription.connectionDescription.type = Connection::Type::HOST;
-                else if (inputObject["type"].as<std::string>() == "client") inputDescription.connectionDescription.type = Connection::Type::CLIENT;
+                if (inputObject["type"].as<std::string>() == "host") inputDescription.type = Connection::Type::HOST;
+                else if (inputObject["type"].as<std::string>() == "client") inputDescription.type = Connection::Type::CLIENT;
 
                 if (inputObject["address"].IsSequence())
                 {
@@ -143,9 +143,9 @@ namespace relay
                         std::string address = addressArray[addressIndex].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        inputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                        inputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
 
-                        if (inputDescription.connectionDescription.type == Connection::Type::HOST)
+                        if (inputDescription.type == Connection::Type::HOST)
                         {
                             listenAddresses.insert(address);
                         }
@@ -156,12 +156,12 @@ namespace relay
                     std::string address = inputObject["address"].as<std::string>();
                     std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                    inputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                    inputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
                 }
 
-                if (inputObject["connectionTimeout"]) inputDescription.connectionDescription.connectionTimeout = inputObject["connectionTimeout"].as<float>();
-                if (inputObject["reconnectInterval"]) inputDescription.connectionDescription.reconnectInterval = inputObject["reconnectInterval"].as<float>();
-                if (inputObject["reconnectCount"]) inputDescription.connectionDescription.reconnectCount = inputObject["reconnectCount"].as<uint32_t>();
+                if (inputObject["connectionTimeout"]) inputDescription.connectionTimeout = inputObject["connectionTimeout"].as<float>();
+                if (inputObject["reconnectInterval"]) inputDescription.reconnectInterval = inputObject["reconnectInterval"].as<float>();
+                if (inputObject["reconnectCount"]) inputDescription.reconnectCount = inputObject["reconnectCount"].as<uint32_t>();
 
                 if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
                 if (inputObject["streamName"]) inputDescription.streamName = inputObject["streamName"].as<std::string>();
@@ -180,10 +180,10 @@ namespace relay
             {
                 const YAML::Node& outputObject = outputArray[outputIndex];
 
-                Server::OutputDescription outputDescription;
+                Connection::Description outputDescription;
 
-                if (outputObject["type"].as<std::string>() == "host") outputDescription.connectionDescription.type = Connection::Type::HOST;
-                else if (outputObject["type"].as<std::string>() == "client") outputDescription.connectionDescription.type = Connection::Type::CLIENT;
+                if (outputObject["type"].as<std::string>() == "host") outputDescription.type = Connection::Type::HOST;
+                else if (outputObject["type"].as<std::string>() == "client") outputDescription.type = Connection::Type::CLIENT;
 
                 if (outputObject["address"].IsSequence())
                 {
@@ -194,9 +194,9 @@ namespace relay
                         std::string address = addressArray[addressIndex].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        outputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                        outputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
 
-                        if (outputDescription.connectionDescription.type == Connection::Type::HOST)
+                        if (outputDescription.type == Connection::Type::HOST)
                         {
                             listenAddresses.insert(address);
                         }
@@ -207,12 +207,12 @@ namespace relay
                     std::string address = outputObject["address"].as<std::string>();
                     std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                    outputDescription.connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                    outputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
                 }
 
-                if (outputObject["connectionTimeout"]) outputDescription.connectionDescription.connectionTimeout = outputObject["connectionTimeout"].as<float>();
-                if (outputObject["reconnectInterval"]) outputDescription.connectionDescription.reconnectInterval = outputObject["reconnectInterval"].as<float>();
-                if (outputObject["reconnectCount"]) outputDescription.connectionDescription.reconnectCount = outputObject["reconnectCount"].as<uint32_t>();
+                if (outputObject["connectionTimeout"]) outputDescription.connectionTimeout = outputObject["connectionTimeout"].as<float>();
+                if (outputObject["reconnectInterval"]) outputDescription.reconnectInterval = outputObject["reconnectInterval"].as<float>();
+                if (outputObject["reconnectCount"]) outputDescription.reconnectCount = outputObject["reconnectCount"].as<uint32_t>();
 
                 if (outputObject["applicationName"]) outputDescription.applicationName = outputObject["applicationName"].as<std::string>();
                 if (outputObject["streamName"]) outputDescription.streamName = outputObject["streamName"].as<std::string>();
@@ -227,18 +227,18 @@ namespace relay
 
             std::unique_ptr<Server> server(new Server(*this, network, serverDescription));
 
-            for (const Server::InputDescription& inputDescription : serverDescription.inputDescriptions)
+            for (const Connection::Description& inputDescription : serverDescription.inputDescriptions)
             {
-                if (inputDescription.connectionDescription.type == Connection::Type::CLIENT)
+                if (inputDescription.type == Connection::Type::CLIENT)
                 {
                     Socket socket(network);
 
                     std::unique_ptr<Connection> connection(new Connection(*this,
                                                                           socket,
-                                                                          inputDescription.connectionDescription.addresses,
-                                                                          inputDescription.connectionDescription.connectionTimeout,
-                                                                          inputDescription.connectionDescription.reconnectInterval,
-                                                                          inputDescription.connectionDescription.reconnectCount,
+                                                                          inputDescription.addresses,
+                                                                          inputDescription.connectionTimeout,
+                                                                          inputDescription.reconnectInterval,
+                                                                          inputDescription.reconnectCount,
                                                                           Connection::StreamType::INPUT,
                                                                           *server,
                                                                           inputDescription.applicationName,
@@ -271,27 +271,27 @@ namespace relay
 
             if (type == Connection::StreamType::INPUT)
             {
-                for (const Server::InputDescription& inputDescription : serverDescription.inputDescriptions)
+                for (const Connection::Description& inputDescription : serverDescription.inputDescriptions)
                 {
                     if ((inputDescription.applicationName.empty() || inputDescription.applicationName == applicationName) &&
                         (inputDescription.streamName.empty() || inputDescription.streamName == streamName))
                     {
                         if (type == Connection::StreamType::INPUT)
                         {
-                            if (std::find(inputDescription.connectionDescription.addresses.begin(),
-                                          inputDescription.connectionDescription.addresses.end(),
-                                          address) != inputDescription.connectionDescription.addresses.end())
+                            if (std::find(inputDescription.addresses.begin(),
+                                          inputDescription.addresses.end(),
+                                          address) != inputDescription.addresses.end())
                             {
                                 return server.get();
                             }
                         }
                         else if (type == Connection::StreamType::OUTPUT)
                         {
-                            for (const Server::OutputDescription& outputDescription : serverDescription.outputDescriptions)
+                            for (const Connection::Description& outputDescription : serverDescription.outputDescriptions)
                             {
-                                if (std::find(outputDescription.connectionDescription.addresses.begin(),
-                                              outputDescription.connectionDescription.addresses.end(),
-                                              address) != outputDescription.connectionDescription.addresses.end())
+                                if (std::find(outputDescription.addresses.begin(),
+                                              outputDescription.addresses.end(),
+                                              address) != outputDescription.addresses.end())
                                 {
                                     return server.get();
                                 }

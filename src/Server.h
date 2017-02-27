@@ -11,34 +11,10 @@ namespace relay
     class Server
     {
     public:
-        struct InputDescription
-        {
-            Connection::Description connectionDescription;
-            bool video = true;
-            bool audio = true;
-            bool data = true;
-            std::string applicationName;
-            std::string streamName;
-            std::string overrideApplicationName;
-            std::string overrideStreamName;
-        };
-
-        struct OutputDescription
-        {
-            Connection::Description connectionDescription;
-            bool video = true;
-            bool audio = true;
-            bool data = true;
-            std::string applicationName;
-            std::string streamName;
-            std::string overrideApplicationName;
-            std::string overrideStreamName;
-        };
-
         struct Description
         {
-            std::vector<InputDescription> inputDescriptions;
-            std::vector<OutputDescription> outputDescriptions;
+            std::vector<Connection::Description> inputDescriptions;
+            std::vector<Connection::Description> outputDescriptions;
         };
 
         Server(Relay& aRelay,
