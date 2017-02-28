@@ -892,7 +892,22 @@ namespace relay
                     argument2.dump(log);
                 }
 
-                if (command.asString() == "onBWDone")
+                if (command.asString() == "connect")
+                {
+                    applicationName = argument1["app"].asString();
+
+                    sendServerBandwidth();
+                    sendClientBandwidth();
+                    sendPing();
+                    sendSetChunkSize();
+                    sendConnectResult(transactionId.asDouble());
+                    sendBWDone();
+
+                    connected = true;
+
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                }
+                else if (command.asString() == "onBWDone")
                 {
                     sendCheckBW();
                 }
@@ -916,24 +931,6 @@ namespace relay
                         server->stopStreaming(*this);
                         server = nullptr;
                     }
-                }
-                if (command.asString() == "connect")
-                {
-                    applicationName = argument1["app"].asString();
-
-                    sendServerBandwidth();
-                    sendClientBandwidth();
-                    sendPing();
-                    sendSetChunkSize();
-                    sendConnectResult(transactionId.asDouble());
-                    sendBWDone();
-
-                    connected = true;
-
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
-                }
-                else if (command.asString() == "onFCPublish")
-                {
                 }
                 else if (command.asString() == "FCPublish")
                 {
@@ -967,6 +964,9 @@ namespace relay
                         socket.close();
                         return false;
                     }
+                }
+                else if (command.asString() == "onFCPublish")
+                {
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
@@ -1028,21 +1028,6 @@ namespace relay
                         return false;
                     }
                 }
-                else if (command.asString() == "getStreamLength")
-                {
-                    if (streamType == StreamType::INPUT)
-                    {
-                        // ignore this
-                    }
-                    else
-                    {
-                        // this is not a sender
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid getStreamLength, disconnecting";
-
-                        socket.close();
-                        return false;
-                    }
-                }
                 else if (command.asString() == "play")
                 {
                     if (streamType == StreamType::NONE)
@@ -1070,6 +1055,21 @@ namespace relay
                     {
                         // this is not a sender
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid play, disconnecting";
+
+                        socket.close();
+                        return false;
+                    }
+                }
+                else if (command.asString() == "getStreamLength")
+                {
+                    if (streamType == StreamType::INPUT)
+                    {
+                        // ignore this
+                    }
+                    else
+                    {
+                        // this is not a sender
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid getStreamLength, disconnecting";
 
                         socket.close();
                         return false;
