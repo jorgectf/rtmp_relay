@@ -120,114 +120,67 @@ namespace relay
 
         const YAML::Node& serversArray = document["servers"];
 
+        std::vector<Connection::Description> connectionDescriptions;
+
         for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
             const YAML::Node& serverObject = serversArray[serverIndex];
 
-            std::vector<Connection::Description> connectionDescriptions;
-
-            const YAML::Node& inputArray = serverObject["inputs"];
-
-            for (size_t inputIndex = 0; inputIndex < inputArray.size(); ++inputIndex)
+            if (serverObject["connections"])
             {
-                const YAML::Node& inputObject = inputArray[inputIndex];
+                const YAML::Node& connectionsArray = serverObject["connections"];
 
-                Connection::Description inputDescription;
-                inputDescription.streamType = Connection::StreamType::INPUT;
-
-                if (inputObject["type"].as<std::string>() == "host") inputDescription.type = Connection::Type::HOST;
-                else if (inputObject["type"].as<std::string>() == "client") inputDescription.type = Connection::Type::CLIENT;
-
-                if (inputObject["address"].IsSequence())
+                for (size_t connectionsIndex = 0; connectionsIndex < connectionsArray.size(); ++connectionsIndex)
                 {
-                    const YAML::Node& addressArray = inputObject["address"];
+                    const YAML::Node& connectionObject = connectionsArray[connectionsIndex];
 
-                    for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
+                    Connection::Description connectionDescription;
+
+                    if (connectionObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
+                    else if (connectionObject["type"].as<std::string>() == "client") connectionDescription.type = Connection::Type::CLIENT;
+
+                    if (connectionObject["stream"].as<std::string>() == "input") connectionDescription.streamType = Connection::StreamType::INPUT;
+                    else if (connectionObject["stream"].as<std::string>() == "output") connectionDescription.streamType = Connection::StreamType::OUTPUT;
+
+                    if (connectionObject["address"].IsSequence())
                     {
-                        std::string address = addressArray[addressIndex].as<std::string>();
-                        std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
+                        const YAML::Node& addressArray = connectionObject["address"];
 
-                        inputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
-
-                        if (inputDescription.type == Connection::Type::HOST)
+                        for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
                         {
-                            listenAddresses.insert(address);
+                            std::string address = addressArray[addressIndex].as<std::string>();
+                            std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
+
+                            connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+
+                            if (connectionDescription.type == Connection::Type::HOST)
+                            {
+                                listenAddresses.insert(address);
+                            }
                         }
                     }
-                }
-                else
-                {
-                    std::string address = inputObject["address"].as<std::string>();
-                    std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
-
-                    inputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
-                }
-
-                if (inputObject["connectionTimeout"]) inputDescription.connectionTimeout = inputObject["connectionTimeout"].as<float>();
-                if (inputObject["reconnectInterval"]) inputDescription.reconnectInterval = inputObject["reconnectInterval"].as<float>();
-                if (inputObject["reconnectCount"]) inputDescription.reconnectCount = inputObject["reconnectCount"].as<uint32_t>();
-
-                if (inputObject["applicationName"]) inputDescription.applicationName = inputObject["applicationName"].as<std::string>();
-                if (inputObject["streamName"]) inputDescription.streamName = inputObject["streamName"].as<std::string>();
-                if (inputObject["overrideApplicationName"]) inputDescription.overrideApplicationName = inputObject["overrideApplicationName"].as<std::string>();
-                if (inputObject["overrideStreamName"]) inputDescription.overrideStreamName = inputObject["overrideStreamName"].as<std::string>();
-                if (inputObject["video"]) inputDescription.video = inputObject["video"].as<bool>();
-                if (inputObject["audio"]) inputDescription.audio = inputObject["audio"].as<bool>();
-                if (inputObject["data"]) inputDescription.data = inputObject["data"].as<bool>();
-
-                connectionDescriptions.push_back(inputDescription);
-            }
-
-            const YAML::Node& outputArray = serverObject["outputs"];
-
-            for (size_t outputIndex = 0; outputIndex < outputArray.size(); ++outputIndex)
-            {
-                const YAML::Node& outputObject = outputArray[outputIndex];
-
-                Connection::Description outputDescription;
-                outputDescription.streamType = Connection::StreamType::OUTPUT;
-
-                if (outputObject["type"].as<std::string>() == "host") outputDescription.type = Connection::Type::HOST;
-                else if (outputObject["type"].as<std::string>() == "client") outputDescription.type = Connection::Type::CLIENT;
-
-                if (outputObject["address"].IsSequence())
-                {
-                    const YAML::Node& addressArray = outputObject["address"];
-
-                    for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
+                    else
                     {
-                        std::string address = addressArray[addressIndex].as<std::string>();
+                        std::string address = connectionObject["address"].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        outputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
-
-                        if (outputDescription.type == Connection::Type::HOST)
-                        {
-                            listenAddresses.insert(address);
-                        }
+                        connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
                     }
+
+                    if (connectionObject["connectionTimeout"]) connectionDescription.connectionTimeout = connectionObject["connectionTimeout"].as<float>();
+                    if (connectionObject["reconnectInterval"]) connectionDescription.reconnectInterval = connectionObject["reconnectInterval"].as<float>();
+                    if (connectionObject["reconnectCount"]) connectionDescription.reconnectCount = connectionObject["reconnectCount"].as<uint32_t>();
+
+                    if (connectionObject["applicationName"]) connectionDescription.applicationName = connectionObject["applicationName"].as<std::string>();
+                    if (connectionObject["streamName"]) connectionDescription.streamName = connectionObject["streamName"].as<std::string>();
+                    if (connectionObject["overrideApplicationName"]) connectionDescription.overrideApplicationName = connectionObject["overrideApplicationName"].as<std::string>();
+                    if (connectionObject["overrideStreamName"]) connectionDescription.overrideStreamName = connectionObject["overrideStreamName"].as<std::string>();
+                    if (connectionObject["video"]) connectionDescription.video = connectionObject["video"].as<bool>();
+                    if (connectionObject["audio"]) connectionDescription.audio = connectionObject["audio"].as<bool>();
+                    if (connectionObject["data"]) connectionDescription.data = connectionObject["data"].as<bool>();
+
+                    connectionDescriptions.push_back(connectionDescription);
                 }
-                else
-                {
-                    std::string address = outputObject["address"].as<std::string>();
-                    std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
-
-                    outputDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
-                }
-
-                if (outputObject["connectionTimeout"]) outputDescription.connectionTimeout = outputObject["connectionTimeout"].as<float>();
-                if (outputObject["reconnectInterval"]) outputDescription.reconnectInterval = outputObject["reconnectInterval"].as<float>();
-                if (outputObject["reconnectCount"]) outputDescription.reconnectCount = outputObject["reconnectCount"].as<uint32_t>();
-
-                if (outputObject["applicationName"]) outputDescription.applicationName = outputObject["applicationName"].as<std::string>();
-                if (outputObject["streamName"]) outputDescription.streamName = outputObject["streamName"].as<std::string>();
-                if (outputObject["overrideApplicationName"]) outputDescription.overrideApplicationName = outputObject["overrideApplicationName"].as<std::string>();
-                if (outputObject["overrideStreamName"]) outputDescription.overrideStreamName = outputObject["overrideStreamName"].as<std::string>();
-                if (outputObject["video"]) outputDescription.video = outputObject["video"].as<bool>();
-                if (outputObject["audio"]) outputDescription.audio = outputObject["audio"].as<bool>();
-                if (outputObject["data"]) outputDescription.data = outputObject["data"].as<bool>();
-
-                connectionDescriptions.push_back(outputDescription);
             }
 
             std::unique_ptr<Server> server(new Server(*this, network));
