@@ -1148,20 +1148,14 @@ namespace relay
 
                             if (!streamName.empty())
                             {
-                                if (streamType == StreamType::INPUT)
+                                sendReleaseStream();
+
+                                if (streamType == StreamType::OUTPUT)
                                 {
-                                    sendPlay();
-                                }
-                                else if (streamType == StreamType::OUTPUT)
-                                {
-                                    sendReleaseStream();
                                     sendFCPublish();
-                                    sendCreateStream();
                                 }
-                                else
-                                {
-                                    return false;
-                                }
+
+                                sendCreateStream();
                             }
                         }
                         else if (i->second == "releaseStream")
@@ -1170,7 +1164,15 @@ namespace relay
                         else if (i->second == "createStream")
                         {
                             streamId = static_cast<uint32_t>(argument2.asDouble());
-                            sendPublish();
+
+                            if (streamType == StreamType::INPUT)
+                            {
+                                sendPlay();
+                            }
+                            else if (streamType == StreamType::OUTPUT)
+                            {
+                                sendPublish();
+                            }
 
                             // TODO: implement
                             /*streaming = true;
