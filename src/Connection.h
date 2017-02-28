@@ -82,7 +82,8 @@ namespace relay
 
         void getInfo(std::string& str, ReportType reportType) const;
 
-        void createStream(const std::string& newStreamName);
+        void createStream(const std::string& newApplicationName,
+                          const std::string& newStreamName);
         void deleteStream();
         void unpublishStream();
 

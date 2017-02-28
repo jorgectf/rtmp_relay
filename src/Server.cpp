@@ -50,7 +50,8 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            outputConnection->createStream(inputConnection->getStreamName());
+            outputConnection->createStream(inputConnection->getApplicationName(),
+                                           inputConnection->getStreamName());
         }
 
         for (const Connection::Description& connectionDescription : connectionDescriptions)
