@@ -47,6 +47,7 @@ namespace relay
     void Server::startStreaming(Connection& connection)
     {
         inputConnection = &connection;
+        streaming = true;
 
         for (Connection* outputConnection : outputConnections)
         {
@@ -71,6 +72,8 @@ namespace relay
 
     void Server::stopStreaming(Connection& connection)
     {
+        streaming = false;
+
         if (&connection == inputConnection)
         {
             for (Connection* outputConnection : outputConnections)
@@ -90,6 +93,13 @@ namespace relay
         if (i == outputConnections.end())
         {
             outputConnections.push_back(&connection);
+
+            if (streaming)
+            {
+                if (!videoHeader.empty()) connection.sendVideoData(0, videoHeader);
+                if (!audioHeader.empty()) connection.sendAudioData(0, videoHeader);
+                if (metaData.getMarker() != amf0::Marker::Unknown) connection.sendMetaData(metaData);
+            }
         }
     }
 

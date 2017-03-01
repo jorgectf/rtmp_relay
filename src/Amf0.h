@@ -66,6 +66,13 @@ namespace relay
 
             Node(const Date& value): marker(Marker::Date), dateValue(value) {}
 
+            bool operator !()
+            {
+                return marker == Marker::Null ||
+                       marker == Marker::Undefined ||
+                       marker == Marker::Unknown;
+            }
+
             Node& operator=(Marker newMarker)
             {
                 marker = newMarker;
