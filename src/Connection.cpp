@@ -1028,6 +1028,33 @@ namespace relay
                         return false;
                     }
                 }
+                else if (command.asString() == "unpublish")
+                {
+                    if (streamType == StreamType::INPUT)
+                    {
+                        streamType = StreamType::NONE;
+
+                        if (server)
+                        {
+                            server->stopReceiving(*this);
+                            server->stopStreaming(*this);
+                            server = nullptr;
+                        }
+
+                        sendUnublishStatus(transactionId.asDouble());
+
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
+
+                        streamName.clear();
+                    }
+                    else
+                    {
+                        // this is not a receiver
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid FCUnpublish, disconnecting";
+                        socket.close();
+                        return false;
+                    }
+                }
                 else if (command.asString() == "play")
                 {
                     if (streamType == StreamType::NONE)
