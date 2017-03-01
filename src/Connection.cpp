@@ -1749,6 +1749,38 @@ namespace relay
         socket.send(buffer);
     }
 
+    void Connection::sendUnublishStatus(double transactionId)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onStatus");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2;
+        argument2["clientid"] = std::string("Lavf57.1.0");
+        argument2["code"] = std::string("NetStream.Unpublish.Success");
+        argument2["description"] = streamName + " stopped publishing";
+        argument2["details"] = streamName;
+        argument2["level"] = std::string("status");
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        
+        socket.send(buffer);
+    }
+
     void Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         rtmp::Packet packet;

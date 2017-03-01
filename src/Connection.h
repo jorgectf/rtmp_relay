@@ -123,6 +123,7 @@ namespace relay
         void sendFCUnpublish();
         void sendPublish();
         void sendPublishStatus(double transactionId);
+        void sendUnublishStatus(double transactionId);
 
         void sendPlay();
         void sendPlayStatus(double transactionId);
