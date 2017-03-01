@@ -1242,24 +1242,18 @@ namespace relay
 
     void Connection::deleteStream()
     {
-        // TODO: implement
-        //if (connected && !streamName.empty())
+        if (connected && server)
         {
-            //sendDeleteStream();
+            server->stopStreaming(*this);
         }
-
-        //streaming = false;
     }
 
     void Connection::unpublishStream()
     {
-        // TODO: implement
-        //if (connected && !streamName.empty())
+        if (connected)
         {
-            //sendFCUnpublish();
+            sendFCUnpublish();
         }
-
-        //streaming = false;
     }
 
     void Connection::sendServerBandwidth()
