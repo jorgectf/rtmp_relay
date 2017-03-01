@@ -551,11 +551,6 @@ namespace relay
     void Connection::handleClose(cppsocket::Socket&)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
-
-        if (type == Type::CLIENT)
-        {
-            // TODO: reconnect
-        }
     }
 
     bool Connection::handlePacket(const rtmp::Packet& packet)
@@ -943,19 +938,21 @@ namespace relay
 
                             const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
-                            if (!connectionDescription)
+                            if (connectionDescription)
+                            {
+                                sendOnFCPublish();
+
+                                server = connectionDescription->server;
+                                server->startStreaming(*this);
+
+                                Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
+                            }
+                            else
                             {
                                 Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
                                 socket.close();
                                 return false;
                             }
-
-                            server = connectionDescription->server;
-                            server->startStreaming(*this);
-
-                            Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
-
-                            sendOnFCPublish();
                         }
                     }
                     else if (streamType == StreamType::OUTPUT)
@@ -1002,27 +999,26 @@ namespace relay
                 {
                     if (streamType == StreamType::NONE)
                     {
-                        if (!server)
+                        streamType = StreamType::INPUT;
+                        streamName = argument2.asString();
+
+                        const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+
+                        if (connectionDescription)
                         {
-                            streamType = StreamType::INPUT;
-                            streamName = argument2.asString();
-
-                            const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
-
-                            if (!server)
-                            {
-                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
-                                socket.close();
-                                return false;
-                            }
+                            sendPing();
+                            sendPublishStatus(transactionId.asDouble());
 
                             server = connectionDescription->server;
                             server->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
-
-                            sendPing();
-                            sendPublishStatus(transactionId.asDouble());
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                            socket.close();
+                            return false;
                         }
                     }
                     else if (streamType == StreamType::OUTPUT)
@@ -1069,19 +1065,19 @@ namespace relay
 
                         const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
-                        if (!server)
+                        if (connectionDescription)
+                        {
+                            sendPlayStatus(transactionId.asDouble());
+
+                            server = connectionDescription->server;
+                            server->startReceiving(*this);
+                        }
+                        else
                         {
                             Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
                             socket.close();
                             return false;
                         }
-
-                        server = connectionDescription->server;
-                        server->startReceiving(*this);
-
-                        sendPlayStatus(transactionId.asDouble());
-
-                        // TODO: add to server
                     }
                     else
                     {
@@ -1205,13 +1201,6 @@ namespace relay
                             {
                                 sendPublish();
                             }
-
-                            // TODO: implement
-                            /*streaming = true;
-                            
-                            sendMetaData();
-                            sendAudioHeader();
-                            sendVideoHeader();*/
                         }
                         
                         invokes.erase(i);
@@ -1268,8 +1257,6 @@ namespace relay
             streamName = overrideStreamName;
             replaceTokens(streamName, tokens);
         }
-
-        // TODO: start streaming
     }
 
     void Connection::deleteStream()
