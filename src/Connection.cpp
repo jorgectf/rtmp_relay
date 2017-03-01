@@ -981,6 +981,8 @@ namespace relay
                             server = nullptr;
                         }
 
+                        sendOnFCUnpublish();
+
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
 
                         streamName.clear();
@@ -992,6 +994,9 @@ namespace relay
                         socket.close();
                         return false;
                     }
+                }
+                else if (command.asString() == "onFCUnpublish")
+                {
                 }
                 else if (command.asString() == "publish")
                 {
@@ -1636,24 +1641,6 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendOnFCPublish()
-    {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::SYSTEM;
-        packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
-
-        amf0::Node commandName = std::string("onFCPublish");
-        commandName.encode(packet.data);
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
-
-        socket.send(buffer);
-    }
-
     void Connection::sendFCPublish()
     {
         rtmp::Packet packet;
@@ -1683,6 +1670,24 @@ namespace relay
         invokes[invokeId] = commandName.asString();
     }
 
+    void Connection::sendOnFCPublish()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onFCPublish");
+        commandName.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
+    }
+
     void Connection::sendFCUnpublish()
     {
         rtmp::Packet packet;
@@ -1710,6 +1715,24 @@ namespace relay
         socket.send(buffer);
 
         invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendOnFCUnpublish()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("onFCUnpublish");
+        commandName.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+
+        socket.send(buffer);
     }
 
     void Connection::sendPublish()
