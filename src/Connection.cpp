@@ -99,8 +99,8 @@ namespace relay
     {
         if (server)
         {
-            server->stopStreaming(*this);
             server->stopReceiving(*this);
+            server->stopStreaming(*this);
         }
     }
 
@@ -1263,7 +1263,9 @@ namespace relay
     {
         if (connected && server)
         {
+            server->stopReceiving(*this);
             server->stopStreaming(*this);
+            server = nullptr;
         }
     }
 
