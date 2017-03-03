@@ -111,7 +111,7 @@ namespace relay
         void sendPing();
         void sendSetChunkSize();
 
-        void sendBWDone();
+        void sendOnBWDone();
         void sendCheckBW();
         void sendCheckBWResult(double transactionId);
 

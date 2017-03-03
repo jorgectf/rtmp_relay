@@ -574,7 +574,10 @@ namespace relay
 
                 Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Chunk size: " << inChunkSize;
 
-                sendSetChunkSize();
+                if (type == Type::CLIENT)
+                {
+                    sendSetChunkSize();
+                }
 
                 break;
             }
@@ -893,26 +896,53 @@ namespace relay
 
                 if (command.asString() == "connect")
                 {
-                    applicationName = argument1["app"].asString();
+                    if (type == Type::HOST)
+                    {
+                        applicationName = argument1["app"].asString();
 
-                    sendServerBandwidth();
-                    sendClientBandwidth();
-                    sendPing();
-                    sendSetChunkSize();
-                    sendConnectResult(transactionId.asDouble());
-                    sendBWDone();
+                        sendServerBandwidth();
+                        sendClientBandwidth();
+                        sendPing();
+                        sendSetChunkSize();
+                        sendConnectResult(transactionId.asDouble());
+                        sendOnBWDone();
 
-                    connected = true;
+                        connected = true;
 
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                    }
+                    else
+                    {
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"connect\") received, disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "onBWDone")
                 {
-                    sendCheckBW();
+                    if (type == Type::CLIENT)
+                    {
+                        sendCheckBW();
+                    }
+                    else
+                    {
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"onBWDone\"), disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "_checkbw")
                 {
-                    sendCheckBWResult(transactionId.asDouble());
+                    if (type == Type::HOST)
+                    {
+                        sendCheckBWResult(transactionId.asDouble());
+                    }
+                    else
+                    {
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"_checkbw\"), disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "createStream")
                 {
@@ -961,7 +991,7 @@ namespace relay
                     }
                     else if (streamType == StreamType::OUTPUT)
                     {
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid FCPublish, disconnecting";
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCPublish\") received, disconnecting";
                         socket.close();
                         return false;
                     }
@@ -991,13 +1021,24 @@ namespace relay
                     else
                     {
                         // this is not a receiver
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid FCUnpublish, disconnecting";
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCUnpublish\") received, disconnecting";
                         socket.close();
                         return false;
                     }
                 }
                 else if (command.asString() == "onFCUnpublish")
                 {
+                    if (streamType == StreamType::INPUT)
+                    {
+                        // Do nothing
+                    }
+                    else
+                    {
+                        // this is not a receiver
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"onFCUnpublish\") received, disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "publish")
                 {
@@ -1028,7 +1069,7 @@ namespace relay
                     else if (streamType == StreamType::OUTPUT)
                     {
                         // this is not a receiver
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid publish, disconnecting";
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"publish\") received, disconnecting";
                         socket.close();
                         return false;
                     }
@@ -1055,7 +1096,7 @@ namespace relay
                     else
                     {
                         // this is not a receiver
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid FCUnpublish, disconnecting";
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCUnpublish\") received, disconnecting";
                         socket.close();
                         return false;
                     }
@@ -1086,7 +1127,7 @@ namespace relay
                     else
                     {
                         // this is not a sender
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid play, disconnecting";
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"play\") received, disconnecting";
 
                         socket.close();
                         return false;
@@ -1101,7 +1142,7 @@ namespace relay
                     else
                     {
                         // this is not a sender
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid getStreamLength, disconnecting";
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"getStreamLength\") received, disconnecting";
 
                         socket.close();
                         return false;
@@ -1117,7 +1158,7 @@ namespace relay
                     else
                     {
                         // this is not a sender
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent invalid stop, disconnecting";
+                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"stop\") received, disconnecting";
 
                         socket.close();
                         return false;
@@ -1133,7 +1174,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status received, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status (\"NetStream.Publish.Start\") received, disconnecting";
 
                             socket.close();
                             return false;
@@ -1147,7 +1188,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status received, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status (\"NetStream.Play.Start\") received, disconnecting";
 
                             socket.close();
                             return false;
@@ -1190,6 +1231,9 @@ namespace relay
                                 sendCreateStream();
                             }
                         }
+                        else if (i->second == "_checkbw")
+                        {
+                        }
                         else if (i->second == "releaseStream")
                         {
                         }
@@ -1208,6 +1252,10 @@ namespace relay
                         }
                         
                         invokes.erase(i);
+                    }
+                    else
+                    {
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << "Invalid _result received";
                     }
                 }
                 break;
@@ -1351,7 +1399,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendBWDone()
+    void Connection::sendOnBWDone()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
