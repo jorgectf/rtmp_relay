@@ -34,6 +34,7 @@ namespace relay
                            float aPingInterval):
         Connection(aRelay, client, Type::HOST)
     {
+        socket.setBlocking(false);
         socket.startRead();
         pingInterval = aPingInterval;
     }
@@ -43,6 +44,8 @@ namespace relay
                            const Description& description):
         Connection(aRelay, connector, Type::CLIENT)
     {
+        socket.setBlocking(false);
+
         addresses = description.addresses;
         connectionTimeout = description.connectionTimeout;
         reconnectInterval = description.reconnectInterval;

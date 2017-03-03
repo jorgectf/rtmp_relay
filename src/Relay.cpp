@@ -181,6 +181,7 @@ namespace relay
         for (const std::string& address : listenAddresses)
         {
             cppsocket::Socket acceptor(network);
+            acceptor.setBlocking(false);
             acceptor.setAcceptCallback(std::bind(&Relay::handleAccept, this, std::placeholders::_1, std::placeholders::_2));
             acceptor.startAccept(address);
             acceptors.push_back(std::move(acceptor));
