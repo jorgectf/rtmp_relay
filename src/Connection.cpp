@@ -946,19 +946,46 @@ namespace relay
                 }
                 else if (command.asString() == "createStream")
                 {
-                    sendCreateStreamResult(transactionId.asDouble());
+                    if (type == Type::HOST)
+                    {
+                        sendCreateStreamResult(transactionId.asDouble());
+                    }
+                    else
+                    {
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"createStream\"), disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "releaseStream")
                 {
-                    sendReleaseStreamResult(transactionId.asDouble());
+                    if (type == Type::HOST)
+                    {
+                        sendReleaseStreamResult(transactionId.asDouble());
+                    }
+                    else
+                    {
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"releaseStream\"), disconnecting";
+                        socket.close();
+                        return false;
+                    }
                 }
                 else if (command.asString() == "deleteStream")
                 {
-                    if (server)
+                    if (type == Type::HOST)
                     {
-                        server->stopReceiving(*this);
-                        server->stopStreaming(*this);
-                        server = nullptr;
+                        if (server)
+                        {
+                            server->stopReceiving(*this);
+                            server->stopStreaming(*this);
+                            server = nullptr;
+                        }
+                    }
+                    else
+                    {
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"deleteStream\"), disconnecting";
+                        socket.close();
+                        return false;
                     }
                 }
                 else if (command.asString() == "FCPublish")
