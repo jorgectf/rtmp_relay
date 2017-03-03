@@ -28,10 +28,9 @@ namespace relay
         Relay(cppsocket::Network& aNetwork);
 
         Relay(const Relay&) = delete;
+        Relay(Relay&&) = delete;
         Relay& operator=(const Relay&) = delete;
-
-        Relay(Relay&&);
-        Relay& operator=(Relay&&);
+        Relay& operator=(Relay&&) = delete;
 
         bool init(const std::string& config);
         void close();

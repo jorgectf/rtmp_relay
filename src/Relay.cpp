@@ -27,23 +27,6 @@ namespace relay
         previousTime = std::chrono::steady_clock::now();
     }
 
-    Relay::Relay(Relay&& other):
-        network(other.network),
-        previousTime(other.previousTime),
-        servers(std::move(other.servers)),
-        connections(std::move(other.connections))
-    {
-    }
-
-    Relay& Relay::operator=(Relay&& other)
-    {
-        previousTime = other.previousTime;
-        servers = std::move(other.servers);
-        connections = std::move(other.connections);
-
-        return *this;
-    }
-
     bool Relay::init(const std::string& config)
     {
         servers.clear();
@@ -198,6 +181,7 @@ namespace relay
         for (const std::string& address : listenAddresses)
         {
             cppsocket::Socket acceptor(network);
+            acceptor.setAcceptCallback(std::bind(&Relay::handleAccept, this, std::placeholders::_1, std::placeholders::_2));
             acceptor.startAccept(address);
             acceptors.push_back(std::move(acceptor));
         }

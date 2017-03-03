@@ -71,6 +71,12 @@ namespace relay
         Connection(Relay& aRelay,
                    cppsocket::Socket& connector,
                    const Description& description);
+
+        Connection(const Connection&) = delete;
+        Connection(Connection&&) = delete;
+        Connection& operator=(const Connection&) = delete;
+        Connection& operator=(Connection&&) = delete;
+
         ~Connection();
 
         Type getType() const { return type; }
