@@ -34,6 +34,7 @@ namespace relay
                            float aPingInterval):
         Connection(aRelay, client, Type::HOST)
     {
+        socket.startRead();
         pingInterval = aPingInterval;
     }
 
