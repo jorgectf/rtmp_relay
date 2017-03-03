@@ -1206,6 +1206,10 @@ namespace relay
 
                         invokes.erase(i);
                     }
+                    else
+                    {
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << "Invalid _error received";
+                    }
                 }
                 else if (command.asString() == "_result")
                 {
