@@ -70,12 +70,36 @@ namespace relay
             {
                 return marker == Marker::Null ||
                        marker == Marker::Undefined ||
-                       marker == Marker::Unknown;
+                       marker == Marker::Unknown ||
+                       (marker == Marker::Number && doubleValue == 0.0f) ||
+                       (marker == Marker::Boolean && boolValue == false);
             }
 
             Node& operator=(Marker newMarker)
             {
                 marker = newMarker;
+
+                switch (marker)
+                {
+                    case Marker::Number: doubleValue = 0.0; break;
+                    case Marker::Boolean: boolValue = false; break;
+                    case Marker::String:
+                    case Marker::LongString:
+                    case Marker::XMLDocument:
+                        stringValue.clear();
+                        break;
+                    case Marker::Object: mapValue.clear(); break;
+                    case Marker::Null: break;
+                    case Marker::Undefined: break;
+                    case Marker::ECMAArray: mapValue.clear(); break;
+                    case Marker::ObjectEnd: break;
+                    case Marker::StrictArray: vectorValue.clear(); break;
+                    case Marker::Date: dateValue.ms = 0.0; dateValue.timezone = 0; break;
+                    case Marker::TypedObject: break;
+                    case Marker::SwitchToAMF3: break;
+                    case Marker::Unknown: break;
+                }
+
                 return *this;
             }
 
@@ -279,12 +303,15 @@ namespace relay
         private:
             Marker marker = Marker::Unknown;
 
-            bool boolValue = false;
-            double doubleValue = 0.0;
+            union
+            {
+                double doubleValue = 0.0;
+                bool boolValue;
+                Date dateValue;
+            };
             std::string stringValue;
             std::vector<Node> vectorValue;
             std::map<std::string, Node> mapValue;
-            Date dateValue;
         };
     }
 }
