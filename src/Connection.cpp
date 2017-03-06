@@ -91,8 +91,8 @@ namespace relay
         if (!addresses.empty())
         {
             socket.setConnectTimeout(connectionTimeout);
-            connector.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
-            connector.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
+            socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
+            socket.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
             socket.connect(addresses[0].first, addresses[0].second);
         }
     }
