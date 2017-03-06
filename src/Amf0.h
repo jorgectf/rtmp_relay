@@ -46,7 +46,7 @@ namespace relay
             Node(const std::vector<Node>& value): marker(Marker::StrictArray), vectorValue(value) {}
             Node(const std::map<std::string, Node>& value): marker(Marker::Object), mapValue(value) {}
             Node(const std::string& value):
-                marker((value.length() <= std::numeric_limits<uint16_t>::max()) ? marker = Marker::String : marker = Marker::LongString),
+                marker((value.length() <= std::numeric_limits<uint16_t>::max()) ? Marker::String : Marker::LongString),
                 stringValue(value)
             {
             }
