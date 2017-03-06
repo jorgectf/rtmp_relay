@@ -36,12 +36,6 @@ namespace relay
 
         std::string markerToString(Marker marker);
 
-        struct Date
-        {
-            double ms = 0.0;
-            uint32_t timezone = 0;
-        };
-
         class Node
         {
         public:
@@ -52,19 +46,12 @@ namespace relay
             Node(const std::vector<Node>& value): marker(Marker::StrictArray), vectorValue(value) {}
             Node(const std::map<std::string, Node>& value): marker(Marker::Object), mapValue(value) {}
             Node(const std::string& value):
-                stringValue(value)
+                stringValue(value),
+                marker(value.length() <= std::numeric_limits<uint16_t>::max() ? marker = Marker::String : marker = Marker::LongString)
             {
-                if (value.length() <= std::numeric_limits<uint16_t>::max())
-                {
-                    marker = Marker::String;
-                }
-                else
-                {
-                    marker = Marker::LongString;
-                }
             }
 
-            Node(const Date& value): marker(Marker::Date), dateValue(value) {}
+            Node(double ms, uint32_t aTimezone): marker(Marker::Date), doubleValue(ms), timezone(aTimezone) {}
 
             bool operator !()
             {
@@ -94,7 +81,7 @@ namespace relay
                     case Marker::ECMAArray: mapValue.clear(); break;
                     case Marker::ObjectEnd: break;
                     case Marker::StrictArray: vectorValue.clear(); break;
-                    case Marker::Date: dateValue.ms = 0.0; dateValue.timezone = 0; break;
+                    case Marker::Date: doubleValue = 0.0; timezone = 0; break;
                     case Marker::TypedObject: break;
                     case Marker::SwitchToAMF3: break;
                     case Marker::Unknown: break;
@@ -145,13 +132,6 @@ namespace relay
                 return *this;
             }
 
-            Node& operator=(const Date& value)
-            {
-                marker = Marker::Date;
-                dateValue = value;
-                return *this;
-            }
-
             Marker getMarker() const { return marker; }
 
             uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
@@ -176,13 +156,6 @@ namespace relay
                 assert(marker == Marker::String || marker == Marker::LongString);
 
                 return stringValue;
-            }
-
-            const Date& asDate() const
-            {
-                assert(marker == Marker::Date);
-
-                return dateValue;
             }
 
             bool isNull() const
@@ -222,13 +195,27 @@ namespace relay
                     case Marker::ECMAArray: return "ECMA array";
                     case Marker::ObjectEnd: return ""; // should not happen
                     case Marker::StrictArray: return "strict array";
-                    case Marker::Date: return std::to_string(dateValue.ms) + " +" + std::to_string(dateValue.timezone);
+                    case Marker::Date: return std::to_string(doubleValue) + " +" + std::to_string(timezone);
                     case Marker::LongString: return stringValue;
                     case Marker::XMLDocument: return stringValue;
                     case Marker::TypedObject: return "typed object";
                     case Marker::SwitchToAMF3: return "switch to AMF3";
                     default: return "";
                 }
+            }
+
+            double getMs() const
+            {
+                assert(marker == Marker::Date);
+
+                return doubleValue;
+            }
+
+            uint32_t getTimezone() const
+            {
+                assert(marker == Marker::Date);
+
+                return timezone;
             }
 
             uint32_t getSize() const
@@ -307,8 +294,8 @@ namespace relay
             {
                 double doubleValue = 0.0;
                 bool boolValue;
-                Date dateValue;
             };
+            uint32_t timezone;
             std::string stringValue;
             std::vector<Node> vectorValue;
             std::map<std::string, Node> mapValue;

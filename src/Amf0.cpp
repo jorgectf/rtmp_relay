@@ -245,11 +245,11 @@ namespace relay
             return offset - originalOffset;
         }
 
-        static uint32_t readDate(const std::vector<uint8_t>& buffer, uint32_t offset, Date& result)
+        static uint32_t readDate(const std::vector<uint8_t>& buffer, uint32_t offset, double& ms, uint32_t& timezone)
         {
             uint32_t originalOffset = offset;
 
-            uint32_t ret = decodeDouble(buffer, offset, result.ms);
+            uint32_t ret = decodeDouble(buffer, offset, ms);
 
             if (ret == 0) // date in milliseconds from 01/01/1970
             {
@@ -258,7 +258,7 @@ namespace relay
 
             offset += ret;
 
-            ret = decodeInt(buffer, offset, 4, result.timezone);
+            ret = decodeInt(buffer, offset, 4, timezone);
 
             if (ret == 0) // unsupported timezone
             {
@@ -494,11 +494,11 @@ namespace relay
             return size;
         }
 
-        static uint32_t writeDate(std::vector<uint8_t>& buffer, const Date& value)
+        static uint32_t writeDate(std::vector<uint8_t>& buffer, double ms, uint32_t timezone)
         {
             uint32_t size = 0;
 
-            uint32_t ret = encodeDouble(buffer, value.ms);
+            uint32_t ret = encodeDouble(buffer, ms);
 
             if (ret == 0) // date in milliseconds from 01/01/1970
             {
@@ -507,7 +507,7 @@ namespace relay
 
             size += ret;
 
-            ret = encodeInt(buffer, 4, value.timezone);
+            ret = encodeInt(buffer, 4, timezone);
 
             if (ret == 0) // unsupported timezone
             {
@@ -645,7 +645,7 @@ namespace relay
                 }
                 case Marker::Date:
                 {
-                    if ((ret = readDate(buffer, offset, dateValue)) == 0)
+                    if ((ret = readDate(buffer, offset, doubleValue, timezone)) == 0)
                     {
                         return 0;
                     }
@@ -711,7 +711,7 @@ namespace relay
                 case Marker::ECMAArray: ret = writeECMAArray(buffer, mapValue); break;
                 case Marker::ObjectEnd: break; // should not happen
                 case Marker::StrictArray: ret = writeStrictArray(buffer, vectorValue); break;
-                case Marker::Date: ret = writeDate(buffer, dateValue); break;
+                case Marker::Date: ret = writeDate(buffer, doubleValue, timezone); break;
                 case Marker::LongString: ret = writeLongString(buffer, stringValue); break;
                 case Marker::XMLDocument: ret = writeXMLDocument(buffer, stringValue); break;
                 case Marker::TypedObject: ret = writeTypedObject(buffer); break;
@@ -765,7 +765,7 @@ namespace relay
                     case Marker::Number: log << doubleValue; break;
                     case Marker::Boolean: log << (boolValue ? "true" : "false"); break;
                     case Marker::String: log << stringValue; break;
-                    case Marker::Date: log << "ms=" <<  dateValue.ms << "timezone=" <<  dateValue.timezone; break;
+                    case Marker::Date: log << "ms=" <<  doubleValue << "timezone=" <<  timezone; break;
                     case Marker::LongString: log << stringValue; break;
                     case Marker::XMLDocument: log << stringValue; break;
                     default:break;
