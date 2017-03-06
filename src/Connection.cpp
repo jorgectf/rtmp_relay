@@ -988,32 +988,10 @@ namespace relay
                 }
                 else if (command.asString() == "FCPublish")
                 {
-                    if (streamType == StreamType::NONE)
+                    if (streamType == StreamType::NONE ||
+                        streamType == StreamType::INPUT)
                     {
-                        if (!server)
-                        {
-                            streamName = argument2.asString();
-                            streamType = StreamType::INPUT;
-
-                            const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
-
-                            if (connectionDescription)
-                            {
-                                sendOnFCPublish();
-
-                                server = connectionDescription->server;
-                                server->startStreaming(*this);
-                                pingInterval = connectionDescription->pingInterval;
-
-                                Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
-                            }
-                            else
-                            {
-                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream, disconnecting";
-                                socket.close();
-                                return false;
-                            }
-                        }
+                        sendOnFCPublish();
                     }
                     else if (streamType == StreamType::OUTPUT)
                     {
@@ -1068,7 +1046,8 @@ namespace relay
                 }
                 else if (command.asString() == "publish")
                 {
-                    if (streamType == StreamType::NONE)
+                    if (streamType == StreamType::NONE ||
+                        streamType == StreamType::INPUT)
                     {
                         streamType = StreamType::INPUT;
                         streamName = argument2.asString();
@@ -1081,8 +1060,9 @@ namespace relay
                             sendPublishStatus(transactionId.asDouble());
 
                             server = connectionDescription->server;
-                            server->startStreaming(*this);
                             pingInterval = connectionDescription->pingInterval;
+
+                            server->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                         }
