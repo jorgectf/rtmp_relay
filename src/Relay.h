@@ -49,7 +49,6 @@ namespace relay
 
         static uint64_t currentId;
         bool active = true;
-        float pingInterval = 5.0f;
 
         cppsocket::Network& network;
         std::unique_ptr<Status> status;

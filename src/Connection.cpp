@@ -30,13 +30,11 @@ namespace relay
     }
 
     Connection::Connection(Relay& aRelay,
-                           cppsocket::Socket& client,
-                           float aPingInterval):
+                           cppsocket::Socket& client):
         Connection(aRelay, client, Type::HOST)
     {
         socket.setBlocking(false);
         socket.startRead();
-        pingInterval = aPingInterval;
     }
 
     Connection::Connection(Relay& aRelay,
@@ -1005,6 +1003,7 @@ namespace relay
 
                                 server = connectionDescription->server;
                                 server->startStreaming(*this);
+                                pingInterval = connectionDescription->pingInterval;
 
                                 Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                             }
@@ -1083,6 +1082,7 @@ namespace relay
 
                             server = connectionDescription->server;
                             server->startStreaming(*this);
+                            pingInterval = connectionDescription->pingInterval;
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
                         }
@@ -1143,6 +1143,7 @@ namespace relay
 
                             server = connectionDescription->server;
                             server->startReceiving(*this);
+                            pingInterval = connectionDescription->pingInterval;
                         }
                         else
                         {

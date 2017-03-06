@@ -66,8 +66,7 @@ namespace relay
 
         Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType);
         Connection(Relay& aRelay,
-                   cppsocket::Socket& client,
-                   float aPingInterval);
+                   cppsocket::Socket& client);
         Connection(Relay& aRelay,
                    cppsocket::Socket& connector,
                    const Description& description);

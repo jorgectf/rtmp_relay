@@ -94,11 +94,6 @@ namespace relay
             }
         }
 
-        if (document["pingInterval"])
-        {
-            pingInterval = document["pingInterval"].as<float>();
-        }
-
         std::set<std::string> listenAddresses;
 
         const YAML::Node& serversArray = document["servers"];
@@ -314,9 +309,7 @@ namespace relay
 
     void Relay::handleAccept(cppsocket::Socket&, cppsocket::Socket& clientSocket)
     {
-        std::unique_ptr<Connection> connection(new Connection(*this,
-                                                              clientSocket,
-                                                              pingInterval));
+        std::unique_ptr<Connection> connection(new Connection(*this, clientSocket));
 
         connections.push_back(std::move(connection));
     }
