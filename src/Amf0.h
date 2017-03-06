@@ -46,14 +46,14 @@ namespace relay
             Node(const std::vector<Node>& value): marker(Marker::StrictArray), vectorValue(value) {}
             Node(const std::map<std::string, Node>& value): marker(Marker::Object), mapValue(value) {}
             Node(const std::string& value):
-                marker(value.length() <= std::numeric_limits<uint16_t>::max() ? marker = Marker::String : marker = Marker::LongString),
+                marker((value.length() <= std::numeric_limits<uint16_t>::max()) ? marker = Marker::String : marker = Marker::LongString),
                 stringValue(value)
             {
             }
 
             Node(double ms, uint32_t aTimezone): marker(Marker::Date), doubleValue(ms), timezone(aTimezone) {}
 
-            bool operator !()
+            bool operator!()
             {
                 return marker == Marker::Null ||
                        marker == Marker::Undefined ||
@@ -106,7 +106,6 @@ namespace relay
 
             Node& operator=(const std::string& value)
             {
-                stringValue = value;
                 if (value.length() <= std::numeric_limits<uint16_t>::max())
                 {
                     marker = Marker::String;
@@ -115,6 +114,7 @@ namespace relay
                 {
                     marker = Marker::LongString;
                 }
+                stringValue = value;
                 return *this;
             }
 
