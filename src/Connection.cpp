@@ -574,7 +574,7 @@ namespace relay
             server = nullptr;
         }
 
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Client at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
     }
 
     bool Connection::handlePacket(const rtmp::Packet& packet)
