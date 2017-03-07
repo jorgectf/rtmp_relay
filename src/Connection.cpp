@@ -553,6 +553,27 @@ namespace relay
 
     void Connection::handleClose(cppsocket::Socket&)
     {
+        state = State::UNINITIALIZED;
+        data.clear();
+        timeSincePing = 0.0f;
+        timeSinceConnect = 0.0f;
+        inChunkSize = 128;
+        outChunkSize = 128;
+        serverBandwidth = 2500000;
+        receivedPackets.clear();
+        sentPackets.clear();
+        invokeId = 0;
+        invokes.clear();
+        streamId = 0;
+        streamType = StreamType::NONE;
+
+        if (server)
+        {
+            server->stopReceiving(*this);
+            server->stopStreaming(*this);
+            server = nullptr;
+        }
+
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
     }
 
