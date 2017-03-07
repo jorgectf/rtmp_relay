@@ -143,7 +143,7 @@ namespace relay
         std::mt19937 generator;
         
         Type type;
-        State state;
+        State state = State::UNINITIALIZED;
         std::vector<std::pair<uint32_t, uint16_t>> addresses;
         float pingInterval = 60.0f;
         float connectionTimeout = 5.0f;
