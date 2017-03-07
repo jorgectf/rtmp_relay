@@ -68,13 +68,6 @@ namespace relay
             {
                 uint32_t ret = decodeInt(data, offset, 3, header.ts);
 
-                log << ", ts: " << header.ts;
-
-                if (header.ts == 0xffffff)
-                {
-                    log << " (extended)";
-                }
-
                 if (!ret)
                 {
                     return 0;
@@ -82,11 +75,16 @@ namespace relay
 
                 offset += ret;
 
+                log << ", ts: " << header.ts;
+
+                if (header.ts == 0xffffff)
+                {
+                    log << " (extended)";
+                }
+
                 if (header.type != Header::Type::FOUR_BYTE)
                 {
                     ret = decodeInt(data, offset, 3, header.length);
-
-                    log << ", data length: " << header.length;
 
                     if (!ret)
                     {
@@ -94,6 +92,8 @@ namespace relay
                     }
 
                     offset += ret;
+
+                    log << ", data length: " << header.length;
 
                     if (data.size() - offset < 1)
                     {
@@ -127,6 +127,11 @@ namespace relay
 
                     if (header.type != Header::Type::EIGHT_BYTE)
                     {
+                        if (data.size() - offset < 4)
+                        {
+                            return 0;
+                        }
+
                         // little endian
                         header.messageStreamId = *reinterpret_cast<const uint32_t*>(data.data() + offset);
                         offset += sizeof(header.messageStreamId);
