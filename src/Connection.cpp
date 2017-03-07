@@ -124,7 +124,7 @@ namespace relay
         }
         else if (type == Type::CLIENT)
         {
-            if (socket.isReady() && state != State::HANDSHAKE_DONE)
+            if (socket.isReady() && state == State::HANDSHAKE_DONE)
             {
                 timeSinceConnect = 0.0f;
             }
