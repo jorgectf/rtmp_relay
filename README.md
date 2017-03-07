@@ -83,33 +83,30 @@ Example configuration:
     statusPage:
         address: "0.0.0.0:80"
     servers:
-      - applicationName: "app/name"
-        overrideApplicationName: "${name}_2"
-        address: "127.0.0.1:2200"
-        type: "push"
-        output:
-          - streamName: "name"
-            overrideStreamName: "test_${name}"
-            address: "10.0.1.1:1935"
-            type: "push"
+      - connections
+          - address: [ "0.0.0.0:13004" ]
+            type: "host"
+            stream: "input"
+            applicationName: "app/name"
             video: true
             audio: true
-            connectionTimeout: 5.0
-            reconnectInterval: 5.0
-            reconnectCount: 3
-      - applicationName: "casino/roulette"
-        address: "127.0.0.1:2200"
-        type: "pull"
-        output:
-          - address: [ "10.0.1.2:1935", "10.0.1.3:1935" ]
-            type: "push"
-            video: true
-            audio: true
-            connectionTimeout: 5.0
-            reconnectInterval: 5.0
-            reconnectCount: 3
-          - address: "0.0.0.0:1935"
-            type: "pull"
+          - address: [ "52.19.130.93:1935" ]
+            type: "client"
+            stream: "output"
+            applicationName: "app/name"
+            streamName: "stream_name"
             video: true
             audio: true
             pingInterval: 60.0
+          - address: [ "127.0.0.1:13005" ]
+            type: "client"
+            stream: "output"
+            applicationName: "app/name"
+            streamName: "stream_name"
+            overrideStreamName: "test_${name}"
+            video: true
+            audio: true
+            pingInterval: 60.0
+            connectionTimeout: 5.0
+            reconnectInterval: 5.0
+            reconnectCount: 3
