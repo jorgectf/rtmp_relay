@@ -756,9 +756,11 @@ namespace relay
                 // only input can receive audio packets
                 if (streamType == StreamType::INPUT)
                 {
-                    Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "Audio packet";
-                    if (isCodecHeader(packet.data)) log << "(header)";
+                    {
+                        Log log(Log::Level::ALL);
+                        log << "[" << id << ", " << name << "] " << "Audio packet";
+                        if (isCodecHeader(packet.data)) log << "(header)";
+                    }
 
                     currentAudioBytes += packet.data.size();
 
@@ -786,17 +788,19 @@ namespace relay
                 // only input can receive video packets
                 if (streamType == StreamType::INPUT)
                 {
-                    Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "Video packet: ";
-                    switch (getVideoFrameType(packet.data))
                     {
-                        case VideoFrameType::KEY: log << "key frame"; break;
-                        case VideoFrameType::INTER: log << "inter frame"; break;
-                        case VideoFrameType::DISPOSABLE: log << "disposable frame"; break;
-                        default: log << "unknown frame"; break;
-                    }
+                        Log log(Log::Level::ALL);
+                        log << "[" << id << ", " << name << "] " << "Video packet: ";
+                        switch (getVideoFrameType(packet.data))
+                        {
+                            case VideoFrameType::KEY: log << "key frame"; break;
+                            case VideoFrameType::INTER: log << "inter frame"; break;
+                            case VideoFrameType::DISPOSABLE: log << "disposable frame"; break;
+                            default: log << "unknown frame"; break;
+                        }
 
-                    if (isCodecHeader(packet.data)) log << "(header)";
+                        if (isCodecHeader(packet.data)) log << "(header)";
+                    }
 
                     currentVideoBytes += packet.data.size();
 
@@ -1943,9 +1947,11 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log log(Log::Level::ALL);
-        log << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ":";
-        argument2.dump(log);
+        {
+            Log log(Log::Level::ALL);
+            log << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ": ";
+            argument2.dump(log);
+        }
 
         socket.send(buffer);
     }
@@ -1967,9 +1973,11 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log log(Log::Level::ALL);
-        log << "[" << id << ", " << name << "] " << "Sending text data";
-        argument1.dump(log);
+        {
+            Log log(Log::Level::ALL);
+            log << "[" << id << ", " << name << "] " << "Sending text data: ";
+            argument1.dump(log);
+        }
         
         socket.send(buffer);
     }
