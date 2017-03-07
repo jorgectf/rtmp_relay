@@ -42,6 +42,7 @@ namespace relay
                            const Description& description):
         Connection(aRelay, connector, Type::CLIENT)
     {
+        // TODO: implement stream name passing from server
         socket.setBlocking(false);
 
         addresses = description.addresses;
@@ -1618,7 +1619,7 @@ namespace relay
         amf0::Node argument1(amf0::Marker::Null);
         argument1.encode(packet.data);
 
-        amf0::Node argument2 = 1.0;
+        amf0::Node argument2 = static_cast<double>(streamId);
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
