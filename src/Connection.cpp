@@ -1943,10 +1943,8 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ":";
-
         Log log(Log::Level::ALL);
-        log << "[" << id << ", " << name << "] ";
+        log << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ":";
         argument2.dump(log);
 
         socket.send(buffer);
@@ -1969,10 +1967,8 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending text data";
-
         Log log(Log::Level::ALL);
-        log << "[" << id << ", " << name << "] ";
+        log << "[" << id << ", " << name << "] " << "Sending text data";
         argument1.dump(log);
         
         socket.send(buffer);
