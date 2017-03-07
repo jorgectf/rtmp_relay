@@ -693,11 +693,9 @@ namespace relay
 
                     offset += ret;
 
-                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "NOTIFY command: ";
-
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] ";
+                        log << "[" << id << ", " << name << "] " << "NOTIFY command: ";
                         command.dump(log);
                     }
 
@@ -707,10 +705,8 @@ namespace relay
                     {
                         offset += ret;
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Argument 1: ";
-
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] ";
+                        log << "[" << id << ", " << name << "] " << "Argument 1: ";
                         argument1.dump(log);
                     }
 
@@ -720,10 +716,8 @@ namespace relay
                     {
                         offset += ret;
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Argument 2: ";
-
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] ";
+                        log << "[" << id << ", " << name << "] " << "Argument 2: ";
                         argument2.dump(log);
                     }
 
