@@ -1262,8 +1262,13 @@ namespace relay
                             {
                                 sendPublish();
                             }
+
+                            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Created stream " << streamId;
                         }
-                        
+                        else if (i->second == "deleteStream")
+                        {
+                        }
+
                         invokes.erase(i);
                     }
                     else
