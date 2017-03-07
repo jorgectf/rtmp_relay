@@ -790,16 +790,22 @@ namespace relay
                 {
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Video packet: ";
-                        switch (getVideoFrameType(packet.data))
-                        {
-                            case VideoFrameType::KEY: log << "key frame"; break;
-                            case VideoFrameType::INTER: log << "inter frame"; break;
-                            case VideoFrameType::DISPOSABLE: log << "disposable frame"; break;
-                            default: log << "unknown frame"; break;
-                        }
+                        log << "[" << id << ", " << name << "] " << "Video packet";
 
-                        if (isCodecHeader(packet.data)) log << "(header)";
+                        if (isCodecHeader(packet.data))
+                        {
+                            log << "(header)";
+                        }
+                        else
+                        {
+                            switch (getVideoFrameType(packet.data))
+                            {
+                                case VideoFrameType::KEY: log << "(key frame)"; break;
+                                case VideoFrameType::INTER: log << "(inter frame)"; break;
+                                case VideoFrameType::DISPOSABLE: log << "(disposable frame)"; break;
+                                default: log << "(unknown frame)"; break;
+                            }
+                        }
                     }
 
                     currentVideoBytes += packet.data.size();
