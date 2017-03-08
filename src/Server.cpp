@@ -29,7 +29,9 @@ namespace relay
 
                 std::unique_ptr<Connection> connection(new Connection(relay,
                                                                       socket,
-                                                                      connectionDescription));
+                                                                      connectionDescription,
+                                                                      connectionDescription.applicationName,
+                                                                      connectionDescription.streamName));
 
                 connections.push_back(std::move(connection));
             }
@@ -64,7 +66,9 @@ namespace relay
 
                 std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                          socket,
-                                                                         connectionDescription));
+                                                                         connectionDescription,
+                                                                         inputConnection->getApplicationName(),
+                                                                         inputConnection->getStreamName()));
 
                 connections.push_back(std::move(newConnection));
             }
@@ -97,6 +101,9 @@ namespace relay
 
             if (streaming)
             {
+                connection.createStream(inputConnection->getApplicationName(),
+                                        inputConnection->getStreamName());
+
                 if (!videoHeader.empty()) connection.sendVideoData(0, videoHeader);
                 if (!audioHeader.empty()) connection.sendAudioData(0, videoHeader);
                 if (metaData.getMarker() != amf0::Marker::Unknown) connection.sendMetaData(metaData);

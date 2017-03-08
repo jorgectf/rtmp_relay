@@ -39,7 +39,9 @@ namespace relay
 
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
-                           const Description& description):
+                           const Description& description,
+                           const std::string& aApplicationName,
+                           const std::string& aStreamName):
         Connection(aRelay, connector, Type::CLIENT)
     {
         // TODO: implement stream name passing from server
@@ -56,13 +58,14 @@ namespace relay
 
         if (overrideApplicationName.empty())
         {
-            applicationName = description.applicationName;
+            applicationName = aApplicationName;
         }
         else
         {
             std::map<std::string, std::string> tokens = {
                 {"id", std::to_string(id)},
-                {"applicationName", description.applicationName},
+                {"streamName", aStreamName},
+                {"applicationName", aApplicationName},
                 {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
                 {"port", std::to_string(socket.getRemotePort())}
             };
@@ -73,14 +76,14 @@ namespace relay
 
         if (overrideStreamName.empty())
         {
-            streamName = description.streamName;
+            streamName = aStreamName;
         }
         else
         {
             std::map<std::string, std::string> tokens = {
                 {"id", std::to_string(id)},
-                {"streamName", description.streamName},
-                {"applicationName", description.applicationName},
+                {"streamName", aStreamName},
+                {"applicationName", aApplicationName},
                 {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
                 {"port", std::to_string(socket.getRemotePort())}
             };
