@@ -39,9 +39,7 @@ namespace relay
 
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
-                           const Description& description,
-                           const std::string& aApplicationName,
-                           const std::string& aStreamName):
+                           const Description& description):
         Connection(aRelay, connector, Type::CLIENT)
     {
         // TODO: implement stream name passing from server
@@ -56,49 +54,9 @@ namespace relay
         overrideApplicationName = description.overrideApplicationName;
         overrideStreamName = description.overrideStreamName;
 
-        if (overrideApplicationName.empty())
-        {
-            applicationName = aApplicationName;
-        }
-        else
-        {
-            std::map<std::string, std::string> tokens = {
-                {"id", std::to_string(id)},
-                {"streamName", aStreamName},
-                {"applicationName", aApplicationName},
-                {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
-                {"port", std::to_string(socket.getRemotePort())}
-            };
-
-            applicationName = overrideApplicationName;
-            replaceTokens(applicationName, tokens);
-        }
-
-        if (overrideStreamName.empty())
-        {
-            streamName = aStreamName;
-        }
-        else
-        {
-            std::map<std::string, std::string> tokens = {
-                {"id", std::to_string(id)},
-                {"streamName", aStreamName},
-                {"applicationName", aApplicationName},
-                {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
-                {"port", std::to_string(socket.getRemotePort())}
-            };
-
-            streamName = overrideStreamName;
-            replaceTokens(streamName, tokens);
-        }
-
-        if (!addresses.empty())
-        {
-            socket.setConnectTimeout(connectionTimeout);
-            socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
-            socket.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
-            socket.connect(addresses[0].first, addresses[0].second);
-        }
+        socket.setConnectTimeout(connectionTimeout);
+        socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
+        socket.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
     }
 
     Connection::~Connection()
@@ -283,6 +241,14 @@ namespace relay
                 str += "}";
                 break;
             }
+        }
+    }
+
+    void Connection::connect()
+    {
+        if (addressIndex < addresses.size())
+        {
+            socket.connect(addresses[addressIndex].first, addresses[addressIndex].second);
         }
     }
 

@@ -27,13 +27,16 @@ namespace relay
             {
                 Socket socket(network);
 
-                std::unique_ptr<Connection> connection(new Connection(relay,
-                                                                      socket,
-                                                                      connectionDescription,
-                                                                      connectionDescription.applicationName,
-                                                                      connectionDescription.streamName));
+                std::unique_ptr<Connection> newConnection(new Connection(relay,
+                                                                         socket,
+                                                                         connectionDescription));
 
-                connections.push_back(std::move(connection));
+                newConnection->createStream(connectionDescription.applicationName,
+                                            connectionDescription.streamName);
+
+                newConnection->connect();
+
+                connections.push_back(std::move(newConnection));
             }
         }
     }
@@ -66,9 +69,12 @@ namespace relay
 
                 std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                          socket,
-                                                                         connectionDescription,
-                                                                         inputConnection->getApplicationName(),
-                                                                         inputConnection->getStreamName()));
+                                                                         connectionDescription));
+
+                newConnection->createStream(inputConnection->getApplicationName(),
+                                            inputConnection->getStreamName());
+
+                newConnection->connect();
 
                 connections.push_back(std::move(newConnection));
             }

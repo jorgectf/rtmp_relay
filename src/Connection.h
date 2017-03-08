@@ -69,9 +69,7 @@ namespace relay
                    cppsocket::Socket& client);
         Connection(Relay& aRelay,
                    cppsocket::Socket& connector,
-                   const Description& description,
-                   const std::string& aApplicationName,
-                   const std::string& aStreamName);
+                   const Description& description);
 
         Connection(const Connection&) = delete;
         Connection(Connection&&) = delete;
@@ -88,6 +86,8 @@ namespace relay
         void update(float delta);
 
         void getInfo(std::string& str, ReportType reportType) const;
+
+        void connect();
 
         void createStream(const std::string& newApplicationName,
                           const std::string& newStreamName);
