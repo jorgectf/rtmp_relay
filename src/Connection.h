@@ -83,6 +83,8 @@ namespace relay
         const std::string& getApplicationName() const { return applicationName; }
         const std::string& getStreamName() const { return streamName; }
 
+        bool isClosed() const { return closed; }
+
         void update(float delta);
 
         void getInfo(std::string& str, ReportType reportType) const;
@@ -188,5 +190,6 @@ namespace relay
         Server* server = nullptr;
         std::set<std::string> metaDataBlacklist;
 
+        bool closed = false;
     };
 }

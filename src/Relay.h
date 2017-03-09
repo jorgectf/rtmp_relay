@@ -44,8 +44,6 @@ namespace relay
 
         const Connection::Description* getConnectionDescription(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const;
 
-        void removeConnection(Connection& connection);
-
     private:
         void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
 

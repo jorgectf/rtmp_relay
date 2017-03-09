@@ -24,8 +24,6 @@ namespace relay
         void startReceiving(Connection& connection);
         void stopReceiving(Connection& connection);
 
-        void removeConnection(Connection& connection);
-
         const std::vector<Connection::Description>& getConnectionDescriptions() const { return connectionDescriptions; }
 
         void sendAudioHeader(const std::vector<uint8_t>& headerData);

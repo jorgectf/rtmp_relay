@@ -44,9 +44,20 @@ namespace relay
 
     void Server::update(float delta)
     {
-        for (const auto& connection : connections)
+        for (auto i = connections.begin(); i != connections.end();)
         {
+            const std::unique_ptr<Connection>& connection = *i;
+
             connection->update(delta);
+
+            if (connection->isClosed())
+            {
+                i = connections.erase(i);
+            }
+            else
+            {
+                ++i;
+            }
         }
     }
 
@@ -127,22 +138,6 @@ namespace relay
         if (outputIterator != outputConnections.end())
         {
             outputConnections.erase(outputIterator);
-        }
-
-        removeConnection(connection);
-        relay.removeConnection(connection);
-    }
-
-    void Server::removeConnection(Connection& connection)
-    {
-        auto connectionIterator = std::find_if(connections.begin(), connections.end(),
-                                               [&connection](const std::unique_ptr<Connection>& currentConnection) {
-                                                   return currentConnection.get() == &connection;
-                                               });
-
-        if (connectionIterator != connections.end())
-        {
-            connections.erase(connectionIterator);
         }
     }
 

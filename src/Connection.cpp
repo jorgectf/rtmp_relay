@@ -543,6 +543,12 @@ namespace relay
             server = nullptr;
         }
 
+        // disconnect all host connections
+        if (type == Type::HOST)
+        {
+            closed = true;
+        }
+
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Client at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
     }
 

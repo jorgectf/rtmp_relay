@@ -212,19 +212,6 @@ namespace relay
         return nullptr;
     }
 
-    void Relay::removeConnection(Connection& connection)
-    {
-        auto connectionIterator = std::find_if(connections.begin(), connections.end(),
-                                               [&connection](const std::unique_ptr<Connection>& currentConnection) {
-                                                   return currentConnection.get() == &connection;
-                                               });
-
-        if (connectionIterator != connections.end())
-        {
-            connections.erase(connectionIterator);
-        }
-    }
-
     void Relay::close()
     {
         connections.clear();
@@ -251,9 +238,20 @@ namespace relay
                 server->update(delta);
             }
 
-            for (const auto& connection : connections)
+            for (auto i = connections.begin(); i != connections.end(); ++i)
             {
+                const std::unique_ptr<Connection>& connection = *i;
+
                 connection->update(delta);
+
+                if (connection->isClosed())
+                {
+                    i = connections.erase(i);
+                }
+                else
+                {
+                    ++i;
+                }
             }
 
             std::this_thread::sleep_for(sleepTime);
