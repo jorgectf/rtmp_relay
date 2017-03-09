@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include "Server.h"
+#include "Relay.h"
 
 using namespace cppsocket;
 
@@ -94,6 +95,8 @@ namespace relay
             }
 
             connections.clear();
+
+            inputConnection = nullptr;
         }
     }
 
@@ -119,11 +122,27 @@ namespace relay
 
     void Server::stopReceiving(Connection& connection)
     {
-        auto i = std::find(outputConnections.begin(), outputConnections.end(), &connection);
+        auto outputIterator = std::find(outputConnections.begin(), outputConnections.end(), &connection);
 
-        if (i != outputConnections.end())
+        if (outputIterator != outputConnections.end())
         {
-            outputConnections.erase(i);
+            outputConnections.erase(outputIterator);
+        }
+
+        removeConnection(connection);
+        relay.removeConnection(connection);
+    }
+
+    void Server::removeConnection(Connection& connection)
+    {
+        auto connectionIterator = std::find_if(connections.begin(), connections.end(),
+                                               [&connection](const std::unique_ptr<Connection>& currentConnection) {
+                                                   return currentConnection.get() == &connection;
+                                               });
+
+        if (connectionIterator != connections.end())
+        {
+            connections.erase(connectionIterator);
         }
     }
 
