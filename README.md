@@ -18,25 +18,22 @@ To compile the RTMP relay, just run "make" in the root directory. To launch it, 
 
 RTMP relay configuration files are YAML-based. It must start with servers array. Each server has following attributes:
 
-* *listen* – the address server is listening to
-* *pingInterval* – client ping interval in seconds
-* *servers* – application object (can be multiple for each server)
-  * *connections* – array of connection descriptors
-    * *applicationName* – name of the application (optional if server should route all applications)
-    * *streamName* – name of the stream (optional if server should route all streams)
-    * *overrideApplicationName* – name of the output application name
-    * *overrideStreamName* – string to override the stream name with
-    * *type* – type of connection (client or host)
-    * *stream* – type of stream (input or output)
-    * *addresses* – list of addresses to connect to (for client connections) or listen to (for server connections)
-    * *video* – flag that indicates wether to forward video stream
-    * *audio* – flag that indicates wether to forward audio stream
-    * *data* – flag that indicates wether to forward data stream
-    * *metaDataBlacklist* – list of metadata fields that should not be forwarded
-    * *pingInterval* – client ping interval in seconds
-    * *connectionTimeout* – how long should the attempt to connect last
-    * *reconnectInterval* – the interval of reconnection
-    * *reconnectCount* – amount of connect attempts
+* *connections* – array of connection descriptors
+  * *applicationName* – for input stream this is the filter of incoming stream application names, for output stream this is the name of the application (optional)
+  * *streamName* – for input stream this is the filter of incoming stream names, for output stream this is the name of the stream (optional)
+  * *overrideApplicationName* – name of the output application name
+  * *overrideStreamName* – string to override the stream name with
+  * *type* – type of connection (client or host)
+  * *stream* – type of stream (input or output)
+  * *addresses* – list of addresses to connect to (for client connections) or listen to (for server connections)
+  * *video* – flag that indicates wether to forward video stream
+  * *audio* – flag that indicates wether to forward audio stream
+  * *data* – flag that indicates wether to forward data stream
+  * *metaDataBlacklist* – list of metadata fields that should not be forwarded
+  * *pingInterval* – client ping interval in seconds
+  * *connectionTimeout* – how long should the attempt to connect last
+  * *reconnectInterval* – the interval of reconnection
+  * *reconnectCount* – amount of connect attempts
 
 *overrideApplicationName* can have the following tokens:
 
