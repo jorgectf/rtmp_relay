@@ -21,23 +21,14 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * *listen* – the address server is listening to
 * *pingInterval* – client ping interval in seconds
 * *servers* – application object (can be multiple for each server)
-  * *inputs* – array of input destinations
+  * *connections* – array of connection descriptors
     * *applicationName* – name of the application (optional if server should route all applications)
-    * *listen*: the address server is listening to (optional)
-    * *addresses* – list of addresses to push to (optional)
-    * *video* – flag that indicates wether to forward video stream
-    * *audio* – flag that indicates wether to forward audio stream
-    * *data* – flag that indicates wether to forward data stream
-    * *metaDataBlacklist* – list of metadata fields that should not be forwarded
-    * *pingInterval* – client ping interval in seconds
-    * *connectionTimeout* – how long should the attempt to connect last
-    * *reconnectInterval* – the interval of reconnection
-    * *reconnectCount* – amount of connect attempts
-  * *outputs* – array of output destinations
+    * *streamName* – name of the stream (optional if server should route all streams)
     * *overrideApplicationName* – name of the output application name
     * *overrideStreamName* – string to override the stream name with
-    * *listen*: the address server is listening to (optional)
-    * *addresses* – list of addresses to push to (optional)
+    * *type* – type of connection (client or host)
+    * *stream* – type of stream (input or output)
+    * *addresses* – list of addresses to connect to (for client connections) or listen to (for server connections)
     * *video* – flag that indicates wether to forward video stream
     * *audio* – flag that indicates wether to forward audio stream
     * *data* – flag that indicates wether to forward data stream
@@ -50,18 +41,21 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 *overrideApplicationName* can have the following tokens:
 
 * ${id} – id of the application
-* ${streamName} – name of the application
+* ${applicationName} – name of the application
+* ${streamName} – name of the stream
+* ${ipAddress} – IP address of the destination
+* ${port} – destination port
 
 *overrideStream* name can have the following tokens:
 
 * ${id} – id of the sender
-* ${streamName} – name of the source stream
 * ${applicationName} – name of the application
+* ${streamName} – name of the source stream
 * ${ipAddress} – IP address of the destination
 * ${port} – destination port
 
 Optionally you can add a web status page with "statusPage" object, which has the following attribute:
-* *listen* – the address of the web status page
+* *address* – the address of the web status page
 
 Status page can be accessed in the following addresses:
 * &lt;server address&gt;/stats – HTML output
