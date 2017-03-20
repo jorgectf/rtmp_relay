@@ -6,7 +6,6 @@
 #include "Relay.h"
 #include "Server.h"
 #include "Constants.h"
-#include "Utils.h"
 #include "Log.h"
 
 using namespace cppsocket;
@@ -549,6 +548,7 @@ namespace relay
         invokes.clear();
         streamId = 0;
         streamType = StreamType::NONE;
+        videoFrameSent = false;
 
         if (server)
         {
@@ -803,7 +803,7 @@ namespace relay
                     else
                     {
                         // forward audio packet
-                        if (server) server->sendAudio(packet.timestamp, packet.data);
+                        if (server) server->sendAudioFrame(packet.timestamp, packet.data);
                     }
                 }
                 else
@@ -820,6 +820,8 @@ namespace relay
                 // only input can receive video packets
                 if (streamType == StreamType::INPUT)
                 {
+                    VideoFrameType frameType = getVideoFrameType(packet.data);
+
                     {
                         Log log(Log::Level::ALL);
                         log << "[" << id << ", " << name << "] " << "Received VIDEO_PACKET";
@@ -830,7 +832,7 @@ namespace relay
                         }
                         else
                         {
-                            switch (getVideoFrameType(packet.data))
+                            switch (frameType)
                             {
                                 case VideoFrameType::KEY: log << "(key frame)"; break;
                                 case VideoFrameType::INTER: log << "(inter frame)"; break;
@@ -849,7 +851,7 @@ namespace relay
                     else
                     {
                         // forward video packet
-                        if (server) server->sendVideo(packet.timestamp, packet.data);
+                        if (server) server->sendVideoFrame(packet.timestamp, packet.data, frameType);
                     }
                 }
                 else
@@ -1037,6 +1039,7 @@ namespace relay
                     if (streamType == StreamType::INPUT)
                     {
                         streamType = StreamType::NONE;
+                        videoFrameSent = false;
 
                         if (server)
                         {
@@ -1132,6 +1135,7 @@ namespace relay
                     if (streamType == StreamType::INPUT)
                     {
                         streamType = StreamType::NONE;
+                        videoFrameSent = false;
 
                         if (server)
                         {
@@ -1209,6 +1213,7 @@ namespace relay
                     if (streamType == StreamType::OUTPUT)
                     {
                         streamType = StreamType::NONE;
+                        videoFrameSent = false;
                         sendStopStatus(transactionId.asDouble());
                     }
                     else
@@ -2082,9 +2087,13 @@ namespace relay
         sendAudioData(timestamp, frameData);
     }
 
-    void Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
+    void Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
-        sendVideoData(timestamp, frameData);
+        if (videoFrameSent || frameType == VideoFrameType::KEY)
+        {
+            videoFrameSent = true;
+            sendVideoData(timestamp, frameData);
+        }
     }
 
     void Connection::sendMetaData(const amf0::Node metaData)

@@ -167,7 +167,7 @@ namespace relay
         }
     }
 
-    void Server::sendAudio(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    void Server::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         for (Connection* outputConnection : outputConnections)
         {
@@ -178,13 +178,13 @@ namespace relay
         }
     }
 
-    void Server::sendVideo(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    void Server::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& videoData, VideoFrameType frameType)
     {
         for (Connection* outputConnection : outputConnections)
         {
             if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                outputConnection->sendVideoFrame(timestamp, videoData);
+                outputConnection->sendVideoFrame(timestamp, videoData, frameType);
             }
         }
     }
