@@ -1239,11 +1239,14 @@ namespace relay
 
                             if (!streamName.empty())
                             {
-                                sendReleaseStream();
-
                                 if (streamType == StreamType::OUTPUT)
                                 {
+                                    sendReleaseStream();
                                     sendFCPublish();
+                                }
+                                else
+                                {
+                                    sendFCSubscribe();
                                 }
 
                                 sendCreateStream();
@@ -1797,6 +1800,64 @@ namespace relay
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
         socket.send(buffer);
+    }
+
+    void Connection::sendFCSubscribe()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("FCSubscribe");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
+    }
+
+    void Connection::sendFCUnsubscribe()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("FCUnsubscribe");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+
+        socket.send(buffer);
+
+        invokes[invokeId] = commandName.asString();
     }
 
     void Connection::sendPublish()

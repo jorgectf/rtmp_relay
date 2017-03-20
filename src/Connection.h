@@ -131,6 +131,10 @@ namespace relay
         void sendOnFCPublish();
         void sendFCUnpublish();
         void sendOnFCUnpublish();
+
+        void sendFCSubscribe();
+        void sendFCUnsubscribe();
+
         void sendPublish();
         void sendPublishStatus(double transactionId);
         void sendUnublishStatus(double transactionId);
