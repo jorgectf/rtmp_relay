@@ -259,10 +259,14 @@ namespace relay
         {
             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
 
+            // C0
             std::vector<uint8_t> version;
             version.push_back(RTMP_VERSION);
             socket.send(version);
 
+            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending version message " << RTMP_VERSION;
+
+            // C1
             rtmp::Challenge challenge;
             challenge.time = 0;
             std::copy(RTMP_SERVER_VERSION, RTMP_SERVER_VERSION + sizeof(RTMP_SERVER_VERSION), challenge.version);
@@ -279,6 +283,8 @@ namespace relay
                                     reinterpret_cast<uint8_t*>(&challenge),
                                     reinterpret_cast<uint8_t*>(&challenge) + sizeof(challenge));
             socket.send(challengeMessage);
+
+            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending challenge message";
 
             state = State::VERSION_SENT;
         }
@@ -340,6 +346,7 @@ namespace relay
                         std::vector<uint8_t> reply;
                         reply.push_back(RTMP_VERSION);
                         socket.send(reply);
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending reply version " << RTMP_VERSION;
 
                         state = State::VERSION_SENT;
                     }
@@ -379,6 +386,8 @@ namespace relay
                                      reinterpret_cast<uint8_t*>(&replyChallenge) + sizeof(replyChallenge));
                         socket.send(reply);
 
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending challange reply message";
+
                         // S2
                         rtmp::Ack ack;
                         ack.time = challenge->time;
@@ -388,6 +397,8 @@ namespace relay
                         std::vector<uint8_t> ackData(reinterpret_cast<uint8_t*>(&ack),
                                                      reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                         socket.send(ackData);
+
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending Ack message";
 
                         state = State::ACK_SENT;
                     }
@@ -404,8 +415,8 @@ namespace relay
                         rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                         offset += sizeof(*ack);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got Ack message, time: " << ack->time <<
-                        ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got Ack reply message, time: " << ack->time <<
+                            ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
                         static_cast<uint32_t>(ack->version[1]) << "." <<
                         static_cast<uint32_t>(ack->version[2]) << "." <<
                         static_cast<uint32_t>(ack->version[3]);
@@ -429,7 +440,7 @@ namespace relay
                         uint8_t version = static_cast<uint8_t>(*data.data() + offset);
                         offset += sizeof(version);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got version " << static_cast<uint32_t>(version);
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got reply version " << static_cast<uint32_t>(version);
 
                         if (version != 0x03)
                         {
@@ -453,8 +464,8 @@ namespace relay
                         rtmp::Challenge* challenge = reinterpret_cast<rtmp::Challenge*>(data.data() + offset);
                         offset += sizeof(*challenge);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got challenge message, time: " << challenge->time <<
-                        ", version: " << static_cast<uint32_t>(challenge->version[0]) << "." <<
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got challenge reply message, time: " << challenge->time <<
+                            ", version: " << static_cast<uint32_t>(challenge->version[0]) << "." <<
                         static_cast<uint32_t>(challenge->version[1]) << "." <<
                         static_cast<uint32_t>(challenge->version[2]) << "." <<
                         static_cast<uint32_t>(challenge->version[3]);
@@ -468,6 +479,8 @@ namespace relay
                         std::vector<uint8_t> ackData(reinterpret_cast<uint8_t*>(&ack),
                                                      reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                         socket.send(ackData);
+
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending Ack message";
 
                         state = State::ACK_SENT;
                     }
@@ -484,8 +497,8 @@ namespace relay
                         rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                         offset += sizeof(*ack);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got Ack message, time: " << ack->time <<
-                        ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got Ack reply message, time: " << ack->time <<
+                            ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
                         static_cast<uint32_t>(ack->version[1]) << "." <<
                         static_cast<uint32_t>(ack->version[2]) << "." <<
                         static_cast<uint32_t>(ack->version[3]);
