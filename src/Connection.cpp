@@ -798,6 +798,12 @@ namespace relay
 
                     if (isCodecHeader(packet.data))
                     {
+                        uint8_t format = packet.data[0];
+                        AudioCodec codec = static_cast<AudioCodec>((format & 0xf0) >> 4);
+                        uint32_t channels = (format & 0x01) + 1;
+                        uint32_t sampleSize = (format & 0x02) ? 2 : 1;
+                        Log(Log::Level::ALL) << "Codec: " << getAudioCodec(codec) << ", channels: " << channels << ", sampleSize: " << sampleSize * 8;
+
                         if (server) server->sendAudioHeader(packet.data);
                     }
                     else
@@ -846,7 +852,11 @@ namespace relay
 
                     if (isCodecHeader(packet.data))
                     {
-                        if (server) server->sendVideoHeader(packet.data);
+                        uint8_t format = packet.data[0];
+                        VideoCodec codec = static_cast<VideoCodec>(format & 0x0f);
+                        Log(Log::Level::ALL) << "Codec: " << getVideoCodec(codec);
+
+                        if (server && frameType == VideoFrameType::KEY) server->sendVideoHeader(packet.data);
                     }
                     else
                     {
