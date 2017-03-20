@@ -144,6 +144,20 @@ namespace relay
                 return doubleValue;
             }
 
+            uint32_t asUInt32() const
+            {
+                assert(marker == Marker::Number);
+
+                return static_cast<uint32_t>(doubleValue);
+            }
+
+            uint64_t asUInt64() const
+            {
+                assert(marker == Marker::Number);
+
+                return static_cast<uint64_t>(doubleValue);
+            }
+
             bool asBool() const
             {
                 assert(marker == Marker::Boolean);
