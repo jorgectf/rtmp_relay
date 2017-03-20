@@ -74,7 +74,7 @@ Example configuration:
     statusPage:
         address: "0.0.0.0:80"
     servers:
-      - connections
+      - connections:
           - address: [ "0.0.0.0:13004" ]
             type: "host"
             stream: "input"
