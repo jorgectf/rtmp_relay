@@ -1718,8 +1718,14 @@ namespace relay
         amf0::Node argument1;
         argument1["app"] = applicationName;
         argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
-        argument1["tcUrl"] = std::string("rtmp://127.0.0.1:") + std::to_string(socket.getRemotePort()) + "/" + applicationName;
+        argument1["tcUrl"] = "rtmp://" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "/" + applicationName;
         argument1["type"] = std::string("nonprivate");
+        argument1["fpad"] = false;
+        argument1["capabilities"] = 15.0;
+        argument1["audioCodecs"] = 4071.0;
+        argument1["videoCodecs"] = 252.0;
+        argument1["videoFunction"] = 1.0;
+
         argument1.encode(packet.data);
 
         std::vector<uint8_t> buffer;

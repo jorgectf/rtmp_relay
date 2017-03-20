@@ -204,7 +204,7 @@ namespace relay
                 }
             }
 
-            if (count != currentCount)
+            if (count != 0 && count != currentCount) // Wowza sends count 0 for ECMA arrays
             {
                 return 0;
             }
