@@ -1429,7 +1429,21 @@ namespace relay
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending PING of type: ";
+        Log log(Log::Level::ALL);
+        log << "[" << id << ", " << name << "] " << "Sending PING of type: ";
+
+        switch (pingType)
+        {
+            case rtmp::PingType::CLEAR_STREAM: log << "CLEAR_STREAM"; break;
+            case rtmp::PingType::CLEAR_BUFFER: log << "CLEAR_BUFFER"; break;
+            case rtmp::PingType::CLIENT_BUFFER_TIME: log << "CLIENT_BUFFER_TIME"; break;
+            case rtmp::PingType::RESET_STREAM: log << "RESET_STREAM"; break;
+            case rtmp::PingType::PING: log << "PING"; break;
+            case rtmp::PingType::PONG: log << "PONG"; break;
+        }
+
+        log << ", parameter 1: " << parameter1;
+        if (parameter2 != 0) log << ", parameter 2: " << parameter2;
 
         socket.send(buffer);
     }
