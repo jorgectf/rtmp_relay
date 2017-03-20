@@ -124,8 +124,8 @@ namespace relay
                 connection.createStream(inputConnection->getApplicationName(),
                                         inputConnection->getStreamName());
 
-                if (!videoHeader.empty()) connection.sendVideoData(0, videoHeader);
-                if (!audioHeader.empty()) connection.sendAudioData(0, videoHeader);
+                if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
+                if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
                 if (metaData.getMarker() != amf0::Marker::Unknown) connection.sendMetaData(metaData);
             }
         }
@@ -149,7 +149,7 @@ namespace relay
         {
             if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                outputConnection->sendAudioData(0, headerData);
+                outputConnection->sendAudioHeader(headerData);
             }
         }
     }
@@ -162,7 +162,7 @@ namespace relay
         {
             if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                outputConnection->sendVideoData(0, headerData);
+                outputConnection->sendVideoHeader(headerData);
             }
         }
     }
@@ -173,7 +173,7 @@ namespace relay
         {
             if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                outputConnection->sendAudioData(timestamp, audioData);
+                outputConnection->sendAudioFrame(timestamp, audioData);
             }
         }
     }
@@ -184,7 +184,7 @@ namespace relay
         {
             if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
-                outputConnection->sendVideoData(timestamp, videoData);
+                outputConnection->sendVideoFrame(timestamp, videoData);
             }
         }
     }

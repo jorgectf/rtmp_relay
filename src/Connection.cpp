@@ -2067,40 +2067,24 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    void Connection::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::AUDIO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
-
-        packet.data = audioData;
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
-
-        socket.send(buffer);
+        sendAudioData(0, headerData);
     }
 
-    void Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    void Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::VIDEO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+        sendVideoData(0, headerData);
+    }
 
-        packet.data = videoData;
+    void Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
+    {
+        sendAudioData(timestamp, frameData);
+    }
 
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
-        
-        socket.send(buffer);
+    void Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
+    {
+        sendVideoData(timestamp, frameData);
     }
 
     void Connection::sendMetaData(const amf0::Node metaData)
@@ -2338,6 +2322,42 @@ namespace relay
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        
+        socket.send(buffer);
+    }
+
+    void Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::AUDIO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
+
+        packet.data = audioData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
+
+        socket.send(buffer);
+    }
+
+    void Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::VIDEO;
+        packet.messageStreamId = streamId;
+        packet.timestamp = timestamp;
+        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+
+        packet.data = videoData;
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
         
         socket.send(buffer);
     }

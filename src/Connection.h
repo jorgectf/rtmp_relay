@@ -97,8 +97,10 @@ namespace relay
         void deleteStream();
         void unpublishStream();
 
-        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
-        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+        void sendAudioHeader(const std::vector<uint8_t>& headerData);
+        void sendVideoHeader(const std::vector<uint8_t>& headerData);
+        void sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData);
+        void sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData);
         void sendMetaData(const amf0::Node metaData);
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
@@ -149,6 +151,9 @@ namespace relay
         void sendStop();
         void sendStopStatus(double transactionId);
 
+        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+
         Relay& relay;
         const uint64_t id;
 
@@ -191,6 +196,7 @@ namespace relay
         std::string overrideStreamName;
         bool connected = false;
 
+        bool videoFrameSent = false;
         float timeSinceMeasure = 0.0f;
         uint64_t currentAudioBytes = 0;
         uint64_t currentVideoBytes = 0;
