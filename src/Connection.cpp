@@ -1325,7 +1325,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << "Invalid _result received";
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Invalid _result received, transaction ID: " << static_cast<uint32_t>(transactionId.asDouble());
                     }
                 }
                 break;
