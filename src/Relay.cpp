@@ -240,7 +240,7 @@ namespace relay
                 server->update(delta);
             }
 
-            for (auto i = connections.begin(); i != connections.end(); ++i)
+            for (auto i = connections.begin(); i != connections.end();)
             {
                 const std::unique_ptr<Connection>& connection = *i;
 

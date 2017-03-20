@@ -1190,7 +1190,8 @@ namespace relay
                 }
                 else if (command.asString() == "getStreamLength")
                 {
-                    if (streamType == StreamType::INPUT)
+                    if (streamType == StreamType::NONE ||
+                        streamType == StreamType::INPUT)
                     {
                         // ignore this
                     }
