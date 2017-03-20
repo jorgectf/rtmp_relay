@@ -2098,6 +2098,33 @@ namespace relay
         socket.send(buffer);
     }
 
+    void Connection::sendGetStreamLength()
+    {
+        rtmp::Packet packet;
+        packet.channel = rtmp::Channel::SYSTEM;
+        packet.timestamp = 0;
+        packet.messageType = rtmp::MessageType::INVOKE;
+
+        amf0::Node commandName = std::string("getStreamLength");
+        commandName.encode(packet.data);
+
+        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(packet.data);
+
+        amf0::Node argument1(amf0::Marker::Null);
+        argument1.encode(packet.data);
+
+        amf0::Node argument2 = streamName;
+        argument2.encode(packet.data);
+
+        std::vector<uint8_t> buffer;
+        encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        
+        socket.send(buffer);
+    }
+
     void Connection::sendPlay()
     {
         rtmp::Packet packet;
