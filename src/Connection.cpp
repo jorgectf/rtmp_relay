@@ -1287,7 +1287,7 @@ namespace relay
                                 }
                                 else
                                 {
-                                    sendFCSubscribe();
+                                    //sendFCSubscribe();
                                 }
 
                                 sendCreateStream();
@@ -1305,6 +1305,7 @@ namespace relay
 
                             if (streamType == StreamType::INPUT)
                             {
+                                sendGetStreamLength();
                                 sendPlay();
                                 sendPing(rtmp::PingType::CLIENT_BUFFER_TIME, streamId, bufferSize);
                             }
@@ -2198,6 +2199,7 @@ namespace relay
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
+        packet.messageStreamId = streamId;
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
