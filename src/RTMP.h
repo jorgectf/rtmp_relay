@@ -44,12 +44,12 @@ namespace relay
 
         enum class PingType: uint16_t
         {
-            CLEAR_STREAM = 0,
+            CLEAR_STREAM = 0, // stream begin
             CLEAR_BUFFER = 1,
             CLIENT_BUFFER_TIME = 3,
             RESET_STREAM = 4,
-            PING = 5, // from server to client
-            PONG = 6 // from client
+            PING = 6, // from server to client
+            PONG = 7 // from client
         };
 
         struct Header

@@ -79,7 +79,7 @@ namespace relay
                 if (timeSincePing >= pingInterval)
                 {
                     timeSincePing = 0.0f;
-                    sendPing();
+                    sendPing(rtmp::PingType::PING);
                 }
             }
         }
@@ -580,7 +580,7 @@ namespace relay
                     return false;
                 }
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Chunk size: " << inChunkSize;
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received SET_CHUNK_SIZE, parameter: " << inChunkSize;
 
                 if (type == Type::CLIENT)
                 {
@@ -602,7 +602,7 @@ namespace relay
                     return false;
                 }
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Bytes read: " << bytesRead;
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received BYTES_READ, parameter: " << bytesRead;
 
                 break;
             }
@@ -611,8 +611,10 @@ namespace relay
             {
                 uint32_t offset = 0;
 
-                uint16_t pingType;
-                uint32_t ret = decodeInt(packet.data, offset, 2, pingType);
+                uint16_t pingTypeValue;
+                uint32_t ret = decodeInt(packet.data, offset, 2, pingTypeValue);
+
+                rtmp::PingType pingType = static_cast<rtmp::PingType>(pingTypeValue);
 
                 if (ret == 0)
                 {
@@ -631,7 +633,27 @@ namespace relay
 
                 offset += ret;
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Ping type: " << pingType << ", param: " << param;
+                {
+                    Log log(Log::Level::ALL);
+                    log << "[" << id << ", " << name << "] " << "Received PING, type: ";
+
+                    switch (pingType)
+                    {
+                        case rtmp::PingType::CLEAR_STREAM: log << "CLEAR_STREAM"; break;
+                        case rtmp::PingType::CLEAR_BUFFER: log << "CLEAR_BUFFER"; break;
+                        case rtmp::PingType::CLIENT_BUFFER_TIME: log << "CLIENT_BUFFER_TIME"; break;
+                        case rtmp::PingType::RESET_STREAM: log << "RESET_STREAM"; break;
+                        case rtmp::PingType::PING: log << "PING"; break;
+                        case rtmp::PingType::PONG: log << "PONG"; break;
+                    }
+
+                    log << ", param: " << param;
+                }
+
+                if (pingType == rtmp::PingType::PING)
+                {
+                    sendPing(rtmp::PingType::PONG);
+                }
 
                 break;
             }
@@ -650,7 +672,7 @@ namespace relay
 
                 offset += ret;
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Server bandwidth: " << bandwidth;
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received SERVER_BANDWIDTH, parameter: " << bandwidth;
 
                 break;
             }
@@ -679,7 +701,7 @@ namespace relay
 
                 offset += ret;
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Client bandwidth: " << bandwidth << ", type: " << bandwidthType;
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received CLIENT_BANDWIDTH, parameter: " << bandwidth << ", type: " << bandwidthType;
 
                 break;
             }
@@ -704,7 +726,7 @@ namespace relay
 
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "NOTIFY command: ";
+                        log << "[" << id << ", " << name << "] " << "Received NOTIFY, command: ";
                         command.dump(log);
                     }
 
@@ -767,7 +789,7 @@ namespace relay
                 {
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Audio packet";
+                        log << "[" << id << ", " << name << "] " << "Received AUDIO_PACKET";
                         if (isCodecHeader(packet.data)) log << "(header)";
                     }
 
@@ -799,7 +821,7 @@ namespace relay
                 {
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Video packet";
+                        log << "[" << id << ", " << name << "] " << "Received VIDEO_PACKET";
 
                         if (isCodecHeader(packet.data))
                         {
@@ -855,7 +877,7 @@ namespace relay
 
                 {
                     Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "INVOKE command: ";
+                    log << "[" << id << ", " << name << "] " << "Received INVOKE, command: ";
                     command.dump(log);
                 }
 
@@ -906,7 +928,7 @@ namespace relay
 
                         sendServerBandwidth();
                         sendClientBandwidth();
-                        sendPing();
+                        sendPing(rtmp::PingType::CLEAR_STREAM);
                         sendSetChunkSize();
                         sendConnectResult(transactionId.asDouble());
                         sendOnBWDone();
@@ -1062,7 +1084,7 @@ namespace relay
 
                         if (connectionDescription)
                         {
-                            sendPing();
+                            sendPing(rtmp::PingType::CLEAR_STREAM);
                             sendPublishStatus(transactionId.asDouble());
 
                             server = connectionDescription->server;
@@ -1125,6 +1147,7 @@ namespace relay
 
                         if (connectionDescription)
                         {
+                            sendPing(rtmp::PingType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
 
                             server = connectionDescription->server;
@@ -1390,20 +1413,20 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendPing()
+    void Connection::sendPing(rtmp::PingType pingType, uint32_t parameter)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::PING;
 
-        encodeInt(packet.data, 2, 0); // ping type
-        encodeInt(packet.data, 4, 0); // ping param
+        encodeInt(packet.data, 2, static_cast<uint16_t>(pingType)); // ping type
+        encodeInt(packet.data, 4, parameter); // ping param
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending PING";
+        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending PING of type: ";
 
         socket.send(buffer);
     }
