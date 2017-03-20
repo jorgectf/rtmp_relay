@@ -143,6 +143,7 @@ namespace relay
         void sendUnublishStatus(double transactionId);
 
         void sendGetStreamLength();
+        void sendGetStreamLengthResult(double transactionId);
         void sendPlay();
         void sendPlayStatus(double transactionId);
         void sendStop();
