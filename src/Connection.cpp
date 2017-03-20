@@ -755,16 +755,16 @@ namespace relay
 
                     if (command.asString() == "@setDataFrame" && argument1.asString() == "onMetaData")
                     {
-                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<uint32_t>(argument2["audiocodecid"].asDouble()));
-                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument2["videocodecid"].asDouble()));
+                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(argument2["audiocodecid"].asDouble()));
+                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(argument2["videocodecid"].asDouble()));
 
                         // forward notify packet
                         if (server) server->sendMetaData(argument2);
                     }
                     else if (command.asString() == "onMetaData")
                     {
-                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<uint32_t>(argument1["audiocodecid"].asDouble()));
-                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<uint32_t>(argument1["videocodecid"].asDouble()));
+                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(argument1["audiocodecid"].asDouble()));
+                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(argument1["videocodecid"].asDouble()));
 
                         // forward notify packet
                         if (server) server->sendMetaData(argument2);

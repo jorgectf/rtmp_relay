@@ -133,8 +133,36 @@ inline void tokenize(const std::string& str, std::vector<std::string>& tokens,
     }
 }
 
-std::string getAudioCodec(uint32_t codecId);
-std::string getVideoCodec(uint32_t codecId);
+enum class AudioCodec
+{
+    ADPCM            = 1,
+    MP3              = 2,
+    LINEAR_LE        = 3,
+    NELLY16          = 4,
+    NELLY8           = 5,
+    NELLY            = 6,
+    G711A            = 7,
+    G711U            = 8,
+    AAC              = 10,
+    SPEEX            = 11,
+    MP3_8            = 14,
+    DEVSPEC          = 15,
+    UNCOMPRESSED     = 16,
+};
+
+enum class VideoCodec
+{
+    JPEG             = 1,
+    SORENSON_H263    = 2,
+    SCREEN           = 3,
+    ON2_VP6          = 4,
+    ON2_VP6_ALPHA    = 5,
+    SCREEN2          = 6,
+    H264             = 7
+};
+
+std::string getAudioCodec(AudioCodec codecId);
+std::string getVideoCodec(VideoCodec codecId);
 
 enum class VideoFrameType
 {
