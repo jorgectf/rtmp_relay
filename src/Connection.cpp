@@ -49,6 +49,7 @@ namespace relay
         connectionTimeout = description.connectionTimeout;
         reconnectInterval = description.reconnectInterval;
         reconnectCount = description.reconnectCount;
+        bufferSize = description.bufferSize;
         streamType = description.streamType;
         server = description.server;
         overrideApplicationName = description.overrideApplicationName;
@@ -1288,6 +1289,7 @@ namespace relay
                             if (streamType == StreamType::INPUT)
                             {
                                 sendPlay();
+                                sendPing(rtmp::PingType::CLIENT_BUFFER_TIME, streamId, bufferSize);
                             }
                             else if (streamType == StreamType::OUTPUT)
                             {
@@ -1413,7 +1415,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendPing(rtmp::PingType pingType, uint32_t parameter)
+    void Connection::sendPing(rtmp::PingType pingType, uint32_t parameter1, uint32_t parameter2)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
@@ -1421,7 +1423,8 @@ namespace relay
         packet.messageType = rtmp::MessageType::PING;
 
         encodeInt(packet.data, 2, static_cast<uint16_t>(pingType)); // ping type
-        encodeInt(packet.data, 4, parameter); // ping param
+        encodeInt(packet.data, 4, parameter1); // ping parameter 1
+        if (parameter2 != 0) encodeInt(packet.data, 4, parameter2); // ping parameter 2
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);

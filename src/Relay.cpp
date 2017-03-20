@@ -148,6 +148,8 @@ namespace relay
                     if (connectionObject["connectionTimeout"]) connectionDescription.connectionTimeout = connectionObject["connectionTimeout"].as<float>();
                     if (connectionObject["reconnectInterval"]) connectionDescription.reconnectInterval = connectionObject["reconnectInterval"].as<float>();
                     if (connectionObject["reconnectCount"]) connectionDescription.reconnectCount = connectionObject["reconnectCount"].as<uint32_t>();
+                    if (connectionObject["pingInterval"]) connectionDescription.pingInterval = connectionObject["pingInterval"].as<float>();
+                    if (connectionObject["bufferSize"]) connectionDescription.bufferSize = connectionObject["bufferSize"].as<uint32_t>();
 
                     if (connectionObject["applicationName"]) connectionDescription.applicationName = connectionObject["applicationName"].as<std::string>();
                     if (connectionObject["streamName"]) connectionDescription.streamName = connectionObject["streamName"].as<std::string>();

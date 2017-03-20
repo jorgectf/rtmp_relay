@@ -30,10 +30,11 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
   * *audio* – flag that indicates wether to forward audio stream
   * *data* – flag that indicates wether to forward data stream
   * *metaDataBlacklist* – list of metadata fields that should not be forwarded
-  * *pingInterval* – client ping interval in seconds
   * *connectionTimeout* – how long should the attempt to connect last
   * *reconnectInterval* – the interval of reconnection
   * *reconnectCount* – amount of connect attempts
+  * *pingInterval* – client ping interval in seconds
+  * *bufferSize* – size of the client buffer for input streams
 
 *overrideApplicationName* can have the following tokens:
 

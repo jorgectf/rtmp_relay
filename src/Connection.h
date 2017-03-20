@@ -43,6 +43,7 @@ namespace relay
             float reconnectInterval = 5.0f;
             uint32_t reconnectCount = 0;
             float pingInterval = 60.0f;
+            uint32_t bufferSize = 3000;
 
             bool video = true;
             bool audio = true;
@@ -111,7 +112,7 @@ namespace relay
 
         void sendServerBandwidth();
         void sendClientBandwidth();
-        void sendPing(rtmp::PingType pingType, uint32_t parameter = 0);
+        void sendPing(rtmp::PingType pingType, uint32_t parameter1 = 0, uint32_t parameter2 = 0);
         void sendSetChunkSize();
 
         void sendOnBWDone();
@@ -153,10 +154,11 @@ namespace relay
         Type type;
         State state = State::UNINITIALIZED;
         std::vector<std::pair<uint32_t, uint16_t>> addresses;
-        float pingInterval = 60.0f;
         float connectionTimeout = 5.0f;
         float reconnectInterval = 5.0f;
         uint32_t reconnectCount = 0;
+        float pingInterval = 60.0f;
+        uint32_t bufferSize = 3000;
         cppsocket::Socket socket;
 
         float timeSincePing = 0.0f;
