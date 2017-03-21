@@ -105,8 +105,7 @@ namespace relay
                 outputConnection->unpublishStream();
             }
 
-            connections.clear();
-
+            outputConnections.clear();
             inputConnection = nullptr;
         }
     }
