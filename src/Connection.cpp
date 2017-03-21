@@ -1303,7 +1303,7 @@ namespace relay
                                 }
                                 else
                                 {
-                                    //sendFCSubscribe();
+                                    sendFCSubscribe();
                                 }
 
                                 sendCreateStream();
