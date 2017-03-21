@@ -1170,7 +1170,8 @@ namespace relay
                 }
                 else if (command.asString() == "play")
                 {
-                    if (streamType == StreamType::NONE)
+                    if (streamType == StreamType::NONE ||
+                        streamType == StreamType::OUTPUT)
                     {
                         streamType = StreamType::OUTPUT;
                         streamName = argument2.asString();
