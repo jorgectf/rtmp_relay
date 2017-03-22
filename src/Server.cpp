@@ -61,6 +61,41 @@ namespace relay
         }
     }
 
+    void Server::getInfo(std::string& str, ReportType reportType) const
+    {
+        switch (reportType)
+        {
+            case ReportType::TEXT:
+            {
+                for (const auto& connection : connections)
+                {
+                    connection->getInfo(str, reportType);
+                }
+                break;
+            }
+            case ReportType::HTML:
+            {
+                for (const auto& connection : connections)
+                {
+                    connection->getInfo(str, reportType);
+                }
+                break;
+            }
+            case ReportType::JSON:
+            {
+                bool first = true;
+
+                for (const auto& connection : connections)
+                {
+                    if (!first) str += ",";
+                    first = false;
+                    connection->getInfo(str, reportType);
+                }
+                break;
+            }
+        }
+    }
+
     void Server::startStreaming(Connection& connection)
     {
         inputConnection = &connection;

@@ -136,9 +136,12 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "\t[" + std::to_string(id) + ", " + name + "] " + (socket.isReady() ? "Connected" : "Not connected") +
-                    " to: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) +
-                    ", connection type: ";
+                str += "\t[" + std::to_string(id) + ", " + name + "], " +
+                    "name: " + streamName + ", " +
+                    "application: " + applicationName + ", " +
+                    "status: " + (socket.isReady() ? "connected" : "not connected") + ", " +
+                    "address: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + ", " +
+                    "connection: ";
 
                 switch (type)
                 {
@@ -156,10 +159,8 @@ namespace relay
                     case State::ACK_SENT: str += "ACK_SENT"; break;
                     case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
-                str += ", application: " + applicationName +
-                    ", name: " + streamName;
 
-                str += ", stream type: ";
+                str += ", stream: ";
 
                 switch (streamType)
                 {
@@ -174,7 +175,9 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td><td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "</td><td>";
+                str += "<tr><td>" + std::to_string(id) +"</td><td>" + streamName + "</td>" +
+                    "<td>" + applicationName + "</td>" +
+                    "<td>" + (socket.isReady() ? "Connected" : "Not connected") + "</td><td>" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "</td><td>";
 
                 switch (type)
                 {
@@ -207,10 +210,12 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"id\":" + std::to_string(id)  +",\"name\":\"" + streamName + "\"," +
+                str += "{\"id\":" + std::to_string(id) +
+                    ",\"name\":\"" + streamName + "\""
+                    ",\"application\":\"" + applicationName + "\"," +
                     "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
                     "\"address\":\"" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "\"," +
-                    "\"connectionType:\"";
+                    "\"connection\":";
 
                 switch (type)
                 {
@@ -218,7 +223,7 @@ namespace relay
                     case Type::CLIENT: str += "\"CLIENT\""; break;
                 }
 
-                str += ",\"status\":";
+                str += ",\"state\":";
 
                 switch (state)
                 {
@@ -229,7 +234,7 @@ namespace relay
                     case State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\""; break;
                 }
 
-                str += ",\"streamType\":";
+                str += ",\"stream\":";
 
                 switch (streamType)
                 {
