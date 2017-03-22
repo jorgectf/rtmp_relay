@@ -187,7 +187,7 @@ namespace relay
         return true;
     }
 
-    const Connection::Description* Relay::getConnectionDescription(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, std::string applicationName, std::string streamName) const
+    const Connection::Description* Relay::getConnectionDescription(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, const std::string& applicationName, const std::string& streamName) const
     {
         for (const std::unique_ptr<Server>& server : servers)
         {

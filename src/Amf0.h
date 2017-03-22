@@ -53,7 +53,7 @@ namespace relay
 
             Node(double ms, uint32_t aTimezone): marker(Marker::Date), doubleValue(ms), timezone(aTimezone) {}
 
-            bool operator!()
+            bool operator!() const
             {
                 return marker == Marker::Null ||
                        marker == Marker::Undefined ||
