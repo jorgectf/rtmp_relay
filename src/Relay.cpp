@@ -88,9 +88,9 @@ namespace relay
         {
             const YAML::Node& statusPageObject = document["statusPage"];
 
-            if (statusPageObject["listen"])
+            if (statusPageObject["address"])
             {
-                status.reset(new Status(network, *this, statusPageObject["listen"].as<std::string>()));
+                status.reset(new Status(network, *this, statusPageObject["address"].as<std::string>()));
             }
         }
 
