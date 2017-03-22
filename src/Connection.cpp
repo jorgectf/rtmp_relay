@@ -2112,7 +2112,7 @@ namespace relay
         }
     }
 
-    void Connection::sendMetaData(const amf0::Node metaData)
+    void Connection::sendMetaData(const amf0::Node& metaData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::AUDIO;

@@ -102,7 +102,7 @@ namespace relay
         void sendVideoHeader(const std::vector<uint8_t>& headerData);
         void sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData);
         void sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType);
-        void sendMetaData(const amf0::Node metaData);
+        void sendMetaData(const amf0::Node& metaData);
         void sendTextData(uint64_t timestamp, const amf0::Node& textData);
 
     private:
