@@ -841,15 +841,15 @@ namespace relay
                         {
                             log << "(header)";
                         }
-                        else
+
+                        switch (frameType)
                         {
-                            switch (frameType)
-                            {
-                                case VideoFrameType::KEY: log << "(key frame)"; break;
-                                case VideoFrameType::INTER: log << "(inter frame)"; break;
-                                case VideoFrameType::DISPOSABLE: log << "(disposable frame)"; break;
-                                default: log << "(unknown frame)"; break;
-                            }
+                            case VideoFrameType::KEY: log << "(key frame)"; break;
+                            case VideoFrameType::INTER: log << "(inter frame)"; break;
+                            case VideoFrameType::DISPOSABLE: log << "(disposable frame)"; break;
+                            case VideoFrameType::GENERATED_KEY: log << "(generated key frame)"; break;
+                            case VideoFrameType::VIDEO_INFO: log << "(video info)"; break;
+                            default: log << "(unknown frame)"; break;
                         }
                     }
 
@@ -862,6 +862,7 @@ namespace relay
                         Log(Log::Level::ALL) << "Codec: " << getVideoCodec(codec);
 
                         if (server && frameType == VideoFrameType::KEY) server->sendVideoHeader(packet.data);
+                        else if (server && frameType == VideoFrameType::VIDEO_INFO) server->sendVideoInfo(packet.data);
                     }
                     else
                     {
@@ -2096,6 +2097,11 @@ namespace relay
     void Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
         sendVideoData(0, headerData);
+    }
+
+    void Connection::sendVideoInfo(const std::vector<uint8_t>& infoData)
+    {
+        sendVideoData(0, infoData);
     }
 
     void Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)

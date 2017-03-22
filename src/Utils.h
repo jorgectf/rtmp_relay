@@ -169,7 +169,9 @@ enum class VideoFrameType
     NONE = 0,
     KEY = 1,
     INTER = 2,
-    DISPOSABLE = 3
+    DISPOSABLE = 3,
+    GENERATED_KEY = 4,
+    VIDEO_INFO = 5
 };
 
 inline VideoFrameType getVideoFrameType(const std::vector<uint8_t>& data)
