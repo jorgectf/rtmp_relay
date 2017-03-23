@@ -41,7 +41,6 @@ namespace relay
                            const Description& description):
         Connection(aRelay, connector, Type::CLIENT)
     {
-        // TODO: implement stream name passing from server
         socket.setBlocking(false);
 
         addresses = description.addresses;
@@ -51,6 +50,8 @@ namespace relay
         bufferSize = description.bufferSize;
         streamType = description.streamType;
         server = description.server;
+        applicationName = description.applicationName;
+        streamName = description.streamName;
         overrideApplicationName = description.overrideApplicationName;
         overrideStreamName = description.overrideStreamName;
 
@@ -1371,7 +1372,10 @@ namespace relay
     {
         if (overrideApplicationName.empty())
         {
-            applicationName = newApplicationName;
+            if (applicationName.empty())
+            {
+                applicationName = newApplicationName;
+            }
         }
         else
         {
@@ -1389,7 +1393,10 @@ namespace relay
 
         if (overrideStreamName.empty())
         {
-            streamName = newStreamName;
+            if (streamName.empty())
+            {
+                streamName = newStreamName;
+            }
         }
         else
         {
