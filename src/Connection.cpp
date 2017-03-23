@@ -1041,7 +1041,6 @@ namespace relay
                     if (streamType == StreamType::NONE ||
                         streamType == StreamType::INPUT)
                     {
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Publishing stream " << streamName;
                         sendOnFCPublish();
                     }
                     else if (streamType == StreamType::OUTPUT)
@@ -1309,11 +1308,15 @@ namespace relay
                             {
                                 if (streamType == StreamType::OUTPUT)
                                 {
+                                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Publishing stream " << streamName;
+
                                     sendReleaseStream();
                                     sendFCPublish();
                                 }
                                 else
                                 {
+                                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Subscribing to stream " << streamName;
+
                                     sendFCSubscribe();
                                 }
 
