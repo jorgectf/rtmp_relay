@@ -2026,6 +2026,9 @@ namespace relay
         amf0::Node argument2 = streamName;
         argument2.encode(packet.data);
 
+        amf0::Node argument3 = std::string("live");
+        argument3.encode(packet.data);
+
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
