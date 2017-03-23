@@ -1313,7 +1313,7 @@ namespace relay
                                     sendReleaseStream();
                                     sendFCPublish();
                                 }
-                                else
+                                else if (streamType == StreamType::INPUT)
                                 {
                                     Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Subscribing to stream " << streamName;
 
