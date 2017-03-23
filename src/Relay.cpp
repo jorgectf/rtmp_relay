@@ -98,10 +98,10 @@ namespace relay
 
         const YAML::Node& serversArray = document["servers"];
 
-        std::vector<Connection::Description> connectionDescriptions;
-
         for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
+            std::vector<Connection::Description> connectionDescriptions;
+            
             const YAML::Node& serverObject = serversArray[serverIndex];
 
             if (serverObject["connections"])
