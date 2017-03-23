@@ -210,9 +210,9 @@ namespace relay
             }
             case ReportType::JSON:
             {
-                str += "{\"id\":" + std::to_string(id) +
-                    ",\"name\":\"" + streamName + "\""
-                    ",\"application\":\"" + applicationName + "\"," +
+                str += "{\"id\":" + std::to_string(id) + "," +
+                    "\"name\":\"" + streamName + "\","
+                    "\"application\":\"" + applicationName + "\"," +
                     "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
                     "\"address\":\"" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "\"," +
                     "\"connection\":";
