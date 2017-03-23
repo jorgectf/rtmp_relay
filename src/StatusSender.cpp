@@ -82,7 +82,9 @@ namespace relay
                 relay.getInfo(info, ReportType::HTML);
 
                 std::string response = "HTTP/1.1 200 OK\r\n"
-                    "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
+                    "Cache-Control: no-cache, no-store, must-revalidate\r\n"
+                    "Pragma: no-cache\r\n"
+                    "Expires: 0\r\n"
                     "Content-Type: text/html\r\n"
                     "Content-Length: " + std::to_string(info.length()) + "\r\n"
                     "\r\n" + info;
@@ -98,10 +100,12 @@ namespace relay
                 relay.getInfo(info, ReportType::TEXT);
 
                 std::string response = "HTTP/1.1 200 OK\r\n"
-                "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
-                "Content-Type: text/plain\r\n"
-                "Content-Length: " + std::to_string(info.length()) + "\r\n"
-                "\r\n" + info;
+                    "Cache-Control: no-cache, no-store, must-revalidate\r\n"
+                    "Pragma: no-cache\r\n"
+                    "Expires: 0\r\n"
+                    "Content-Type: text/plain\r\n"
+                    "Content-Length: " + std::to_string(info.length()) + "\r\n"
+                    "\r\n" + info;
 
                 std::vector<uint8_t> buffer(response.begin(), response.end());
 
@@ -113,10 +117,12 @@ namespace relay
                 relay.getInfo(info, ReportType::JSON);
 
                 std::string response = "HTTP/1.1 200 OK\r\n"
-                "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
-                "Content-Type: application/json\r\n"
-                "Content-Length: " + std::to_string(info.length()) + "\r\n"
-                "\r\n" + info;
+                    "Cache-Control: no-cache, no-store, must-revalidate\r\n"
+                    "Pragma: no-cache\r\n"
+                    "Expires: 0\r\n"
+                    "Content-Type: application/json\r\n"
+                    "Content-Length: " + std::to_string(info.length()) + "\r\n"
+                    "\r\n" + info;
 
                 std::vector<uint8_t> buffer(response.begin(), response.end());
 
