@@ -661,7 +661,7 @@ namespace relay
 
                 if (pingType == rtmp::PingType::PING)
                 {
-                    sendPing(rtmp::PingType::PONG);
+                    sendPing(rtmp::PingType::PONG, packet.timestamp);
                 }
 
                 break;
@@ -1337,7 +1337,7 @@ namespace relay
                             {
                                 sendGetStreamLength();
                                 sendPlay();
-                                sendPing(rtmp::PingType::CLIENT_BUFFER_TIME, streamId, bufferSize);
+                                sendPing(rtmp::PingType::CLIENT_BUFFER_TIME, 0, streamId, bufferSize);
                             }
                             else if (streamType == StreamType::OUTPUT)
                             {
@@ -1469,11 +1469,11 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendPing(rtmp::PingType pingType, uint32_t parameter1, uint32_t parameter2)
+    void Connection::sendPing(rtmp::PingType pingType, uint64_t timestamp, uint32_t parameter1, uint32_t parameter2)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
-        packet.timestamp = 0;
+        packet.timestamp = timestamp;
         packet.messageType = rtmp::MessageType::PING;
 
         encodeIntBE(packet.data, 2, static_cast<uint16_t>(pingType)); // ping type
