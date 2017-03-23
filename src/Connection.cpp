@@ -80,7 +80,7 @@ namespace relay
                 if (timeSincePing >= pingInterval)
                 {
                     timeSincePing = 0.0f;
-                    sendPing(rtmp::PingType::PING);
+                    sendUserControl(rtmp::UserControlType::PING);
                 }
             }
         }
@@ -616,14 +616,14 @@ namespace relay
                 break;
             }
 
-            case rtmp::MessageType::PING:
+            case rtmp::MessageType::USER_CONTROL:
             {
                 uint32_t offset = 0;
 
-                uint16_t pingTypeValue;
-                uint32_t ret = decodeIntBE(packet.data, offset, 2, pingTypeValue);
+                uint16_t argument;
+                uint32_t ret = decodeIntBE(packet.data, offset, 2, argument);
 
-                rtmp::PingType pingType = static_cast<rtmp::PingType>(pingTypeValue);
+                rtmp::UserControlType userControlType = static_cast<rtmp::UserControlType>(argument);
 
                 if (ret == 0)
                 {
@@ -646,22 +646,22 @@ namespace relay
                     Log log(Log::Level::ALL);
                     log << "[" << id << ", " << name << "] " << "Received PING, type: ";
 
-                    switch (pingType)
+                    switch (userControlType)
                     {
-                        case rtmp::PingType::CLEAR_STREAM: log << "CLEAR_STREAM"; break;
-                        case rtmp::PingType::CLEAR_BUFFER: log << "CLEAR_BUFFER"; break;
-                        case rtmp::PingType::CLIENT_BUFFER_TIME: log << "CLIENT_BUFFER_TIME"; break;
-                        case rtmp::PingType::RESET_STREAM: log << "RESET_STREAM"; break;
-                        case rtmp::PingType::PING: log << "PING"; break;
-                        case rtmp::PingType::PONG: log << "PONG"; break;
+                        case rtmp::UserControlType::CLEAR_STREAM: log << "CLEAR_STREAM"; break;
+                        case rtmp::UserControlType::CLEAR_BUFFER: log << "CLEAR_BUFFER"; break;
+                        case rtmp::UserControlType::CLIENT_BUFFER_TIME: log << "CLIENT_BUFFER_TIME"; break;
+                        case rtmp::UserControlType::RESET_STREAM: log << "RESET_STREAM"; break;
+                        case rtmp::UserControlType::PING: log << "PING"; break;
+                        case rtmp::UserControlType::PONG: log << "PONG"; break;
                     }
 
                     log << ", param: " << param;
                 }
 
-                if (pingType == rtmp::PingType::PING)
+                if (userControlType == rtmp::UserControlType::PING)
                 {
-                    sendPing(rtmp::PingType::PONG, packet.timestamp);
+                    sendUserControl(rtmp::UserControlType::PONG, packet.timestamp);
                 }
 
                 break;
@@ -950,7 +950,7 @@ namespace relay
 
                         sendServerBandwidth();
                         sendClientBandwidth();
-                        sendPing(rtmp::PingType::CLEAR_STREAM);
+                        sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                         sendSetChunkSize();
                         sendConnectResult(transactionId.asDouble());
                         sendOnBWDone();
@@ -1124,7 +1124,7 @@ namespace relay
 
                         if (connectionDescription)
                         {
-                            sendPing(rtmp::PingType::CLEAR_STREAM);
+                            sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPublishStatus(transactionId.asDouble());
 
                             server = connectionDescription->server;
@@ -1189,7 +1189,7 @@ namespace relay
 
                         if (connectionDescription)
                         {
-                            sendPing(rtmp::PingType::CLEAR_STREAM);
+                            sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
 
                             server = connectionDescription->server;
@@ -1337,7 +1337,7 @@ namespace relay
                             {
                                 sendGetStreamLength();
                                 sendPlay();
-                                sendPing(rtmp::PingType::CLIENT_BUFFER_TIME, 0, streamId, bufferSize);
+                                sendUserControl(rtmp::UserControlType::CLIENT_BUFFER_TIME, 0, streamId, bufferSize);
                             }
                             else if (streamType == StreamType::OUTPUT)
                             {
@@ -1469,31 +1469,31 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendPing(rtmp::PingType pingType, uint64_t timestamp, uint32_t parameter1, uint32_t parameter2)
+    void Connection::sendUserControl(rtmp::UserControlType userControlType, uint64_t timestamp, uint32_t parameter1, uint32_t parameter2)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
         packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::PING;
+        packet.messageType = rtmp::MessageType::USER_CONTROL;
 
-        encodeIntBE(packet.data, 2, static_cast<uint16_t>(pingType)); // ping type
-        encodeIntBE(packet.data, 4, parameter1); // ping parameter 1
-        if (parameter2 != 0) encodeIntBE(packet.data, 4, parameter2); // ping parameter 2
+        encodeIntBE(packet.data, 2, static_cast<uint16_t>(userControlType));
+        encodeIntBE(packet.data, 4, parameter1); // parameter 1
+        if (parameter2 != 0) encodeIntBE(packet.data, 4, parameter2); // parameter 2
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
 
         Log log(Log::Level::ALL);
-        log << "[" << id << ", " << name << "] " << "Sending PING of type: ";
+        log << "[" << id << ", " << name << "] " << "Sending USER_CONTROL of type: ";
 
-        switch (pingType)
+        switch (userControlType)
         {
-            case rtmp::PingType::CLEAR_STREAM: log << "CLEAR_STREAM"; break;
-            case rtmp::PingType::CLEAR_BUFFER: log << "CLEAR_BUFFER"; break;
-            case rtmp::PingType::CLIENT_BUFFER_TIME: log << "CLIENT_BUFFER_TIME"; break;
-            case rtmp::PingType::RESET_STREAM: log << "RESET_STREAM"; break;
-            case rtmp::PingType::PING: log << "PING"; break;
-            case rtmp::PingType::PONG: log << "PONG"; break;
+            case rtmp::UserControlType::CLEAR_STREAM: log << "CLEAR_STREAM"; break;
+            case rtmp::UserControlType::CLEAR_BUFFER: log << "CLEAR_BUFFER"; break;
+            case rtmp::UserControlType::CLIENT_BUFFER_TIME: log << "CLIENT_BUFFER_TIME"; break;
+            case rtmp::UserControlType::RESET_STREAM: log << "RESET_STREAM"; break;
+            case rtmp::UserControlType::PING: log << "PING"; break;
+            case rtmp::UserControlType::PONG: log << "PONG"; break;
         }
 
         log << ", parameter 1: " << parameter1;

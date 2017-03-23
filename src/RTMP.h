@@ -29,7 +29,7 @@ namespace relay
 
             SET_CHUNK_SIZE = 1,     // chunk size change
             BYTES_READ = 3,         // number of bytes read
-            PING = 4,               // ping
+            USER_CONTROL = 4,       // user control message
             SERVER_BANDWIDTH = 5,   // server bandwidth
             CLIENT_BANDWIDTH = 6,   // client bandwidth
             AUDIO_PACKET = 8,       // audio packet
@@ -42,7 +42,7 @@ namespace relay
             INVOKE = 20,            // invoke some stream action
         };
 
-        enum class PingType: uint16_t
+        enum class UserControlType: uint16_t
         {
             CLEAR_STREAM = 0, // stream begin
             CLEAR_BUFFER = 1,

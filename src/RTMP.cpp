@@ -109,7 +109,7 @@ namespace relay
                     {
                         case rtmp::MessageType::SET_CHUNK_SIZE: log << "SET_CHUNK_SIZE"; break;
                         case rtmp::MessageType::BYTES_READ: log << "BYTES_READ"; break;
-                        case rtmp::MessageType::PING: log << "PING"; break;
+                        case rtmp::MessageType::USER_CONTROL: log << "USER_CONTROL"; break;
                         case rtmp::MessageType::SERVER_BANDWIDTH: log << "SERVER_BANDWIDTH"; break;
                         case rtmp::MessageType::CLIENT_BANDWIDTH: log << "CLIENT_BANDWIDTH"; break;
                         case rtmp::MessageType::AUDIO_PACKET: log << "AUDIO_PACKET"; break;
@@ -362,7 +362,7 @@ namespace relay
                     {
                         case rtmp::MessageType::SET_CHUNK_SIZE: log << "SET_CHUNK_SIZE"; break;
                         case rtmp::MessageType::BYTES_READ: log << "BYTES_READ"; break;
-                        case rtmp::MessageType::PING: log << "PING"; break;
+                        case rtmp::MessageType::USER_CONTROL: log << "USER_CONTROL"; break;
                         case rtmp::MessageType::SERVER_BANDWIDTH: log << "SERVER_BANDWIDTH"; break;
                         case rtmp::MessageType::CLIENT_BANDWIDTH: log << "CLIENT_BANDWIDTH"; break;
                         case rtmp::MessageType::AUDIO_PACKET: log << "AUDIO_PACKET"; break;

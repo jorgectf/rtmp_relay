@@ -115,7 +115,7 @@ namespace relay
 
         void sendServerBandwidth();
         void sendClientBandwidth();
-        void sendPing(rtmp::PingType pingType, uint64_t timestamp = 0, uint32_t parameter1 = 0, uint32_t parameter2 = 0);
+        void sendUserControl(rtmp::UserControlType userControlType, uint64_t timestamp = 0, uint32_t parameter1 = 0, uint32_t parameter2 = 0);
         void sendSetChunkSize();
 
         void sendOnBWDone();
