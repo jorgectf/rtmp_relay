@@ -29,9 +29,7 @@ inline uint32_t decodeIntBE(const std::vector<uint8_t>& buffer, uint32_t offset,
 
     for (uint32_t i = 0; i < size; ++i)
     {
-        result <<= 8;
-
-        result += static_cast<T>(*(buffer.data() + offset));
+        result += static_cast<T>(*(buffer.data() + offset)) << 8 * (size - i - 1);
         offset += 1;
     }
 
@@ -46,14 +44,42 @@ inline uint32_t decodeIntBE<uint8_t>(const std::vector<uint8_t>& buffer, uint32_
         return 0;
     }
 
+    result += static_cast<uint8_t>(*(buffer.data() + offset));
+    offset += 1;
+
+    return size;
+}
+
+template <class T>
+inline uint32_t decodeIntLE(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, T& result)
+{
+    if (buffer.size() - offset < size)
+    {
+        return 0;
+    }
+
     result = 0;
 
     for (uint32_t i = 0; i < size; ++i)
     {
-        result += static_cast<uint8_t>(*(buffer.data() + offset));
+        result += static_cast<T>(*(buffer.data() + offset)) << 8 * i;
         offset += 1;
     }
 
+    return size;
+}
+
+template <>
+inline uint32_t decodeIntLE<uint8_t>(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, uint8_t& result)
+{
+    if (buffer.size() - offset < size)
+    {
+        return 0;
+    }
+
+    result += static_cast<uint8_t>(*(buffer.data() + offset));
+    offset += 1;
+    
     return size;
 }
 
@@ -87,6 +113,17 @@ inline uint32_t encodeIntBE(std::vector<uint8_t>& buffer, uint32_t size, T value
     for (uint32_t i = 0; i < size; ++i)
     {
         buffer.push_back(static_cast<uint8_t>(value >> 8 * (size - i - 1)));
+    }
+
+    return size;
+}
+
+template <class T>
+inline uint32_t encodeIntLE(std::vector<uint8_t>& buffer, uint32_t size, T value)
+{
+    for (uint32_t i = 0; i < size; ++i)
+    {
+        buffer.push_back(static_cast<uint8_t>(value >> 8 * i));
     }
 
     return size;

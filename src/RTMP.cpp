@@ -132,9 +132,14 @@ namespace relay
                             return 0;
                         }
 
-                        // little endian
-                        header.messageStreamId = *reinterpret_cast<const uint32_t*>(data.data() + offset);
-                        offset += sizeof(header.messageStreamId);
+                        ret = decodeIntLE(data, offset, 4, header.messageStreamId);
+
+                        if (!ret)
+                        {
+                            return 0;
+                        }
+
+                        offset += ret;
 
                         log << ", message stream ID: " << header.messageStreamId;
                     }
@@ -375,9 +380,12 @@ namespace relay
 
                     if (header.type != Header::Type::EIGHT_BYTE)
                     {
-                        // little endian
-                        const uint8_t* messageStreamId = reinterpret_cast<const uint8_t*>(&header.messageStreamId);
-                        data.insert(data.end(), messageStreamId, messageStreamId + sizeof(uint32_t));
+                        ret = encodeIntLE(data, 4, header.messageStreamId);
+
+                        if (!ret)
+                        {
+                            return 0;
+                        }
 
                         log << ", message stream ID: " << header.messageStreamId;
                     }
