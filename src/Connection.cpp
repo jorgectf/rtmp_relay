@@ -1757,11 +1757,11 @@ namespace relay
         argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
         argument1["tcUrl"] = "rtmp://" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "/" + applicationName;
         argument1["type"] = std::string("nonprivate");
-        argument1["fpad"] = false;
-        argument1["capabilities"] = 15.0;
-        argument1["audioCodecs"] = 4071.0;
-        argument1["videoCodecs"] = 252.0;
-        argument1["videoFunction"] = 1.0;
+        //argument1["fpad"] = false;
+        //argument1["capabilities"] = 15.0;
+        //argument1["audioCodecs"] = 4071.0;
+        //argument1["videoCodecs"] = 252.0;
+        //argument1["videoFunction"] = 1.0;
 
         argument1.encode(packet.data);
 
@@ -1790,6 +1790,7 @@ namespace relay
 
         amf0::Node argument1;
         argument1["fmsVer"] = std::string("FMS/3,0,1,123");
+        argument1["fmsVer"] = std::string("FMS/3,5,7,7009");
         argument1["capabilities"] = 31.0;
         argument1.encode(packet.data);
 
@@ -1797,7 +1798,7 @@ namespace relay
         argument2["level"] = std::string("status");
         argument2["code"] = std::string("NetConnection.Connect.Success");
         argument2["description"] = std::string("Connection succeeded.");
-        argument2["objectEncoding"] = 0.0;
+        argument2["objectEncoding"] = 0.0; // TODO: implement AMF3 support
         argument2.encode(packet.data);
 
         std::vector<uint8_t> buffer;
