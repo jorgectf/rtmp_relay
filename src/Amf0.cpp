@@ -75,7 +75,7 @@ namespace relay
 
             uint16_t length;
 
-            uint32_t ret = decodeInt(buffer, offset, 2, length);
+            uint32_t ret = decodeIntBE(buffer, offset, 2, length);
 
             if (ret == 0)
             {
@@ -149,7 +149,7 @@ namespace relay
 
             uint32_t count;
 
-            uint32_t ret = decodeInt(buffer, offset, 4, count);
+            uint32_t ret = decodeIntBE(buffer, offset, 4, count);
 
             if (ret == 0)
             {
@@ -218,7 +218,7 @@ namespace relay
 
             uint32_t count;
 
-            uint32_t ret = decodeInt(buffer, offset, 4, count);
+            uint32_t ret = decodeIntBE(buffer, offset, 4, count);
 
             if (ret == 0)
             {
@@ -258,7 +258,7 @@ namespace relay
 
             offset += ret;
 
-            ret = decodeInt(buffer, offset, 4, timezone);
+            ret = decodeIntBE(buffer, offset, 4, timezone);
 
             if (ret == 0) // unsupported timezone
             {
@@ -276,7 +276,7 @@ namespace relay
 
             uint32_t length;
 
-            uint32_t ret = decodeInt(buffer, offset, 4, length);
+            uint32_t ret = decodeIntBE(buffer, offset, 4, length);
 
             if (ret == 0)
             {
@@ -302,7 +302,7 @@ namespace relay
 
             uint32_t length;
 
-            uint32_t ret = decodeInt(buffer, offset, 4, length);
+            uint32_t ret = decodeIntBE(buffer, offset, 4, length);
 
             if (ret == 0)
             {
@@ -359,7 +359,7 @@ namespace relay
 
         static uint32_t writeString(std::vector<uint8_t>& buffer, const std::string& value)
         {
-            uint32_t ret = encodeInt(buffer, 2, value.size());
+            uint32_t ret = encodeIntBE(buffer, 2, value.size());
 
             if (ret == 0)
             {
@@ -421,7 +421,7 @@ namespace relay
         {
             uint32_t size = 0;
 
-            uint32_t ret = encodeInt(buffer, 4, value.size());
+            uint32_t ret = encodeIntBE(buffer, 4, value.size());
 
             if (ret == 0)
             {
@@ -470,7 +470,7 @@ namespace relay
         {
             uint32_t size = 0;
 
-            uint32_t ret = encodeInt(buffer, 4, value.size());
+            uint32_t ret = encodeIntBE(buffer, 4, value.size());
 
             if (ret == 0)
             {
@@ -507,7 +507,7 @@ namespace relay
 
             size += ret;
 
-            ret = encodeInt(buffer, 4, timezone);
+            ret = encodeIntBE(buffer, 4, timezone);
 
             if (ret == 0) // unsupported timezone
             {
@@ -521,7 +521,7 @@ namespace relay
 
         static uint32_t writeLongString(std::vector<uint8_t>& buffer, const std::string& value)
         {
-            uint32_t ret = encodeInt(buffer, 4, value.size());
+            uint32_t ret = encodeIntBE(buffer, 4, value.size());
 
             if (ret == 0)
             {
@@ -540,7 +540,7 @@ namespace relay
 
         static uint32_t writeXMLDocument(std::vector<uint8_t>& buffer, const std::string& value)
         {
-            uint32_t ret = encodeInt(buffer, 4, value.size());
+            uint32_t ret = encodeIntBE(buffer, 4, value.size());
 
             if (ret == 0)
             {

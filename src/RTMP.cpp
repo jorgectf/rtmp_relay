@@ -33,7 +33,7 @@ namespace relay
             if (header.channel < 2)
             {
                 uint32_t newChannel;
-                uint32_t ret = decodeInt(data, offset, header.channel + 1, newChannel);
+                uint32_t ret = decodeIntBE(data, offset, header.channel + 1, newChannel);
 
                 if (!ret)
                 {
@@ -66,7 +66,7 @@ namespace relay
 
             if (header.type != Header::Type::ONE_BYTE)
             {
-                uint32_t ret = decodeInt(data, offset, 3, header.ts);
+                uint32_t ret = decodeIntBE(data, offset, 3, header.ts);
 
                 if (!ret)
                 {
@@ -84,7 +84,7 @@ namespace relay
 
                 if (header.type != Header::Type::FOUR_BYTE)
                 {
-                    ret = decodeInt(data, offset, 3, header.length);
+                    ret = decodeIntBE(data, offset, 3, header.length);
 
                     if (!ret)
                     {
@@ -144,7 +144,7 @@ namespace relay
             // extended timestamp
             if (header.ts == 0xffffff)
             {
-                uint32_t ret = decodeInt(data, offset, 4, header.timestamp);
+                uint32_t ret = decodeIntBE(data, offset, 4, header.timestamp);
 
                 if (!ret)
                 {
@@ -300,13 +300,13 @@ namespace relay
             {
                 headerData |= 0;
                 data.push_back(headerData);
-                encodeInt(data, 1, header.channel - 64);
+                encodeIntBE(data, 1, header.channel - 64);
             }
             else
             {
                 headerData |= 1;
                 data.push_back(headerData);
-                encodeInt(data, 2, header.channel - 64);
+                encodeIntBE(data, 2, header.channel - 64);
             }
 
             Log log(Log::Level::ALL);
@@ -325,7 +325,7 @@ namespace relay
 
             if (header.type != Header::Type::ONE_BYTE)
             {
-                uint32_t ret = encodeInt(data, 3, header.ts);
+                uint32_t ret = encodeIntBE(data, 3, header.ts);
 
                 if (!ret)
                 {
@@ -341,7 +341,7 @@ namespace relay
 
                 if (header.type != Header::Type::FOUR_BYTE)
                 {
-                    ret = encodeInt(data, 3, header.length);
+                    ret = encodeIntBE(data, 3, header.length);
 
                     if (!ret)
                     {
@@ -386,7 +386,7 @@ namespace relay
 
             if (header.ts == 0xffffff || (header.type == Header::Type::ONE_BYTE && previousPackets[header.channel].ts == 0xffffff))
             {
-                uint32_t ret = encodeInt(data, 4, timestamp);
+                uint32_t ret = encodeIntBE(data, 4, timestamp);
 
                 if (!ret)
                 {

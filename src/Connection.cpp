@@ -582,7 +582,7 @@ namespace relay
             {
                 uint32_t offset = 0;
 
-                uint32_t ret = decodeInt(packet.data, offset, 4, inChunkSize);
+                uint32_t ret = decodeIntBE(packet.data, offset, 4, inChunkSize);
 
                 if (ret == 0)
                 {
@@ -604,7 +604,7 @@ namespace relay
                 uint32_t offset = 0;
                 uint32_t bytesRead;
 
-                uint32_t ret = decodeInt(packet.data, offset, 4, bytesRead);
+                uint32_t ret = decodeIntBE(packet.data, offset, 4, bytesRead);
 
                 if (ret == 0)
                 {
@@ -621,7 +621,7 @@ namespace relay
                 uint32_t offset = 0;
 
                 uint16_t pingTypeValue;
-                uint32_t ret = decodeInt(packet.data, offset, 2, pingTypeValue);
+                uint32_t ret = decodeIntBE(packet.data, offset, 2, pingTypeValue);
 
                 rtmp::PingType pingType = static_cast<rtmp::PingType>(pingTypeValue);
 
@@ -633,7 +633,7 @@ namespace relay
                 offset += ret;
 
                 uint32_t param;
-                ret = decodeInt(packet.data, offset, 4, param);
+                ret = decodeIntBE(packet.data, offset, 4, param);
 
                 if (ret == 0)
                 {
@@ -672,7 +672,7 @@ namespace relay
                 uint32_t offset = 0;
 
                 uint32_t bandwidth;
-                uint32_t ret = decodeInt(packet.data, offset, 4, bandwidth);
+                uint32_t ret = decodeIntBE(packet.data, offset, 4, bandwidth);
 
                 if (ret == 0)
                 {
@@ -691,7 +691,7 @@ namespace relay
                 uint32_t offset = 0;
 
                 uint32_t bandwidth;
-                uint32_t ret = decodeInt(packet.data, offset, 4, bandwidth);
+                uint32_t ret = decodeIntBE(packet.data, offset, 4, bandwidth);
 
                 if (ret == 0)
                 {
@@ -701,7 +701,7 @@ namespace relay
                 offset += ret;
 
                 uint8_t bandwidthType;
-                ret = decodeInt(packet.data, offset, 1, bandwidthType);
+                ret = decodeIntBE(packet.data, offset, 1, bandwidthType);
 
                 if (ret == 0)
                 {
@@ -1441,7 +1441,7 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::SERVER_BANDWIDTH;
 
-        encodeInt(packet.data, 4, serverBandwidth);
+        encodeIntBE(packet.data, 4, serverBandwidth);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1458,8 +1458,8 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::CLIENT_BANDWIDTH;
 
-        encodeInt(packet.data, 4, serverBandwidth);
-        encodeInt(packet.data, 1, 2); // dynamic
+        encodeIntBE(packet.data, 4, serverBandwidth);
+        encodeIntBE(packet.data, 1, 2); // dynamic
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1476,9 +1476,9 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::PING;
 
-        encodeInt(packet.data, 2, static_cast<uint16_t>(pingType)); // ping type
-        encodeInt(packet.data, 4, parameter1); // ping parameter 1
-        if (parameter2 != 0) encodeInt(packet.data, 4, parameter2); // ping parameter 2
+        encodeIntBE(packet.data, 2, static_cast<uint16_t>(pingType)); // ping type
+        encodeIntBE(packet.data, 4, parameter1); // ping parameter 1
+        if (parameter2 != 0) encodeIntBE(packet.data, 4, parameter2); // ping parameter 2
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1509,7 +1509,7 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::SET_CHUNK_SIZE;
 
-        encodeInt(packet.data, 4, outChunkSize);
+        encodeIntBE(packet.data, 4, outChunkSize);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);

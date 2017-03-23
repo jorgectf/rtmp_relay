@@ -18,7 +18,7 @@ union IntFloat64
 };
 
 template <class T>
-inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, T& result)
+inline uint32_t decodeIntBE(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, T& result)
 {
     if (buffer.size() - offset < size)
     {
@@ -39,7 +39,7 @@ inline uint32_t decodeInt(const std::vector<uint8_t>& buffer, uint32_t offset, u
 }
 
 template <>
-inline uint32_t decodeInt<uint8_t>(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, uint8_t& result)
+inline uint32_t decodeIntBE<uint8_t>(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t size, uint8_t& result)
 {
     if (buffer.size() - offset < size)
     {
@@ -82,7 +82,7 @@ inline uint32_t decodeDouble(const std::vector<uint8_t>& buffer, uint32_t offset
 }
 
 template <class T>
-inline uint32_t encodeInt(std::vector<uint8_t>& buffer, uint32_t size, T value)
+inline uint32_t encodeIntBE(std::vector<uint8_t>& buffer, uint32_t size, T value)
 {
     for (uint32_t i = 0; i < size; ++i)
     {
