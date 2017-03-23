@@ -142,8 +142,8 @@ namespace relay
     void StatusSender::sendError()
     {
         std::string response = "HTTP/1.1 404 Not Found\r\n"
-        "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
-        "\r\n";
+            "Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n"
+            "\r\n";
 
         std::vector<uint8_t> buffer(response.begin(), response.end());
 
