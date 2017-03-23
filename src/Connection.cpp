@@ -504,12 +504,14 @@ namespace relay
 
                         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got Ack reply message, time: " << ack->time <<
                             ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
-                        static_cast<uint32_t>(ack->version[1]) << "." <<
-                        static_cast<uint32_t>(ack->version[2]) << "." <<
-                        static_cast<uint32_t>(ack->version[3]);
+                            static_cast<uint32_t>(ack->version[1]) << "." <<
+                            static_cast<uint32_t>(ack->version[2]) << "." <<
+                            static_cast<uint32_t>(ack->version[3]);
                         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Handshake done";
                         
                         state = State::HANDSHAKE_DONE;
+
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Connecting to application " << applicationName;
 
                         sendConnect();
                     }
@@ -1038,6 +1040,7 @@ namespace relay
                     if (streamType == StreamType::NONE ||
                         streamType == StreamType::INPUT)
                     {
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Publishing stream " << streamName;
                         sendOnFCPublish();
                     }
                     else if (streamType == StreamType::OUTPUT)
