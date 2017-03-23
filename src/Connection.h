@@ -39,7 +39,8 @@ namespace relay
         {
             Type type;
             StreamType streamType;
-            std::vector<std::pair<uint32_t, uint16_t>> addresses;
+            std::vector<std::pair<uint32_t, uint16_t>> ipAddresses;
+            std::vector<std::string> addresses;
             float connectionTimeout = 5.0f;
             float reconnectInterval = 5.0f;
             uint32_t reconnectCount = 0;
@@ -163,7 +164,8 @@ namespace relay
         
         Type type;
         State state = State::UNINITIALIZED;
-        std::vector<std::pair<uint32_t, uint16_t>> addresses;
+        std::vector<std::pair<uint32_t, uint16_t>> ipAddresses;
+        std::vector<std::string> addresses;
         float connectionTimeout = 5.0f;
         float reconnectInterval = 5.0f;
         uint32_t reconnectCount = 0;

@@ -129,7 +129,8 @@ namespace relay
                             std::string address = addressArray[addressIndex].as<std::string>();
                             std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                            connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                            connectionDescription.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
+                            connectionDescription.addresses.push_back(address);
 
                             if (connectionDescription.type == Connection::Type::HOST)
                             {
@@ -142,7 +143,8 @@ namespace relay
                         std::string address = connectionObject["address"].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
 
-                        connectionDescription.addresses.push_back(std::make_pair(addr.first, addr.second));
+                        connectionDescription.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
+                        connectionDescription.addresses.push_back(address);
                     }
 
                     if (connectionObject["connectionTimeout"]) connectionDescription.connectionTimeout = connectionObject["connectionTimeout"].as<float>();
@@ -200,9 +202,9 @@ namespace relay
                 {
                     if (connectionDescription.streamType == type)
                     {
-                        if (std::find(connectionDescription.addresses.begin(),
-                                      connectionDescription.addresses.end(),
-                                      address) != connectionDescription.addresses.end())
+                        if (std::find(connectionDescription.ipAddresses.begin(),
+                                      connectionDescription.ipAddresses.end(),
+                                      address) != connectionDescription.ipAddresses.end())
                         {
                             return &connectionDescription;
                         }

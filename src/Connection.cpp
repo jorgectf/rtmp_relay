@@ -44,6 +44,7 @@ namespace relay
         socket.setBlocking(false);
 
         addresses = description.addresses;
+        ipAddresses = description.ipAddresses;
         connectionTimeout = description.connectionTimeout;
         reconnectInterval = description.reconnectInterval;
         reconnectCount = description.reconnectCount;
@@ -112,7 +113,7 @@ namespace relay
 
                     if (addressIndex < addresses.size())
                     {
-                        socket.connect(addresses[addressIndex].first, addresses[addressIndex].second);
+                        socket.connect(ipAddresses[addressIndex].first, ipAddresses[addressIndex].second);
                     }
                 }
             }
@@ -254,7 +255,7 @@ namespace relay
     {
         if (addressIndex < addresses.size())
         {
-            socket.connect(addresses[addressIndex].first, addresses[addressIndex].second);
+            socket.connect(ipAddresses[addressIndex].first, ipAddresses[addressIndex].second);
         }
     }
 
@@ -1754,9 +1755,9 @@ namespace relay
 
         amf0::Node argument1;
         argument1["app"] = applicationName;
-        argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf57.5.0)");
-        argument1["tcUrl"] = "rtmp://" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "/" + applicationName;
         argument1["type"] = std::string("nonprivate");
+        argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf56.16.0)");
+        argument1["tcUrl"] = "rtmp://" + addresses[addressIndex] + "/" + applicationName;
         //argument1["fpad"] = false;
         //argument1["capabilities"] = 15.0;
         //argument1["audioCodecs"] = 4071.0;
