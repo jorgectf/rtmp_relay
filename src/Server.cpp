@@ -160,7 +160,6 @@ namespace relay
 
                 if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
                 if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
-                if (!videoInfo.empty()) connection.sendVideoInfo(videoInfo);
                 if (metaData.getMarker() != amf0::Marker::Unknown) connection.sendMetaData(metaData);
             }
         }
@@ -198,19 +197,6 @@ namespace relay
             if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
             {
                 outputConnection->sendVideoHeader(headerData);
-            }
-        }
-    }
-
-    void Server::sendVideoInfo(const std::vector<uint8_t>& infoData)
-    {
-        videoInfo = infoData;
-
-        for (Connection* outputConnection : outputConnections)
-        {
-            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
-            {
-                outputConnection->sendVideoInfo(infoData);
             }
         }
     }

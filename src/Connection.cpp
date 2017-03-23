@@ -865,7 +865,7 @@ namespace relay
                         Log(Log::Level::ALL) << "Codec: " << getVideoCodec(codec);
 
                         if (server && frameType == VideoFrameType::KEY) server->sendVideoHeader(packet.data);
-                        else if (server && frameType == VideoFrameType::VIDEO_INFO) server->sendVideoInfo(packet.data);
+                        // do nothing if frameType is VideoFrameType::VIDEO_INFO
                     }
                     else
                     {
@@ -2110,11 +2110,8 @@ namespace relay
     void Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
         sendVideoData(0, headerData);
-    }
 
-    void Connection::sendVideoInfo(const std::vector<uint8_t>& infoData)
-    {
-        sendVideoData(0, infoData);
+        // TODO: send video info
     }
 
     void Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
