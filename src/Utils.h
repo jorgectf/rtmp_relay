@@ -44,7 +44,7 @@ inline uint32_t decodeIntBE<uint8_t>(const std::vector<uint8_t>& buffer, uint32_
         return 0;
     }
 
-    result += static_cast<uint8_t>(*(buffer.data() + offset));
+    result = static_cast<uint8_t>(*(buffer.data() + offset));
     offset += 1;
 
     return size;
@@ -77,7 +77,7 @@ inline uint32_t decodeIntLE<uint8_t>(const std::vector<uint8_t>& buffer, uint32_
         return 0;
     }
 
-    result += static_cast<uint8_t>(*(buffer.data() + offset));
+    result = static_cast<uint8_t>(*(buffer.data() + offset));
     offset += 1;
     
     return size;
