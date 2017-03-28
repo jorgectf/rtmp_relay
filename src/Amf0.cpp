@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include <cstdint>
 #include "Amf0.h"
 #include "Utils.h"
 
