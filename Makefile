@@ -1,7 +1,7 @@
 CXXFLAGS=-c -std=c++11 -Wall -DLOG_SYSLOG -I external/cppsocket -I external/yaml-cpp/include
 LDFLAGS=
 
-SOURCES=src/Amf0.cpp \
+SOURCES=src/Amf.cpp \
 	src/Connection.cpp \
 	src/main.cpp \
 	src/Relay.cpp \
