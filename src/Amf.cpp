@@ -3,14 +3,14 @@
 //
 
 #include <iostream>
-#include "Amf0.h"
+#include "Amf.h"
 #include "Utils.h"
 
 using namespace cppsocket;
 
 namespace relay
 {
-    namespace amf0
+    namespace amf
     {
         static const std::string INDENT = "  ";
 
@@ -127,7 +127,7 @@ namespace relay
                 {
                     Node node;
 
-                    ret = node.decode(buffer, offset);
+                    ret = node.decode(amf::Version::AMF0, buffer, offset);
 
                     if (ret == 0)
                     {
@@ -188,7 +188,7 @@ namespace relay
                 else
                 {
                     Node node;
-                    ret = node.decode(buffer, offset);
+                    ret = node.decode(amf::Version::AMF0, buffer, offset);
 
                     if (ret == 0)
                     {
@@ -229,7 +229,7 @@ namespace relay
             for (uint32_t i = 0; i < count; ++i)
             {
                 Node node;
-                ret = node.decode(buffer, offset);
+                ret = node.decode(amf::Version::AMF0, buffer, offset);
 
                 if (ret == 0)
                 {
@@ -391,7 +391,7 @@ namespace relay
 
                 size += ret;
 
-                ret = i.second.encode(buffer);
+                ret = i.second.encode(amf::Version::AMF0, buffer);
 
                 if (ret == 0)
                 {
@@ -440,7 +440,7 @@ namespace relay
 
                 size += ret;
 
-                ret = i.second.encode(buffer);
+                ret = i.second.encode(amf::Version::AMF0, buffer);
 
                 if (ret == 0)
                 {
@@ -480,7 +480,7 @@ namespace relay
 
             for (const auto& i : value)
             {
-                ret = i.encode(buffer);
+                ret = i.encode(amf::Version::AMF0, buffer);
 
                 if (ret == 0)
                 {
@@ -575,150 +575,166 @@ namespace relay
             return 0;
         }
 
-        uint32_t Node::decode(const std::vector<uint8_t>& buffer, uint32_t offset)
+        uint32_t Node::decode(Version version, const std::vector<uint8_t>& buffer, uint32_t offset)
         {
             uint32_t originalOffset = offset;
 
-            if (buffer.size() - offset < 1)
+            if (version == Version::AMF0)
             {
+                if (buffer.size() - offset < 1)
+                {
+                    return 0;
+                }
+
+                marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
+                offset += 1;
+
+                uint32_t ret = 0;
+
+                switch (marker)
+                {
+                    case Marker::Number:
+                    {
+                        if ((ret = readNumber(buffer, offset, doubleValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::Boolean:
+                    {
+                        if ((ret = readBoolean(buffer, offset, boolValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::String:
+                    {
+                        if ((ret = readString(buffer, offset, stringValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::Object:
+                    {
+                        if ((ret = readObject(buffer, offset, mapValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::Null: /* Null */; break;
+                    case Marker::Undefined: /* Undefined */; break;
+                    case Marker::ECMAArray:
+                    {
+                        if ((ret = readECMAArray(buffer, offset, mapValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::ObjectEnd: break; // should not happen
+                    case Marker::StrictArray:
+                    {
+                        if ((ret = readStrictArray(buffer, offset, vectorValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::Date:
+                    {
+                        if ((ret = readDate(buffer, offset, doubleValue, timezone)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::LongString:
+                    {
+                        if ((ret = readLongString(buffer, offset, stringValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::XMLDocument:
+                    {
+                        if ((ret = readXMLDocument(buffer, offset, stringValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::TypedObject:
+                    {
+                        if ((ret = readTypedObject(buffer, offset)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    case Marker::SwitchToAMF3:
+                    {
+                        if ((ret = readSwitchToAMF3(buffer, offset)) == 0)
+                        {
+                            return 0;
+                        }
+                        break;
+                    }
+                    default: return 0;
+                }
+
+                offset += ret;
+            }
+            else if (version == Version::AMF3)
+            {
+                Log(Log::Level::ERR) << "AMF3 not supported";
                 return 0;
             }
-
-            marker = *reinterpret_cast<const Marker*>(buffer.data() + offset);
-            offset += 1;
-
-            uint32_t ret = 0;
-
-            switch (marker)
-            {
-                case Marker::Number:
-                {
-                    if ((ret = readNumber(buffer, offset, doubleValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::Boolean:
-                {
-                    if ((ret = readBoolean(buffer, offset, boolValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::String:
-                {
-                    if ((ret = readString(buffer, offset, stringValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::Object:
-                {
-                    if ((ret = readObject(buffer, offset, mapValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::Null: /* Null */; break;
-                case Marker::Undefined: /* Undefined */; break;
-                case Marker::ECMAArray:
-                {
-                    if ((ret = readECMAArray(buffer, offset, mapValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::ObjectEnd: break; // should not happen
-                case Marker::StrictArray:
-                {
-                    if ((ret = readStrictArray(buffer, offset, vectorValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::Date:
-                {
-                    if ((ret = readDate(buffer, offset, doubleValue, timezone)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::LongString:
-                {
-                    if ((ret = readLongString(buffer, offset, stringValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::XMLDocument:
-                {
-                    if ((ret = readXMLDocument(buffer, offset, stringValue)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::TypedObject:
-                {
-                    if ((ret = readTypedObject(buffer, offset)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                case Marker::SwitchToAMF3:
-                {
-                    if ((ret = readSwitchToAMF3(buffer, offset)) == 0)
-                    {
-                        return 0;
-                    }
-                    break;
-                }
-                default: return 0;
-            }
-
-            offset += ret;
 
             return offset - originalOffset;
         }
 
-        uint32_t Node::encode(std::vector<uint8_t>& buffer) const
+        uint32_t Node::encode(Version version, std::vector<uint8_t>& buffer) const
         {
             uint32_t size = 0;
 
-            uint32_t ret = 0;
-
-            buffer.push_back(static_cast<uint8_t>(marker));
-            size += 1;
-
-            switch (marker)
+            if (version == Version::AMF0)
             {
-                case Marker::Number: ret = writeNumber(buffer, doubleValue); break;
-                case Marker::Boolean: ret = writeBoolean(buffer, boolValue); break;
-                case Marker::String: ret = writeString(buffer, stringValue); break;
-                case Marker::Object: ret = writeObject(buffer, mapValue); break;
-                case Marker::Null: /* Null */; break;
-                case Marker::Undefined: /* Undefined */; break;
-                case Marker::ECMAArray: ret = writeECMAArray(buffer, mapValue); break;
-                case Marker::ObjectEnd: break; // should not happen
-                case Marker::StrictArray: ret = writeStrictArray(buffer, vectorValue); break;
-                case Marker::Date: ret = writeDate(buffer, doubleValue, timezone); break;
-                case Marker::LongString: ret = writeLongString(buffer, stringValue); break;
-                case Marker::XMLDocument: ret = writeXMLDocument(buffer, stringValue); break;
-                case Marker::TypedObject: ret = writeTypedObject(buffer); break;
-                case Marker::SwitchToAMF3: ret = writeSwitchToAMF3(buffer); break;
-                default: return 0;
-            }
+                uint32_t ret = 0;
 
-            size += ret;
+                buffer.push_back(static_cast<uint8_t>(marker));
+                size += 1;
+
+                switch (marker)
+                {
+                    case Marker::Number: ret = writeNumber(buffer, doubleValue); break;
+                    case Marker::Boolean: ret = writeBoolean(buffer, boolValue); break;
+                    case Marker::String: ret = writeString(buffer, stringValue); break;
+                    case Marker::Object: ret = writeObject(buffer, mapValue); break;
+                    case Marker::Null: /* Null */; break;
+                    case Marker::Undefined: /* Undefined */; break;
+                    case Marker::ECMAArray: ret = writeECMAArray(buffer, mapValue); break;
+                    case Marker::ObjectEnd: break; // should not happen
+                    case Marker::StrictArray: ret = writeStrictArray(buffer, vectorValue); break;
+                    case Marker::Date: ret = writeDate(buffer, doubleValue, timezone); break;
+                    case Marker::LongString: ret = writeLongString(buffer, stringValue); break;
+                    case Marker::XMLDocument: ret = writeXMLDocument(buffer, stringValue); break;
+                    case Marker::TypedObject: ret = writeTypedObject(buffer); break;
+                    case Marker::SwitchToAMF3: ret = writeSwitchToAMF3(buffer); break;
+                    default: return 0;
+                }
+
+                size += ret;
+            }
+            else if (version == Version::AMF3)
+            {
+                Log(Log::Level::ERR) << "AMF3 not supported";
+                return 0;
+            }
 
             return size;
         }

@@ -723,9 +723,9 @@ namespace relay
                 {
                     uint32_t offset = 0;
 
-                    amf0::Node command;
+                    amf::Node command;
 
-                    uint32_t ret = command.decode(packet.data, offset);
+                    uint32_t ret = command.decode(amf::Version::AMF0, packet.data, offset);
 
                     if (ret == 0)
                     {
@@ -740,9 +740,9 @@ namespace relay
                         command.dump(log);
                     }
 
-                    amf0::Node argument1;
+                    amf::Node argument1;
 
-                    if ((ret = argument1.decode(packet.data, offset))  > 0)
+                    if ((ret = argument1.decode(amf::Version::AMF0, packet.data, offset))  > 0)
                     {
                         offset += ret;
 
@@ -751,9 +751,9 @@ namespace relay
                         argument1.dump(log);
                     }
 
-                    amf0::Node argument2;
+                    amf::Node argument2;
 
-                    if ((ret = argument2.decode(packet.data, offset)) > 0)
+                    if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
                     {
                         offset += ret;
 
@@ -887,9 +887,9 @@ namespace relay
             {
                 uint32_t offset = 0;
 
-                amf0::Node command;
+                amf::Node command;
 
-                uint32_t ret = command.decode(packet.data, offset);
+                uint32_t ret = command.decode(amf::Version::AMF0, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -904,9 +904,9 @@ namespace relay
                     command.dump(log);
                 }
 
-                amf0::Node transactionId;
+                amf::Node transactionId;
 
-                ret = transactionId.decode(packet.data, offset);
+                ret = transactionId.decode(amf::Version::AMF0, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -921,9 +921,9 @@ namespace relay
                     transactionId.dump(log);
                 }
 
-                amf0::Node argument1;
+                amf::Node argument1;
 
-                if ((ret = argument1.decode(packet.data, offset)) > 0)
+                if ((ret = argument1.decode(amf::Version::AMF0, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
@@ -932,9 +932,9 @@ namespace relay
                     argument1.dump(log);
                 }
 
-                amf0::Node argument2;
+                amf::Node argument2;
 
-                if ((ret = argument2.decode(packet.data, offset)) > 0)
+                if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
@@ -1527,17 +1527,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onBWDone");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onBWDone");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = 0.0;
-        argument2.encode(packet.data);
+        amf::Node argument2 = 0.0;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1556,14 +1556,14 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("_checkbw");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("_checkbw");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1582,14 +1582,14 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("_result");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("_result");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1606,14 +1606,14 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("createStream");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("createStream");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1632,14 +1632,14 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("_result");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("_result");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
         ++streamId;
         if (streamId == 0 || streamId == 2) // streams 0 and 2 are reserved
@@ -1647,8 +1647,8 @@ namespace relay
             ++streamId;
         }
 
-        amf0::Node argument2 = static_cast<double>(streamId);
-        argument2.encode(packet.data);
+        amf::Node argument2 = static_cast<double>(streamId);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1665,17 +1665,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("releaseStream");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("releaseStream");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1694,14 +1694,14 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("_result");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("_result");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1718,17 +1718,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("deleteStream");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("deleteStream");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = static_cast<double>(streamId);
-        argument2.encode(packet.data);
+        amf::Node argument2 = static_cast<double>(streamId);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1747,13 +1747,13 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("connect");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("connect");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1;
+        amf::Node argument1;
         argument1["app"] = applicationName;
         argument1["type"] = std::string("nonprivate");
         argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf56.16.0)");
@@ -1764,7 +1764,7 @@ namespace relay
         //argument1["videoCodecs"] = 252.0;
         //argument1["videoFunction"] = 1.0;
 
-        argument1.encode(packet.data);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1783,24 +1783,24 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("_result");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("_result");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1;
+        amf::Node argument1;
         argument1["fmsVer"] = std::string("FMS/3,0,1,123");
         argument1["fmsVer"] = std::string("FMS/3,5,7,7009");
         argument1["capabilities"] = 31.0;
-        argument1.encode(packet.data);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2;
+        amf::Node argument2;
         argument2["level"] = std::string("status");
         argument2["code"] = std::string("NetConnection.Connect.Success");
         argument2["description"] = std::string("Connection succeeded.");
         argument2["objectEncoding"] = 0.0; // TODO: implement AMF3 support
-        argument2.encode(packet.data);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1817,17 +1817,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("FCPublish");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("FCPublish");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1846,8 +1846,8 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onFCPublish");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onFCPublish");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1864,17 +1864,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("FCUnpublish");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("FCUnpublish");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1893,8 +1893,8 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onFCUnpublish");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onFCUnpublish");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1911,17 +1911,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("FCSubscribe");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("FCSubscribe");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1940,18 +1940,18 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onFCSubscribe");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onFCSubscribe");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2;
+        amf::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Play.Start");
         argument2["description"] = "Subscribed to " + streamName;
         argument2["level"] = std::string("status");
-        argument2.encode(packet.data);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1968,17 +1968,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("FCUnsubscribe");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("FCUnsubscribe");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -1997,8 +1997,8 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onFCUnsubscribe");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onFCUnsubscribe");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2016,20 +2016,20 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("publish");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("publish");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument3 = std::string("live");
-        argument3.encode(packet.data);
+        amf::Node argument3 = std::string("live");
+        argument3.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2050,22 +2050,22 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onStatus");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onStatus");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2;
+        amf::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Publish.Start");
         argument2["description"] = streamName + " is now published";
         argument2["details"] = streamName;
         argument2["level"] = std::string("status");
-        argument2.encode(packet.data);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2082,22 +2082,22 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onStatus");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onStatus");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2;
+        amf::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Unpublish.Success");
         argument2["description"] = streamName + " stopped publishing";
         argument2["details"] = streamName;
         argument2["level"] = std::string("status");
-        argument2.encode(packet.data);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2133,7 +2133,7 @@ namespace relay
         }
     }
 
-    void Connection::sendMetaData(const amf0::Node& metaData)
+    void Connection::sendMetaData(const amf::Node& metaData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::AUDIO;
@@ -2141,13 +2141,13 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::NOTIFY;
 
-        amf0::Node commandName = std::string("@setDataFrame");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("@setDataFrame");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1 = std::string("onMetaData");
-        argument1.encode(packet.data);
+        amf::Node argument1 = std::string("onMetaData");
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node filteredMetaData = amf0::Marker::ECMAArray;
+        amf::Node filteredMetaData = amf::Marker::ECMAArray;
 
         for (auto value : metaData.asMap())
         {
@@ -2158,8 +2158,8 @@ namespace relay
             }
         }
 
-        amf0::Node argument2 = filteredMetaData;
-        argument2.encode(packet.data);
+        amf::Node argument2 = filteredMetaData;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2173,7 +2173,7 @@ namespace relay
         socket.send(buffer);
     }
 
-    void Connection::sendTextData(uint64_t timestamp, const amf0::Node& textData)
+    void Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::AUDIO;
@@ -2181,11 +2181,11 @@ namespace relay
         packet.timestamp = timestamp;
         packet.messageType = rtmp::MessageType::NOTIFY;
 
-        amf0::Node commandName = std::string("onTextData");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onTextData");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1 = textData;
-        argument1.encode(packet.data);
+        amf::Node argument1 = textData;
+        argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2206,17 +2206,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("getStreamLength");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("getStreamLength");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2233,17 +2233,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("_result");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("_result");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = 0.0;
-        argument2.encode(packet.data);
+        amf::Node argument2 = 0.0;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2261,17 +2261,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("play");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("play");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2288,22 +2288,22 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onStatus");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onStatus");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2;
+        amf::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Play.Start");
         argument2["description"] = streamName + " is now playing";
         argument2["details"] = streamName;
         argument2["level"] = std::string("status");
-        argument2.encode(packet.data);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2320,17 +2320,17 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("stop");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("stop");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = static_cast<double>(++invokeId);
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = static_cast<double>(++invokeId);
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2 = streamName;
-        argument2.encode(packet.data);
+        amf::Node argument2 = streamName;
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
@@ -2347,22 +2347,22 @@ namespace relay
         packet.timestamp = 0;
         packet.messageType = rtmp::MessageType::INVOKE;
 
-        amf0::Node commandName = std::string("onStatus");
-        commandName.encode(packet.data);
+        amf::Node commandName = std::string("onStatus");
+        commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node transactionIdNode = transactionId;
-        transactionIdNode.encode(packet.data);
+        amf::Node transactionIdNode = transactionId;
+        transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument1(amf0::Marker::Null);
-        argument1.encode(packet.data);
+        amf::Node argument1(amf::Marker::Null);
+        argument1.encode(amf::Version::AMF0, packet.data);
 
-        amf0::Node argument2;
+        amf::Node argument2;
         argument2["clientid"] = std::string("Lavf57.1.0");
         argument2["code"] = std::string("NetStream.Play.Stop");
         argument2["description"] = streamName + " is now stopped";
         argument2["details"] = streamName;
         argument2["level"] = std::string("status");
-        argument2.encode(packet.data);
+        argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);

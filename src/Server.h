@@ -31,8 +31,8 @@ namespace relay
         void sendVideoHeader(const std::vector<uint8_t>& headerData);
         void sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& audioData);
         void sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& videoData, VideoFrameType frameType);
-        void sendMetaData(const amf0::Node& newMetaData);
-        void sendTextData(uint64_t timestamp, const amf0::Node& textData);
+        void sendMetaData(const amf::Node& newMetaData);
+        void sendTextData(uint64_t timestamp, const amf::Node& textData);
 
     private:
         Relay& relay;
@@ -48,7 +48,7 @@ namespace relay
         bool streaming = false;
         std::vector<uint8_t> audioHeader;
         std::vector<uint8_t> videoHeader;
-        amf0::Node metaData;
+        amf::Node metaData;
 
         std::vector<std::unique_ptr<Connection>> connections;
     };

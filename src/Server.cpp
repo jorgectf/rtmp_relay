@@ -160,7 +160,7 @@ namespace relay
 
                 if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
                 if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
-                if (metaData.getMarker() != amf0::Marker::Unknown) connection.sendMetaData(metaData);
+                if (metaData.getMarker() != amf::Marker::Unknown) connection.sendMetaData(metaData);
             }
         }
     }
@@ -223,7 +223,7 @@ namespace relay
         }
     }
 
-    void Server::sendMetaData(const amf0::Node& newMetaData)
+    void Server::sendMetaData(const amf::Node& newMetaData)
     {
         metaData = newMetaData;
 
@@ -236,7 +236,7 @@ namespace relay
         }
     }
 
-    void Server::sendTextData(uint64_t timestamp, const amf0::Node& textData)
+    void Server::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
         for (Connection* outputConnection : outputConnections)
         {

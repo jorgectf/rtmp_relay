@@ -13,8 +13,14 @@
 
 namespace relay
 {
-    namespace amf0
+    namespace amf
     {
+        enum class Version
+        {
+            AMF0 = 0,
+            AMF3 = 1
+        };
+
         enum class Marker: uint8_t
         {
             Number = 0x00,
@@ -135,8 +141,8 @@ namespace relay
 
             Marker getMarker() const { return marker; }
 
-            uint32_t decode(const std::vector<uint8_t>& buffer, uint32_t offset = 0);
-            uint32_t encode(std::vector<uint8_t>& buffer) const;
+            uint32_t decode(Version version, const std::vector<uint8_t>& buffer, uint32_t offset = 0);
+            uint32_t encode(Version version, std::vector<uint8_t>& buffer) const;
 
             double asDouble() const
             {
