@@ -46,6 +46,22 @@ namespace relay
         class Node
         {
         public:
+            enum class Type
+            {
+                Unknown,
+                Null,
+                Number,
+                Boolean,
+                String,
+                Object,
+                Undefined,
+                ECMAArray,
+                StrictArray,
+                Date,
+                XMLDocument,
+                TypedObject
+            };
+
             Node() {}
             Node(Marker aMarker): marker(aMarker) {}
             Node(double value): marker(Marker::Number), doubleValue(value) {}

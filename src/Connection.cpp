@@ -2135,42 +2135,45 @@ namespace relay
 
     void Connection::sendMetaData(const amf::Node& metaData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::AUDIO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::NOTIFY;
-
-        amf::Node commandName = std::string("@setDataFrame");
-        commandName.encode(amf::Version::AMF0, packet.data);
-
-        amf::Node argument1 = std::string("onMetaData");
-        argument1.encode(amf::Version::AMF0, packet.data);
-
-        amf::Node filteredMetaData = amf::Marker::ECMAArray;
-
-        for (auto value : metaData.asMap())
+        if (metaData.getMarker() == amf::Marker::ECMAArray)
         {
-            /// not in the blacklist
-            if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = streamId;
+            packet.timestamp = 0;
+            packet.messageType = rtmp::MessageType::NOTIFY;
+
+            amf::Node commandName = std::string("@setDataFrame");
+            commandName.encode(amf::Version::AMF0, packet.data);
+
+            amf::Node argument1 = std::string("onMetaData");
+            argument1.encode(amf::Version::AMF0, packet.data);
+
+            amf::Node filteredMetaData = amf::Marker::ECMAArray;
+
+            for (auto value : metaData.asMap())
             {
-                filteredMetaData[value.first] = value.second;
+                /// not in the blacklist
+                if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
+                {
+                    filteredMetaData[value.first] = value.second;
+                }
             }
+
+            amf::Node argument2 = filteredMetaData;
+            argument2.encode(amf::Version::AMF0, packet.data);
+
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+            {
+                Log log(Log::Level::ALL);
+                log << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ": ";
+                argument2.dump(log);
+            }
+
+            socket.send(buffer);
         }
-
-        amf::Node argument2 = filteredMetaData;
-        argument2.encode(amf::Version::AMF0, packet.data);
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        {
-            Log log(Log::Level::ALL);
-            log << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ": ";
-            argument2.dump(log);
-        }
-
-        socket.send(buffer);
     }
 
     void Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
