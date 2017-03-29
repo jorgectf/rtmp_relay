@@ -556,7 +556,7 @@ namespace relay
         invokeId = 0;
         invokes.clear();
         streamId = 0;
-        streamType = StreamType::NONE;
+
         videoFrameSent = false;
 
         if (server)
@@ -570,6 +570,7 @@ namespace relay
         if (type == Type::HOST)
         {
             closed = true;
+            streamType = StreamType::NONE;
         }
 
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Client at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
