@@ -14,7 +14,7 @@ namespace relay
     {
         static const std::string INDENT = "  ";
 
-        std::string markerToString(AMF0Marker marker)
+        static std::string markerToString(AMF0Marker marker)
         {
             switch (marker)
             {
@@ -33,6 +33,25 @@ namespace relay
                 case AMF0Marker::TypedObject: return "TypedObject";
                 case AMF0Marker::SwitchToAMF3: return "SwitchToAMF3";
                 default: return "Unknown";
+            }
+        }
+
+        static std::string typeToString(Node::Type type)
+        {
+            switch (type)
+            {
+                case Node::Type::Unknown: return "Unknwonw";
+                case Node::Type::Null: return "Null";
+                case Node::Type::Number: return "Number";
+                case Node::Type::Boolean: return "Boolean";
+                case Node::Type::String: return "String";
+                case Node::Type::Object: return "Object";
+                case Node::Type::Undefined: return "Undefined";
+                case Node::Type::ECMAArray: return "ECMA array";
+                case Node::Type::StrictArray: return "StrictArray";
+                case Node::Type::Date: return "Date";
+                case Node::Type::XMLDocument: return "XMLDocument";
+                case Node::Type::TypedObject: return "TypedObject";
             }
         }
 
@@ -586,7 +605,7 @@ namespace relay
                     return 0;
                 }
 
-                marker = *reinterpret_cast<const AMF0Marker*>(buffer.data() + offset);
+                AMF0Marker marker = *reinterpret_cast<const AMF0Marker*>(buffer.data() + offset);
                 offset += 1;
 
                 uint32_t ret = 0;
@@ -599,6 +618,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::Number;
                         break;
                     }
                     case AMF0Marker::Boolean:
@@ -607,6 +627,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::Boolean;
                         break;
                     }
                     case AMF0Marker::String:
@@ -615,6 +636,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::String;
                         break;
                     }
                     case AMF0Marker::Object:
@@ -623,16 +645,18 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::Object;
                         break;
                     }
-                    case AMF0Marker::Null: /* Null */; break;
-                    case AMF0Marker::Undefined: /* Undefined */; break;
+                    case AMF0Marker::Null: type = Type::Null; break;
+                    case AMF0Marker::Undefined: type = Type::Undefined; break;
                     case AMF0Marker::ECMAArray:
                     {
                         if ((ret = readECMAArray(buffer, offset, mapValue)) == 0)
                         {
                             return 0;
                         }
+                        type = Type::ECMAArray;
                         break;
                     }
                     case AMF0Marker::ObjectEnd: break; // should not happen
@@ -642,6 +666,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::StrictArray;
                         break;
                     }
                     case AMF0Marker::Date:
@@ -650,6 +675,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::Date;
                         break;
                     }
                     case AMF0Marker::LongString:
@@ -658,6 +684,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::String;
                         break;
                     }
                     case AMF0Marker::XMLDocument:
@@ -666,6 +693,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::XMLDocument;
                         break;
                     }
                     case AMF0Marker::TypedObject:
@@ -674,6 +702,7 @@ namespace relay
                         {
                             return 0;
                         }
+                        type = Type::TypedObject;
                         break;
                     }
                     case AMF0Marker::SwitchToAMF3:
@@ -705,6 +734,28 @@ namespace relay
             if (version == Version::AMF0)
             {
                 uint32_t ret = 0;
+
+                AMF0Marker marker = AMF0Marker::Unknown;
+
+                switch (type)
+                {
+                    case Type::Unknown: marker = AMF0Marker::Unknown; break; // should not happen
+                    case Type::Null: marker = AMF0Marker::Null; break;
+                    case Type::Number: marker = AMF0Marker::Number; break;
+                    case Type::Boolean: marker = AMF0Marker::Boolean; break;
+                    case Type::String:
+                    {
+                        marker = ((stringValue.length() <= std::numeric_limits<uint16_t>::max()) ? AMF0Marker::String : AMF0Marker::LongString);
+                        break;
+                    }
+                    case Type::Object: marker = AMF0Marker::Object; break;
+                    case Type::Undefined: marker = AMF0Marker::Undefined; break;
+                    case Type::ECMAArray: marker = AMF0Marker::ECMAArray; break;
+                    case Type::StrictArray: marker = AMF0Marker::StrictArray; break;
+                    case Type::Date: marker = AMF0Marker::Date; break;
+                    case Type::XMLDocument: marker = AMF0Marker::XMLDocument; break;
+                    case Type::TypedObject: marker = AMF0Marker::TypedObject; break;
+                }
 
                 buffer.push_back(static_cast<uint8_t>(marker));
                 size += 1;
@@ -741,15 +792,15 @@ namespace relay
 
         void Node::dump(cppsocket::Log& log, const std::string& indent)
         {
-            log << "Type: " << markerToString(marker) << "(" << static_cast<uint32_t>(marker) << ")";
+            log << "Type: " << typeToString(type) << "(" << static_cast<uint32_t>(type) << ")";
 
-            if (marker == AMF0Marker::Object ||
-                marker == AMF0Marker::StrictArray ||
-                marker == AMF0Marker::ECMAArray)
+            if (type == Type::Object ||
+                type == Type::StrictArray ||
+                type == Type::ECMAArray)
             {
                 log << ", values:";
 
-                if (marker == AMF0Marker::StrictArray)
+                if (type == Type::StrictArray)
                 {
                     for (size_t index = 0; index < vectorValue.size(); index++)
                     {
@@ -766,23 +817,21 @@ namespace relay
                     }
                 }
             }
-            else if (marker == AMF0Marker::Number ||
-                     marker == AMF0Marker::Boolean ||
-                     marker == AMF0Marker::String ||
-                     marker == AMF0Marker::Date ||
-                     marker == AMF0Marker::LongString ||
-                     marker == AMF0Marker::XMLDocument)
+            else if (type == Type::Number ||
+                     type == Type::Boolean ||
+                     type == Type::String ||
+                     type == Type::Date ||
+                     type == Type::XMLDocument)
             {
                 log << ", value: ";
 
-                switch (marker)
+                switch (type)
                 {
-                    case AMF0Marker::Number: log << doubleValue; break;
-                    case AMF0Marker::Boolean: log << (boolValue ? "true" : "false"); break;
-                    case AMF0Marker::String: log << stringValue; break;
-                    case AMF0Marker::Date: log << "ms=" <<  doubleValue << "timezone=" <<  timezone; break;
-                    case AMF0Marker::LongString: log << stringValue; break;
-                    case AMF0Marker::XMLDocument: log << stringValue; break;
+                    case Type::Number: log << doubleValue; break;
+                    case Type::Boolean: log << (boolValue ? "true" : "false"); break;
+                    case Type::String: log << stringValue; break;
+                    case Type::Date: log << "ms=" <<  doubleValue << "timezone=" <<  timezone; break;
+                    case Type::XMLDocument: log << stringValue; break;
                     default:break;
                 }
             }

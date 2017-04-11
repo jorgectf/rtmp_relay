@@ -1534,7 +1534,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = 0.0;
@@ -1563,7 +1563,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
@@ -1589,7 +1589,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
@@ -1613,7 +1613,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
@@ -1639,7 +1639,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         ++streamId;
@@ -1672,7 +1672,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -1701,7 +1701,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
@@ -1725,7 +1725,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = static_cast<double>(streamId);
@@ -1824,7 +1824,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -1871,7 +1871,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -1918,7 +1918,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -1944,7 +1944,7 @@ namespace relay
         amf::Node commandName = std::string("onFCSubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2;
@@ -1975,7 +1975,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -2023,7 +2023,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -2057,7 +2057,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2;
@@ -2089,7 +2089,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2;
@@ -2136,7 +2136,7 @@ namespace relay
 
     void Connection::sendMetaData(const amf::Node& metaData)
     {
-        if (metaData.getMarker() == amf::AMF0Marker::ECMAArray)
+        if (metaData.getType() == amf::Node::Type::ECMAArray)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
@@ -2150,7 +2150,7 @@ namespace relay
             amf::Node argument1 = std::string("onMetaData");
             argument1.encode(amf::Version::AMF0, packet.data);
 
-            amf::Node filteredMetaData = amf::AMF0Marker::ECMAArray;
+            amf::Node filteredMetaData = amf::Node::Type::ECMAArray;
 
             for (auto value : metaData.asMap())
             {
@@ -2216,7 +2216,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -2243,7 +2243,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = 0.0;
@@ -2271,7 +2271,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -2298,7 +2298,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2;
@@ -2330,7 +2330,7 @@ namespace relay
         amf::Node transactionIdNode = static_cast<double>(++invokeId);
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2 = streamName;
@@ -2357,7 +2357,7 @@ namespace relay
         amf::Node transactionIdNode = transactionId;
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
-        amf::Node argument1(amf::AMF0Marker::Null);
+        amf::Node argument1(amf::Node::Type::Null);
         argument1.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument2;

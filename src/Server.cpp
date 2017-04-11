@@ -160,7 +160,7 @@ namespace relay
 
                 if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
                 if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
-                if (metaData.getMarker() != amf::AMF0Marker::Unknown) connection.sendMetaData(metaData);
+                if (metaData.getType() != amf::Node::Type::Unknown) connection.sendMetaData(metaData);
             }
         }
     }

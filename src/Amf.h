@@ -64,8 +64,6 @@ namespace relay
             Unknown = 0xff
         };
 
-        std::string markerToString(AMF0Marker marker);
-
         class Node
         {
         public:
@@ -86,51 +84,46 @@ namespace relay
             };
 
             Node() {}
-            Node(AMF0Marker aMarker): marker(aMarker) {}
-            Node(double value): marker(AMF0Marker::Number), doubleValue(value) {}
-            Node(bool value): marker(AMF0Marker::Boolean), boolValue(value) {}
-            Node(const std::vector<Node>& value): marker(AMF0Marker::StrictArray), vectorValue(value) {}
-            Node(const std::map<std::string, Node>& value): marker(AMF0Marker::Object), mapValue(value) {}
-            Node(const std::string& value):
-                marker((value.length() <= std::numeric_limits<uint16_t>::max()) ? AMF0Marker::String : AMF0Marker::LongString),
-                stringValue(value)
-            {
-            }
+            Node(Type aType): type(aType) {}
+            Node(double value): type(Type::Number), doubleValue(value) {}
+            Node(bool value): type(Type::Boolean), boolValue(value) {}
+            Node(const std::vector<Node>& value): type(Type::StrictArray), vectorValue(value) {}
+            Node(const std::map<std::string, Node>& value): type(Type::Object), mapValue(value) {}
+            Node(const std::string& value): type(Type::String), stringValue(value) {}
 
-            Node(double ms, uint32_t aTimezone): marker(AMF0Marker::Date), doubleValue(ms), timezone(aTimezone) {}
+            Node(double ms, uint32_t aTimezone): type(Type::Date), doubleValue(ms), timezone(aTimezone) {}
 
             bool operator!() const
             {
-                return marker == AMF0Marker::Null ||
-                       marker == AMF0Marker::Undefined ||
-                       marker == AMF0Marker::Unknown ||
-                       (marker == AMF0Marker::Number && doubleValue == 0.0f) ||
-                       (marker == AMF0Marker::Boolean && boolValue == false);
+                return type == Type::Null ||
+                       type == Type::Undefined ||
+                       type == Type::Unknown ||
+                       (type == Type::Number && doubleValue == 0.0f) ||
+                       (type == Type::Boolean && boolValue == false);
             }
 
-            Node& operator=(AMF0Marker newMarker)
+            Node& operator=(Type newType)
             {
-                marker = newMarker;
+                type = newType;
 
-                switch (marker)
+                switch (type)
                 {
-                    case AMF0Marker::Number: doubleValue = 0.0; break;
-                    case AMF0Marker::Boolean: boolValue = false; break;
-                    case AMF0Marker::String:
-                    case AMF0Marker::LongString:
-                    case AMF0Marker::XMLDocument:
+                    case Type::Unknown: break; // should not happen
+                    case Type::Null: break;
+                    case Type::Number: doubleValue = 0.0; break;
+                    case Type::Boolean: boolValue = false; break;
+                    case Type::String:
+                    case Type::XMLDocument:
                         stringValue.clear();
                         break;
-                    case AMF0Marker::Object: mapValue.clear(); break;
-                    case AMF0Marker::Null: break;
-                    case AMF0Marker::Undefined: break;
-                    case AMF0Marker::ECMAArray: mapValue.clear(); break;
-                    case AMF0Marker::ObjectEnd: break;
-                    case AMF0Marker::StrictArray: vectorValue.clear(); break;
-                    case AMF0Marker::Date: doubleValue = 0.0; timezone = 0; break;
-                    case AMF0Marker::TypedObject: break;
-                    case AMF0Marker::SwitchToAMF3: break;
-                    case AMF0Marker::Unknown: break;
+                    case Type::Object:
+                    case Type::ECMAArray:
+                        mapValue.clear();
+                        break;
+                    case Type::Undefined: break;
+                    case Type::StrictArray: vectorValue.clear(); break;
+                    case Type::Date: doubleValue = 0.0; timezone = 0; break;
+                    case Type::TypedObject: break;
                 }
 
                 return *this;
@@ -138,156 +131,146 @@ namespace relay
 
             Node& operator=(double value)
             {
-                marker = AMF0Marker::Number;
+                type = Type::Number;
                 doubleValue = value;
                 return *this;
             }
 
             Node& operator=(bool value)
             {
-                marker = AMF0Marker::Boolean;
+                type = Type::Boolean;
                 boolValue = value;
                 return *this;
             }
 
             Node& operator=(const std::string& value)
             {
-                if (value.length() <= std::numeric_limits<uint16_t>::max())
-                {
-                    marker = AMF0Marker::String;
-                }
-                else
-                {
-                    marker = AMF0Marker::LongString;
-                }
+                type = Type::String;
                 stringValue = value;
                 return *this;
             }
 
             Node& operator=(const std::vector<Node>& value)
             {
-                marker = AMF0Marker::StrictArray;
+                type = Type::StrictArray;
                 vectorValue = value;
                 return *this;
             }
 
             Node& operator=(const std::map<std::string, Node>& value)
             {
-                marker = AMF0Marker::Object;
+                type = Type::Object;
                 mapValue = value;
                 return *this;
             }
 
-            AMF0Marker getMarker() const { return marker; }
+            Type getType() const { return type; }
 
             uint32_t decode(Version version, const std::vector<uint8_t>& buffer, uint32_t offset = 0);
             uint32_t encode(Version version, std::vector<uint8_t>& buffer) const;
 
             double asDouble() const
             {
-                assert(marker == AMF0Marker::Number);
+                assert(type == Type::Number);
 
                 return doubleValue;
             }
 
             uint32_t asUInt32() const
             {
-                assert(marker == AMF0Marker::Number);
+                assert(type == Type::Number);
 
                 return static_cast<uint32_t>(doubleValue);
             }
 
             uint64_t asUInt64() const
             {
-                assert(marker == AMF0Marker::Number);
+                assert(type == Type::Number);
 
                 return static_cast<uint64_t>(doubleValue);
             }
 
             bool asBool() const
             {
-                assert(marker == AMF0Marker::Boolean);
+                assert(type == Type::Boolean);
 
                 return boolValue;
             }
 
             const std::string& asString() const
             {
-                assert(marker == AMF0Marker::String || marker == AMF0Marker::LongString);
+                assert(type == Type::String);
 
                 return stringValue;
             }
 
             bool isNull() const
             {
-                return marker == AMF0Marker::Null;
+                return type == Type::Null;
             }
 
             bool isUndefined() const
             {
-                return marker == AMF0Marker::Undefined;
+                return type == Type::Undefined;
             }
 
             const std::vector<Node>& asVector() const
             {
-                assert(marker == AMF0Marker::StrictArray);
+                assert(type == Type::StrictArray);
 
                 return vectorValue;
             }
             
             const std::map<std::string, Node>& asMap() const
             {
-                assert(marker == AMF0Marker::Object || marker == AMF0Marker::ECMAArray);
+                assert(type == Type::Object || type == Type::ECMAArray);
 
                 return mapValue;
             }
 
             std::string toString() const
             {
-                switch (marker)
+                switch (type)
                 {
-                    case AMF0Marker::Number: return std::to_string(doubleValue);
-                    case AMF0Marker::Boolean: return std::to_string(boolValue);
-                    case AMF0Marker::String: return stringValue;
-                    case AMF0Marker::Object: return "object";
-                    case AMF0Marker::Null: return "null";
-                    case AMF0Marker::Undefined: return "undefined";
-                    case AMF0Marker::ECMAArray: return "ECMA array";
-                    case AMF0Marker::ObjectEnd: return ""; // should not happen
-                    case AMF0Marker::StrictArray: return "strict array";
-                    case AMF0Marker::Date: return std::to_string(doubleValue) + " +" + std::to_string(timezone);
-                    case AMF0Marker::LongString: return stringValue;
-                    case AMF0Marker::XMLDocument: return stringValue;
-                    case AMF0Marker::TypedObject: return "typed object";
-                    case AMF0Marker::SwitchToAMF3: return "switch to AMF3";
-                    default: return "";
+                    case Type::Unknown: return "";
+                    case Type::Null: return "null";
+                    case Type::Number: return std::to_string(doubleValue);
+                    case Type::Boolean: return std::to_string(boolValue);
+                    case Type::String: return stringValue;
+                    case Type::Object: return "object";
+                    case Type::Undefined: return "undefined";
+                    case Type::ECMAArray: return "ECMA array";
+                    case Type::StrictArray: return "strict array";
+                    case Type::Date: return std::to_string(doubleValue) + " +" + std::to_string(timezone);
+                    case Type::XMLDocument: return stringValue;
+                    case Type::TypedObject: return "typed object";
                 }
             }
 
             double getMs() const
             {
-                assert(marker == AMF0Marker::Date);
+                assert(type == Type::Date);
 
                 return doubleValue;
             }
 
             uint32_t getTimezone() const
             {
-                assert(marker == AMF0Marker::Date);
+                assert(type == Type::Date);
 
                 return timezone;
             }
 
             uint32_t getSize() const
             {
-                assert(marker == AMF0Marker::StrictArray);
+                assert(type == Type::StrictArray);
 
                 return static_cast<uint32_t>(vectorValue.size());
             }
 
             Node operator[](size_t key) const
             {
-                assert(marker == AMF0Marker::StrictArray);
+                assert(type == Type::StrictArray);
                 
                 if (key >= vectorValue.size())
                 {
@@ -301,13 +284,13 @@ namespace relay
 
             Node& operator[](size_t key)
             {
-                marker = AMF0Marker::StrictArray;
+                type = Type::StrictArray;
                 return vectorValue[key];
             }
 
             Node operator[](const std::string& key) const
             {
-                assert(marker == AMF0Marker::Object || marker == AMF0Marker::ECMAArray);
+                assert(type == Type::Object || type == Type::ECMAArray);
 
                 auto i = mapValue.find(key);
 
@@ -323,24 +306,24 @@ namespace relay
 
             Node& operator[](const std::string& key)
             {
-                if (marker != AMF0Marker::Object &&
-                    marker != AMF0Marker::ECMAArray)
+                if (type != Type::Object &&
+                    type != Type::ECMAArray)
                 {
-                    marker = AMF0Marker::Object;
+                    type = Type::Object;
                 }
                 return mapValue[key];
             }
 
             bool hasElement(const std::string& key) const
             {
-                assert(marker == AMF0Marker::Object || marker == AMF0Marker::ECMAArray);
+                assert(type == Type::Object || type == Type::ECMAArray);
 
                 return mapValue.find(key) != mapValue.end();
             }
             
             void append(const Node& node)
             {
-                assert(marker == AMF0Marker::StrictArray);
+                assert(type == Type::StrictArray);
 
                 vectorValue.push_back(node);
             }
@@ -348,7 +331,7 @@ namespace relay
             void dump(cppsocket::Log& log, const std::string& indent = "");
 
         private:
-            AMF0Marker marker = AMF0Marker::Unknown;
+            Type type = Type::Unknown;
 
             union
             {
