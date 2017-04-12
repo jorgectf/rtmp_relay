@@ -49,7 +49,7 @@ namespace relay
                 case Node::Type::Object: return "Object";
                 case Node::Type::Undefined: return "Undefined";
                 case Node::Type::Dictionary: return "Dictionary";
-                case Node::Type::StrictArray: return "StrictArray";
+                case Node::Type::Array: return "Array";
                 case Node::Type::Date: return "Date";
                 case Node::Type::XMLDocument: return "XMLDocument";
                 case Node::Type::TypedObject: return "TypedObject";
@@ -667,7 +667,7 @@ namespace relay
                         {
                             return 0;
                         }
-                        type = Type::StrictArray;
+                        type = Type::Array;
                         break;
                     }
                     case AMF0Marker::Date:
@@ -753,7 +753,7 @@ namespace relay
                     case Type::Object: marker = AMF0Marker::Object; break;
                     case Type::Undefined: marker = AMF0Marker::Undefined; break;
                     case Type::Dictionary: marker = AMF0Marker::ECMAArray; break;
-                    case Type::StrictArray: marker = AMF0Marker::StrictArray; break;
+                    case Type::Array: marker = AMF0Marker::StrictArray; break;
                     case Type::Date: marker = AMF0Marker::Date; break;
                     case Type::XMLDocument: marker = AMF0Marker::XMLDocument; break;
                     case Type::TypedObject: marker = AMF0Marker::TypedObject; break;
@@ -804,7 +804,7 @@ namespace relay
                         ret = writeECMAArray(buffer, mapValue);
                         break;
                     }
-                    case Type::StrictArray:
+                    case Type::Array:
                     {
                         ret = writeStrictArray(buffer, vectorValue);
                         break;
@@ -843,7 +843,7 @@ namespace relay
                     case Type::Object: marker = AMF3Marker::Object; break;
                     case Type::Undefined: marker = AMF3Marker::Undefined; break;
                     case Type::Dictionary: marker = AMF3Marker::Dictionary; break;
-                    case Type::StrictArray: /*marker = AMF3Marker::StrictArray;*/ break;
+                    case Type::Array: /*marker = AMF3Marker::StrictArray;*/ break;
                     case Type::Date: marker = AMF3Marker::Date; break;
                     case Type::XMLDocument: marker = AMF3Marker::XMLDocument; break;
                     case Type::TypedObject: /*marker = AMF3Marker::TypedObject;*/ break;
@@ -861,12 +861,12 @@ namespace relay
             log << "Type: " << typeToString(type) << "(" << static_cast<uint32_t>(type) << ")";
 
             if (type == Type::Object ||
-                type == Type::StrictArray ||
+                type == Type::Array ||
                 type == Type::Dictionary)
             {
                 log << ", values:";
 
-                if (type == Type::StrictArray)
+                if (type == Type::Array)
                 {
                     for (size_t index = 0; index < vectorValue.size(); index++)
                     {

@@ -78,7 +78,7 @@ namespace relay
                 Object,
                 Undefined,
                 Dictionary,
-                StrictArray,
+                Array,
                 Date,
                 XMLDocument,
                 TypedObject
@@ -89,7 +89,7 @@ namespace relay
             Node(int64_t value): type(Type::Integer), intValue(value) {}
             Node(double value): type(Type::Double), doubleValue(value) {}
             Node(bool value): type(Type::Boolean), boolValue(value) {}
-            Node(const std::vector<Node>& value): type(Type::StrictArray), vectorValue(value) {}
+            Node(const std::vector<Node>& value): type(Type::Array), vectorValue(value) {}
             Node(const std::map<std::string, Node>& value): type(Type::Object), mapValue(value) {}
             Node(const std::string& value): type(Type::String), stringValue(value) {}
 
@@ -125,7 +125,7 @@ namespace relay
                         mapValue.clear();
                         break;
                     case Type::Undefined: break;
-                    case Type::StrictArray: vectorValue.clear(); break;
+                    case Type::Array: vectorValue.clear(); break;
                     case Type::Date: doubleValue = 0.0; timezone = 0; break;
                     case Type::TypedObject: break;
                 }
@@ -163,7 +163,7 @@ namespace relay
 
             Node& operator=(const std::vector<Node>& value)
             {
-                type = Type::StrictArray;
+                type = Type::Array;
                 vectorValue = value;
                 return *this;
             }
@@ -251,7 +251,7 @@ namespace relay
 
             const std::vector<Node>& asVector() const
             {
-                assert(type == Type::StrictArray);
+                assert(type == Type::Array);
 
                 return vectorValue;
             }
@@ -276,7 +276,7 @@ namespace relay
                     case Type::Object: return "object";
                     case Type::Undefined: return "undefined";
                     case Type::Dictionary: return "dictionary";
-                    case Type::StrictArray: return "strict array";
+                    case Type::Array: return "array";
                     case Type::Date: return std::to_string(doubleValue) + " +" + std::to_string(timezone);
                     case Type::XMLDocument: return stringValue;
                     case Type::TypedObject: return "typed object";
@@ -299,14 +299,14 @@ namespace relay
 
             uint32_t getSize() const
             {
-                assert(type == Type::StrictArray);
+                assert(type == Type::Array);
 
                 return static_cast<uint32_t>(vectorValue.size());
             }
 
             Node operator[](size_t key) const
             {
-                assert(type == Type::StrictArray);
+                assert(type == Type::Array);
                 
                 if (key >= vectorValue.size())
                 {
@@ -320,7 +320,7 @@ namespace relay
 
             Node& operator[](size_t key)
             {
-                type = Type::StrictArray;
+                type = Type::Array;
                 return vectorValue[key];
             }
 
@@ -359,7 +359,7 @@ namespace relay
             
             void append(const Node& node)
             {
-                assert(type == Type::StrictArray);
+                assert(type == Type::Array);
 
                 vectorValue.push_back(node);
             }
