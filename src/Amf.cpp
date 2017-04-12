@@ -736,11 +736,11 @@ namespace relay
             {
                 uint32_t ret = 0;
 
-                AMF0Marker marker = AMF0Marker::Unknown;
+                AMF0Marker marker;
 
                 switch (type)
                 {
-                    case Type::Unknown: marker = AMF0Marker::Unknown; break; // should not happen
+                    case Type::Unknown: return 0; // should not happen
                     case Type::Null: marker = AMF0Marker::Null; break;
                     case Type::Integer: marker = AMF0Marker::Number; break;
                     case Type::Double: marker = AMF0Marker::Number; break;
@@ -830,11 +830,11 @@ namespace relay
             }
             else if (version == Version::AMF3)
             {
-                AMF3Marker marker = AMF3Marker::Unknown;
+                AMF3Marker marker;
 
                 switch (type)
                 {
-                    case Type::Unknown: marker = AMF3Marker::Unknown; break; // should not happen
+                    case Type::Unknown: return 0; break; // should not happen
                     case Type::Null: marker = AMF3Marker::Null; break;
                     case Type::Integer: marker = AMF3Marker::Integer; break;
                     case Type::Double: marker = AMF3Marker::Double; break;

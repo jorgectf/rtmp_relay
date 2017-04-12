@@ -36,9 +36,7 @@ namespace relay
             LongString = 0x0c,
             XMLDocument = 0x0f,
             TypedObject = 0x10,
-            SwitchToAMF3 = 0x11,
-
-            Unknown = 0xff
+            SwitchToAMF3 = 0x11
         };
 
         enum class AMF3Marker: uint8_t
@@ -59,9 +57,7 @@ namespace relay
             VectorInt = 0x0e,
             VectorDouble = 0x0f,
             VectorObject = 0x10,
-            Dictionary = 0x11,
-
-            Unknown = 0xff
+            Dictionary = 0x11
         };
 
         class Node
