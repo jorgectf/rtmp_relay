@@ -59,7 +59,7 @@ namespace relay
             VectorInt = 0x0e,
             VectorDouble = 0x0f,
             VectorObject = 0x10,
-            Disctionary = 0x11,
+            Dictionary = 0x11,
 
             Unknown = 0xff
         };
@@ -71,12 +71,13 @@ namespace relay
             {
                 Unknown,
                 Null,
-                Number,
+                Integer,
+                Double,
                 Boolean,
                 String,
                 Object,
                 Undefined,
-                ECMAArray,
+                Dictionary,
                 StrictArray,
                 Date,
                 XMLDocument,
@@ -85,7 +86,8 @@ namespace relay
 
             Node() {}
             Node(Type aType): type(aType) {}
-            Node(double value): type(Type::Number), doubleValue(value) {}
+            Node(int64_t value): type(Type::Integer), intValue(value) {}
+            Node(double value): type(Type::Double), doubleValue(value) {}
             Node(bool value): type(Type::Boolean), boolValue(value) {}
             Node(const std::vector<Node>& value): type(Type::StrictArray), vectorValue(value) {}
             Node(const std::map<std::string, Node>& value): type(Type::Object), mapValue(value) {}
@@ -98,7 +100,8 @@ namespace relay
                 return type == Type::Null ||
                        type == Type::Undefined ||
                        type == Type::Unknown ||
-                       (type == Type::Number && doubleValue == 0.0f) ||
+                       (type == Type::Integer && intValue == 0) ||
+                       (type == Type::Double && doubleValue == 0.0f) ||
                        (type == Type::Boolean && boolValue == false);
             }
 
@@ -110,14 +113,15 @@ namespace relay
                 {
                     case Type::Unknown: break; // should not happen
                     case Type::Null: break;
-                    case Type::Number: doubleValue = 0.0; break;
+                    case Type::Integer: intValue = 0; break;
+                    case Type::Double: doubleValue = 0.0; break;
                     case Type::Boolean: boolValue = false; break;
                     case Type::String:
                     case Type::XMLDocument:
                         stringValue.clear();
                         break;
                     case Type::Object:
-                    case Type::ECMAArray:
+                    case Type::Dictionary:
                         mapValue.clear();
                         break;
                     case Type::Undefined: break;
@@ -129,9 +133,16 @@ namespace relay
                 return *this;
             }
 
+            Node& operator=(int64_t value)
+            {
+                type = Type::Integer;
+                intValue = value;
+                return *this;
+            }
+
             Node& operator=(double value)
             {
-                type = Type::Number;
+                type = Type::Double;
                 doubleValue = value;
                 return *this;
             }
@@ -171,23 +182,47 @@ namespace relay
 
             double asDouble() const
             {
-                assert(type == Type::Number);
+                assert(type == Type::Integer || type == Type::Double);
 
-                return doubleValue;
+                if (type == Type::Integer) return intValue;
+                else if (type == Type::Double) return doubleValue;
+                else return 0.0;
+            }
+
+            int32_t asInt32() const
+            {
+                assert(type == Type::Integer || type == Type::Double);
+
+                if (type == Type::Integer) return static_cast<int32_t>(intValue);
+                else if (type == Type::Double) return static_cast<int32_t>(doubleValue);
+                else return 0;
+            }
+
+            int64_t asInt64() const
+            {
+                assert(type == Type::Integer || type == Type::Double);
+
+                if (type == Type::Integer) return static_cast<int64_t>(intValue);
+                else if (type == Type::Double) return static_cast<int64_t>(doubleValue);
+                else return 0;
             }
 
             uint32_t asUInt32() const
             {
-                assert(type == Type::Number);
+                assert(type == Type::Integer || type == Type::Double);
 
-                return static_cast<uint32_t>(doubleValue);
+                if (type == Type::Integer) return static_cast<uint32_t>(intValue);
+                else if (type == Type::Double) return static_cast<uint32_t>(doubleValue);
+                else return 0;
             }
 
             uint64_t asUInt64() const
             {
-                assert(type == Type::Number);
+                assert(type == Type::Integer || type == Type::Double);
 
-                return static_cast<uint64_t>(doubleValue);
+                if (type == Type::Integer) return static_cast<uint64_t>(intValue);
+                else if (type == Type::Double) return static_cast<uint64_t>(doubleValue);
+                else return 0;
             }
 
             bool asBool() const
@@ -223,7 +258,7 @@ namespace relay
             
             const std::map<std::string, Node>& asMap() const
             {
-                assert(type == Type::Object || type == Type::ECMAArray);
+                assert(type == Type::Object || type == Type::Dictionary);
 
                 return mapValue;
             }
@@ -234,12 +269,13 @@ namespace relay
                 {
                     case Type::Unknown: return "";
                     case Type::Null: return "null";
-                    case Type::Number: return std::to_string(doubleValue);
+                    case Type::Integer: return std::to_string(intValue);
+                    case Type::Double: return std::to_string(doubleValue);
                     case Type::Boolean: return std::to_string(boolValue);
                     case Type::String: return stringValue;
                     case Type::Object: return "object";
                     case Type::Undefined: return "undefined";
-                    case Type::ECMAArray: return "ECMA array";
+                    case Type::Dictionary: return "dictionary";
                     case Type::StrictArray: return "strict array";
                     case Type::Date: return std::to_string(doubleValue) + " +" + std::to_string(timezone);
                     case Type::XMLDocument: return stringValue;
@@ -290,7 +326,7 @@ namespace relay
 
             Node operator[](const std::string& key) const
             {
-                assert(type == Type::Object || type == Type::ECMAArray);
+                assert(type == Type::Object || type == Type::Dictionary);
 
                 auto i = mapValue.find(key);
 
@@ -307,7 +343,7 @@ namespace relay
             Node& operator[](const std::string& key)
             {
                 if (type != Type::Object &&
-                    type != Type::ECMAArray)
+                    type != Type::Dictionary)
                 {
                     type = Type::Object;
                 }
@@ -316,7 +352,7 @@ namespace relay
 
             bool hasElement(const std::string& key) const
             {
-                assert(type == Type::Object || type == Type::ECMAArray);
+                assert(type == Type::Object || type == Type::Dictionary);
 
                 return mapValue.find(key) != mapValue.end();
             }
@@ -335,7 +371,8 @@ namespace relay
 
             union
             {
-                double doubleValue = 0.0;
+                int64_t intValue = 0;
+                double doubleValue;
                 bool boolValue;
             };
             uint32_t timezone;

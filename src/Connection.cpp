@@ -2136,7 +2136,7 @@ namespace relay
 
     void Connection::sendMetaData(const amf::Node& metaData)
     {
-        if (metaData.getType() == amf::Node::Type::ECMAArray)
+        if (metaData.getType() == amf::Node::Type::Dictionary)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
@@ -2150,7 +2150,7 @@ namespace relay
             amf::Node argument1 = std::string("onMetaData");
             argument1.encode(amf::Version::AMF0, packet.data);
 
-            amf::Node filteredMetaData = amf::Node::Type::ECMAArray;
+            amf::Node filteredMetaData = amf::Node::Type::Dictionary;
 
             for (auto value : metaData.asMap())
             {

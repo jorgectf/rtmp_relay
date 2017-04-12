@@ -42,12 +42,13 @@ namespace relay
             {
                 case Node::Type::Unknown: return "Unknwonw";
                 case Node::Type::Null: return "Null";
-                case Node::Type::Number: return "Number";
+                case Node::Type::Integer: return "Integer";
+                case Node::Type::Double: return "Double";
                 case Node::Type::Boolean: return "Boolean";
                 case Node::Type::String: return "String";
                 case Node::Type::Object: return "Object";
                 case Node::Type::Undefined: return "Undefined";
-                case Node::Type::ECMAArray: return "ECMA array";
+                case Node::Type::Dictionary: return "Dictionary";
                 case Node::Type::StrictArray: return "StrictArray";
                 case Node::Type::Date: return "Date";
                 case Node::Type::XMLDocument: return "XMLDocument";
@@ -618,7 +619,7 @@ namespace relay
                         {
                             return 0;
                         }
-                        type = Type::Number;
+                        type = Type::Double;
                         break;
                     }
                     case AMF0Marker::Boolean:
@@ -656,7 +657,7 @@ namespace relay
                         {
                             return 0;
                         }
-                        type = Type::ECMAArray;
+                        type = Type::Dictionary;
                         break;
                     }
                     case AMF0Marker::ObjectEnd: break; // should not happen
@@ -741,7 +742,8 @@ namespace relay
                 {
                     case Type::Unknown: marker = AMF0Marker::Unknown; break; // should not happen
                     case Type::Null: marker = AMF0Marker::Null; break;
-                    case Type::Number: marker = AMF0Marker::Number; break;
+                    case Type::Integer: marker = AMF0Marker::Number; break;
+                    case Type::Double: marker = AMF0Marker::Number; break;
                     case Type::Boolean: marker = AMF0Marker::Boolean; break;
                     case Type::String:
                     {
@@ -750,7 +752,7 @@ namespace relay
                     }
                     case Type::Object: marker = AMF0Marker::Object; break;
                     case Type::Undefined: marker = AMF0Marker::Undefined; break;
-                    case Type::ECMAArray: marker = AMF0Marker::ECMAArray; break;
+                    case Type::Dictionary: marker = AMF0Marker::ECMAArray; break;
                     case Type::StrictArray: marker = AMF0Marker::StrictArray; break;
                     case Type::Date: marker = AMF0Marker::Date; break;
                     case Type::XMLDocument: marker = AMF0Marker::XMLDocument; break;
@@ -760,29 +762,93 @@ namespace relay
                 buffer.push_back(static_cast<uint8_t>(marker));
                 size += 1;
 
-                switch (marker)
+                switch (type)
                 {
-                    case AMF0Marker::Number: ret = writeNumber(buffer, doubleValue); break;
-                    case AMF0Marker::Boolean: ret = writeBoolean(buffer, boolValue); break;
-                    case AMF0Marker::String: ret = writeString(buffer, stringValue); break;
-                    case AMF0Marker::Object: ret = writeObject(buffer, mapValue); break;
-                    case AMF0Marker::Null: /* Null */; break;
-                    case AMF0Marker::Undefined: /* Undefined */; break;
-                    case AMF0Marker::ECMAArray: ret = writeECMAArray(buffer, mapValue); break;
-                    case AMF0Marker::ObjectEnd: break; // should not happen
-                    case AMF0Marker::StrictArray: ret = writeStrictArray(buffer, vectorValue); break;
-                    case AMF0Marker::Date: ret = writeDate(buffer, doubleValue, timezone); break;
-                    case AMF0Marker::LongString: ret = writeLongString(buffer, stringValue); break;
-                    case AMF0Marker::XMLDocument: ret = writeXMLDocument(buffer, stringValue); break;
-                    case AMF0Marker::TypedObject: ret = writeTypedObject(buffer); break;
-                    case AMF0Marker::SwitchToAMF3: ret = writeSwitchToAMF3(buffer); break;
-                    default: return 0;
+                    case Type::Unknown: break; // should not happen
+                    case Type::Null: break;
+                    case Type::Integer:
+                    {
+                        ret = writeNumber(buffer, static_cast<double>(intValue));
+                        break;
+                    }
+                    case Type::Double:
+                    {
+                        ret = writeNumber(buffer, doubleValue);
+                        break;
+                    }
+                    case Type::Boolean:
+                    {
+                        ret = writeBoolean(buffer, boolValue);
+                        break;
+                    }
+                    case Type::String:
+                    {
+                        if (stringValue.length() <= std::numeric_limits<uint16_t>::max())
+                        {
+                            writeString(buffer, stringValue); break;
+                        }
+                        else
+                        {
+                            writeLongString(buffer, stringValue); break;
+                        }
+                        break;
+                    }
+                    case Type::Object:
+                    {
+                        ret = writeObject(buffer, mapValue);
+                        break;
+                    }
+                    case Type::Undefined: break;
+                    case Type::Dictionary:
+                    {
+                        ret = writeECMAArray(buffer, mapValue);
+                        break;
+                    }
+                    case Type::StrictArray:
+                    {
+                        ret = writeStrictArray(buffer, vectorValue);
+                        break;
+                    }
+                    case Type::Date:
+                    {
+                        ret = writeDate(buffer, doubleValue, timezone);
+                        break;
+                    }
+                    case Type::XMLDocument:
+                    {
+                        ret = writeXMLDocument(buffer, stringValue);
+                        break;
+                    }
+                    case Type::TypedObject:
+                    {
+                        ret = writeTypedObject(buffer);
+                        break;
+                    }
                 }
 
                 size += ret;
             }
             else if (version == Version::AMF3)
             {
+                AMF3Marker marker = AMF3Marker::Unknown;
+
+                switch (type)
+                {
+                    case Type::Unknown: marker = AMF3Marker::Unknown; break; // should not happen
+                    case Type::Null: marker = AMF3Marker::Null; break;
+                    case Type::Integer: marker = AMF3Marker::Integer; break;
+                    case Type::Double: marker = AMF3Marker::Double; break;
+                    case Type::Boolean: marker = (boolValue) ? AMF3Marker::True : AMF3Marker::False; break;
+                    case Type::String: marker = AMF3Marker::String; break;
+                    case Type::Object: marker = AMF3Marker::Object; break;
+                    case Type::Undefined: marker = AMF3Marker::Undefined; break;
+                    case Type::Dictionary: marker = AMF3Marker::Dictionary; break;
+                    case Type::StrictArray: /*marker = AMF3Marker::StrictArray;*/ break;
+                    case Type::Date: marker = AMF3Marker::Date; break;
+                    case Type::XMLDocument: marker = AMF3Marker::XMLDocument; break;
+                    case Type::TypedObject: /*marker = AMF3Marker::TypedObject;*/ break;
+                }
+
                 Log(Log::Level::ERR) << "AMF3 not supported";
                 return 0;
             }
@@ -796,7 +862,7 @@ namespace relay
 
             if (type == Type::Object ||
                 type == Type::StrictArray ||
-                type == Type::ECMAArray)
+                type == Type::Dictionary)
             {
                 log << ", values:";
 
@@ -817,7 +883,8 @@ namespace relay
                     }
                 }
             }
-            else if (type == Type::Number ||
+            else if (type == Type::Integer ||
+                     type == Type::Double ||
                      type == Type::Boolean ||
                      type == Type::String ||
                      type == Type::Date ||
@@ -827,7 +894,8 @@ namespace relay
 
                 switch (type)
                 {
-                    case Type::Number: log << doubleValue; break;
+                    case Type::Integer: log << intValue; break;
+                    case Type::Double: log << doubleValue; break;
                     case Type::Boolean: log << (boolValue ? "true" : "false"); break;
                     case Type::String: log << stringValue; break;
                     case Type::Date: log << "ms=" <<  doubleValue << "timezone=" <<  timezone; break;
