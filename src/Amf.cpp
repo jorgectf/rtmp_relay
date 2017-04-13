@@ -353,7 +353,7 @@ namespace relay
             return ret;
         }
 
-        static uint32_t writeInteger(std::vector<uint8_t>& buffer, double value)
+        static uint32_t writeInteger(std::vector<uint8_t>& buffer, int32_t value)
         {
             uint32_t ret = encodeIntBE(buffer, sizeof(value), value);
 
