@@ -82,7 +82,7 @@ namespace relay
 
             Node() {}
             Node(Type aType): type(aType) {}
-            Node(int64_t value): type(Type::Integer), intValue(value) {}
+            Node(int32_t value): type(Type::Integer), intValue(value) {}
             Node(double value): type(Type::Double), doubleValue(value) {}
             Node(bool value): type(Type::Boolean), boolValue(value) {}
             Node(const std::vector<Node>& value): type(Type::Array), vectorValue(value) {}
@@ -129,7 +129,7 @@ namespace relay
                 return *this;
             }
 
-            Node& operator=(int64_t value)
+            Node& operator=(int32_t value)
             {
                 type = Type::Integer;
                 intValue = value;
@@ -367,7 +367,7 @@ namespace relay
 
             union
             {
-                int64_t intValue = 0;
+                int32_t intValue = 0;
                 double doubleValue;
                 bool boolValue;
             };

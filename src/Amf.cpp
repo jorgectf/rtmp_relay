@@ -51,6 +51,22 @@ namespace relay
             return offset - originalOffset;
         }
 
+        static uint32_t readInteger(const std::vector<uint8_t>& buffer, uint32_t offset, int32_t& result)
+        {
+            uint32_t originalOffset = offset;
+
+            uint32_t ret = decodeIntBE(buffer, offset, sizeof(result), result);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            offset += ret;
+
+            return offset - originalOffset;
+        }
+
         static uint32_t readBoolean(const std::vector<uint8_t>& buffer, uint32_t offset, bool& result)
         {
             uint32_t originalOffset = offset;
@@ -333,6 +349,13 @@ namespace relay
         static uint32_t writeNumber(std::vector<uint8_t>& buffer, double value)
         {
             uint32_t ret = encodeDouble(buffer, value);
+
+            return ret;
+        }
+
+        static uint32_t writeInteger(std::vector<uint8_t>& buffer, double value)
+        {
+            uint32_t ret = encodeIntBE(buffer, sizeof(value), value);
 
             return ret;
         }
@@ -685,28 +708,54 @@ namespace relay
                 switch (marker)
                 {
                     case AMF3Marker::Undefined:
+                        type = Type::Undefined;
                         break;
                     case AMF3Marker::Null:
+                        type = Type::Null;
                         break;
                     case AMF3Marker::False:
+                        type = Type::Boolean;
+                        boolValue = false;
                         break;
                     case AMF3Marker::True:
+                        type = Type::Boolean;
+                        boolValue = true;
                         break;
                     case AMF3Marker::Integer:
+                        type = Type::Integer;
+                        if ((ret = readInteger(buffer, offset, intValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                     case AMF3Marker::Double:
+                        type = Type::Double;
+                        if ((ret = readNumber(buffer, offset, doubleValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                     case AMF3Marker::String:
+                        type = Type::String;
                         break;
                     case AMF3Marker::XMLDocument:
+                        type = Type::XMLDocument;
+                        if ((ret = readXMLDocument(buffer, offset, stringValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                     case AMF3Marker::Date:
+                        type = Type::Date;
                         break;
                     case AMF3Marker::Array:
+                        type = Type::Array;
                         break;
                     case AMF3Marker::Object:
+                        type = Type::Object;
                         break;
                     case AMF3Marker::XML:
+                        type = Type::XMLDocument;
                         break;
                     case AMF3Marker::ByteArray:
                         break;
@@ -717,6 +766,7 @@ namespace relay
                     case AMF3Marker::VectorObject:
                         break;
                     case AMF3Marker::Dictionary:
+                        type = Type::Dictionary;
                         break;
                 }
 
