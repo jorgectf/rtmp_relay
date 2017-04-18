@@ -563,7 +563,11 @@ namespace relay
         {
             server->stopReceiving(*this);
             server->stopStreaming(*this);
-            server = nullptr;
+
+            if (type != Type::CLIENT)
+            {
+                server = nullptr;
+            }
         }
 
         // disconnect all host connections
@@ -1066,14 +1070,21 @@ namespace relay
                         {
                             server->stopReceiving(*this);
                             server->stopStreaming(*this);
-                            server = nullptr;
+
+                            if (type != Type::CLIENT)
+                            {
+                                server = nullptr;
+                            }
                         }
 
                         sendOnFCUnpublish();
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
 
-                        streamName.clear();
+                        if (type != Type::CLIENT)
+                        {
+                            streamName.clear();
+                        }
                     }
                     else
                     {
@@ -1162,14 +1173,21 @@ namespace relay
                         {
                             server->stopReceiving(*this);
                             server->stopStreaming(*this);
-                            server = nullptr;
+
+                            if (type != Type::CLIENT)
+                            {
+                                server = nullptr;
+                            }
                         }
 
                         sendUnublishStatus(transactionId.asDouble());
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
 
-                        streamName.clear();
+                        if (type != Type::CLIENT)
+                        {
+                            streamName.clear();
+                        }
                     }
                     else
                     {
@@ -1424,7 +1442,11 @@ namespace relay
         {
             server->stopReceiving(*this);
             server->stopStreaming(*this);
-            server = nullptr;
+
+            if (type != Type::CLIENT)
+            {
+                server = nullptr;
+            }
         }
     }
 
