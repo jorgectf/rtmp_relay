@@ -77,7 +77,7 @@ inline uint32_t decodeIntLE<uint8_t>(const std::vector<uint8_t>& buffer, uint32_
         return 0;
     }
 
-    result = static_cast<uint8_t>(*(buffer.data() + offset));
+    result = *(buffer.data() + offset);
     offset += 1;
     
     return size;
@@ -95,7 +95,7 @@ inline uint32_t decodeDouble(const std::vector<uint8_t>& buffer, uint32_t offset
     for (uint32_t i = 0; i < sizeof(double); ++i)
     {
         value <<= 8;
-        value += static_cast<uint64_t>(*(buffer.data() + offset));
+        value += *(buffer.data() + offset);
         offset += 1;
     }
 
@@ -105,6 +105,35 @@ inline uint32_t decodeDouble(const std::vector<uint8_t>& buffer, uint32_t offset
     result = intFloat64.f;
 
     return sizeof(double);
+}
+
+inline uint32_t decodeU29(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t& result)
+{
+    uint32_t originalOffset = offset;
+
+    result = 0;
+
+    for (uint32_t i = 0; i < 4; ++i)
+    {
+        uint8_t b = *(buffer.data() + offset);
+
+        if (i == 3)
+        {
+            result <<= 8;
+            result += b;
+        }
+        else
+        {
+            result <<= 7;
+            result += b & 0x7F; // zero the first bit
+        }
+
+        offset += 1;
+
+        if (!(b & (1 << 7))) break;
+    }
+
+    return offset - originalOffset;
 }
 
 template <class T>
@@ -142,6 +171,40 @@ inline uint32_t encodeDouble(std::vector<uint8_t>& buffer, double value)
     }
 
     return sizeof(double);
+}
+
+inline uint32_t encodeU29(std::vector<uint8_t>& buffer, uint32_t value)
+{
+    if (value <= 0x7F) // one byte
+    {
+        buffer.push_back(static_cast<uint8_t>(value));
+        return 1;
+    }
+    else if (value <= 0x3FFF) // two bytes
+    {
+        buffer.push_back(static_cast<uint8_t>((value >> 7) | 0x80));
+        buffer.push_back(static_cast<uint8_t>(value & 0x7F));
+        return 2;
+    }
+    else if (value <= 0x1FFFFF) // three bytes
+    {
+        buffer.push_back(static_cast<uint8_t>((value >> 14) | 0x80));
+        buffer.push_back(static_cast<uint8_t>((value >> 7) | 0x80));
+        buffer.push_back(static_cast<uint8_t>(value & 0x7F));
+        return 3;
+    }
+    else if (value <= 0x1FFFFFFF) // four bytes
+    {
+        buffer.push_back(static_cast<uint8_t>((value >> 22) | 0x80));
+        buffer.push_back(static_cast<uint8_t>((value >> 15) | 0x80));
+        buffer.push_back(static_cast<uint8_t>((value >> 8) | 0x80));
+        buffer.push_back(static_cast<uint8_t>(value));
+        return 4;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 size_t replaceTokens(std::string& str, const std::map<std::string, std::string>& tokens);
