@@ -34,7 +34,8 @@ namespace relay
             }
         }
 
-        // reading
+        // decoding
+        // AMF0 and AMF3
         static uint32_t readNumber(const std::vector<uint8_t>& buffer, uint32_t offset, double& result)
         {
             uint32_t originalOffset = offset;
@@ -51,11 +52,13 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF3
         static uint32_t readInteger(const std::vector<uint8_t>& buffer, uint32_t offset, int32_t& result)
         {
             uint32_t originalOffset = offset;
 
-            uint32_t ret = decodeIntBE(buffer, offset, sizeof(result), result);
+            uint32_t unsignedValue;
+            uint32_t ret = decodeU29(buffer, offset, unsignedValue);
 
             if (ret == 0)
             {
@@ -64,9 +67,13 @@ namespace relay
 
             offset += ret;
 
+            result = static_cast<int32_t>(unsignedValue << 3);
+            result >>= 3;
+
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readBoolean(const std::vector<uint8_t>& buffer, uint32_t offset, bool& result)
         {
             uint32_t originalOffset = offset;
@@ -82,6 +89,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readString(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
         {
             uint32_t originalOffset = offset;
@@ -108,6 +116,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readObject(const std::vector<uint8_t>& buffer, uint32_t offset, std::map<std::string, Node>& result)
         {
             uint32_t originalOffset = offset;
@@ -156,6 +165,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readECMAArray(const std::vector<uint8_t>& buffer, uint32_t offset, std::map<std::string, Node>& result)
         {
             uint32_t originalOffset = offset;
@@ -225,6 +235,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readStrictArray(const std::vector<uint8_t>& buffer, uint32_t offset, std::vector<Node>& result)
         {
             uint32_t originalOffset = offset;
@@ -258,6 +269,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readDate(const std::vector<uint8_t>& buffer, uint32_t offset, double& ms, uint32_t& timezone)
         {
             uint32_t originalOffset = offset;
@@ -283,6 +295,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readLongString(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
         {
             uint32_t originalOffset = offset;
@@ -309,6 +322,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readXMLDocument(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
         {
             uint32_t originalOffset = offset;
@@ -335,6 +349,7 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF0
         static uint32_t readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
         {
             UNUSED(buffer);
@@ -345,7 +360,8 @@ namespace relay
             return 0;
         }
 
-        // writing
+        // encoding
+        // AMF0 and AMF3
         static uint32_t writeNumber(std::vector<uint8_t>& buffer, double value)
         {
             uint32_t ret = encodeDouble(buffer, value);
@@ -353,13 +369,18 @@ namespace relay
             return ret;
         }
 
+        // AMF3
         static uint32_t writeInteger(std::vector<uint8_t>& buffer, int32_t value)
         {
-            uint32_t ret = encodeIntBE(buffer, sizeof(value), value);
+            uint32_t unsignedValue = static_cast<uint32_t>(value & 0xFFFFFFF);
+            unsignedValue |= (static_cast<uint32_t>(value) & 0x80000000) >> 3;
+
+            uint32_t ret = encodeU29(buffer, unsignedValue);
 
             return ret;
         }
 
+        // AMF0
         static uint32_t writeBoolean(std::vector<uint8_t>& buffer, bool value)
         {
             buffer.push_back(static_cast<uint8_t>(value));
@@ -367,6 +388,7 @@ namespace relay
             return 1;
         }
 
+        // AMF0
         static uint32_t writeString(std::vector<uint8_t>& buffer, const std::string& value)
         {
             uint32_t ret = encodeIntBE(buffer, 2, value.size());
@@ -386,6 +408,7 @@ namespace relay
             return size;
         }
 
+        // AMF0
         static uint32_t writeObject(std::vector<uint8_t>& buffer, const std::map<std::string, Node>& value)
         {
             uint32_t size = 0;
@@ -427,6 +450,7 @@ namespace relay
             return size;
         }
 
+        // AMF0
         static uint32_t writeECMAArray(std::vector<uint8_t>& buffer, const std::map<std::string, Node>& value)
         {
             uint32_t size = 0;
@@ -476,6 +500,7 @@ namespace relay
             return size;
         }
 
+        // AMF0
         static uint32_t writeStrictArray(std::vector<uint8_t>& buffer, const std::vector<Node>& value)
         {
             uint32_t size = 0;
@@ -504,6 +529,7 @@ namespace relay
             return size;
         }
 
+        // AMF0
         static uint32_t writeDate(std::vector<uint8_t>& buffer, double ms, uint32_t timezone)
         {
             uint32_t size = 0;
@@ -529,6 +555,7 @@ namespace relay
             return size;
         }
 
+        // AMF0
         static uint32_t writeLongString(std::vector<uint8_t>& buffer, const std::string& value)
         {
             uint32_t ret = encodeIntBE(buffer, 4, value.size());
@@ -548,6 +575,7 @@ namespace relay
             return size;
         }
 
+        // AMF0
         static uint32_t writeXMLDocument(std::vector<uint8_t>& buffer, const std::string& value)
         {
             uint32_t ret = encodeIntBE(buffer, 4, value.size());
@@ -568,6 +596,7 @@ namespace relay
             return size;
         }
 
+        // AMF0
         static uint32_t writeTypedObject(std::vector<uint8_t>& buffer)
         {
             UNUSED(buffer);
@@ -782,8 +811,6 @@ namespace relay
 
             if (version == Version::AMF0)
             {
-                uint32_t ret = 0;
-
                 AMF0Marker marker;
 
                 switch (type)
@@ -809,6 +836,8 @@ namespace relay
 
                 buffer.push_back(static_cast<uint8_t>(marker));
                 size += 1;
+
+                uint32_t ret = 0;
 
                 switch (type)
                 {
@@ -896,6 +925,73 @@ namespace relay
                     case Type::XMLDocument: marker = AMF3Marker::XMLDocument; break;
                     case Type::TypedObject: /*marker = AMF3Marker::TypedObject;*/ break;
                 }
+
+                buffer.push_back(static_cast<uint8_t>(marker));
+                size += 1;
+
+                uint32_t ret = 0;
+
+                switch (type)
+                {
+                    case Type::Unknown: break; // should not happen
+                    case Type::Null: break;
+                    case Type::Integer:
+                    {
+                        ret = writeInteger(buffer, intValue);
+                        break;
+                    }
+                    case Type::Double:
+                    {
+                        ret = writeNumber(buffer, doubleValue);
+                        break;
+                    }
+                    case Type::Boolean: break;
+                    case Type::String:
+                    {
+                        if (stringValue.length() <= std::numeric_limits<uint16_t>::max())
+                        {
+                            writeString(buffer, stringValue); break;
+                        }
+                        else
+                        {
+                            writeLongString(buffer, stringValue); break;
+                        }
+                        break;
+                    }
+                    case Type::Object:
+                    {
+                        ret = writeObject(buffer, mapValue);
+                        break;
+                    }
+                    case Type::Undefined: break;
+                    case Type::Dictionary:
+                    {
+                        ret = writeECMAArray(buffer, mapValue);
+                        break;
+                    }
+                    case Type::Array:
+                    {
+                        ret = writeStrictArray(buffer, vectorValue);
+                        break;
+                    }
+                    case Type::Date:
+                    {
+                        ret = writeDate(buffer, doubleValue, timezone);
+                        break;
+                    }
+                    case Type::XMLDocument:
+                    {
+                        ret = writeXMLDocument(buffer, stringValue);
+                        break;
+                    }
+                    case Type::TypedObject:
+                    {
+                        ret = writeTypedObject(buffer);
+                        break;
+                    }
+                }
+
+                size += ret;
 
                 Log(Log::Level::ERR) << "AMF3 not supported";
                 return 0;
