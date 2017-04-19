@@ -194,6 +194,55 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF3
+        static uint32_t readObjectAMF3(const std::vector<uint8_t>& buffer, uint32_t offset, std::map<std::string, Node>& result)
+        {
+            uint32_t originalOffset = offset;
+
+            while (true)
+            {
+                std::string key;
+
+                uint32_t ret = readString(buffer, offset, key);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                offset += ret;
+
+                if (buffer.size() - offset < 1)
+                {
+                    return 0;
+                }
+
+                AMF0Marker marker = *reinterpret_cast<const AMF0Marker*>(buffer.data() + offset);
+
+                if (marker == AMF0Marker::ObjectEnd)
+                {
+                    offset += 1;
+                    break;
+                }
+                else
+                {
+                    Node node;
+
+                    ret = node.decode(amf::Version::AMF0, buffer, offset);
+
+                    if (ret == 0)
+                    {
+                        return 0;
+                    }
+                    offset += ret;
+                    
+                    result[key] = node;
+                }
+            }
+            
+            return offset - originalOffset;
+        }
+
         // AMF0
         static uint32_t readECMAArray(const std::vector<uint8_t>& buffer, uint32_t offset, std::map<std::string, Node>& result)
         {
@@ -264,6 +313,64 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF3
+        static uint32_t readDictionary(const std::vector<uint8_t>& buffer, uint32_t offset, std::map<std::string, Node>& result)
+        {
+            uint32_t originalOffset = offset;
+
+            uint32_t count;
+
+            uint32_t ret = decodeU29(buffer, offset, count);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            offset += ret;
+
+            // skip the weakly-referenced flag
+            offset += 1;
+
+            std::string key;
+
+            uint32_t currentCount = 0;
+
+            while (true)
+            {
+                key.clear();
+                ret = readStringAMF3(buffer, offset, key);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                offset += ret;
+
+                if (buffer.size() - offset < 1)
+                {
+                    return 0;
+                }
+
+                Node node;
+                ret = node.decode(amf::Version::AMF3, buffer, offset);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                offset += ret;
+
+                result[key] = node;
+
+                ++currentCount;
+            }
+
+            return offset - originalOffset;
+        }
+
         // AMF0
         static uint32_t readStrictArray(const std::vector<uint8_t>& buffer, uint32_t offset, std::vector<Node>& result)
         {
@@ -295,6 +402,40 @@ namespace relay
                 result.push_back(node);
             }
 
+            return offset - originalOffset;
+        }
+
+        // AMF3
+        static uint32_t readStrictArrayAMF3(const std::vector<uint8_t>& buffer, uint32_t offset, std::vector<Node>& result)
+        {
+            uint32_t originalOffset = offset;
+
+            uint32_t count;
+
+            uint32_t ret = decodeIntBE(buffer, offset, 4, count);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            offset += ret;
+
+            for (uint32_t i = 0; i < count; ++i)
+            {
+                Node node;
+                ret = node.decode(amf::Version::AMF0, buffer, offset);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                offset += ret;
+
+                result.push_back(node);
+            }
+            
             return offset - originalOffset;
         }
 
@@ -380,6 +521,17 @@ namespace relay
 
         // AMF0
         static uint32_t readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
+        {
+            UNUSED(buffer);
+            UNUSED(offset);
+
+            Log(Log::Level::ERR) << "Typed objects are not supported";
+
+            return 0;
+        }
+
+        // AMF3
+        static uint32_t readTypedObjectAMF3(const std::vector<uint8_t>& buffer, uint32_t& offset)
         {
             UNUSED(buffer);
             UNUSED(offset);
@@ -494,6 +646,48 @@ namespace relay
             return size;
         }
 
+        // AMF3
+        static uint32_t writeObjectAMF3(std::vector<uint8_t>& buffer, const std::map<std::string, Node>& value)
+        {
+            uint32_t size = 0;
+            uint32_t ret;
+
+            for (const auto& i : value)
+            {
+                ret = writeString(buffer, i.first);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                size += ret;
+
+                ret = i.second.encode(amf::Version::AMF0, buffer);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                size += ret;
+            }
+
+            if ((ret = writeString(buffer, "")) == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+
+            AMF0Marker marker = AMF0Marker::ObjectEnd;
+            buffer.push_back(static_cast<uint8_t>(marker));
+            
+            size += 1;
+            
+            return size;
+        }
+
         // AMF0
         static uint32_t writeECMAArray(std::vector<uint8_t>& buffer, const std::map<std::string, Node>& value)
         {
@@ -544,6 +738,47 @@ namespace relay
             return size;
         }
 
+        // AMF3
+        static uint32_t writeDictionary(std::vector<uint8_t>& buffer, const std::map<std::string, Node>& value)
+        {
+            uint32_t size = 0;
+
+            uint32_t ret = encodeU29(buffer, static_cast<uint32_t>(value.size()) << 1 | 1); // add the low bit (dictionary literal marker)
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+
+            buffer.push_back(0x00); // not using weakly-referenced keys
+            size += 1;
+
+            for (const auto& i : value)
+            {
+                ret = writeStringAMF3(buffer, i.first);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                size += ret;
+
+                ret = i.second.encode(amf::Version::AMF3, buffer);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                size += ret;
+            }
+            
+            return size;
+        }
+
         // AMF0
         static uint32_t writeStrictArray(std::vector<uint8_t>& buffer, const std::vector<Node>& value)
         {
@@ -570,6 +805,35 @@ namespace relay
                 size += ret;
             }
 
+            return size;
+        }
+
+        // AMF3
+        static uint32_t writeStrictArrayAMF3(std::vector<uint8_t>& buffer, const std::vector<Node>& value)
+        {
+            uint32_t size = 0;
+
+            uint32_t ret = encodeIntBE(buffer, 4, value.size());
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            size += ret;
+
+            for (const auto& i : value)
+            {
+                ret = i.encode(amf::Version::AMF0, buffer);
+
+                if (ret == 0)
+                {
+                    return 0;
+                }
+
+                size += ret;
+            }
+            
             return size;
         }
 
@@ -666,6 +930,16 @@ namespace relay
 
         // AMF0
         static uint32_t writeTypedObject(std::vector<uint8_t>& buffer)
+        {
+            UNUSED(buffer);
+
+            Log(Log::Level::ERR) << "Typed objects are not supported";
+
+            return 0;
+        }
+
+        // AMF3
+        static uint32_t writeTypedObjectAMF3(std::vector<uint8_t>& buffer)
         {
             UNUSED(buffer);
 
@@ -856,9 +1130,17 @@ namespace relay
                         break;
                     case AMF3Marker::Array:
                         type = Type::Array;
+                        if ((ret = readStrictArrayAMF3(buffer, offset, vectorValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                     case AMF3Marker::Object:
                         type = Type::Object;
+                        if ((ret = readObjectAMF3(buffer, offset, mapValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                     case AMF3Marker::XML:
                         type = Type::XMLDocument;
@@ -877,6 +1159,10 @@ namespace relay
                         break;
                     case AMF3Marker::Dictionary:
                         type = Type::Dictionary;
+                        if ((ret = readDictionary(buffer, offset, mapValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                 }
 
@@ -1034,18 +1320,18 @@ namespace relay
                     }
                     case Type::Object:
                     {
-                        ret = writeObject(buffer, mapValue);
+                        ret = writeObjectAMF3(buffer, mapValue);
                         break;
                     }
                     case Type::Undefined: break;
                     case Type::Dictionary:
                     {
-                        ret = writeECMAArray(buffer, mapValue);
+                        ret = writeDictionary(buffer, mapValue);
                         break;
                     }
                     case Type::Array:
                     {
-                        ret = writeStrictArray(buffer, vectorValue);
+                        // TODO: implement
                         break;
                     }
                     case Type::Date:
@@ -1060,7 +1346,7 @@ namespace relay
                     }
                     case Type::TypedObject:
                     {
-                        ret = writeTypedObject(buffer);
+                        ret = writeTypedObjectAMF3(buffer);
                         break;
                     }
                 }
