@@ -73,6 +73,25 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF3
+        static uint32_t readLength(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t& result)
+        {
+            uint32_t originalOffset = offset;
+
+            uint32_t ret = decodeU29(buffer, offset, result);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            offset += ret;
+
+            result >>= 1;
+
+            return offset - originalOffset;
+        }
+
         // AMF0
         static uint32_t readBoolean(const std::vector<uint8_t>& buffer, uint32_t offset, bool& result)
         {
@@ -376,6 +395,14 @@ namespace relay
             unsignedValue |= (static_cast<uint32_t>(value) & 0x80000000) >> 3;
 
             uint32_t ret = encodeU29(buffer, unsignedValue);
+
+            return ret;
+        }
+
+        // AMF3
+        static uint32_t writeLength(std::vector<uint8_t>& buffer, uint32_t value)
+        {
+            uint32_t ret = encodeU29(buffer, value << 1 | 1);
 
             return ret;
         }
