@@ -73,25 +73,6 @@ namespace relay
             return offset - originalOffset;
         }
 
-        // AMF3
-        static uint32_t readLength(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t& result)
-        {
-            uint32_t originalOffset = offset;
-
-            uint32_t ret = decodeU29(buffer, offset, result);
-
-            if (ret == 0)
-            {
-                return 0;
-            }
-
-            offset += ret;
-
-            result >>= 1;
-
-            return offset - originalOffset;
-        }
-
         // AMF0
         static uint32_t readBoolean(const std::vector<uint8_t>& buffer, uint32_t offset, bool& result)
         {
@@ -132,6 +113,35 @@ namespace relay
             result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
             offset += length;
 
+            return offset - originalOffset;
+        }
+
+        // AMF3
+        static uint32_t readStringAMF3(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
+        {
+            uint32_t originalOffset = offset;
+
+            uint32_t length;
+
+            uint32_t ret = decodeU29(buffer, offset, length);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            offset += ret;
+
+            length >>= 1; // shift out the low bit (reference/literal marker)
+
+            if (buffer.size() - offset < length)
+            {
+                return 0;
+            }
+
+            result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
+            offset += length;
+            
             return offset - originalOffset;
         }
 
@@ -342,33 +352,6 @@ namespace relay
         }
 
         // AMF0
-        static uint32_t readXMLDocument(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
-        {
-            uint32_t originalOffset = offset;
-
-            uint32_t length;
-
-            uint32_t ret = decodeIntBE(buffer, offset, 4, length);
-
-            if (ret == 0)
-            {
-                return 0;
-            }
-
-            offset += ret;
-
-            if (buffer.size() - offset < length)
-            {
-                return 0;
-            }
-
-            result.assign(reinterpret_cast<const char*>(buffer.data() + offset), length);
-            offset += length;
-
-            return offset - originalOffset;
-        }
-
-        // AMF0
         static uint32_t readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
         {
             UNUSED(buffer);
@@ -399,14 +382,6 @@ namespace relay
             return ret;
         }
 
-        // AMF3
-        static uint32_t writeLength(std::vector<uint8_t>& buffer, uint32_t value)
-        {
-            uint32_t ret = encodeU29(buffer, value << 1 | 1);
-
-            return ret;
-        }
-
         // AMF0
         static uint32_t writeBoolean(std::vector<uint8_t>& buffer, bool value)
         {
@@ -432,6 +407,21 @@ namespace relay
                           reinterpret_cast<const uint8_t*>(value.data()) + value.length());
             size += static_cast<uint32_t>(value.length());
 
+            return size;
+        }
+
+        // AMF3
+        static uint32_t writeStringAMF3(std::vector<uint8_t>& buffer, const std::string& value)
+        {
+            uint32_t ret = encodeU29(buffer, static_cast<uint32_t>(value.size()) << 1 | 1); // add the low bit (string literal marker)
+
+            uint32_t size = ret;
+
+            buffer.insert(buffer.end(),
+                          reinterpret_cast<const uint8_t*>(value.data()),
+                          reinterpret_cast<const uint8_t*>(value.data()) + value.length());
+            size += static_cast<uint32_t>(value.length());
+            
             return size;
         }
 
@@ -729,7 +719,7 @@ namespace relay
                     case AMF0Marker::XMLDocument:
                     {
                         type = Type::XMLDocument;
-                        if ((ret = readXMLDocument(buffer, offset, stringValue)) == 0)
+                        if ((ret = readLongString(buffer, offset, stringValue)) == 0)
                         {
                             return 0;
                         }
@@ -793,10 +783,14 @@ namespace relay
                         break;
                     case AMF3Marker::String:
                         type = Type::String;
+                        if ((ret = readStringAMF3(buffer, offset, stringValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                     case AMF3Marker::XMLDocument:
                         type = Type::XMLDocument;
-                        if ((ret = readXMLDocument(buffer, offset, stringValue)) == 0)
+                        if ((ret = readStringAMF3(buffer, offset, stringValue)) == 0)
                         {
                             return 0;
                         }
@@ -812,6 +806,10 @@ namespace relay
                         break;
                     case AMF3Marker::XML:
                         type = Type::XMLDocument;
+                        if ((ret = readStringAMF3(buffer, offset, stringValue)) == 0)
+                        {
+                            return 0;
+                        }
                         break;
                     case AMF3Marker::ByteArray:
                         break;
@@ -975,14 +973,7 @@ namespace relay
                     case Type::Boolean: break;
                     case Type::String:
                     {
-                        if (stringValue.length() <= std::numeric_limits<uint16_t>::max())
-                        {
-                            writeString(buffer, stringValue); break;
-                        }
-                        else
-                        {
-                            writeLongString(buffer, stringValue); break;
-                        }
+                        writeStringAMF3(buffer, stringValue); break;
                         break;
                     }
                     case Type::Object:
@@ -1008,7 +999,7 @@ namespace relay
                     }
                     case Type::XMLDocument:
                     {
-                        ret = writeXMLDocument(buffer, stringValue);
+                        writeStringAMF3(buffer, stringValue); break;
                         break;
                     }
                     case Type::TypedObject:
