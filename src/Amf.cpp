@@ -530,17 +530,6 @@ namespace relay
             return 0;
         }
 
-        // AMF3
-        static uint32_t readTypedObjectAMF3(const std::vector<uint8_t>& buffer, uint32_t& offset)
-        {
-            UNUSED(buffer);
-            UNUSED(offset);
-
-            Log(Log::Level::ERR) << "Typed objects are not supported";
-
-            return 0;
-        }
-
         // encoding
         // AMF0 and AMF3
         static uint32_t writeNumber(std::vector<uint8_t>& buffer, double value)
@@ -938,16 +927,6 @@ namespace relay
             return 0;
         }
 
-        // AMF3
-        static uint32_t writeTypedObjectAMF3(std::vector<uint8_t>& buffer)
-        {
-            UNUSED(buffer);
-
-            Log(Log::Level::ERR) << "Typed objects are not supported";
-
-            return 0;
-        }
-
         uint32_t Node::decode(Version version, const std::vector<uint8_t>& buffer, uint32_t offset)
         {
             uint32_t originalOffset = offset;
@@ -1287,10 +1266,10 @@ namespace relay
                     case Type::Object: marker = AMF3Marker::Object; break;
                     case Type::Undefined: marker = AMF3Marker::Undefined; break;
                     case Type::Dictionary: marker = AMF3Marker::Dictionary; break;
-                    case Type::Array: /*marker = AMF3Marker::StrictArray;*/ break;
+                    case Type::Array: marker = AMF3Marker::Array; break;
                     case Type::Date: marker = AMF3Marker::Date; break;
                     case Type::XMLDocument: marker = AMF3Marker::XMLDocument; break;
-                    case Type::TypedObject: /*marker = AMF3Marker::TypedObject;*/ break;
+                    case Type::TypedObject: return 0; // typed objects are not supported
                 }
 
                 buffer.push_back(static_cast<uint8_t>(marker));
@@ -1331,7 +1310,7 @@ namespace relay
                     }
                     case Type::Array:
                     {
-                        // TODO: implement
+                        ret = writeStrictArrayAMF3(buffer, vectorValue);
                         break;
                     }
                     case Type::Date:
@@ -1346,7 +1325,6 @@ namespace relay
                     }
                     case Type::TypedObject:
                     {
-                        ret = writeTypedObjectAMF3(buffer);
                         break;
                     }
                 }
