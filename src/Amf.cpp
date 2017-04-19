@@ -1229,11 +1229,11 @@ namespace relay
                     {
                         if (stringValue.length() <= std::numeric_limits<uint16_t>::max())
                         {
-                            writeString(buffer, stringValue); break;
+                            ret = writeString(buffer, stringValue); break;
                         }
                         else
                         {
-                            writeLongString(buffer, stringValue); break;
+                            ret = writeLongString(buffer, stringValue); break;
                         }
                         break;
                     }
@@ -1315,7 +1315,7 @@ namespace relay
                     case Type::Boolean: break;
                     case Type::String:
                     {
-                        writeStringAMF3(buffer, stringValue); break;
+                        ret = writeStringAMF3(buffer, stringValue); break;
                         break;
                     }
                     case Type::Object:
@@ -1341,7 +1341,7 @@ namespace relay
                     }
                     case Type::XMLDocument:
                     {
-                        writeStringAMF3(buffer, stringValue); break;
+                        ret = writeStringAMF3(buffer, stringValue); break;
                         break;
                     }
                     case Type::TypedObject:
