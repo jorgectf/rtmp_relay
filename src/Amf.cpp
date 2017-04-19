@@ -324,6 +324,33 @@ namespace relay
             return offset - originalOffset;
         }
 
+        // AMF3
+        static uint32_t readDateAMF3(const std::vector<uint8_t>& buffer, uint32_t offset, double& ms)
+        {
+            uint32_t originalOffset = offset;
+
+            uint32_t value;
+            uint32_t ret = decodeU29(buffer, offset, value);
+
+            if (ret == 0)
+            {
+                return 0;
+            }
+
+            offset += ret;
+
+            ret = decodeDouble(buffer, offset, ms);
+
+            if (ret == 0) // date in milliseconds from 01/01/1970
+            {
+                return 0;
+            }
+
+            offset += ret;
+            
+            return offset - originalOffset;
+        }
+
         // AMF0
         static uint32_t readLongString(const std::vector<uint8_t>& buffer, uint32_t offset, std::string& result)
         {
@@ -572,6 +599,30 @@ namespace relay
             return size;
         }
 
+        // AMF3
+        static uint32_t writeDateAMF3(std::vector<uint8_t>& buffer, double ms)
+        {
+            uint32_t size = 0;
+
+            uint32_t ret = encodeU29(buffer, 1);
+
+            if (ret == 0) // date in milliseconds from 01/01/1970
+            {
+                return 0;
+            }
+
+            ret = encodeDouble(buffer, ms);
+
+            if (ret == 0) // date in milliseconds from 01/01/1970
+            {
+                return 0;
+            }
+
+            size += ret;
+            
+            return size;
+        }
+
         // AMF0
         static uint32_t writeLongString(std::vector<uint8_t>& buffer, const std::string& value)
         {
@@ -797,6 +848,11 @@ namespace relay
                         break;
                     case AMF3Marker::Date:
                         type = Type::Date;
+                        if ((ret = readDateAMF3(buffer, offset, doubleValue)) == 0)
+                        {
+                            return 0;
+                        }
+                        timezone = 0;
                         break;
                     case AMF3Marker::Array:
                         type = Type::Array;
@@ -994,7 +1050,7 @@ namespace relay
                     }
                     case Type::Date:
                     {
-                        ret = writeDate(buffer, doubleValue, timezone);
+                        ret = writeDateAMF3(buffer, doubleValue);
                         break;
                     }
                     case Type::XMLDocument:
