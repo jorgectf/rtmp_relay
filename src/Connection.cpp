@@ -55,6 +55,7 @@ namespace relay
         streamName = description.streamName;
         overrideApplicationName = description.overrideApplicationName;
         overrideStreamName = description.overrideStreamName;
+        amfVersion = description.amfVersion;
 
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
@@ -1817,7 +1818,6 @@ namespace relay
         transactionIdNode.encode(amf::Version::AMF0, packet.data);
 
         amf::Node argument1;
-        argument1["fmsVer"] = std::string("FMS/3,0,1,123");
         argument1["fmsVer"] = std::string("FMS/3,5,7,7009");
         argument1["capabilities"] = 31.0;
         argument1.encode(amf::Version::AMF0, packet.data);
