@@ -26,9 +26,9 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
   * *type* – type of connection (client or host)
   * *stream* – type of stream (input or output)
   * *addresses* – list of addresses to connect to (for client connections) or listen to (for server connections)
-  * *video* – flag that indicates wether to forward video stream (default value is true)
-  * *audio* – flag that indicates wether to forward audio stream (default value is true)
-  * *data* – flag that indicates wether to forward data stream (default value is true)
+  * *video* – flag that indicates whether to forward video stream (default value is true)
+  * *audio* – flag that indicates whether to forward audio stream (default value is true)
+  * *data* – flag that indicates whether to forward data stream (default value is true)
   * *metaDataBlacklist* – list of metadata fields that should not be forwarded
   * *connectionTimeout* – how long should the attempt to connect last (default value is 5.0)
   * *reconnectInterval* – the interval of reconnection (default value is 5.0)
