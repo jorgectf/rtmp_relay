@@ -573,7 +573,6 @@ namespace relay
         // disconnect all host connections
         if (type == Type::HOST)
         {
-            closed = true;
             streamType = StreamType::NONE;
         }
 

@@ -208,7 +208,5 @@ namespace relay
 
         Server* server = nullptr;
         std::set<std::string> metaDataBlacklist;
-
-        bool closed = false;
     };
 }
