@@ -46,6 +46,7 @@ namespace relay
             uint32_t reconnectCount = 0;
             float pingInterval = 60.0f;
             uint32_t bufferSize = 3000;
+            amf::Version amfVersion = amf::Version::AMF0;
 
             bool video = true;
             bool audio = true;
