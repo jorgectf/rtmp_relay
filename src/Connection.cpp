@@ -70,6 +70,11 @@ namespace relay
         }
     }
 
+    bool Connection::isClosed() const
+    {
+        return type == Type::HOST && socket.isReady(); // host connections are closed if the client disconnected
+    }
+
     void Connection::update(float delta)
     {
         if (type == Type::HOST)
