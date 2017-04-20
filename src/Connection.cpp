@@ -32,7 +32,6 @@ namespace relay
                            cppsocket::Socket& client):
         Connection(aRelay, client, Type::HOST)
     {
-        socket.setBlocking(false);
         socket.startRead();
     }
 
@@ -41,8 +40,6 @@ namespace relay
                            const Description& description):
         Connection(aRelay, connector, Type::CLIENT)
     {
-        socket.setBlocking(false);
-
         addresses = description.addresses;
         ipAddresses = description.ipAddresses;
         connectionTimeout = description.connectionTimeout;
@@ -55,7 +52,6 @@ namespace relay
         streamName = description.streamName;
         overrideApplicationName = description.overrideApplicationName;
         overrideStreamName = description.overrideStreamName;
-        amfVersion = description.amfVersion;
 
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
