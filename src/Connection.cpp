@@ -69,7 +69,7 @@ namespace relay
 
     bool Connection::isClosed() const
     {
-        return type == Type::HOST && socket.isReady(); // host connections are closed if the client disconnected
+        return type == Type::HOST && !socket.isReady(); // host connections are closed if the client disconnected
     }
 
     void Connection::update(float delta)
@@ -965,6 +965,12 @@ namespace relay
                         connected = true;
 
                         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+
+#ifdef DEBUG
+                        Log log(Log::Level::ALL);
+                        log << "Connect argument: ";
+                        argument1.dump(log);
+#endif
                     }
                     else
                     {
