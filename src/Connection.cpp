@@ -729,6 +729,7 @@ namespace relay
             }
 
             case rtmp::MessageType::NOTIFY:
+            case rtmp::MessageType::AMF3_NOTIFY:
             {
                 // only input can receive notify packets
                 if (streamType == StreamType::INPUT)
@@ -896,6 +897,7 @@ namespace relay
             }
 
             case rtmp::MessageType::INVOKE:
+            case rtmp::MessageType::AMF3_INVOKE:
             {
                 uint32_t offset = 0;
 

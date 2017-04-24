@@ -35,11 +35,11 @@ namespace relay
             CLIENT_BANDWIDTH = 6,   // client bandwidth
             AUDIO_PACKET = 8,       // audio packet
             VIDEO_PACKET = 9,       // video packet
-            FLEX_STREAM = 15,       // Flex shared stream
-            FLEX_OBJECT = 16,       // Flex shared object
-            FLEX_MESSAGE = 17,      // Flex shared message
+            AMF3_NOTIFY = 15,       // Flex shared stream
+            AMF3_SHARED_OBJECT = 16,// Flex shared object
+            AMF3_INVOKE = 17,       // Flex shared message
             NOTIFY = 18,            // some notification
-            SHARED_OBJ = 19,        // shared object
+            SHARED_OBJECT = 19,     // shared object
             INVOKE = 20,            // invoke some stream action
         };
 
