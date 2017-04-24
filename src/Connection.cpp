@@ -52,6 +52,7 @@ namespace relay
         streamName = description.streamName;
         overrideApplicationName = description.overrideApplicationName;
         overrideStreamName = description.overrideStreamName;
+        amfVersion = description.amfVersion;
 
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
@@ -1807,6 +1808,7 @@ namespace relay
         argument1["type"] = std::string("nonprivate");
         argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf56.16.0)");
         argument1["tcUrl"] = "rtmp://" + addresses[addressIndex] + "/" + applicationName;
+        argument1["objectEncoding"] = (amfVersion == amf::Version::AMF3) ? 3.0 : 0.0;
         //argument1["fpad"] = false;
         //argument1["capabilities"] = 15.0;
         //argument1["audioCodecs"] = 4071.0;
