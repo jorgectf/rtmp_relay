@@ -731,6 +731,9 @@ namespace relay
             case rtmp::MessageType::NOTIFY:
             case rtmp::MessageType::AMF3_NOTIFY:
             {
+                amf::Version decodeAmfVersion = amf::Version::AMF0;
+                if (packet.messageType == rtmp::MessageType::AMF3_NOTIFY) decodeAmfVersion = amf::Version::AMF3;
+
                 // only input can receive notify packets
                 if (streamType == StreamType::INPUT)
                 {
@@ -738,7 +741,7 @@ namespace relay
 
                     amf::Node command;
 
-                    uint32_t ret = command.decode(amfVersion, packet.data, offset);
+                    uint32_t ret = command.decode(decodeAmfVersion, packet.data, offset);
 
                     if (ret == 0)
                     {
@@ -755,7 +758,7 @@ namespace relay
 
                     amf::Node argument1;
 
-                    if ((ret = argument1.decode(amfVersion, packet.data, offset))  > 0)
+                    if ((ret = argument1.decode(decodeAmfVersion, packet.data, offset))  > 0)
                     {
                         offset += ret;
 
@@ -766,7 +769,7 @@ namespace relay
 
                     amf::Node argument2;
 
-                    if ((ret = argument2.decode(amfVersion, packet.data, offset)) > 0)
+                    if ((ret = argument2.decode(decodeAmfVersion, packet.data, offset)) > 0)
                     {
                         offset += ret;
 
@@ -899,11 +902,14 @@ namespace relay
             case rtmp::MessageType::INVOKE:
             case rtmp::MessageType::AMF3_INVOKE:
             {
+                amf::Version decodeAmfVersion = amf::Version::AMF0;
+                if (packet.messageType == rtmp::MessageType::AMF3_INVOKE) decodeAmfVersion = amf::Version::AMF3;
+
                 uint32_t offset = 0;
 
                 amf::Node command;
 
-                uint32_t ret = command.decode(amfVersion, packet.data, offset);
+                uint32_t ret = command.decode(decodeAmfVersion, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -920,7 +926,7 @@ namespace relay
 
                 amf::Node transactionId;
 
-                ret = transactionId.decode(amfVersion, packet.data, offset);
+                ret = transactionId.decode(decodeAmfVersion, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -937,7 +943,7 @@ namespace relay
 
                 amf::Node argument1;
 
-                if ((ret = argument1.decode(amfVersion, packet.data, offset)) > 0)
+                if ((ret = argument1.decode(decodeAmfVersion, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
@@ -948,7 +954,7 @@ namespace relay
 
                 amf::Node argument2;
 
-                if ((ret = argument2.decode(amfVersion, packet.data, offset)) > 0)
+                if ((ret = argument2.decode(decodeAmfVersion, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
