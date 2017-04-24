@@ -108,6 +108,7 @@ namespace relay
                     switch (header.messageType)
                     {
                         case rtmp::MessageType::SET_CHUNK_SIZE: log << "SET_CHUNK_SIZE"; break;
+                        case rtmp::MessageType::ABORT: log << "ABORT"; break;
                         case rtmp::MessageType::BYTES_READ: log << "BYTES_READ"; break;
                         case rtmp::MessageType::USER_CONTROL: log << "USER_CONTROL"; break;
                         case rtmp::MessageType::SERVER_BANDWIDTH: log << "SERVER_BANDWIDTH"; break;
@@ -361,6 +362,7 @@ namespace relay
                     switch (header.messageType)
                     {
                         case rtmp::MessageType::SET_CHUNK_SIZE: log << "SET_CHUNK_SIZE"; break;
+                        case rtmp::MessageType::ABORT: log << "ABORT"; break;
                         case rtmp::MessageType::BYTES_READ: log << "BYTES_READ"; break;
                         case rtmp::MessageType::USER_CONTROL: log << "USER_CONTROL"; break;
                         case rtmp::MessageType::SERVER_BANDWIDTH: log << "SERVER_BANDWIDTH"; break;

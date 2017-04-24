@@ -28,6 +28,7 @@ namespace relay
             NONE = 0,
 
             SET_CHUNK_SIZE = 1,     // chunk size change
+            ABORT = 2,              // abort message
             BYTES_READ = 3,         // number of bytes read
             USER_CONTROL = 4,       // user control message
             SERVER_BANDWIDTH = 5,   // server bandwidth

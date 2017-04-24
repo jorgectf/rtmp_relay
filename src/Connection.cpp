@@ -606,6 +606,12 @@ namespace relay
                 break;
             }
 
+            case rtmp::MessageType::ABORT:
+            {
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received ABORT";
+                break;
+            }
+
             case rtmp::MessageType::BYTES_READ:
             {
                 uint32_t offset = 0;
