@@ -35,7 +35,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
   * *reconnectCount* – amount of connect attempts (0 to reconnect forever)
   * *pingInterval* – client ping interval in seconds (default value is 60.0)
   * *bufferSize* – size of the client buffer for input streams (default value is 3000)
-  * *amfVersion* – amfVersion to use for the connection (default value is 0)
+  * *amfVersion* – AMF version (for client connections) to use for communication (default value is 0)
 
 *overrideApplicationName* can have the following tokens:
 

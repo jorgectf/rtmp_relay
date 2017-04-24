@@ -731,7 +731,7 @@ namespace relay
 
                     amf::Node command;
 
-                    uint32_t ret = command.decode(amf::Version::AMF0, packet.data, offset);
+                    uint32_t ret = command.decode(amfVersion, packet.data, offset);
 
                     if (ret == 0)
                     {
@@ -748,7 +748,7 @@ namespace relay
 
                     amf::Node argument1;
 
-                    if ((ret = argument1.decode(amf::Version::AMF0, packet.data, offset))  > 0)
+                    if ((ret = argument1.decode(amfVersion, packet.data, offset))  > 0)
                     {
                         offset += ret;
 
@@ -759,7 +759,7 @@ namespace relay
 
                     amf::Node argument2;
 
-                    if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
+                    if ((ret = argument2.decode(amfVersion, packet.data, offset)) > 0)
                     {
                         offset += ret;
 
@@ -895,7 +895,7 @@ namespace relay
 
                 amf::Node command;
 
-                uint32_t ret = command.decode(amf::Version::AMF0, packet.data, offset);
+                uint32_t ret = command.decode(amfVersion, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -912,7 +912,7 @@ namespace relay
 
                 amf::Node transactionId;
 
-                ret = transactionId.decode(amf::Version::AMF0, packet.data, offset);
+                ret = transactionId.decode(amfVersion, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -929,7 +929,7 @@ namespace relay
 
                 amf::Node argument1;
 
-                if ((ret = argument1.decode(amf::Version::AMF0, packet.data, offset)) > 0)
+                if ((ret = argument1.decode(amfVersion, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
@@ -940,7 +940,7 @@ namespace relay
 
                 amf::Node argument2;
 
-                if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
+                if ((ret = argument2.decode(amfVersion, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
@@ -954,6 +954,11 @@ namespace relay
                     if (type == Type::HOST)
                     {
                         applicationName = argument1["app"].asString();
+
+                        if (argument1.hasElement("objectEncoding"))
+                        {
+                            amfVersion = (argument1["objectEncoding"].asDouble() == 3.0) ? amf::Version::AMF3 : amf::Version::AMF0;
+                        }
 
                         sendServerBandwidth();
                         sendClientBandwidth();
@@ -1828,7 +1833,8 @@ namespace relay
         argument2["level"] = std::string("status");
         argument2["code"] = std::string("NetConnection.Connect.Success");
         argument2["description"] = std::string("Connection succeeded.");
-        argument2["objectEncoding"] = 0.0; // TODO: implement AMF3 support
+        argument2["objectEncoding"] = (amfVersion == amf::Version::AMF3) ? 3.0 : 0.0;
+
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
