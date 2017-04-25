@@ -1809,11 +1809,6 @@ namespace relay
         argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf56.16.0)");
         argument1["tcUrl"] = "rtmp://" + addresses[addressIndex] + "/" + applicationName;
         argument1["objectEncoding"] = (amfVersion == amf::Version::AMF3) ? 3.0 : 0.0;
-        //argument1["fpad"] = false;
-        //argument1["capabilities"] = 15.0;
-        //argument1["audioCodecs"] = 4071.0;
-        //argument1["videoCodecs"] = 252.0;
-        //argument1["videoFunction"] = 1.0;
 
         argument1.encode(amf::Version::AMF0, packet.data);
 
