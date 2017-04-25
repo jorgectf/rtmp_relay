@@ -729,7 +729,7 @@ namespace relay
                 break;
             }
 
-            case rtmp::MessageType::NOTIFY:
+            case rtmp::MessageType::AMF0_NOTIFY:
             case rtmp::MessageType::AMF3_NOTIFY:
             {
                 amf::Version decodeAmfVersion = amf::Version::AMF0;
@@ -900,7 +900,7 @@ namespace relay
                 break;
             }
 
-            case rtmp::MessageType::INVOKE:
+            case rtmp::MessageType::AMF0_INVOKE:
             case rtmp::MessageType::AMF3_INVOKE:
             {
                 amf::Version decodeAmfVersion = amf::Version::AMF0;
@@ -1406,7 +1406,14 @@ namespace relay
                 }
                 break;
             }
-                
+
+            case rtmp::MessageType::AMF0_SHARED_OBJECT:
+            case rtmp::MessageType::AMF3_SHARED_OBJECT:
+            {
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received shared object";
+                break;
+            }
+
             default:
             {
                 Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unhandled message: " << static_cast<uint32_t>(packet.messageType);
@@ -1575,7 +1582,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onBWDone");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1604,7 +1611,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("_checkbw");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1630,7 +1637,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1654,7 +1661,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("createStream");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1680,7 +1687,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1713,7 +1720,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("releaseStream");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1742,7 +1749,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1766,7 +1773,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("deleteStream");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1795,7 +1802,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("connect");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1827,7 +1834,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1861,7 +1868,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("FCPublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1890,7 +1897,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onFCPublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1908,7 +1915,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("FCUnpublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1937,7 +1944,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onFCUnpublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1955,7 +1962,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("FCSubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1984,7 +1991,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onFCSubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2012,7 +2019,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("FCUnsubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2041,7 +2048,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onFCUnsubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2060,7 +2067,7 @@ namespace relay
         packet.channel = rtmp::Channel::SOURCE;
         packet.messageStreamId = streamId;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("publish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2094,7 +2101,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2126,7 +2133,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2187,7 +2194,7 @@ namespace relay
             packet.channel = rtmp::Channel::AUDIO;
             packet.messageStreamId = streamId;
             packet.timestamp = 0;
-            packet.messageType = rtmp::MessageType::NOTIFY;
+            packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
 
             amf::Node commandName = std::string("@setDataFrame");
             commandName.encode(amf::Version::AMF0, packet.data);
@@ -2228,7 +2235,7 @@ namespace relay
         packet.channel = rtmp::Channel::AUDIO;
         packet.messageStreamId = streamId;
         packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::NOTIFY;
+        packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
 
         amf::Node commandName = std::string("onTextData");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2253,7 +2260,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("getStreamLength");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2280,7 +2287,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2308,7 +2315,7 @@ namespace relay
         packet.channel = rtmp::Channel::SYSTEM;
         packet.messageStreamId = streamId;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("play");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2335,7 +2342,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2367,7 +2374,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("stop");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2394,7 +2401,7 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::INVOKE;
+        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);

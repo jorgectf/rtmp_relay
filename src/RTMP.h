@@ -35,12 +35,12 @@ namespace relay
             CLIENT_BANDWIDTH = 6,   // client bandwidth
             AUDIO_PACKET = 8,       // audio packet
             VIDEO_PACKET = 9,       // video packet
-            AMF3_NOTIFY = 15,       // Flex shared stream
-            AMF3_SHARED_OBJECT = 16,// Flex shared object
-            AMF3_INVOKE = 17,       // Flex shared message
-            NOTIFY = 18,            // some notification
-            SHARED_OBJECT = 19,     // shared object
-            INVOKE = 20,            // invoke some stream action
+            AMF3_NOTIFY = 15,       // AMF3 notification
+            AMF3_SHARED_OBJECT = 16,// AMF3 shared object
+            AMF3_INVOKE = 17,       // AMF3 invoke
+            AMF0_NOTIFY = 18,       // AMF0 notification
+            AMF0_SHARED_OBJECT = 19,// AMF0 shared object
+            AMF0_INVOKE = 20,       // AMF0 invoke
         };
 
         enum class UserControlType: uint16_t

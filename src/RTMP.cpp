@@ -118,9 +118,9 @@ namespace relay
                         case rtmp::MessageType::AMF3_NOTIFY: log << "AMF3_NOTIFY"; break;
                         case rtmp::MessageType::AMF3_SHARED_OBJECT: log << "AMF3_SHARED_OBJECT"; break;
                         case rtmp::MessageType::AMF3_INVOKE: log << "AMF3_INVOKE"; break;
-                        case rtmp::MessageType::NOTIFY: log << "NOTIFY"; break;
-                        case rtmp::MessageType::SHARED_OBJECT: log << "SHARED_OBJECT"; break;
-                        case rtmp::MessageType::INVOKE: log << "INVOKE"; break;
+                        case rtmp::MessageType::AMF0_NOTIFY: log << "AMF0_NOTIFY"; break;
+                        case rtmp::MessageType::AMF0_SHARED_OBJECT: log << "AMF0_SHARED_OBJECT"; break;
+                        case rtmp::MessageType::AMF0_INVOKE: log << "AMF0_INVOKE"; break;
                         default: log << "unknown command";
                     };
 
@@ -372,9 +372,9 @@ namespace relay
                         case rtmp::MessageType::AMF3_NOTIFY: log << "AMF3_NOTIFY"; break;
                         case rtmp::MessageType::AMF3_SHARED_OBJECT: log << "AMF3_SHARED_OBJECT"; break;
                         case rtmp::MessageType::AMF3_INVOKE: log << "AMF3_INVOKE"; break;
-                        case rtmp::MessageType::NOTIFY: log << "NOTIFY"; break;
-                        case rtmp::MessageType::SHARED_OBJECT: log << "SHARED_OBJECT"; break;
-                        case rtmp::MessageType::INVOKE: log << "INVOKE"; break;
+                        case rtmp::MessageType::AMF0_NOTIFY: log << "AMF0_NOTIFY"; break;
+                        case rtmp::MessageType::AMF0_SHARED_OBJECT: log << "AMF0_SHARED_OBJECT"; break;
+                        case rtmp::MessageType::AMF0_INVOKE: log << "AMF0_INVOKE"; break;
                         default: log << "unknown command";
                     };
 
