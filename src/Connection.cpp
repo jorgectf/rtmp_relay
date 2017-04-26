@@ -1414,6 +1414,12 @@ namespace relay
                 break;
             }
 
+            case rtmp::MessageType::AGGREGATE:
+            {
+                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received aggregated messages";
+                break;
+            }
+
             default:
             {
                 Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unhandled message: " << static_cast<uint32_t>(packet.messageType);

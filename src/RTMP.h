@@ -41,6 +41,7 @@ namespace relay
             AMF0_NOTIFY = 18,       // AMF0 notification
             AMF0_SHARED_OBJECT = 19,// AMF0 shared object
             AMF0_INVOKE = 20,       // AMF0 invoke
+            AGGREGATE = 22          // Aggregated messages
         };
 
         enum class UserControlType: uint16_t
