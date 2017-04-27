@@ -906,11 +906,16 @@ namespace relay
                 amf::Version decodeAmfVersion = amf::Version::AMF0;
                 if (packet.messageType == rtmp::MessageType::AMF3_INVOKE) decodeAmfVersion = amf::Version::AMF3;
 
+                if (packet.messageType == rtmp::MessageType::AMF3_INVOKE)
+                {
+                    
+                }
+
                 uint32_t offset = 0;
 
                 amf::Node command;
 
-                uint32_t ret = command.decode(decodeAmfVersion, packet.data, offset);
+                uint32_t ret = command.decode(amf::Version::AMF0, packet.data, offset);
 
                 if (ret == 0)
                 {
