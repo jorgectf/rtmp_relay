@@ -903,19 +903,28 @@ namespace relay
             case rtmp::MessageType::AMF0_INVOKE:
             case rtmp::MessageType::AMF3_INVOKE:
             {
-                amf::Version decodeAmfVersion = amf::Version::AMF0;
-                if (packet.messageType == rtmp::MessageType::AMF3_INVOKE) decodeAmfVersion = amf::Version::AMF3;
+                uint32_t offset = 0;
+                uint32_t ret;
 
+                amf::Version decodeAmfVersion = amf::Version::AMF0;
                 if (packet.messageType == rtmp::MessageType::AMF3_INVOKE)
                 {
-                    
-                }
+                    uint8_t version;
+                    ret = decodeIntBE(packet.data, offset, sizeof(uint8_t), version);
 
-                uint32_t offset = 0;
+                    if (ret == 0)
+                    {
+                        return false;
+                    }
+
+                    offset += ret;
+
+                    if (version == 0x03) decodeAmfVersion = amf::Version::AMF3;
+                }
 
                 amf::Node command;
 
-                uint32_t ret = command.decode(amf::Version::AMF0, packet.data, offset);
+                ret = command.decode(decodeAmfVersion, packet.data, offset);
 
                 if (ret == 0)
                 {
