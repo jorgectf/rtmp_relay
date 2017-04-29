@@ -919,6 +919,7 @@ namespace relay
 
                     offset += ret;
 
+                    // no documentation states what this byte means, but it usually is 0
                     if (version == 0x03) decodeAmfVersion = amf::Version::AMF3;
                 }
 
@@ -1602,7 +1603,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onBWDone");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1631,7 +1641,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("_checkbw");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1657,7 +1676,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1681,7 +1709,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("createStream");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1707,7 +1744,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1740,7 +1786,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("releaseStream");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1769,7 +1824,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1793,7 +1857,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("deleteStream");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1822,7 +1895,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("connect");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1854,7 +1936,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1888,7 +1979,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("FCPublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1917,7 +2017,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onFCPublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1935,7 +2044,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("FCUnpublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1964,7 +2082,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onFCUnpublish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -1982,7 +2109,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("FCSubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2011,7 +2147,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onFCSubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2039,7 +2184,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("FCUnsubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2068,7 +2222,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onFCUnsubscribe");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2087,7 +2250,16 @@ namespace relay
         packet.channel = rtmp::Channel::SOURCE;
         packet.messageStreamId = streamId;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("publish");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2121,7 +2293,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2153,7 +2334,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2214,7 +2404,16 @@ namespace relay
             packet.channel = rtmp::Channel::AUDIO;
             packet.messageStreamId = streamId;
             packet.timestamp = 0;
-            packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
+
+            if (amfVersion == amf::Version::AMF0)
+            {
+                packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
+            }
+            else if (amfVersion == amf::Version::AMF3)
+            {
+                packet.messageType = rtmp::MessageType::AMF3_NOTIFY;
+                packet.data.push_back(0); // using AMF0
+            }
 
             amf::Node commandName = std::string("@setDataFrame");
             commandName.encode(amf::Version::AMF0, packet.data);
@@ -2255,7 +2454,16 @@ namespace relay
         packet.channel = rtmp::Channel::AUDIO;
         packet.messageStreamId = streamId;
         packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_NOTIFY;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onTextData");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2280,7 +2488,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("getStreamLength");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2307,7 +2524,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("_result");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2335,7 +2561,16 @@ namespace relay
         packet.channel = rtmp::Channel::SYSTEM;
         packet.messageStreamId = streamId;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("play");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2362,7 +2597,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2394,7 +2638,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("stop");
         commandName.encode(amf::Version::AMF0, packet.data);
@@ -2421,7 +2674,16 @@ namespace relay
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
-        packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+
+        if (amfVersion == amf::Version::AMF0)
+        {
+            packet.messageType = rtmp::MessageType::AMF0_INVOKE;
+        }
+        else if (amfVersion == amf::Version::AMF3)
+        {
+            packet.messageType = rtmp::MessageType::AMF3_INVOKE;
+            packet.data.push_back(0); // using AMF0
+        }
 
         amf::Node commandName = std::string("onStatus");
         commandName.encode(amf::Version::AMF0, packet.data);
