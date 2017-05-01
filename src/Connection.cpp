@@ -732,17 +732,32 @@ namespace relay
             case rtmp::MessageType::AMF0_NOTIFY:
             case rtmp::MessageType::AMF3_NOTIFY:
             {
+                uint32_t offset = 0;
+                uint32_t ret;
+
                 amf::Version decodeAmfVersion = amf::Version::AMF0;
-                if (packet.messageType == rtmp::MessageType::AMF3_NOTIFY) decodeAmfVersion = amf::Version::AMF3;
+                if (packet.messageType == rtmp::MessageType::AMF3_NOTIFY)
+                {
+                    uint8_t version;
+                    ret = decodeIntBE(packet.data, offset, sizeof(uint8_t), version);
+
+                    if (ret == 0)
+                    {
+                        return false;
+                    }
+
+                    offset += ret;
+
+                    // no documentation states what this byte means, but it usually is 0
+                    if (version == 0x03) decodeAmfVersion = amf::Version::AMF3;
+                }
 
                 // only input can receive notify packets
                 if (streamType == StreamType::INPUT)
                 {
-                    uint32_t offset = 0;
-
                     amf::Node command;
 
-                    uint32_t ret = command.decode(decodeAmfVersion, packet.data, offset);
+                    ret = command.decode(decodeAmfVersion, packet.data, offset);
 
                     if (ret == 0)
                     {
