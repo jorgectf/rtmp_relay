@@ -735,11 +735,10 @@ namespace relay
                 uint32_t offset = 0;
                 uint32_t ret;
 
-                amf::Version decodeAmfVersion = amf::Version::AMF0;
                 if (packet.messageType == rtmp::MessageType::AMF3_NOTIFY)
                 {
-                    uint8_t version;
-                    ret = decodeIntBE(packet.data, offset, sizeof(uint8_t), version);
+                    uint8_t header;
+                    ret = decodeIntBE(packet.data, offset, sizeof(uint8_t), header);
 
                     if (ret == 0)
                     {
@@ -749,7 +748,10 @@ namespace relay
                     offset += ret;
 
                     // no documentation states what this byte means, but it usually is 0
-                    if (version == 0x03) decodeAmfVersion = amf::Version::AMF3;
+                    if (header != 0)
+                    {
+                        return false;
+                    }
                 }
 
                 // only input can receive notify packets
@@ -757,7 +759,7 @@ namespace relay
                 {
                     amf::Node command;
 
-                    ret = command.decode(decodeAmfVersion, packet.data, offset);
+                    ret = command.decode(amf::Version::AMF0, packet.data, offset);
 
                     if (ret == 0)
                     {
@@ -774,7 +776,7 @@ namespace relay
 
                     amf::Node argument1;
 
-                    if ((ret = argument1.decode(decodeAmfVersion, packet.data, offset))  > 0)
+                    if ((ret = argument1.decode(amf::Version::AMF0, packet.data, offset))  > 0)
                     {
                         offset += ret;
 
@@ -785,7 +787,7 @@ namespace relay
 
                     amf::Node argument2;
 
-                    if ((ret = argument2.decode(decodeAmfVersion, packet.data, offset)) > 0)
+                    if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
                     {
                         offset += ret;
 
@@ -921,11 +923,10 @@ namespace relay
                 uint32_t offset = 0;
                 uint32_t ret;
 
-                amf::Version decodeAmfVersion = amf::Version::AMF0;
                 if (packet.messageType == rtmp::MessageType::AMF3_INVOKE)
                 {
-                    uint8_t version;
-                    ret = decodeIntBE(packet.data, offset, sizeof(uint8_t), version);
+                    uint8_t header;
+                    ret = decodeIntBE(packet.data, offset, sizeof(uint8_t), header);
 
                     if (ret == 0)
                     {
@@ -935,12 +936,15 @@ namespace relay
                     offset += ret;
 
                     // no documentation states what this byte means, but it usually is 0
-                    if (version == 0x03) decodeAmfVersion = amf::Version::AMF3;
+                    if (header != 0)
+                    {
+                        return false;
+                    }
                 }
 
                 amf::Node command;
 
-                ret = command.decode(decodeAmfVersion, packet.data, offset);
+                ret = command.decode(amf::Version::AMF0, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -957,7 +961,7 @@ namespace relay
 
                 amf::Node transactionId;
 
-                ret = transactionId.decode(decodeAmfVersion, packet.data, offset);
+                ret = transactionId.decode(amf::Version::AMF0, packet.data, offset);
 
                 if (ret == 0)
                 {
@@ -974,7 +978,7 @@ namespace relay
 
                 amf::Node argument1;
 
-                if ((ret = argument1.decode(decodeAmfVersion, packet.data, offset)) > 0)
+                if ((ret = argument1.decode(amf::Version::AMF0, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
@@ -985,7 +989,7 @@ namespace relay
 
                 amf::Node argument2;
 
-                if ((ret = argument2.decode(decodeAmfVersion, packet.data, offset)) > 0)
+                if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
                 {
                     offset += ret;
 
