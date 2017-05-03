@@ -987,17 +987,6 @@ namespace relay
                     argument1.dump(log);
                 }
 
-                amf::Node argument2;
-
-                if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
-                {
-                    offset += ret;
-
-                    Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "Argument 2: ";
-                    argument2.dump(log);
-                }
-
                 if (command.asString() == "connect")
                 {
                     if (type == Type::HOST)
@@ -1192,6 +1181,18 @@ namespace relay
                         streamType == StreamType::INPUT)
                     {
                         streamType = StreamType::INPUT;
+
+                        amf::Node argument2;
+
+                        if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
+                        {
+                            offset += ret;
+
+                            Log log(Log::Level::ALL);
+                            log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                            argument2.dump(log);
+                        }
+
                         streamName = argument2.asString();
 
                         const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
@@ -1264,6 +1265,18 @@ namespace relay
                         streamType == StreamType::OUTPUT)
                     {
                         streamType = StreamType::OUTPUT;
+
+                        amf::Node argument2;
+
+                        if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
+                        {
+                            offset += ret;
+
+                            Log log(Log::Level::ALL);
+                            log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                            argument2.dump(log);
+                        }
+
                         streamName = argument2.asString();
 
                         const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
@@ -1328,6 +1341,17 @@ namespace relay
                 }
                 else if (command.asString() == "onStatus")
                 {
+                    amf::Node argument2;
+
+                    if ((ret = argument2.decode((packet.messageType == rtmp::MessageType::AMF3_INVOKE) ? amf::Version::AMF3 : amf::Version::AMF0, packet.data, offset)) > 0)
+                    {
+                        offset += ret;
+
+                        Log log(Log::Level::ALL);
+                        log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                        argument2.dump(log);
+                    }
+
                     if (argument2["code"].asString() == "NetStream.Publish.Start")
                     {
                         if (streamType == StreamType::OUTPUT)
@@ -1412,6 +1436,17 @@ namespace relay
                         }
                         else if (i->second == "createStream")
                         {
+                            amf::Node argument2;
+
+                            if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
+                            {
+                                offset += ret;
+
+                                Log log(Log::Level::ALL);
+                                log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                                argument2.dump(log);
+                            }
+                            
                             streamId = static_cast<uint32_t>(argument2.asDouble());
 
                             if (streamType == StreamType::INPUT)
