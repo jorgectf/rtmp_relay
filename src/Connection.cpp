@@ -1446,7 +1446,7 @@ namespace relay
                                 log << "[" << id << ", " << name << "] " << "Argument 2: ";
                                 argument2.dump(log);
                             }
-                            
+
                             streamId = static_cast<uint32_t>(argument2.asDouble());
 
                             if (streamType == StreamType::INPUT)
@@ -2373,7 +2373,7 @@ namespace relay
         argument2["description"] = streamName + " is now published";
         argument2["details"] = streamName;
         argument2["level"] = std::string("status");
-        argument2.encode(amf::Version::AMF0, packet.data);
+        argument2.encode((amfVersion == amf::Version::AMF3) ? amf::Version::AMF3 : amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
         encodePacket(buffer, outChunkSize, packet, sentPackets);
