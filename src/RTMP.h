@@ -16,32 +16,32 @@ namespace relay
         {
             NONE = 0,
 
-            NETWORK = 2,   // channel for network-related messages (bandwidth report, ping, etc)
-            SYSTEM = 3,    // channel for sending server control messages
-            AUDIO = 4,     // channel for audio data
-            VIDEO   = 6,   // channel for video data
-            SOURCE  = 8,   // channel for a/v invokes
+            NETWORK = 2, // channel for network-related messages (bandwidth report, ping, etc)
+            SYSTEM = 3, // channel for sending server control messages
+            AUDIO = 4, // channel for audio data
+            VIDEO   = 6, // channel for video data
+            SOURCE  = 8, // channel for a/v invokes
         };
 
         enum class MessageType: uint8_t
         {
             NONE = 0,
 
-            SET_CHUNK_SIZE = 1,     // chunk size change
-            ABORT = 2,              // abort message
-            BYTES_READ = 3,         // number of bytes read
-            USER_CONTROL = 4,       // user control message
-            SERVER_BANDWIDTH = 5,   // server bandwidth
-            CLIENT_BANDWIDTH = 6,   // client bandwidth
-            AUDIO_PACKET = 8,       // audio packet
-            VIDEO_PACKET = 9,       // video packet
-            AMF3_NOTIFY = 15,       // AMF3 notification
-            AMF3_SHARED_OBJECT = 16,// AMF3 shared object
-            AMF3_INVOKE = 17,       // AMF3 invoke
-            AMF0_NOTIFY = 18,       // AMF0 notification
-            AMF0_SHARED_OBJECT = 19,// AMF0 shared object
-            AMF0_INVOKE = 20,       // AMF0 invoke
-            AGGREGATE = 22          // Aggregated messages
+            SET_CHUNK_SIZE = 1, // chunk size change
+            ABORT = 2, // abort message
+            BYTES_READ = 3, // number of bytes read
+            USER_CONTROL = 4, // user control message
+            SERVER_BANDWIDTH = 5, // server bandwidth
+            CLIENT_BANDWIDTH = 6, // client bandwidth
+            AUDIO_PACKET = 8, // audio packet
+            VIDEO_PACKET = 9, // video packet
+            AMF3_DATA = 15, // AMF3 data
+            AMF3_SHARED_OBJECT = 16, // AMF3 shared object
+            AMF3_INVOKE = 17, // AMF3 data
+            AMF0_DATA = 18, // AMF0 notification
+            AMF0_SHARED_OBJECT = 19, // AMF0 shared object
+            AMF0_INVOKE = 20, // AMF0 invoke
+            AGGREGATE = 22 // Aggregated messages
         };
 
         enum class UserControlType: uint16_t

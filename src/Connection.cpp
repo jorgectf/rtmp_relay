@@ -729,13 +729,13 @@ namespace relay
                 break;
             }
 
-            case rtmp::MessageType::AMF0_NOTIFY:
-            case rtmp::MessageType::AMF3_NOTIFY:
+            case rtmp::MessageType::AMF0_DATA:
+            case rtmp::MessageType::AMF3_DATA:
             {
                 uint32_t offset = 0;
                 uint32_t ret;
 
-                if (packet.messageType == rtmp::MessageType::AMF3_NOTIFY)
+                if (packet.messageType == rtmp::MessageType::AMF3_DATA)
                 {
                     uint8_t header;
                     ret = decodeIntBE(packet.data, offset, sizeof(uint8_t), header);
@@ -2461,11 +2461,11 @@ namespace relay
 
             if (amfVersion == amf::Version::AMF0)
             {
-                packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
+                packet.messageType = rtmp::MessageType::AMF0_DATA;
             }
             else if (amfVersion == amf::Version::AMF3)
             {
-                packet.messageType = rtmp::MessageType::AMF3_NOTIFY;
+                packet.messageType = rtmp::MessageType::AMF3_DATA;
                 packet.data.push_back(0); // using AMF0
             }
 
@@ -2511,11 +2511,11 @@ namespace relay
 
         if (amfVersion == amf::Version::AMF0)
         {
-            packet.messageType = rtmp::MessageType::AMF0_NOTIFY;
+            packet.messageType = rtmp::MessageType::AMF0_DATA;
         }
         else if (amfVersion == amf::Version::AMF3)
         {
-            packet.messageType = rtmp::MessageType::AMF3_NOTIFY;
+            packet.messageType = rtmp::MessageType::AMF3_DATA;
             packet.data.push_back(0); // using AMF0
         }
 

@@ -15,6 +15,28 @@ namespace relay
 {
     namespace rtmp
     {
+        static std::string messageTypeToString(MessageType messageType)
+        {
+            switch (messageType)
+            {
+                case rtmp::MessageType::SET_CHUNK_SIZE: return "SET_CHUNK_SIZE";
+                case rtmp::MessageType::ABORT: return "ABORT";
+                case rtmp::MessageType::BYTES_READ: return "BYTES_READ";
+                case rtmp::MessageType::USER_CONTROL: return "USER_CONTROL";
+                case rtmp::MessageType::SERVER_BANDWIDTH: return "SERVER_BANDWIDTH";
+                case rtmp::MessageType::CLIENT_BANDWIDTH: return "CLIENT_BANDWIDTH";
+                case rtmp::MessageType::AUDIO_PACKET: return "AUDIO_PACKET";
+                case rtmp::MessageType::VIDEO_PACKET: return "VIDEO_PACKET";
+                case rtmp::MessageType::AMF3_DATA: return "AMF3_DATA";
+                case rtmp::MessageType::AMF3_SHARED_OBJECT: return "AMF3_SHARED_OBJECT";
+                case rtmp::MessageType::AMF3_INVOKE: return "AMF3_INVOKE";
+                case rtmp::MessageType::AMF0_DATA: return "AMF0_DATA";
+                case rtmp::MessageType::AMF0_SHARED_OBJECT: return "AMF0_SHARED_OBJECT";
+                case rtmp::MessageType::AMF0_INVOKE: return "AMF0_INVOKE";
+                default: return "unknown";
+            };
+        }
+
         static uint32_t decodeHeader(const std::vector<uint8_t>& data, uint32_t offset, Header& header, std::map<uint32_t, rtmp::Header>& previousPackets)
         {
             uint32_t originalOffset = offset;
@@ -103,28 +125,7 @@ namespace relay
                     header.messageType = static_cast<MessageType>(*(data.data() + offset));
                     offset += 1;
 
-                    log << ", message type: ";
-
-                    switch (header.messageType)
-                    {
-                        case rtmp::MessageType::SET_CHUNK_SIZE: log << "SET_CHUNK_SIZE"; break;
-                        case rtmp::MessageType::ABORT: log << "ABORT"; break;
-                        case rtmp::MessageType::BYTES_READ: log << "BYTES_READ"; break;
-                        case rtmp::MessageType::USER_CONTROL: log << "USER_CONTROL"; break;
-                        case rtmp::MessageType::SERVER_BANDWIDTH: log << "SERVER_BANDWIDTH"; break;
-                        case rtmp::MessageType::CLIENT_BANDWIDTH: log << "CLIENT_BANDWIDTH"; break;
-                        case rtmp::MessageType::AUDIO_PACKET: log << "AUDIO_PACKET"; break;
-                        case rtmp::MessageType::VIDEO_PACKET: log << "VIDEO_PACKET"; break;
-                        case rtmp::MessageType::AMF3_NOTIFY: log << "AMF3_NOTIFY"; break;
-                        case rtmp::MessageType::AMF3_SHARED_OBJECT: log << "AMF3_SHARED_OBJECT"; break;
-                        case rtmp::MessageType::AMF3_INVOKE: log << "AMF3_INVOKE"; break;
-                        case rtmp::MessageType::AMF0_NOTIFY: log << "AMF0_NOTIFY"; break;
-                        case rtmp::MessageType::AMF0_SHARED_OBJECT: log << "AMF0_SHARED_OBJECT"; break;
-                        case rtmp::MessageType::AMF0_INVOKE: log << "AMF0_INVOKE"; break;
-                        default: log << "unknown command";
-                    };
-
-                    log << "(" << static_cast<uint32_t>(header.messageType) << ")";
+                    log << ", message type: " << messageTypeToString(header.messageType) << "(" << static_cast<uint32_t>(header.messageType) << ")";
 
                     if (header.type != Header::Type::EIGHT_BYTE)
                     {
@@ -357,28 +358,7 @@ namespace relay
                     data.insert(data.end(), static_cast<uint8_t>(header.messageType));
 
                     log << ", data length: " << header.length;
-                    log << ", message type: ";
-
-                    switch (header.messageType)
-                    {
-                        case rtmp::MessageType::SET_CHUNK_SIZE: log << "SET_CHUNK_SIZE"; break;
-                        case rtmp::MessageType::ABORT: log << "ABORT"; break;
-                        case rtmp::MessageType::BYTES_READ: log << "BYTES_READ"; break;
-                        case rtmp::MessageType::USER_CONTROL: log << "USER_CONTROL"; break;
-                        case rtmp::MessageType::SERVER_BANDWIDTH: log << "SERVER_BANDWIDTH"; break;
-                        case rtmp::MessageType::CLIENT_BANDWIDTH: log << "CLIENT_BANDWIDTH"; break;
-                        case rtmp::MessageType::AUDIO_PACKET: log << "AUDIO_PACKET"; break;
-                        case rtmp::MessageType::VIDEO_PACKET: log << "VIDEO_PACKET"; break;
-                        case rtmp::MessageType::AMF3_NOTIFY: log << "AMF3_NOTIFY"; break;
-                        case rtmp::MessageType::AMF3_SHARED_OBJECT: log << "AMF3_SHARED_OBJECT"; break;
-                        case rtmp::MessageType::AMF3_INVOKE: log << "AMF3_INVOKE"; break;
-                        case rtmp::MessageType::AMF0_NOTIFY: log << "AMF0_NOTIFY"; break;
-                        case rtmp::MessageType::AMF0_SHARED_OBJECT: log << "AMF0_SHARED_OBJECT"; break;
-                        case rtmp::MessageType::AMF0_INVOKE: log << "AMF0_INVOKE"; break;
-                        default: log << "unknown command";
-                    };
-
-                    log << "(" << static_cast<uint32_t>(header.messageType) << ")";
+                    log << ", message type: " << messageTypeToString(header.messageType) << "(" << static_cast<uint32_t>(header.messageType) << ")";
 
                     if (header.type != Header::Type::EIGHT_BYTE)
                     {
