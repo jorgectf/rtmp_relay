@@ -31,6 +31,8 @@ namespace relay
                 case Node::Type::Date: return "Date";
                 case Node::Type::XMLDocument: return "XMLDocument";
                 case Node::Type::TypedObject: return "TypedObject";
+                case Node::Type::SwitchToAMF3: return "SwitchToAMF3";
+                default: return "Invalid";
             }
         }
 
@@ -1178,6 +1180,7 @@ namespace relay
                     case Type::Date: marker = AMF0Marker::Date; break;
                     case Type::XMLDocument: marker = AMF0Marker::XMLDocument; break;
                     case Type::TypedObject: marker = AMF0Marker::TypedObject; break;
+                    case Type::SwitchToAMF3: marker = AMF0Marker::SwitchToAMF3; break;
                 }
 
                 buffer.push_back(static_cast<uint8_t>(marker));
@@ -1247,6 +1250,7 @@ namespace relay
                         ret = writeTypedObject(buffer);
                         break;
                     }
+                    case Type::SwitchToAMF3: break;
                 }
 
                 size += ret;
@@ -1270,6 +1274,7 @@ namespace relay
                     case Type::Date: marker = AMF3Marker::Date; break;
                     case Type::XMLDocument: marker = AMF3Marker::XMLDocument; break;
                     case Type::TypedObject: return 0; // typed objects are not supported
+                    case Type::SwitchToAMF3: return 0; // switch to AMF3 not supported
                 }
 
                 buffer.push_back(static_cast<uint8_t>(marker));
@@ -1327,6 +1332,7 @@ namespace relay
                     {
                         break;
                     }
+                    case Type::SwitchToAMF3: break;
                 }
 
                 size += ret;

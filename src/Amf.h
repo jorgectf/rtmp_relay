@@ -77,7 +77,8 @@ namespace relay
                 Array,
                 Date,
                 XMLDocument,
-                TypedObject
+                TypedObject,
+                SwitchToAMF3
             };
 
             Node() {}
