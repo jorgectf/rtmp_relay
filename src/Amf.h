@@ -125,6 +125,7 @@ namespace relay
                     case Type::Array: vectorValue.clear(); break;
                     case Type::Date: doubleValue = 0.0; timezone = 0; break;
                     case Type::TypedObject: break;
+                    case Type::SwitchToAMF3: break;
                 }
 
                 return *this;
@@ -277,6 +278,7 @@ namespace relay
                     case Type::Date: return std::to_string(doubleValue) + " +" + std::to_string(timezone);
                     case Type::XMLDocument: return stringValue;
                     case Type::TypedObject: return "typed object";
+                    case Type::SwitchToAMF3: return "switch to AMF3";
                 }
             }
 
