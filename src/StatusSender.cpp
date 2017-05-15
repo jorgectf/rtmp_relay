@@ -25,7 +25,7 @@ namespace relay
 
     void StatusSender::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
     {
-        const std::vector<uint8_t> clrf = { '\r', '\n' };
+        const std::vector<uint8_t> clrf = {'\r', '\n'};
 
         data.insert(data.end(), newData.begin(), newData.end());
 
