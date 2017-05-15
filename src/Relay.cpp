@@ -127,7 +127,11 @@ namespace relay
                         for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
                         {
                             std::string address = addressArray[addressIndex].as<std::string>();
-                            std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
+                            std::pair<uint32_t, uint16_t> addr;
+                            if (!Socket::getAddress(address, addr))
+                            {
+                                return false;
+                            }
 
                             connectionDescription.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
                             connectionDescription.addresses.push_back(address);
@@ -141,7 +145,11 @@ namespace relay
                     else
                     {
                         std::string address = connectionObject["address"].as<std::string>();
-                        std::pair<uint32_t, uint16_t> addr = Socket::getAddress(address);
+                        std::pair<uint32_t, uint16_t> addr;
+                        if (!Socket::getAddress(address, addr))
+                        {
+                            return false;
+                        }
 
                         connectionDescription.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
                         connectionDescription.addresses.push_back(address);
