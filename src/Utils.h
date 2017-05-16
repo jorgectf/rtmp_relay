@@ -215,7 +215,7 @@ inline void tokenize(const std::string& str, std::vector<std::string>& tokens,
 {
     std::string::size_type pos, lastPos = 0, length = str.length();
 
-    while(lastPos < length + 1)
+    while (lastPos < length + 1)
     {
         pos = str.find_first_of(delimiters, lastPos);
         if(pos == std::string::npos)
