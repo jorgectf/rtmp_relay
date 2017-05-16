@@ -218,12 +218,9 @@ inline void tokenize(const std::string& str, std::vector<std::string>& tokens,
     while (lastPos < length + 1)
     {
         pos = str.find_first_of(delimiters, lastPos);
-        if(pos == std::string::npos)
-        {
-            pos = length;
-        }
+        if (pos == std::string::npos) pos = length;
 
-        if(pos != lastPos || !trimEmpty)
+        if (pos != lastPos || !trimEmpty)
         {
             tokens.push_back(std::string(str.data() + lastPos,
                                          static_cast<std::vector<std::string>::size_type>(pos) - lastPos));
