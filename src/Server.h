@@ -14,6 +14,8 @@ namespace relay
     public:
         Server(Relay& aRelay, cppsocket::Network& aNetwork);
 
+        uint64_t getId() const { return id; }
+
         void start(const std::vector<Connection::Description>& aConnectionDescriptions);
 
         void update(float delta);
@@ -36,6 +38,8 @@ namespace relay
 
     private:
         Relay& relay;
+        const uint64_t id;
+
         cppsocket::Network& network;
         std::vector<Connection::Description> connectionDescriptions;
 

@@ -292,7 +292,7 @@ namespace relay
             case ReportType::HTML:
             {
                 str = "<html><title>Status</title><body>";
-                str += "<table><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Stream</th></tr>";
+                str += "<table><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Stream</th><th>Server ID</th></tr>";
 
                 for (const auto& connection : connections)
                 {

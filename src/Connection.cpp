@@ -174,6 +174,7 @@ namespace relay
                     case StreamType::OUTPUT: str += "OUTPUT"; break;
                 }
 
+                if (server) str += ", server: " + std::to_string(server->getId());
                 str += "\n";
 
                 break;
@@ -210,7 +211,7 @@ namespace relay
                     case StreamType::OUTPUT: str += "OUTPUT"; break;
                 }
 
-                str += "</td></tr>";
+                str += "</td><td>" + (server ? std::to_string(server->getId()) : "") + "</td></tr>";
                 break;
             }
             case ReportType::JSON:
@@ -218,7 +219,7 @@ namespace relay
                 str += "{\"id\":" + std::to_string(id) + "," +
                     "\"name\":\"" + streamName + "\","
                     "\"application\":\"" + applicationName + "\"," +
-                    "\"connected\":" + (socket.isReady() ? "true" : "false") + "," +
+                    "\"status\":" + (socket.isReady() ? "\"connected\"" : "\"not connected\"") + "," +
                     "\"address\":\"" + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + "\"," +
                     "\"connection\":";
 
@@ -248,6 +249,7 @@ namespace relay
                     case StreamType::OUTPUT: str += "\"OUTPUT\""; break;
                 }
 
+                if (server) str += ",\"serverId\":" + std::to_string(server->getId());
                 str += "}";
                 break;
             }

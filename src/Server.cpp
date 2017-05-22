@@ -13,6 +13,7 @@ namespace relay
     Server::Server(Relay& aRelay,
                    cppsocket::Network& aNetwork):
         relay(aRelay),
+        id(Relay::nextId()),
         network(aNetwork)
     {
     }

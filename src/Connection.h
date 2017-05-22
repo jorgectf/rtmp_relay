@@ -82,6 +82,7 @@ namespace relay
 
         ~Connection();
 
+        uint64_t getId() const { return id; }
         Type getType() const { return type; }
         StreamType getStreamType() const { return streamType; }
         const std::string& getApplicationName() const { return applicationName; }
