@@ -79,7 +79,7 @@ namespace relay
             if (fields[1] == "/stats" || fields[1] == "/stats.html")
             {
                 std::string info;
-                relay.getInfo(info, ReportType::HTML);
+                relay.getStats(info, ReportType::HTML);
 
                 std::string response = "HTTP/1.1 200 OK\r\n"
                     "Cache-Control: no-cache, no-store, must-revalidate\r\n"
@@ -97,7 +97,7 @@ namespace relay
             else if (fields[1] == "/stats.txt")
             {
                 std::string info;
-                relay.getInfo(info, ReportType::TEXT);
+                relay.getStats(info, ReportType::TEXT);
 
                 std::string response = "HTTP/1.1 200 OK\r\n"
                     "Cache-Control: no-cache, no-store, must-revalidate\r\n"
@@ -114,7 +114,7 @@ namespace relay
             else if (fields[1] == "/stats.json")
             {
                 std::string info;
-                relay.getInfo(info, ReportType::JSON);
+                relay.getStats(info, ReportType::JSON);
 
                 std::string response = "HTTP/1.1 200 OK\r\n"
                     "Cache-Control: no-cache, no-store, must-revalidate\r\n"

@@ -92,7 +92,7 @@ namespace relay
 
         void update(float delta);
 
-        void getInfo(std::string& str, ReportType reportType) const;
+        void getStats(std::string& str, ReportType reportType) const;
 
         void connect();
 
@@ -105,7 +105,7 @@ namespace relay
         void sendVideoHeader(const std::vector<uint8_t>& headerData);
         void sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData);
         void sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType);
-        void sendMetaData(const amf::Node& metaData);
+        void sendMetaData(const amf::Node& newMetaData);
         void sendTextData(uint64_t timestamp, const amf::Node& textData);
 
     private:
@@ -209,6 +209,7 @@ namespace relay
         uint64_t videoRate = 0;
 
         Server* server = nullptr;
+        amf::Node metaData;
         std::set<std::string> metaDataBlacklist;
 
         amf::Version amfVersion = amf::Version::AMF0;

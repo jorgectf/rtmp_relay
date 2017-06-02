@@ -19,7 +19,7 @@ namespace relay
         void start(const std::vector<Connection::Description>& aConnectionDescriptions);
 
         void update(float delta);
-        void getInfo(std::string& str, ReportType reportType) const;
+        void getStats(std::string& str, ReportType reportType) const;
 
         void startStreaming(Connection& connection);
         void stopStreaming(Connection& connection);

@@ -135,7 +135,7 @@ namespace relay
         }
     }
 
-    void Connection::getInfo(std::string& str, ReportType reportType) const
+    void Connection::getStats(std::string& str, ReportType reportType) const
     {
         switch (reportType)
         {
@@ -175,6 +175,21 @@ namespace relay
                 }
 
                 if (server) str += ", server: " + std::to_string(server->getId());
+
+                if (metaData.getType() == amf::Node::Type::Dictionary ||
+                    metaData.getType() == amf::Node::Type::Object)
+                {
+                    str += ", metadata: ";
+                    bool first = true;
+
+                    for (const std::pair<std::string, amf::Node>& value : metaData.asMap())
+                    {
+                        if (!first) str += ", ";
+                        first = false;
+                        str += value.first + " = " + value.second.toString();
+                    }
+                }
+
                 str += "\n";
 
                 break;
@@ -211,7 +226,22 @@ namespace relay
                     case StreamType::OUTPUT: str += "OUTPUT"; break;
                 }
 
-                str += "</td><td>" + (server ? std::to_string(server->getId()) : "") + "</td></tr>";
+                str += "</td><td>" + (server ? std::to_string(server->getId()) : "") + "</td><td>";
+
+                if (metaData.getType() == amf::Node::Type::Dictionary ||
+                    metaData.getType() == amf::Node::Type::Object)
+                {
+                    bool first = true;
+
+                    for (const std::pair<std::string, amf::Node>& value : metaData.asMap())
+                    {
+                        if (!first) str += "<br/>";
+                        first = false;
+                        str += value.first + " = " + value.second.toString();
+                    }
+                }
+
+                str += "</td></tr>";
                 break;
             }
             case ReportType::JSON:
@@ -250,6 +280,23 @@ namespace relay
                 }
 
                 if (server) str += ",\"serverId\":" + std::to_string(server->getId());
+
+                if (metaData.getType() == amf::Node::Type::Dictionary ||
+                    metaData.getType() == amf::Node::Type::Object)
+                {
+                    str += ",\"metaData\":{";
+                    bool first = true;
+
+                    for (const std::pair<std::string, amf::Node>& value : metaData.asMap())
+                    {
+                        if (!first) str += ", ";
+                        first = false;
+                        str += "\"" + value.first + "\":\"" + value.second.toString() + "\"";
+                    }
+
+                    str += "}";
+                }
+
                 str += "}";
                 break;
             }
@@ -798,21 +845,30 @@ namespace relay
                         argument2.dump(log);
                     }
 
-                    if (command.asString() == "@setDataFrame" && argument1.asString() == "onMetaData")
+                    if (command.asString() == "@setDataFrame" &&
+                        argument1.asString() == "onMetaData" &&
+                        (argument2.getType() == amf::Node::Type::Dictionary ||
+                         argument2.getType() == amf::Node::Type::Object))
                     {
-                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(argument2["audiocodecid"].asUInt32()));
-                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(argument2["videocodecid"].asUInt32()));
+                        metaData = argument2;
+
+                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
 
                         // forward notify packet
-                        if (server) server->sendMetaData(argument2);
+                        if (server) server->sendMetaData(metaData);
                     }
-                    else if (command.asString() == "onMetaData")
+                    else if (command.asString() == "onMetaData" &&
+                             (argument1.getType() == amf::Node::Type::Dictionary ||
+                              argument1.getType() == amf::Node::Type::Object))
                     {
-                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(argument1["audiocodecid"].asUInt32()));
-                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(argument1["videocodecid"].asUInt32()));
+                        metaData = argument1;
+
+                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
 
                         // forward notify packet
-                        if (server) server->sendMetaData(argument2);
+                        if (server) server->sendMetaData(metaData);
                     }
                     else if (command.asString() == "onTextData")
                     {
@@ -2452,10 +2508,22 @@ namespace relay
         }
     }
 
-    void Connection::sendMetaData(const amf::Node& metaData)
+    void Connection::sendMetaData(const amf::Node& newMetaData)
     {
-        if (metaData.getType() == amf::Node::Type::Dictionary)
+        if (newMetaData.getType() == amf::Node::Type::Dictionary ||
+            newMetaData.getType() == amf::Node::Type::Object)
         {
+            metaData = amf::Node::Type::Dictionary;
+
+            for (const std::pair<std::string, amf::Node>& value : newMetaData.asMap())
+            {
+                // not in the blacklist
+                if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
+                {
+                    metaData[value.first] = value.second;
+                }
+            }
+
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
             packet.messageStreamId = streamId;
@@ -2477,18 +2545,7 @@ namespace relay
             amf::Node argument1 = std::string("onMetaData");
             argument1.encode(amf::Version::AMF0, packet.data);
 
-            amf::Node filteredMetaData = amf::Node::Type::Dictionary;
-
-            for (auto value : metaData.asMap())
-            {
-                /// not in the blacklist
-                if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
-                {
-                    filteredMetaData[value.first] = value.second;
-                }
-            }
-
-            amf::Node argument2 = filteredMetaData;
+            amf::Node argument2 = metaData;
             argument2.encode(amf::Version::AMF0, packet.data);
 
             std::vector<uint8_t> buffer;

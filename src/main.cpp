@@ -45,7 +45,7 @@ static void signalHandler(int signo)
         case SIGUSR1:
         {
             std::string str;
-            rel.getInfo(str, ReportType::TEXT);
+            rel.getStats(str, ReportType::TEXT);
             Log(Log::Level::INFO) << str;
             break;
         }

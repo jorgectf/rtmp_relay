@@ -37,7 +37,7 @@ namespace relay
 
         void run();
 
-        void getInfo(std::string& str, ReportType reportType) const;
+        void getStats(std::string& str, ReportType reportType) const;
 
         void openLog();
         void closeLog();

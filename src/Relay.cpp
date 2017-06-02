@@ -271,7 +271,7 @@ namespace relay
         }
     }
 
-    void Relay::getInfo(std::string& str, ReportType reportType) const
+    void Relay::getStats(std::string& str, ReportType reportType) const
     {
         switch (reportType)
         {
@@ -280,28 +280,28 @@ namespace relay
                 str = "Connections:\n";
                 for (const auto& connection : connections)
                 {
-                    connection->getInfo(str, reportType);
+                    connection->getStats(str, reportType);
                 }
 
                 for (const auto& server : servers)
                 {
-                    server->getInfo(str, reportType);
+                    server->getStats(str, reportType);
                 }
                 break;
             }
             case ReportType::HTML:
             {
                 str = "<html><title>Status</title><body>";
-                str += "<table><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Stream</th><th>Server ID</th></tr>";
+                str += "<table border=\"1\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Stream</th><th>Server ID</th><th>Meta data</th></tr>";
 
                 for (const auto& connection : connections)
                 {
-                    connection->getInfo(str, reportType);
+                    connection->getStats(str, reportType);
                 }
 
                 for (const auto& server : servers)
                 {
-                    server->getInfo(str, reportType);
+                    server->getStats(str, reportType);
                 }
 
                 str += "</table>";
@@ -319,14 +319,14 @@ namespace relay
                 {
                     if (!first) str += ",";
                     first = false;
-                    connection->getInfo(str, reportType);
+                    connection->getStats(str, reportType);
                 }
 
                 for (const auto& server : servers)
                 {
                     if (!first) str += ",";
                     first = false;
-                    server->getInfo(str, reportType);
+                    server->getStats(str, reportType);
                 }
 
                 str += "]}";

@@ -62,7 +62,7 @@ namespace relay
         }
     }
 
-    void Server::getInfo(std::string& str, ReportType reportType) const
+    void Server::getStats(std::string& str, ReportType reportType) const
     {
         switch (reportType)
         {
@@ -70,7 +70,7 @@ namespace relay
             {
                 for (const auto& connection : connections)
                 {
-                    connection->getInfo(str, reportType);
+                    connection->getStats(str, reportType);
                 }
                 break;
             }
@@ -78,7 +78,7 @@ namespace relay
             {
                 for (const auto& connection : connections)
                 {
-                    connection->getInfo(str, reportType);
+                    connection->getStats(str, reportType);
                 }
                 break;
             }
@@ -90,7 +90,7 @@ namespace relay
                 {
                     if (!first) str += ",";
                     first = false;
-                    connection->getInfo(str, reportType);
+                    connection->getStats(str, reportType);
                 }
                 break;
             }
