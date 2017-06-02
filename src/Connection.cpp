@@ -291,7 +291,18 @@ namespace relay
                     {
                         if (!first) str += ", ";
                         first = false;
-                        str += "\"" + value.first + "\":\"" + value.second.toString() + "\"";
+                        if (value.second.getType() == amf::Node::Type::Boolean)
+                        {
+                            str += "\"" + escapeString(value.first) + "\":" + (value.second.asBool() ? "true" : "false");
+                        }
+                        else if (value.second.isNumber())
+                        {
+                            str += "\"" + escapeString(value.first) + "\":" + value.second.toString();
+                        }
+                        else
+                        {
+                            str += "\"" + escapeString(value.first) + "\":\"" + escapeString(value.second.toString()) + "\"";
+                        }
                     }
 
                     str += "}";

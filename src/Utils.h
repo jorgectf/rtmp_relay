@@ -230,6 +230,36 @@ inline void tokenize(const std::string& str, std::vector<std::string>& tokens,
     }
 }
 
+inline std::string escapeString(const std::string& str)
+{
+    std::map<char, std::string> replace = {
+        {'\b', "\\b"},
+        {'\f', "\\f"},
+        {'\n', "\\n"},
+        {'\r', "\\r"},
+        {'"', "\\\""},
+        {'\\', "\\\\"}
+    };
+
+    std::string result;
+
+    for (char c : str)
+    {
+        std::map<char, std::string>::iterator i = replace.find(c);
+
+        if (i == replace.end())
+        {
+            result.push_back(c);
+        }
+        else
+        {
+            result += i->second;
+        }
+    }
+
+    return result;
+}
+
 enum class AudioCodec
 {
     ADPCM            = 1,

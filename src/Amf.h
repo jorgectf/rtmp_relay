@@ -247,6 +247,12 @@ namespace relay
                 return type == Type::Undefined;
             }
 
+            bool isNumber() const
+            {
+                return type == Type::Integer ||
+                    type == Type::Double;
+            }
+
             const std::vector<Node>& asVector() const
             {
                 assert(type == Type::Array);
