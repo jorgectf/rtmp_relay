@@ -89,8 +89,9 @@ namespace relay
         invokes.clear();
         streamId = 0;
 
-        metaData = amf::Node::Type::Unknown;
+        connected = false;
         videoFrameSent = false;
+        metaData = amf::Node::Type::Unknown;
 
         if (server)
         {
@@ -99,6 +100,11 @@ namespace relay
 
             if (type != Type::CLIENT)
             {
+                streamType = StreamType::NONE;
+                applicationName.clear();
+                streamName.clear();
+                overrideApplicationName.clear();
+                overrideStreamName.clear();
                 server = nullptr;
             }
         }
