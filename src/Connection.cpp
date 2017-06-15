@@ -53,6 +53,7 @@ namespace relay
         overrideApplicationName = description.overrideApplicationName;
         overrideStreamName = description.overrideStreamName;
         amfVersion = description.amfVersion;
+        metaDataBlacklist = description.metaDataBlacklist;
 
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
@@ -105,6 +106,7 @@ namespace relay
                 streamName.clear();
                 overrideApplicationName.clear();
                 overrideStreamName.clear();
+                metaDataBlacklist.clear();
                 server = nullptr;
             }
         }
@@ -1376,6 +1378,7 @@ namespace relay
                             server = connectionDescription->server;
                             server->startReceiving(*this);
                             pingInterval = connectionDescription->pingInterval;
+                            metaDataBlacklist = connectionDescription->metaDataBlacklist;
                         }
                         else
                         {

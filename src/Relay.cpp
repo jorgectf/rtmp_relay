@@ -165,6 +165,17 @@ namespace relay
                     if (connectionObject["streamName"]) connectionDescription.streamName = connectionObject["streamName"].as<std::string>();
                     if (connectionObject["overrideApplicationName"]) connectionDescription.overrideApplicationName = connectionObject["overrideApplicationName"].as<std::string>();
                     if (connectionObject["overrideStreamName"]) connectionDescription.overrideStreamName = connectionObject["overrideStreamName"].as<std::string>();
+
+                    if (connectionObject["metaDataBlacklist"])
+                    {
+                        const YAML::Node& metaDataBlacklistArray = connectionObject["metaDataBlacklist"];
+
+                        for (size_t metaDataBlacklistIndex = 0; metaDataBlacklistIndex < metaDataBlacklistArray.size(); ++metaDataBlacklistIndex)
+                        {
+                            connectionDescription.metaDataBlacklist.insert(metaDataBlacklistArray[metaDataBlacklistIndex].as<std::string>());
+                        }
+                    }
+
                     if (connectionObject["video"]) connectionDescription.video = connectionObject["video"].as<bool>();
                     if (connectionObject["audio"]) connectionDescription.audio = connectionObject["audio"].as<bool>();
                     if (connectionObject["data"]) connectionDescription.data = connectionObject["data"].as<bool>();

@@ -55,6 +55,7 @@ namespace relay
             std::string streamName;
             std::string overrideApplicationName;
             std::string overrideStreamName;
+            std::set<std::string> metaDataBlacklist;
 
             Server* server = nullptr;
         };
