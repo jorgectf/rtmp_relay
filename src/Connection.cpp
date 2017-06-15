@@ -2556,10 +2556,22 @@ namespace relay
             for (const std::pair<std::string, amf::Node>& value : newMetaData.asMap())
             {
                 // not in the blacklist
-                if (metaDataBlacklist.find(value.first) == metaDataBlacklist.end())
-                {
-                    metaData[value.first] = value.second;
-                }
+                if (metaDataBlacklist.find(value.first) != metaDataBlacklist.end()) continue;
+
+                // don't send audio meta data if audio stream is disabled
+                if (!audioStream && (value.first == "audiocodecid" ||
+                                     value.first == "audiodatarate")) continue;
+
+                // don't send video meta data if video stream is disabled
+                if (!videoStream && (value.first == "fps" ||
+                                     value.first == "framerate" ||
+                                     value.first == "gopsize" ||
+                                     value.first == "level" ||
+                                     value.first == "profile" ||
+                                     value.first == "videocodecid" ||
+                                     value.first == "videodatarate")) continue;
+
+                metaData[value.first] = value.second;
             }
 
             rtmp::Packet packet;
