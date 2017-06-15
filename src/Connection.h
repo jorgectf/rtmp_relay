@@ -82,6 +82,8 @@ namespace relay
 
         ~Connection();
 
+        void close();
+
         uint64_t getId() const { return id; }
         Type getType() const { return type; }
         StreamType getStreamType() const { return streamType; }
@@ -109,6 +111,8 @@ namespace relay
         void sendTextData(uint64_t timestamp, const amf::Node& textData);
 
     private:
+        void reset();
+
         void handleConnect(cppsocket::Socket&);
         void handleConnectError(cppsocket::Socket&);
         void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
