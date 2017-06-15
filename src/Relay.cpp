@@ -176,9 +176,9 @@ namespace relay
                         }
                     }
 
-                    if (connectionObject["video"]) connectionDescription.video = connectionObject["video"].as<bool>();
-                    if (connectionObject["audio"]) connectionDescription.audio = connectionObject["audio"].as<bool>();
-                    if (connectionObject["data"]) connectionDescription.data = connectionObject["data"].as<bool>();
+                    if (connectionObject["video"]) connectionDescription.videoStream = connectionObject["video"].as<bool>();
+                    if (connectionObject["audio"]) connectionDescription.audioStream = connectionObject["audio"].as<bool>();
+                    if (connectionObject["data"]) connectionDescription.dataStream = connectionObject["data"].as<bool>();
                     if (connectionObject["amfVersion"]) connectionDescription.amfVersion = (connectionObject["amfVersion"].as<uint32_t>() == 3) ? amf::Version::AMF3 : amf::Version::AMF0;
 
                     connectionDescriptions.push_back(connectionDescription);

@@ -48,9 +48,9 @@ namespace relay
             uint32_t bufferSize = 3000;
             amf::Version amfVersion = amf::Version::AMF0;
 
-            bool video = true;
-            bool audio = true;
-            bool data = true;
+            bool videoStream = true;
+            bool audioStream = true;
+            bool dataStream = true;
             std::string applicationName;
             std::string streamName;
             std::string overrideApplicationName;
@@ -205,6 +205,10 @@ namespace relay
         std::string overrideApplicationName;
         std::string overrideStreamName;
         bool connected = false;
+
+        bool videoStream = true;
+        bool audioStream = true;
+        bool dataStream = true;
 
         bool videoFrameSent = false;
         float timeSinceMeasure = 0.0f;

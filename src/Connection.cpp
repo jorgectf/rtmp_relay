@@ -46,6 +46,9 @@ namespace relay
         reconnectInterval = description.reconnectInterval;
         reconnectCount = description.reconnectCount;
         bufferSize = description.bufferSize;
+        videoStream = description.videoStream;
+        audioStream = description.audioStream;
+        dataStream = description.dataStream;
         streamType = description.streamType;
         server = description.server;
         applicationName = description.applicationName;
@@ -101,6 +104,10 @@ namespace relay
 
             if (type != Type::CLIENT)
             {
+                videoStream = true;
+                audioStream = true;
+                dataStream = true;
+
                 streamType = StreamType::NONE;
                 applicationName.clear();
                 streamName.clear();
@@ -1378,6 +1385,9 @@ namespace relay
                             server = connectionDescription->server;
                             server->startReceiving(*this);
                             pingInterval = connectionDescription->pingInterval;
+                            videoStream = connectionDescription->videoStream;
+                            audioStream = connectionDescription->audioStream;
+                            dataStream = connectionDescription->dataStream;
                             metaDataBlacklist = connectionDescription->metaDataBlacklist;
                         }
                         else
@@ -2528,7 +2538,8 @@ namespace relay
 
     void Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
-        if (videoFrameSent || frameType == VideoFrameType::KEY)
+        if (videoStream &&
+            (videoFrameSent || frameType == VideoFrameType::KEY))
         {
             videoFrameSent = true;
             sendVideoData(timestamp, frameData);
@@ -2590,37 +2601,40 @@ namespace relay
 
     void Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::AUDIO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = timestamp;
-
-        if (amfVersion == amf::Version::AMF0)
+        if (dataStream)
         {
-            packet.messageType = rtmp::MessageType::AMF0_DATA;
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = streamId;
+            packet.timestamp = timestamp;
+
+            if (amfVersion == amf::Version::AMF0)
+            {
+                packet.messageType = rtmp::MessageType::AMF0_DATA;
+            }
+            else if (amfVersion == amf::Version::AMF3)
+            {
+                packet.messageType = rtmp::MessageType::AMF3_DATA;
+                packet.data.push_back(0); // using AMF0
+            }
+
+            amf::Node commandName = std::string("onTextData");
+            commandName.encode(amf::Version::AMF0, packet.data);
+
+            amf::Node argument1 = textData;
+            argument1.encode(amf::Version::AMF0, packet.data);
+
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
+
+            {
+                Log log(Log::Level::ALL);
+                log << "[" << id << ", " << name << "] " << "Sending text data: ";
+                argument1.dump(log);
+            }
+            
+            socket.send(buffer);
         }
-        else if (amfVersion == amf::Version::AMF3)
-        {
-            packet.messageType = rtmp::MessageType::AMF3_DATA;
-            packet.data.push_back(0); // using AMF0
-        }
-
-        amf::Node commandName = std::string("onTextData");
-        commandName.encode(amf::Version::AMF0, packet.data);
-
-        amf::Node argument1 = textData;
-        argument1.encode(amf::Version::AMF0, packet.data);
-
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
-
-        {
-            Log log(Log::Level::ALL);
-            log << "[" << id << ", " << name << "] " << "Sending text data: ";
-            argument1.dump(log);
-        }
-        
-        socket.send(buffer);
     }
 
     void Connection::sendGetStreamLength()
@@ -2852,37 +2866,43 @@ namespace relay
 
     void Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::AUDIO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::AUDIO_PACKET;
+        if (audioStream)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::AUDIO;
+            packet.messageStreamId = streamId;
+            packet.timestamp = timestamp;
+            packet.messageType = rtmp::MessageType::AUDIO_PACKET;
 
-        packet.data = audioData;
+            packet.data = audioData;
 
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
+            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
 
-        socket.send(buffer);
+            socket.send(buffer);
+        }
     }
 
     void Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        rtmp::Packet packet;
-        packet.channel = rtmp::Channel::VIDEO;
-        packet.messageStreamId = streamId;
-        packet.timestamp = timestamp;
-        packet.messageType = rtmp::MessageType::VIDEO_PACKET;
+        if (videoStream)
+        {
+            rtmp::Packet packet;
+            packet.channel = rtmp::Channel::VIDEO;
+            packet.messageStreamId = streamId;
+            packet.timestamp = timestamp;
+            packet.messageType = rtmp::MessageType::VIDEO_PACKET;
 
-        packet.data = videoData;
+            packet.data = videoData;
 
-        std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+            std::vector<uint8_t> buffer;
+            encodePacket(buffer, outChunkSize, packet, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
-        
-        socket.send(buffer);
+            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
+            
+            socket.send(buffer);
+        }
     }
 }
