@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <random>
 #include <map>
 #include <set>
 #include "Socket.h"
 #include "RTMP.h"
 #include "Amf.h"
+#include "MersanneTwister.h"
 #include "Status.h"
 #include "Utils.h"
 
@@ -166,8 +166,7 @@ namespace relay
         Relay& relay;
         const uint64_t id;
 
-        std::random_device rd;
-        std::mt19937 generator;
+        MersanneTwister& mersanneTwister;
         
         Type type;
         State state = State::UNINITIALIZED;

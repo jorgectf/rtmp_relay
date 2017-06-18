@@ -15,7 +15,7 @@ namespace relay
     Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType):
         relay(aRelay),
         id(Relay::nextId()),
-        generator(rd()),
+        mersanneTwister(relay.getMersanneTwister()),
         type(aType),
         socket(std::move(aSocket))
     {
@@ -400,7 +400,7 @@ namespace relay
 
             for (size_t i = 0; i < sizeof(challenge.randomBytes); ++i)
             {
-                uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
+                uint32_t randomValue = mersanneTwister.extractU32() % 255;
 
                 challenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
             }
@@ -503,7 +503,7 @@ namespace relay
 
                         for (size_t i = 0; i < sizeof(replyChallenge.randomBytes); ++i)
                         {
-                            uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
+                            uint32_t randomValue = mersanneTwister.extractU32() % 255;
                             replyChallenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
                         }
 

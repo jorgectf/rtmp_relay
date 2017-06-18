@@ -132,6 +132,7 @@
 		30BB18F01D47A43800102062 /* tag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tag.cpp; sourceTree = "<group>"; };
 		30BB18F11D47A43800102062 /* tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tag.h; sourceTree = "<group>"; };
 		30BB18F21D47A43800102062 /* token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = token.h; sourceTree = "<group>"; };
+		30C8E8451EF721D600824792 /* MersanneTwister.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MersanneTwister.h; sourceTree = "<group>"; };
 		30FA80F61C8F588500F2695E /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
 		30FA80F71C8F588500F2695E /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -174,6 +175,7 @@
 				301457011E3FA0E500BA75DB /* Connection.h */,
 				307A9A261C92311B00B4984A /* Constants.h */,
 				3009340C1C873DF200CC50D3 /* main.cpp */,
+				30C8E8451EF721D600824792 /* MersanneTwister.h */,
 				300934131C874CBA00CC50D3 /* Relay.cpp */,
 				300934141C874CBA00CC50D3 /* Relay.h */,
 				304B286B1C9C3ED900BA162D /* RTMP.cpp */,

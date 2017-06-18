@@ -11,6 +11,7 @@
 #include "Socket.h"
 #include "Status.h"
 #include "Server.h"
+#include "MersanneTwister.h"
 
 #if !defined(_MSC_VER)
 #include <sys/syslog.h>
@@ -44,6 +45,8 @@ namespace relay
 
         const Connection::Description* getConnectionDescription(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, const std::string& applicationName, const std::string& streamName) const;
 
+        MersanneTwister& getMersanneTwister() { return mersanneTwister; }
+
     private:
         void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
 
@@ -58,6 +61,8 @@ namespace relay
         std::vector<std::unique_ptr<Connection>> connections;
 
         std::vector<cppsocket::Socket> acceptors;
+
+        MersanneTwister mersanneTwister;
 
 #if !defined(_MSC_VER)
         std::string syslogIdent;
