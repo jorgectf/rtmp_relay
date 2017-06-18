@@ -183,6 +183,7 @@
     <ClInclude Include="src\Connection.h" />
     <ClInclude Include="src\Server.h" />
     <ClInclude Include="src\Amf.h" />
+    <ClInclude Include="src\MersanneTwister.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">
