@@ -13,7 +13,7 @@
 #include "Server.h"
 #include "MersanneTwister.h"
 
-#if !defined(_MSC_VER)
+#ifndef _WIN32
 #include <sys/syslog.h>
 #endif
 
@@ -64,7 +64,7 @@ namespace relay
 
         MersanneTwister mersanneTwister;
 
-#if !defined(_MSC_VER)
+#ifndef _WIN32
         std::string syslogIdent;
         int syslogFacility = LOG_USER;
 #endif

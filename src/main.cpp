@@ -7,7 +7,7 @@
 #include <signal.h>
 
 #include <sys/stat.h>
-#ifndef _MSC_VER
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 #include <fcntl.h>
@@ -23,7 +23,7 @@ static std::string config;
 cppsocket::Network network;
 Relay rel(network);
 
-#ifndef _MSC_VER
+#ifndef _WIN32
 static void signalHandler(int signo)
 {
     switch(signo)
@@ -137,7 +137,7 @@ static int daemonize(const char* lock_file)
     return EXIT_SUCCESS;
 }
 
-static int killDaemon(const char* lockFile)
+static int getPid(const char* lockFile)
 {
     int lfp = open(lockFile, O_RDONLY);
 
@@ -147,7 +147,7 @@ static int killDaemon(const char* lockFile)
         return 0;
     }
 
-    char str[20] = { 0 };
+    char str[20];
     if (read(lfp, str, sizeof(str)) == -1)
     {
         Log(Log::Level::ERR) << "Failed to read pid from the lock file";
@@ -155,16 +155,8 @@ static int killDaemon(const char* lockFile)
     }
 
     pid_t pid = atoi(str);
-
-    if (kill(pid, SIGTERM) != 0)
-    {
-        Log(Log::Level::ERR) << "Failed to kill daemon";
-        return 0;
-    }
-
+    
     close(lfp);
-
-    Log(Log::Level::INFO) << "Daemon killed";
 
     return pid;
 }
@@ -186,15 +178,26 @@ int main(int argc, const char* argv[])
         }
         else if (std::string(argv[i]) == "--kill-daemon")
         {
-#ifndef _MSC_VER
-            if (killDaemon("/var/run/rtmp_relay.pid"))
+#ifndef _WIN32
+            if (int pid = getPid("/var/run/rtmp_relay.pid"))
             {
+                if (kill(pid, SIGTERM) != 0)
+                {
+                    Log(Log::Level::ERR) << "Failed to kill daemon";
+                    return EXIT_FAILURE;
+                }
+                
+                Log(Log::Level::INFO) << "Daemon killed";
+
                 return EXIT_SUCCESS;
             }
             else
             {
                 return EXIT_FAILURE;
             }
+#else
+            Log(Log::Level::ERR) << "Daemon not supported on Windows";
+            return EXIT_FAILURE;
 #endif
         }
         else if (std::string(argv[i]) == "--help")
@@ -218,15 +221,15 @@ int main(int argc, const char* argv[])
 
     if (daemon)
     {
-#ifdef _MSC_VER
+#ifndef _WIN32
+        if (daemonize("/var/run/rtmp_relay.pid") == -1) return EXIT_FAILURE;
+#else
         Log(Log::Level::ERR) << "Daemon not supported on Windows";
         return EXIT_FAILURE;
-#else
-        if (daemonize("/var/run/rtmp_relay.pid") == -1) return EXIT_FAILURE;
 #endif
     }
 
-#ifndef _MSC_VER
+#ifndef _WIN32
     if (signal(SIGUSR1, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGUSR1";

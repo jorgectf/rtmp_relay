@@ -59,7 +59,7 @@ namespace relay
                 Log::threshold = static_cast<Log::Level>(logObject["level"].as<uint32_t>());
             }
 
-#if !defined(_MSC_VER)
+#ifndef _WIN32
             if (logObject["syslogEnabled"])
             {
                 Log::syslogEnabled = logObject["syslogEnabled"].as<bool>();
@@ -354,14 +354,14 @@ namespace relay
 
     void Relay::openLog()
     {
-#if !defined(_MSC_VER)
+#ifndef _WIN32
         openlog(syslogIdent.empty() ? nullptr : syslogIdent.c_str(), 0, syslogFacility);
 #endif
     }
 
     void Relay::closeLog()
     {
-#if !defined(_MSC_VER)
+#ifndef _WIN32
         closelog();
 #endif
     }
