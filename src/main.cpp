@@ -76,6 +76,7 @@ static bool daemonize(const char* lock_file)
         return false;
     }
 
+    // close all open file descriptors
     for (int i = getdtablesize(); i >= 0; --i)
     {
         close(i);
@@ -86,6 +87,7 @@ static bool daemonize(const char* lock_file)
     dup2(i, STDOUT_FILENO);
     dup2(i, STDERR_FILENO);
 
+    // prevent access to created files to other users
     umask(027);
 
     int lfp = open(lock_file, O_RDWR|O_CREAT, 0600);
