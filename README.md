@@ -12,7 +12,14 @@ RTMP relay uses cppsocket and yaml-cpp submodules. The following command has to 
 $ git submodule update --init
 ```
 
-To compile the RTMP relay, just run "make" in the root directory. To launch it, run "./bin/rtmp_relay --config config.yaml". You can optionally pass "--daemon" to run it as a daemon or "--kill-daemon" to kill it.
+To compile the RTMP relay, just run "make" in the root directory.
+You can pass these arguments to rtmp_realy (located in the bin directory):
+
+* *--config <config_file>* – path to config file
+* *--daemon* – run RTMP relay as daemon
+* *--kill-daemon* – kill the daemon
+* *--realod-config* – reload the daemon's configuration
+* *--help* – print the documentation
 
 # Configuration
 
