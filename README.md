@@ -64,6 +64,7 @@ Status page can be accessed in the following addresses:
 
 To configure logging, you can add "log" object to the config file. It has the following attributes
 * *level* – the log threshold level (0 for no logs and 4 for all logs)
+* *syslogEnabled* – should the syslog be used (default value is true) (on *NIX only)
 * *syslogIdent* – identification to be passed to openlog (on *NIX only)
 * *syslogFacility* – facility to be passed to openlog (on *NIX only)
 

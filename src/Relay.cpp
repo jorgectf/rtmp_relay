@@ -60,6 +60,11 @@ namespace relay
             }
 
 #if !defined(_MSC_VER)
+            if (logObject["syslogEnabled"])
+            {
+                Log::syslogEnabled = logObject["syslogEnabled"].as<bool>();
+            }
+
             if (logObject["syslogIdent"])
             {
                 syslogIdent = logObject["syslogIdent"].as<std::string>();
