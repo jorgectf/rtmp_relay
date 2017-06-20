@@ -172,6 +172,29 @@ int main(int argc, const char* argv[])
         {
             if (++i < argc) config = argv[i];
         }
+        else if (std::string(argv[i]) == "--reload-config")
+        {
+#ifndef _WIN32
+            if (int pid = getPid("/var/run/rtmp_relay.pid"))
+            {
+                if (kill(pid, SIGHUP) != 0)
+                {
+                    Log(Log::Level::ERR) << "Failed to send SIGHUP to the daemon";
+                    return EXIT_FAILURE;
+                }
+                
+                return EXIT_SUCCESS;
+            }
+            else
+            {
+                Log(Log::Level::ERR) << "Failed to get the pid of the daemon";
+                return EXIT_FAILURE;
+            }
+#else
+            Log(Log::Level::ERR) << "Daemon is not supported on Windows";
+            return EXIT_FAILURE;
+#endif
+        }
         else if (std::string(argv[i]) == "--daemon")
         {
             daemon = true;
@@ -193,10 +216,11 @@ int main(int argc, const char* argv[])
             }
             else
             {
+                Log(Log::Level::ERR) << "Failed to get the pid of the daemon";
                 return EXIT_FAILURE;
             }
 #else
-            Log(Log::Level::ERR) << "Daemon not supported on Windows";
+            Log(Log::Level::ERR) << "Daemon is not supported on Windows";
             return EXIT_FAILURE;
 #endif
         }
@@ -224,7 +248,7 @@ int main(int argc, const char* argv[])
 #ifndef _WIN32
         if (daemonize("/var/run/rtmp_relay.pid") == -1) return EXIT_FAILURE;
 #else
-        Log(Log::Level::ERR) << "Daemon not supported on Windows";
+        Log(Log::Level::ERR) << "Daemon is not supported on Windows";
         return EXIT_FAILURE;
 #endif
     }
