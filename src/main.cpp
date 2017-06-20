@@ -64,7 +64,7 @@ static bool daemonize(const char* lock_file)
         Log(Log::Level::ERR) << "Failed to fork process";
         return false;
     }
-    if (pid > 0) return true; // parent process
+    if (pid > 0) exit(EXIT_SUCCESS); // parent process
 
     rel.openLog();
 
