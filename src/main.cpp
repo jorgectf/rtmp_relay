@@ -55,16 +55,16 @@ static void signalHandler(int signo)
     }
 }
 
-static int daemonize(const char* lock_file)
+static bool daemonize(const char* lock_file)
 {
     pid_t pid = fork();
 
     if (pid < 0)
     {
         Log(Log::Level::ERR) << "Failed to fork process";
-        exit(EXIT_FAILURE);
+        return false;
     }
-    if (pid > 0) exit(EXIT_SUCCESS); // parent process
+    if (pid > 0) return true; // parent process
 
     rel.openLog();
 
@@ -73,7 +73,7 @@ static int daemonize(const char* lock_file)
     if (sid < 0)
     {
         Log(Log::Level::ERR) << "Failed to create a session";
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     for (int i = getdtablesize(); i >= 0; --i)
@@ -93,13 +93,13 @@ static int daemonize(const char* lock_file)
     if (lfp == -1)
     {
         Log(Log::Level::ERR) << "Failed to open lock file";
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     if (lockf(lfp, F_TLOCK, 0) == -1)
     {
         Log(Log::Level::ERR) << "Failed to lock the file";
-        exit(EXIT_SUCCESS);
+        return false;
     }
 
     std::string str = std::to_string(getpid());
@@ -108,33 +108,33 @@ static int daemonize(const char* lock_file)
     if (write(lfp, str.c_str(), str.length()) == -1)
     {
         Log(Log::Level::ERR) << "Failed to write pid to lock file";
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     // ignore child terminate signal
     if (signal(SIGCHLD, SIG_IGN) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to ignore SIGCHLD";
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     // hangup signal
     if (signal(SIGHUP, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGHUP";
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     // software termination signal from kill
     if (signal(SIGTERM, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGTERM";
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     Log(Log::Level::INFO) << "Daemon started, pid: " << getpid();
 
-    return EXIT_SUCCESS;
+    return true;
 }
 
 static int getPid(const char* lockFile)
@@ -246,7 +246,7 @@ int main(int argc, const char* argv[])
     if (daemon)
     {
 #ifndef _WIN32
-        if (daemonize("/var/run/rtmp_relay.pid") == -1) return EXIT_FAILURE;
+        if (!daemonize("/var/run/rtmp_relay.pid")) return EXIT_FAILURE;
 #else
         Log(Log::Level::ERR) << "Daemon is not supported on Windows";
         return EXIT_FAILURE;
