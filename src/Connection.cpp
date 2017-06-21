@@ -101,27 +101,22 @@ namespace relay
         {
             server->stopReceiving(*this);
             server->stopStreaming(*this);
-
-            if (type != Type::CLIENT)
-            {
-                videoStream = true;
-                audioStream = true;
-                dataStream = true;
-
-                streamType = StreamType::NONE;
-                applicationName.clear();
-                streamName.clear();
-                overrideApplicationName.clear();
-                overrideStreamName.clear();
-                metaDataBlacklist.clear();
-                server = nullptr;
-            }
+            server = nullptr;
         }
 
         // disconnect all host connections
         if (type == Type::HOST)
         {
+            videoStream = true;
+            audioStream = true;
+            dataStream = true;
+
             streamType = StreamType::NONE;
+            applicationName.clear();
+            streamName.clear();
+            overrideApplicationName.clear();
+            overrideStreamName.clear();
+            metaDataBlacklist.clear();
         }
     }
 
