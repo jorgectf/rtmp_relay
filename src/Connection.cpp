@@ -889,7 +889,16 @@ namespace relay
                         Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
 
                         // forward notify packet
-                        if (server) server->sendMetaData(metaData);
+                        if (server)
+                        {
+                            server->sendMetaData(metaData);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            close();
+                            return false;
+                        }
                     }
                     else if (command.asString() == "onMetaData" &&
                              (argument1.getType() == amf::Node::Type::Dictionary ||
@@ -901,11 +910,29 @@ namespace relay
                         Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
 
                         // forward notify packet
-                        if (server) server->sendMetaData(metaData);
+                        if (server)
+                        {
+                            server->sendMetaData(metaData);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            close();
+                            return false;
+                        }
                     }
                     else if (command.asString() == "onTextData")
                     {
-                        if (server) server->sendTextData(packet.timestamp, argument1);
+                        if (server)
+                        {
+                            server->sendTextData(packet.timestamp, argument1);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            close();
+                            return false;
+                        }
                     }
                 }
                 else
@@ -938,12 +965,30 @@ namespace relay
                         uint32_t sampleSize = (format & 0x02) ? 2 : 1;
                         Log(Log::Level::ALL) << "Codec: " << getAudioCodec(codec) << ", channels: " << channels << ", sampleSize: " << sampleSize * 8;
 
-                        if (server) server->sendAudioHeader(packet.data);
+                        if (server)
+                        {
+                            server->sendAudioHeader(packet.data);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            close();
+                            return false;
+                        }
                     }
                     else
                     {
                         // forward audio packet
-                        if (server) server->sendAudioFrame(packet.timestamp, packet.data);
+                        if (server)
+                        {
+                            server->sendAudioFrame(packet.timestamp, packet.data);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            close();
+                            return false;
+                        }
                     }
                 }
                 else
@@ -990,13 +1035,31 @@ namespace relay
                         VideoCodec codec = static_cast<VideoCodec>(format & 0x0f);
                         Log(Log::Level::ALL) << "Codec: " << getVideoCodec(codec);
 
-                        if (server && frameType == VideoFrameType::KEY) server->sendVideoHeader(packet.data);
-                        // do nothing if frameType is VideoFrameType::VIDEO_INFO
+                        if (server)
+                        {
+                            // do nothing if frameType is VideoFrameType::VIDEO_INFO
+                            if (frameType == VideoFrameType::KEY) server->sendVideoHeader(packet.data);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            close();
+                            return false;
+                        }
                     }
                     else
                     {
                         // forward video packet
-                        if (server) server->sendVideoFrame(packet.timestamp, packet.data, frameType);
+                        if (server)
+                        {
+                            server->sendVideoFrame(packet.timestamp, packet.data, frameType);
+                        }
+                        else
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            close();
+                            return false;
+                        }
                     }
                 }
                 else
@@ -1448,7 +1511,16 @@ namespace relay
                     {
                         if (streamType == StreamType::OUTPUT)
                         {
-                            server->startReceiving(*this);
+                            if (server)
+                            {
+                                server->startReceiving(*this);
+                            }
+                            else
+                            {
+                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                                close();
+                                return false;
+                            }
                         }
                         else
                         {
@@ -1461,7 +1533,16 @@ namespace relay
                     {
                         if (streamType == StreamType::INPUT)
                         {
-                            server->startStreaming(*this);
+                            if (server)
+                            {
+                                server->startStreaming(*this);
+                            }
+                            else
+                            {
+                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                                close();
+                                return false;
+                            }
                         }
                         else
                         {
