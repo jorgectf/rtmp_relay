@@ -34,6 +34,8 @@ namespace relay
                 case Node::Type::SwitchToAMF3: return "SwitchToAMF3";
                 default: return "Invalid";
             }
+
+            return "";
         }
 
         // decoding
