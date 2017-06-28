@@ -57,6 +57,7 @@
     <ClCompile Include="src\Server.cpp" />
     <ClCompile Include="src\Status.cpp" />
     <ClCompile Include="src\StatusSender.cpp" />
+    <ClCompile Include="src\Stream.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +94,7 @@
     <ClInclude Include="src\Server.h" />
     <ClInclude Include="src\Status.h" />
     <ClInclude Include="src\StatusSender.h" />
+    <ClInclude Include="src\Stream.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
