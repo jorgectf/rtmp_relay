@@ -9,6 +9,7 @@ SOURCES=src/Amf.cpp \
 	src/RTMP.cpp \
 	src/Status.cpp \
 	src/StatusSender.cpp \
+	src/Stream.cpp \
 	src/Utils.cpp \
 	external/cppsocket/Log.cpp \
 	external/cppsocket/Network.cpp \
