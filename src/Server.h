@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "Connection.h"
+#include "Stream.h"
 
 namespace relay
 {
@@ -57,6 +58,7 @@ namespace relay
         std::vector<uint8_t> videoHeader;
         amf::Node metaData;
 
+        std::vector<std::unique_ptr<Stream>> streams;
         std::vector<std::unique_ptr<Connection>> connections;
     };
 }
