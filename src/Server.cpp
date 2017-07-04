@@ -18,6 +18,49 @@ namespace relay
     {
     }
 
+    Stream* Server::findStream(Connection::StreamType type,
+                               const std::string& aApplicationName,
+                               const std::string& aStreamName) const
+    {
+        for (auto i = streams.begin(); i != streams.end(); ++i)
+        {
+            if ((*i)->getType() == type &&
+                (*i)->getApplicationName() == aApplicationName &&
+                (*i)->getStreamName() == aStreamName)
+            {
+                return i->get();
+            }
+        }
+
+        return nullptr;
+    }
+
+    Stream* Server::createStream(Connection::StreamType type,
+                                 const std::string& aApplicationName,
+                                 const std::string& aStreamName)
+    {
+        std::unique_ptr<Stream> stream(new Stream(type, aApplicationName, aStreamName));
+        Stream* streamPtr = stream.get();
+        streams.push_back(std::move(stream));
+
+        return streamPtr;
+    }
+
+    void Server::releaseStream(Stream* stream)
+    {
+        for (auto i = streams.begin(); i != streams.end();)
+        {
+            if (i->get() == stream)
+            {
+                i = streams.erase(i);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
+
     void Server::start(const std::vector<Connection::Description>& aConnectionDescriptions)
     {
         connectionDescriptions = aConnectionDescriptions;
