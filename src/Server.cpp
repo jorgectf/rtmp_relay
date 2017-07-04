@@ -19,14 +19,14 @@ namespace relay
     }
 
     Stream* Server::findStream(Connection::StreamType type,
-                               const std::string& aApplicationName,
-                               const std::string& aStreamName) const
+                               const std::string& applicationName,
+                               const std::string& streamName) const
     {
         for (auto i = streams.begin(); i != streams.end(); ++i)
         {
             if ((*i)->getType() == type &&
-                (*i)->getApplicationName() == aApplicationName &&
-                (*i)->getStreamName() == aStreamName)
+                (*i)->getApplicationName() == applicationName &&
+                (*i)->getStreamName() == streamName)
             {
                 return i->get();
             }
@@ -36,10 +36,10 @@ namespace relay
     }
 
     Stream* Server::createStream(Connection::StreamType type,
-                                 const std::string& aApplicationName,
-                                 const std::string& aStreamName)
+                                 const std::string& applicationName,
+                                 const std::string& streamName)
     {
-        std::unique_ptr<Stream> stream(new Stream(type, aApplicationName, aStreamName));
+        std::unique_ptr<Stream> stream(new Stream(type, applicationName, streamName));
         Stream* streamPtr = stream.get();
         streams.push_back(std::move(stream));
 

@@ -27,9 +27,6 @@ namespace relay
 
         void start(const std::vector<Connection::Description>& aConnectionDescriptions);
 
-        const std::string& getApplicationName() const { return applicationName; }
-        const std::string& getStreamName() const { return streamName; }
-
         void update(float delta);
         void getStats(std::string& str, ReportType reportType) const;
 
@@ -57,9 +54,6 @@ namespace relay
 
         Connection* inputConnection = nullptr;
         std::vector<Connection*> outputConnections;
-
-        std::string applicationName;
-        std::string streamName;
 
         bool streaming = false;
         std::vector<uint8_t> audioHeader;
