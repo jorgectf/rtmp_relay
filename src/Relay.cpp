@@ -214,8 +214,13 @@ namespace relay
         return true;
     }
 
-    const Connection::Description* Relay::getConnectionDescription(const std::pair<uint32_t, uint16_t>& address, Connection::StreamType type, const std::string& applicationName, const std::string& streamName) const
+    std::vector<const Connection::Description*> Relay::getConnectionDescriptions(const std::pair<uint32_t, uint16_t>& address,
+                                                                                 Connection::StreamType type,
+                                                                                 const std::string& applicationName,
+                                                                                 const std::string& streamName) const
     {
+        std::vector<const Connection::Description*> result;
+
         for (const std::unique_ptr<Server>& server : servers)
         {
             const std::vector<Connection::Description>& serverDescription = server->getConnectionDescriptions();
@@ -231,14 +236,14 @@ namespace relay
                                       connectionDescription.ipAddresses.end(),
                                       address) != connectionDescription.ipAddresses.end())
                         {
-                            return &connectionDescription;
+                            result.push_back(&connectionDescription);
                         }
                     }
                 }
             }
         }
 
-        return nullptr;
+        return result;
     }
 
     void Relay::close()

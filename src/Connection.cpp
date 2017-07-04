@@ -1349,10 +1349,12 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<const Connection::Description*> connectionDescriptions = relay.getConnectionDescriptions(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
-                        if (connectionDescription)
+                        if (!connectionDescriptions.empty())
                         {
+                            const Description* connectionDescription = connectionDescriptions.front();
+
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPublishStatus(transactionId.asDouble());
 
@@ -1433,10 +1435,12 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        const Description* connectionDescription = relay.getConnectionDescription(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<const Connection::Description*> connectionDescriptions = relay.getConnectionDescriptions(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
-                        if (connectionDescription)
+                        if (!connectionDescriptions.empty())
                         {
+                            const Description* connectionDescription = connectionDescriptions.front();
+
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
 
