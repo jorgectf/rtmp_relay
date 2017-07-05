@@ -17,6 +17,7 @@ namespace relay
 {
     class Relay;
     class Server;
+    class Stream;
 
     class Connection
     {
@@ -217,6 +218,7 @@ namespace relay
         uint64_t videoRate = 0;
 
         Server* server = nullptr;
+        Stream* stream = nullptr;
         amf::Node metaData;
         std::set<std::string> metaDataBlacklist;
 
