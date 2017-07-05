@@ -2,6 +2,7 @@
 //  rtmp_relay
 //
 
+#include <algorithm>
 #include "Stream.h"
 #include "Relay.h"
 #include "Server.h"
