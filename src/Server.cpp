@@ -71,6 +71,10 @@ namespace relay
             {
                 Socket socket(network);
 
+                createStream(connectionDescription.streamType,
+                             connectionDescription.applicationName,
+                             connectionDescription.streamName);
+
                 std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                          socket,
                                                                          connectionDescription));
