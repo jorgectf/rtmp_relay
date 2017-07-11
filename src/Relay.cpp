@@ -186,6 +186,16 @@ namespace relay
                     if (connectionObject["data"]) connectionDescription.dataStream = connectionObject["data"].as<bool>();
                     if (connectionObject["amfVersion"]) connectionDescription.amfVersion = (connectionObject["amfVersion"].as<uint32_t>() == 3) ? amf::Version::AMF3 : amf::Version::AMF0;
 
+                    if (connectionDescription.type == Connection::Type::CLIENT)
+                    {
+                        if (connectionDescription.applicationName.empty() ||
+                            connectionDescription.streamName.empty())
+                        {
+                            Log(Log::Level::ERR) << "Client streams can not have mepty application name or stream name";
+                            return false;
+                        }
+                    }
+
                     connectionDescriptions.push_back(connectionDescription);
                 }
             }
