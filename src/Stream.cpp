@@ -40,8 +40,7 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            outputConnection->createStream(inputConnection->getApplicationName(),
-                                           inputConnection->getStreamName());
+            outputConnection->setStream(this);
         }
 
         for (const Endpoint& endpoint : server.getEndpoints())
@@ -55,8 +54,7 @@ namespace relay
                                                                          socket,
                                                                          endpoint));
 
-                newConnection->createStream(inputConnection->getApplicationName(),
-                                            inputConnection->getStreamName());
+                newConnection->setStream(this);
 
                 newConnection->connect();
 
@@ -92,8 +90,7 @@ namespace relay
 
             if (streaming)
             {
-                connection.createStream(inputConnection->getApplicationName(),
-                                        inputConnection->getStreamName());
+                connection.setStream(this);
 
                 if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
                 if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);

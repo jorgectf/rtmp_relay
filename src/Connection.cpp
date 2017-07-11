@@ -1687,22 +1687,23 @@ namespace relay
         return true;
     }
 
-    void Connection::createStream(const std::string& newApplicationName,
-                                  const std::string& newStreamName)
+    void Connection::setStream(Stream* aStream)
     {
+        stream = aStream;
+
         if (overrideApplicationName.empty())
         {
             if (applicationName.empty())
             {
-                applicationName = newApplicationName;
+                applicationName = stream->getApplicationName();
             }
         }
         else
         {
             std::map<std::string, std::string> tokens = {
                 {"id", std::to_string(id)},
-                {"streamName", newStreamName},
-                {"applicationName", newApplicationName},
+                {"streamName", stream->getStreamName()},
+                {"applicationName", stream->getApplicationName()},
                 {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
                 {"port", std::to_string(socket.getRemotePort())}
             };
@@ -1715,15 +1716,15 @@ namespace relay
         {
             if (streamName.empty())
             {
-                streamName = newStreamName;
+                streamName = stream->getStreamName();
             }
         }
         else
         {
             std::map<std::string, std::string> tokens = {
                 {"id", std::to_string(id)},
-                {"streamName", newStreamName},
-                {"applicationName", newApplicationName},
+                {"streamName", stream->getStreamName()},
+                {"applicationName", stream->getApplicationName()},
                 {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
                 {"port", std::to_string(socket.getRemotePort())}
             };

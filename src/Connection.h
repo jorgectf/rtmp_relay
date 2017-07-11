@@ -70,8 +70,7 @@ namespace relay
 
         void connect();
 
-        void createStream(const std::string& newApplicationName,
-                          const std::string& newStreamName);
+        void setStream(Stream* aStream);
         void deleteStream();
         void unpublishStream();
 
