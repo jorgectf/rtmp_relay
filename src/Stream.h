@@ -72,6 +72,6 @@ namespace relay
         std::vector<uint8_t> videoHeader;
         amf::Node metaData;
 
-        std::vector<Connection> connections;
+        std::vector<std::unique_ptr<Connection>> connections;
     };
 }

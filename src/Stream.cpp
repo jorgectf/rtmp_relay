@@ -60,7 +60,7 @@ namespace relay
 
                 newConnection->connect();
 
-                //connections.push_back(std::move(newConnection));
+                connections.push_back(std::move(newConnection));
             }
         }
     }
