@@ -286,6 +286,8 @@ namespace relay
                     case Type::TypedObject: return "typed object";
                     case Type::SwitchToAMF3: return "switch to AMF3";
                 }
+
+                return "";
             }
 
             double getMs() const

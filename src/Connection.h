@@ -19,7 +19,7 @@ namespace relay
     class Relay;
     class Server;
     class Stream;
-    class Endpoint;
+    struct Endpoint;
 
     class Connection
     {

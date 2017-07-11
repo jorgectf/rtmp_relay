@@ -186,6 +186,7 @@
     <ClInclude Include="src\Amf.h" />
     <ClInclude Include="src\MersanneTwister.h" />
     <ClInclude Include="src\Stream.h" />
+    <ClInclude Include="src\Endpoint.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="cppsocket">
