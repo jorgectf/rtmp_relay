@@ -60,27 +60,27 @@ namespace relay
         }
     }
 
-    void Server::start(const std::vector<Connection::Description>& aConnectionDescriptions)
+    void Server::start(const std::vector<Endpoint>& aEndpoints)
     {
-        connectionDescriptions = aConnectionDescriptions;
+        endpoints = aEndpoints;
 
-        for (const Connection::Description& connectionDescription : connectionDescriptions)
+        for (const Endpoint& endpoint : endpoints)
         {
-            if (connectionDescription.connectionType == Connection::Type::CLIENT &&
-                connectionDescription.streamType == Stream::Type::INPUT)
+            if (endpoint.connectionType == Connection::Type::CLIENT &&
+                endpoint.streamType == Stream::Type::INPUT)
             {
                 Socket socket(network);
 
-                createStream(connectionDescription.streamType,
-                             connectionDescription.applicationName,
-                             connectionDescription.streamName);
+                createStream(endpoint.streamType,
+                             endpoint.applicationName,
+                             endpoint.streamName);
 
                 std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                          socket,
-                                                                         connectionDescription));
+                                                                         endpoint));
 
-                newConnection->createStream(connectionDescription.applicationName,
-                                            connectionDescription.streamName);
+                newConnection->createStream(endpoint.applicationName,
+                                            endpoint.streamName);
 
                 newConnection->connect();
 

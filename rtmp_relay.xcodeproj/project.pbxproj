@@ -70,6 +70,7 @@
 		300934141C874CBA00CC50D3 /* Relay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Relay.h; sourceTree = "<group>"; };
 		301457001E3FA0E500BA75DB /* Connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Connection.cpp; sourceTree = "<group>"; };
 		301457011E3FA0E500BA75DB /* Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Connection.h; sourceTree = "<group>"; };
+		3022B9481F14FEF5006EB235 /* Endpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Endpoint.h; sourceTree = "<group>"; };
 		3030D5121DAF8C94007CC8EB /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		3030D5131DAF8C94007CC8EB /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		3030D6E71DB7AADE007CC8EB /* Status.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Status.cpp; sourceTree = "<group>"; };
@@ -177,6 +178,7 @@
 				301457001E3FA0E500BA75DB /* Connection.cpp */,
 				301457011E3FA0E500BA75DB /* Connection.h */,
 				307A9A261C92311B00B4984A /* Constants.h */,
+				3022B9481F14FEF5006EB235 /* Endpoint.h */,
 				3009340C1C873DF200CC50D3 /* main.cpp */,
 				30C8E8451EF721D600824792 /* MersanneTwister.h */,
 				300934131C874CBA00CC50D3 /* Relay.cpp */,

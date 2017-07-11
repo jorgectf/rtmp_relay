@@ -11,6 +11,7 @@
 #include "Socket.h"
 #include "Status.h"
 #include "Server.h"
+#include "Endpoint.h"
 #include "MersanneTwister.h"
 
 #ifndef _WIN32
@@ -43,10 +44,10 @@ namespace relay
         void openLog();
         void closeLog();
 
-        std::vector<const Connection::Description*> getConnectionDescriptions(const std::pair<uint32_t, uint16_t>& address,
-                                                                              Stream::Type type,
-                                                                              const std::string& applicationName,
-                                                                              const std::string& streamName) const;
+        std::vector<const Endpoint*> getEndpoints(const std::pair<uint32_t, uint16_t>& address,
+                                                  Stream::Type type,
+                                                  const std::string& applicationName,
+                                                  const std::string& streamName) const;
 
         MersanneTwister& getMersanneTwister() { return mersanneTwister; }
 

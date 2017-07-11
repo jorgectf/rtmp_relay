@@ -105,29 +105,29 @@ namespace relay
 
         for (size_t serverIndex = 0; serverIndex < serversArray.size(); ++serverIndex)
         {
-            std::vector<Connection::Description> connectionDescriptions;
+            std::vector<Endpoint> endpoints;
             
             const YAML::Node& serverObject = serversArray[serverIndex];
 
-            if (serverObject["connections"])
+            if (serverObject["endpoints"])
             {
-                const YAML::Node& connectionsArray = serverObject["connections"];
+                const YAML::Node& endpointsArray = serverObject["endpoints"];
 
-                for (size_t connectionsIndex = 0; connectionsIndex < connectionsArray.size(); ++connectionsIndex)
+                for (size_t endpointIndex = 0; endpointIndex < endpointsArray.size(); ++endpointIndex)
                 {
-                    const YAML::Node& connectionObject = connectionsArray[connectionsIndex];
+                    const YAML::Node& endpointObject = endpointsArray[endpointIndex];
 
-                    Connection::Description connectionDescription;
+                    Endpoint endpoint;
 
-                    if (connectionObject["type"].as<std::string>() == "host") connectionDescription.connectionType = Connection::Type::HOST;
-                    else if (connectionObject["type"].as<std::string>() == "client") connectionDescription.connectionType = Connection::Type::CLIENT;
+                    if (endpointObject["type"].as<std::string>() == "host") endpoint.connectionType = Connection::Type::HOST;
+                    else if (endpointObject["type"].as<std::string>() == "client") endpoint.connectionType = Connection::Type::CLIENT;
 
-                    if (connectionObject["stream"].as<std::string>() == "input") connectionDescription.streamType = Stream::Type::INPUT;
-                    else if (connectionObject["stream"].as<std::string>() == "output") connectionDescription.streamType = Stream::Type::OUTPUT;
+                    if (endpointObject["stream"].as<std::string>() == "input") endpoint.streamType = Stream::Type::INPUT;
+                    else if (endpointObject["stream"].as<std::string>() == "output") endpoint.streamType = Stream::Type::OUTPUT;
 
-                    if (connectionObject["address"].IsSequence())
+                    if (endpointObject["address"].IsSequence())
                     {
-                        const YAML::Node& addressArray = connectionObject["address"];
+                        const YAML::Node& addressArray = endpointObject["address"];
 
                         for (size_t addressIndex = 0; addressIndex < addressArray.size(); ++addressIndex)
                         {
@@ -138,10 +138,10 @@ namespace relay
                                 return false;
                             }
 
-                            connectionDescription.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
-                            connectionDescription.addresses.push_back(address);
+                            endpoint.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
+                            endpoint.addresses.push_back(address);
 
-                            if (connectionDescription.connectionType == Connection::Type::HOST)
+                            if (endpoint.connectionType == Connection::Type::HOST)
                             {
                                 listenAddresses.insert(address);
                             }
@@ -149,66 +149,77 @@ namespace relay
                     }
                     else
                     {
-                        std::string address = connectionObject["address"].as<std::string>();
+                        std::string address = endpointObject["address"].as<std::string>();
                         std::pair<uint32_t, uint16_t> addr;
                         if (!Socket::getAddress(address, addr))
                         {
                             return false;
                         }
 
-                        connectionDescription.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
-                        connectionDescription.addresses.push_back(address);
+                        endpoint.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
+                        endpoint.addresses.push_back(address);
                     }
 
-                    if (connectionObject["connectionTimeout"]) connectionDescription.connectionTimeout = connectionObject["connectionTimeout"].as<float>();
-                    if (connectionObject["reconnectInterval"]) connectionDescription.reconnectInterval = connectionObject["reconnectInterval"].as<float>();
-                    if (connectionObject["reconnectCount"]) connectionDescription.reconnectCount = connectionObject["reconnectCount"].as<uint32_t>();
-                    if (connectionObject["pingInterval"]) connectionDescription.pingInterval = connectionObject["pingInterval"].as<float>();
-                    if (connectionObject["bufferSize"]) connectionDescription.bufferSize = connectionObject["bufferSize"].as<uint32_t>();
+                    if (endpointObject["connectionTimeout"]) endpoint.connectionTimeout = endpointObject["connectionTimeout"].as<float>();
+                    if (endpointObject["reconnectInterval"]) endpoint.reconnectInterval = endpointObject["reconnectInterval"].as<float>();
+                    if (endpointObject["reconnectCount"]) endpoint.reconnectCount = endpointObject["reconnectCount"].as<uint32_t>();
+                    if (endpointObject["pingInterval"]) endpoint.pingInterval = endpointObject["pingInterval"].as<float>();
+                    if (endpointObject["bufferSize"]) endpoint.bufferSize = endpointObject["bufferSize"].as<uint32_t>();
 
-                    if (connectionObject["applicationName"]) connectionDescription.applicationName = connectionObject["applicationName"].as<std::string>();
-                    if (connectionObject["streamName"]) connectionDescription.streamName = connectionObject["streamName"].as<std::string>();
-                    if (connectionObject["overrideApplicationName"]) connectionDescription.overrideApplicationName = connectionObject["overrideApplicationName"].as<std::string>();
-                    if (connectionObject["overrideStreamName"]) connectionDescription.overrideStreamName = connectionObject["overrideStreamName"].as<std::string>();
+                    if (endpointObject["applicationName"]) endpoint.applicationName = endpointObject["applicationName"].as<std::string>();
+                    if (endpointObject["streamName"]) endpoint.streamName = endpointObject["streamName"].as<std::string>();
+                    if (endpointObject["overrideApplicationName"]) endpoint.overrideApplicationName = endpointObject["overrideApplicationName"].as<std::string>();
+                    if (endpointObject["overrideStreamName"]) endpoint.overrideStreamName = endpointObject["overrideStreamName"].as<std::string>();
 
-                    if (connectionObject["metaDataBlacklist"])
+                    if (endpointObject["metaDataBlacklist"])
                     {
-                        const YAML::Node& metaDataBlacklistArray = connectionObject["metaDataBlacklist"];
+                        const YAML::Node& metaDataBlacklistArray = endpointObject["metaDataBlacklist"];
 
                         for (size_t metaDataBlacklistIndex = 0; metaDataBlacklistIndex < metaDataBlacklistArray.size(); ++metaDataBlacklistIndex)
                         {
-                            connectionDescription.metaDataBlacklist.insert(metaDataBlacklistArray[metaDataBlacklistIndex].as<std::string>());
+                            endpoint.metaDataBlacklist.insert(metaDataBlacklistArray[metaDataBlacklistIndex].as<std::string>());
                         }
                     }
 
-                    if (connectionObject["video"]) connectionDescription.videoStream = connectionObject["video"].as<bool>();
-                    if (connectionObject["audio"]) connectionDescription.audioStream = connectionObject["audio"].as<bool>();
-                    if (connectionObject["data"]) connectionDescription.dataStream = connectionObject["data"].as<bool>();
-                    if (connectionObject["amfVersion"]) connectionDescription.amfVersion = (connectionObject["amfVersion"].as<uint32_t>() == 3) ? amf::Version::AMF3 : amf::Version::AMF0;
-
-                    if (connectionDescription.connectionType == Connection::Type::CLIENT &&
-                        connectionDescription.streamType == Stream::Type::INPUT)
+                    if (endpointObject["video"]) endpoint.videoStream = endpointObject["video"].as<bool>();
+                    if (endpointObject["audio"]) endpoint.audioStream = endpointObject["audio"].as<bool>();
+                    if (endpointObject["data"]) endpoint.dataStream = endpointObject["data"].as<bool>();
+                    if (endpointObject["amfVersion"])
                     {
-                        if (connectionDescription.applicationName.empty() ||
-                            connectionDescription.streamName.empty())
+                        switch (endpointObject["amfVersion"].as<uint32_t>())
+                        {
+                            case 0: endpoint.amfVersion = amf::Version::AMF0; break;
+                            case 3: endpoint.amfVersion = amf::Version::AMF3; break;
+                            default:
+                                Log(Log::Level::ERR) << "Invalid AMF version";
+                                break;
+                        }
+
+                    }
+
+                    if (endpoint.connectionType == Connection::Type::CLIENT &&
+                        endpoint.streamType == Stream::Type::INPUT)
+                    {
+                        if (endpoint.applicationName.empty() ||
+                            endpoint.streamName.empty())
                         {
                             Log(Log::Level::ERR) << "Client input streams can not have mepty application name or stream name";
                             return false;
                         }
                     }
 
-                    connectionDescriptions.push_back(connectionDescription);
+                    endpoints.push_back(endpoint);
                 }
             }
 
             std::unique_ptr<Server> server(new Server(*this, network));
 
-            for (Connection::Description& description : connectionDescriptions)
+            for (Endpoint& endpoint : endpoints)
             {
-                description.server = server.get();
+                endpoint.server = server.get();
             }
 
-            server->start(connectionDescriptions);
+            server->start(endpoints);
 
             servers.push_back(std::move(server));
         }
@@ -225,29 +236,29 @@ namespace relay
         return true;
     }
 
-    std::vector<const Connection::Description*> Relay::getConnectionDescriptions(const std::pair<uint32_t, uint16_t>& address,
-                                                                                 Stream::Type type,
-                                                                                 const std::string& applicationName,
-                                                                                 const std::string& streamName) const
+    std::vector<const Endpoint*> Relay::getEndpoints(const std::pair<uint32_t, uint16_t>& address,
+                                                     Stream::Type type,
+                                                     const std::string& applicationName,
+                                                     const std::string& streamName) const
     {
-        std::vector<const Connection::Description*> result;
+        std::vector<const Endpoint*> result;
 
         for (const std::unique_ptr<Server>& server : servers)
         {
-            const std::vector<Connection::Description>& serverDescription = server->getConnectionDescriptions();
+            const std::vector<Endpoint>& endpoints = server->getEndpoints();
 
-            for (const Connection::Description& connectionDescription : serverDescription)
+            for (const Endpoint& endpoint : endpoints)
             {
-                if ((connectionDescription.applicationName.empty() || connectionDescription.applicationName == applicationName) &&
-                    (connectionDescription.streamName.empty() || connectionDescription.streamName == streamName))
+                if ((endpoint.applicationName.empty() || endpoint.applicationName == applicationName) &&
+                    (endpoint.streamName.empty() || endpoint.streamName == streamName))
                 {
-                    if (connectionDescription.streamType == type)
+                    if (endpoint.streamType == type)
                     {
-                        if (std::find(connectionDescription.ipAddresses.begin(),
-                                      connectionDescription.ipAddresses.end(),
-                                      address) != connectionDescription.ipAddresses.end())
+                        if (std::find(endpoint.ipAddresses.begin(),
+                                      endpoint.ipAddresses.end(),
+                                      address) != endpoint.ipAddresses.end())
                         {
-                            result.push_back(&connectionDescription);
+                            result.push_back(&endpoint);
                         }
                     }
                 }

@@ -5,6 +5,7 @@
 #include "Connection.h"
 #include "Relay.h"
 #include "Server.h"
+#include "Endpoint.h"
 #include "Constants.h"
 #include "Log.h"
 
@@ -37,26 +38,26 @@ namespace relay
 
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
-                           const Description& description):
+                           const Endpoint& endpoint):
         Connection(aRelay, connector, Type::CLIENT)
     {
-        addresses = description.addresses;
-        ipAddresses = description.ipAddresses;
-        connectionTimeout = description.connectionTimeout;
-        reconnectInterval = description.reconnectInterval;
-        reconnectCount = description.reconnectCount;
-        bufferSize = description.bufferSize;
-        videoStream = description.videoStream;
-        audioStream = description.audioStream;
-        dataStream = description.dataStream;
-        streamType = description.streamType;
-        server = description.server;
-        applicationName = description.applicationName;
-        streamName = description.streamName;
-        overrideApplicationName = description.overrideApplicationName;
-        overrideStreamName = description.overrideStreamName;
-        amfVersion = description.amfVersion;
-        metaDataBlacklist = description.metaDataBlacklist;
+        addresses = endpoint.addresses;
+        ipAddresses = endpoint.ipAddresses;
+        connectionTimeout = endpoint.connectionTimeout;
+        reconnectInterval = endpoint.reconnectInterval;
+        reconnectCount = endpoint.reconnectCount;
+        bufferSize = endpoint.bufferSize;
+        videoStream = endpoint.videoStream;
+        audioStream = endpoint.audioStream;
+        dataStream = endpoint.dataStream;
+        streamType = endpoint.streamType;
+        server = endpoint.server;
+        applicationName = endpoint.applicationName;
+        streamName = endpoint.streamName;
+        overrideApplicationName = endpoint.overrideApplicationName;
+        overrideStreamName = endpoint.overrideStreamName;
+        amfVersion = endpoint.amfVersion;
+        metaDataBlacklist = endpoint.metaDataBlacklist;
 
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
@@ -1354,17 +1355,17 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        std::vector<const Connection::Description*> connectionDescriptions = relay.getConnectionDescriptions(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<const Endpoint*> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
-                        if (!connectionDescriptions.empty())
+                        if (!endpoints.empty())
                         {
-                            const Description* connectionDescription = connectionDescriptions.front();
+                            const Endpoint* endpoint = endpoints.front();
 
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPublishStatus(transactionId.asDouble());
 
-                            server = connectionDescription->server;
-                            pingInterval = connectionDescription->pingInterval;
+                            server = endpoint->server;
+                            pingInterval = endpoint->pingInterval;
 
                             stream = server->findStream(streamType, applicationName, streamName);
                             if (!stream) stream = server->createStream(streamType, applicationName, streamName);
@@ -1443,26 +1444,26 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        std::vector<const Connection::Description*> connectionDescriptions = relay.getConnectionDescriptions(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<const Endpoint*> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
-                        if (!connectionDescriptions.empty())
+                        if (!endpoints.empty())
                         {
-                            const Description* connectionDescription = connectionDescriptions.front();
+                            const Endpoint* endpoint = endpoints.front();
 
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
 
-                            server = connectionDescription->server;
+                            server = endpoint->server;
 
                             stream = server->findStream(streamType, applicationName, streamName);
                             if (!stream) stream = server->createStream(streamType, applicationName, streamName);
 
                             stream->startReceiving(*this);
-                            pingInterval = connectionDescription->pingInterval;
-                            videoStream = connectionDescription->videoStream;
-                            audioStream = connectionDescription->audioStream;
-                            dataStream = connectionDescription->dataStream;
-                            metaDataBlacklist = connectionDescription->metaDataBlacklist;
+                            pingInterval = endpoint->pingInterval;
+                            videoStream = endpoint->videoStream;
+                            audioStream = endpoint->audioStream;
+                            dataStream = endpoint->dataStream;
+                            metaDataBlacklist = endpoint->metaDataBlacklist;
                         }
                         else
                         {

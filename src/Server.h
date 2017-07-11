@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "Connection.h"
+#include "Endpoint.h"
 #include "Stream.h"
 
 namespace relay
@@ -25,19 +26,19 @@ namespace relay
                              const std::string& streamName);
         void releaseStream(Stream* stream);
 
-        void start(const std::vector<Connection::Description>& aConnectionDescriptions);
+        void start(const std::vector<Endpoint>& aEndpoints);
 
         void update(float delta);
         void getStats(std::string& str, ReportType reportType) const;
 
-        const std::vector<Connection::Description>& getConnectionDescriptions() const { return connectionDescriptions; }
+        const std::vector<Endpoint>& getEndpoints() const { return endpoints; }
 
     private:
         Relay& relay;
         const uint64_t id;
 
         cppsocket::Network& network;
-        std::vector<Connection::Description> connectionDescriptions;
+        std::vector<Endpoint> endpoints;
 
         std::vector<std::unique_ptr<Stream>> streams;
         std::vector<std::unique_ptr<Connection>> connections;

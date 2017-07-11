@@ -44,16 +44,16 @@ namespace relay
                                            inputConnection->getStreamName());
         }
 
-        for (const Connection::Description& connectionDescription : server.getConnectionDescriptions())
+        for (const Endpoint& endpoint : server.getEndpoints())
         {
-            if (connectionDescription.connectionType == Connection::Type::CLIENT &&
-                connectionDescription.streamType == Type::OUTPUT)
+            if (endpoint.connectionType == Connection::Type::CLIENT &&
+                endpoint.streamType == Type::OUTPUT)
             {
                 Socket socket(network);
 
                 std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                          socket,
-                                                                         connectionDescription));
+                                                                         endpoint));
 
                 newConnection->createStream(inputConnection->getApplicationName(),
                                             inputConnection->getStreamName());
