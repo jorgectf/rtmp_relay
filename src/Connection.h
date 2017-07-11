@@ -11,6 +11,7 @@
 #include "Amf.h"
 #include "MersanneTwister.h"
 #include "Status.h"
+#include "Stream.h"
 #include "Utils.h"
 
 namespace relay
@@ -29,17 +30,10 @@ namespace relay
             CLIENT
         };
 
-        enum class StreamType
-        {
-            NONE,
-            INPUT,
-            OUTPUT
-        };
-
         struct Description
         {
             Type type;
-            StreamType streamType;
+            Stream::Type streamType;
             std::vector<std::pair<uint32_t, uint16_t>> ipAddresses;
             std::vector<std::string> addresses;
             float connectionTimeout = 5.0f;
@@ -88,7 +82,7 @@ namespace relay
 
         uint64_t getId() const { return id; }
         Type getType() const { return type; }
-        StreamType getStreamType() const { return streamType; }
+        Stream::Type getStreamType() const { return streamType; }
         const std::string& getApplicationName() const { return applicationName; }
         const std::string& getStreamName() const { return streamName; }
 
@@ -199,7 +193,7 @@ namespace relay
 
         uint32_t streamId = 0;
 
-        StreamType streamType = StreamType::NONE;
+        Stream::Type streamType = Stream::Type::NONE;
         std::string applicationName;
         std::string streamName;
         std::string overrideApplicationName;

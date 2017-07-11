@@ -17,7 +17,7 @@ namespace relay
     {
     }
 
-    Stream* Server::findStream(Connection::StreamType type,
+    Stream* Server::findStream(Stream::Type type,
                                const std::string& applicationName,
                                const std::string& streamName) const
     {
@@ -34,7 +34,7 @@ namespace relay
         return nullptr;
     }
 
-    Stream* Server::createStream(Connection::StreamType type,
+    Stream* Server::createStream(Stream::Type type,
                                  const std::string& applicationName,
                                  const std::string& streamName)
     {
@@ -67,7 +67,7 @@ namespace relay
         for (const Connection::Description& connectionDescription : connectionDescriptions)
         {
             if (connectionDescription.type == Connection::Type::CLIENT &&
-                connectionDescription.streamType == Connection::StreamType::INPUT)
+                connectionDescription.streamType == Stream::Type::INPUT)
             {
                 Socket socket(network);
 

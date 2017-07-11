@@ -122,8 +122,8 @@ namespace relay
                     if (connectionObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
                     else if (connectionObject["type"].as<std::string>() == "client") connectionDescription.type = Connection::Type::CLIENT;
 
-                    if (connectionObject["stream"].as<std::string>() == "input") connectionDescription.streamType = Connection::StreamType::INPUT;
-                    else if (connectionObject["stream"].as<std::string>() == "output") connectionDescription.streamType = Connection::StreamType::OUTPUT;
+                    if (connectionObject["stream"].as<std::string>() == "input") connectionDescription.streamType = Stream::Type::INPUT;
+                    else if (connectionObject["stream"].as<std::string>() == "output") connectionDescription.streamType = Stream::Type::OUTPUT;
 
                     if (connectionObject["address"].IsSequence())
                     {
@@ -225,7 +225,7 @@ namespace relay
     }
 
     std::vector<const Connection::Description*> Relay::getConnectionDescriptions(const std::pair<uint32_t, uint16_t>& address,
-                                                                                 Connection::StreamType type,
+                                                                                 Stream::Type type,
                                                                                  const std::string& applicationName,
                                                                                  const std::string& streamName) const
     {

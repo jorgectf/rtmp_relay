@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include "Stream.h"
+#include "Connection.h"
 #include "Relay.h"
 #include "Server.h"
 
@@ -14,7 +15,7 @@ namespace relay
     Stream::Stream(Relay& aRelay,
                    cppsocket::Network& aNetwork,
                    Server& aServer,
-                   Connection::StreamType aType,
+                   Type aType,
                    const std::string& aApplicationName,
                    const std::string& aStreamName):
         id(Relay::nextId()),
@@ -46,7 +47,7 @@ namespace relay
         for (const Connection::Description& connectionDescription : server.getConnectionDescriptions())
         {
             if (connectionDescription.type == Connection::Type::CLIENT &&
-                connectionDescription.streamType == Connection::StreamType::OUTPUT)
+                connectionDescription.streamType == Type::OUTPUT)
             {
                 Socket socket(network);
 
@@ -117,7 +118,7 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Type::OUTPUT)
             {
                 outputConnection->sendAudioHeader(headerData);
             }
@@ -130,7 +131,7 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Type::OUTPUT)
             {
                 outputConnection->sendVideoHeader(headerData);
             }
@@ -141,7 +142,7 @@ namespace relay
     {
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Type::OUTPUT)
             {
                 outputConnection->sendAudioFrame(timestamp, audioData);
             }
@@ -152,7 +153,7 @@ namespace relay
     {
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Type::OUTPUT)
             {
                 outputConnection->sendVideoFrame(timestamp, videoData, frameType);
             }
@@ -165,7 +166,7 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Type::OUTPUT)
             {
                 outputConnection->sendMetaData(metaData);
             }
@@ -176,7 +177,7 @@ namespace relay
     {
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Connection::StreamType::OUTPUT)
+            if (outputConnection->getStreamType() == Type::OUTPUT)
             {
                 outputConnection->sendTextData(timestamp, textData);
             }

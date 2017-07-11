@@ -17,10 +17,10 @@ namespace relay
 
         uint64_t getId() const { return id; }
 
-        Stream* findStream(Connection::StreamType type,
+        Stream* findStream(Stream::Type type,
                            const std::string& applicationName,
                            const std::string& streamName) const;
-        Stream* createStream(Connection::StreamType type,
+        Stream* createStream(Stream::Type type,
                              const std::string& applicationName,
                              const std::string& streamName);
         void releaseStream(Stream* stream);

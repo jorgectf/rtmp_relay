@@ -6,24 +6,35 @@
 
 #include <string>
 #include <vector>
-#include "Connection.h"
 #include "Amf.h"
+#include "Socket.h"
+#include "Status.h"
+#include "Utils.h"
 
 namespace relay
 {
+    class Relay;
     class Server;
+    class Connection;
 
     class Stream
     {
     public:
+        enum class Type
+        {
+            NONE,
+            INPUT,
+            OUTPUT
+        };
+
         Stream(Relay& aRelay,
                cppsocket::Network& aNetwork,
                Server& aServer,
-               Connection::StreamType aType,
+               Type aType,
                const std::string& aApplicationName,
                const std::string& aStreamName);
 
-        Connection::StreamType getType() const { return type; }
+        Type getType() const { return type; }
         const std::string& getApplicationName() const { return applicationName; }
         const std::string& getStreamName() const { return streamName; }
 
@@ -49,7 +60,7 @@ namespace relay
         cppsocket::Network& network;
         Server& server;
 
-        Connection::StreamType type;
+        Type type;
         std::string applicationName;
         std::string streamName;
 

@@ -44,7 +44,7 @@ namespace relay
         void closeLog();
 
         std::vector<const Connection::Description*> getConnectionDescriptions(const std::pair<uint32_t, uint16_t>& address,
-                                                                              Connection::StreamType type,
+                                                                              Stream::Type type,
                                                                               const std::string& applicationName,
                                                                               const std::string& streamName) const;
 
