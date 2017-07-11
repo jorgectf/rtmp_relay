@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cstdint>
+#include <vector>
 #include "Connection.h"
 #include "Stream.h"
 #include "Amf.h"
