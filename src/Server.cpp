@@ -66,7 +66,7 @@ namespace relay
 
         for (const Connection::Description& connectionDescription : connectionDescriptions)
         {
-            if (connectionDescription.type == Connection::Type::CLIENT &&
+            if (connectionDescription.connectionType == Connection::Type::CLIENT &&
                 connectionDescription.streamType == Stream::Type::INPUT)
             {
                 Socket socket(network);

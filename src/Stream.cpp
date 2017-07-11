@@ -46,7 +46,7 @@ namespace relay
 
         for (const Connection::Description& connectionDescription : server.getConnectionDescriptions())
         {
-            if (connectionDescription.type == Connection::Type::CLIENT &&
+            if (connectionDescription.connectionType == Connection::Type::CLIENT &&
                 connectionDescription.streamType == Type::OUTPUT)
             {
                 Socket socket(network);

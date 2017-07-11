@@ -32,7 +32,7 @@ namespace relay
 
         struct Description
         {
-            Type type;
+            Type connectionType;
             Stream::Type streamType;
             std::vector<std::pair<uint32_t, uint16_t>> ipAddresses;
             std::vector<std::string> addresses;

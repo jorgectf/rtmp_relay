@@ -119,8 +119,8 @@ namespace relay
 
                     Connection::Description connectionDescription;
 
-                    if (connectionObject["type"].as<std::string>() == "host") connectionDescription.type = Connection::Type::HOST;
-                    else if (connectionObject["type"].as<std::string>() == "client") connectionDescription.type = Connection::Type::CLIENT;
+                    if (connectionObject["type"].as<std::string>() == "host") connectionDescription.connectionType = Connection::Type::HOST;
+                    else if (connectionObject["type"].as<std::string>() == "client") connectionDescription.connectionType = Connection::Type::CLIENT;
 
                     if (connectionObject["stream"].as<std::string>() == "input") connectionDescription.streamType = Stream::Type::INPUT;
                     else if (connectionObject["stream"].as<std::string>() == "output") connectionDescription.streamType = Stream::Type::OUTPUT;
@@ -141,7 +141,7 @@ namespace relay
                             connectionDescription.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
                             connectionDescription.addresses.push_back(address);
 
-                            if (connectionDescription.type == Connection::Type::HOST)
+                            if (connectionDescription.connectionType == Connection::Type::HOST)
                             {
                                 listenAddresses.insert(address);
                             }
@@ -186,12 +186,13 @@ namespace relay
                     if (connectionObject["data"]) connectionDescription.dataStream = connectionObject["data"].as<bool>();
                     if (connectionObject["amfVersion"]) connectionDescription.amfVersion = (connectionObject["amfVersion"].as<uint32_t>() == 3) ? amf::Version::AMF3 : amf::Version::AMF0;
 
-                    if (connectionDescription.type == Connection::Type::CLIENT)
+                    if (connectionDescription.connectionType == Connection::Type::CLIENT &&
+                        connectionDescription.streamType == Stream::Type::INPUT)
                     {
                         if (connectionDescription.applicationName.empty() ||
                             connectionDescription.streamName.empty())
                         {
-                            Log(Log::Level::ERR) << "Client streams can not have mepty application name or stream name";
+                            Log(Log::Level::ERR) << "Client input streams can not have mepty application name or stream name";
                             return false;
                         }
                     }
