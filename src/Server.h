@@ -24,7 +24,7 @@ namespace relay
         Stream* createStream(Stream::Type type,
                              const std::string& applicationName,
                              const std::string& streamName);
-        void releaseStream(Stream* stream);
+        void deleteStream(Stream* stream);
 
         void start(const std::vector<Endpoint>& aEndpoints);
 

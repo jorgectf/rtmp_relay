@@ -28,6 +28,17 @@ namespace relay
     {
     }
 
+    Stream::~Stream()
+    {
+        if (inputConnection) inputConnection->removeStream();
+
+        for (Connection* outputConnection : outputConnections)
+        {
+            outputConnection->removeStream();
+            outputConnection->unpublishStream();
+        }
+    }
+
     void Stream::getStats(std::string& str, ReportType reportType) const
     {
         // TODO: implement

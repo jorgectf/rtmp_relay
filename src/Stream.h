@@ -33,7 +33,9 @@ namespace relay
                Type aType,
                const std::string& aApplicationName,
                const std::string& aStreamName);
+        virtual ~Stream();
 
+        Server& getServer() { return server; }
         Type getType() const { return type; }
         const std::string& getApplicationName() const { return applicationName; }
         const std::string& getStreamName() const { return streamName; }

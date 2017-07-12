@@ -45,7 +45,7 @@ namespace relay
         return streamPtr;
     }
 
-    void Server::releaseStream(Stream* stream)
+    void Server::deleteStream(Stream* stream)
     {
         for (auto i = streams.begin(); i != streams.end();)
         {

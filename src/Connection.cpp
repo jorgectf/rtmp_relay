@@ -103,12 +103,18 @@ namespace relay
         {
             if (stream)
             {
-                stream->stopReceiving(*this);
-                stream->stopStreaming(*this);
+                if (streamType == Stream::Type::INPUT)
+                {
+                    // input disconnected
+                    stream->getServer().deleteStream(stream);
+                }
+                else
+                {
+                    stream->stopReceiving(*this);
+                    stream->stopStreaming(*this);
+                }
                 stream = nullptr;
             }
-
-            server = nullptr;
 
             videoStream = true;
             audioStream = true;
@@ -1456,7 +1462,13 @@ namespace relay
                             server = endpoint->server;
 
                             stream = server->findStream(streamType, applicationName, streamName);
-                            if (!stream) stream = server->createStream(streamType, applicationName, streamName);
+                            //if (!stream) stream = server->createStream(streamType, applicationName, streamName);
+                            if (!stream)
+                            {
+                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Stream not found \"" << applicationName << "/" << streamName << "\", disconnecting";
+                                close();
+                                return false;
+                            }
 
                             stream->startReceiving(*this);
                             pingInterval = endpoint->pingInterval;
