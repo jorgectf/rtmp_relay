@@ -16,6 +16,11 @@ namespace relay
     public:
         Server(Relay& aRelay, cppsocket::Network& aNetwork);
 
+        Server(const Server&) = delete;
+        Server(Server&&) = delete;
+        Server& operator=(const Server&) = delete;
+        Server& operator=(Server&&) = delete;
+
         uint64_t getId() const { return id; }
 
         Stream* findStream(Stream::Type type,

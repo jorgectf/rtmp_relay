@@ -25,7 +25,6 @@ namespace relay
 
         Status(const Status&) = delete;
         Status& operator=(const Status&) = delete;
-
         Status(Status&& other) = delete;
         Status& operator=(Status&& other) = delete;
 

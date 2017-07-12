@@ -17,6 +17,11 @@ namespace relay
                      cppsocket::Socket& aSocket,
                      Relay& aRelay);
 
+        StatusSender(const StatusSender&) = delete;
+        StatusSender(StatusSender&&) = delete;
+        StatusSender& operator=(const StatusSender&) = delete;
+        StatusSender& operator=(StatusSender&&) = delete;
+
         bool isConnected() const { return socket.isReady(); }
         
     private:
