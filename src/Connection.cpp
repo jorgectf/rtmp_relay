@@ -38,9 +38,12 @@ namespace relay
 
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
+                           Stream& aStream,
                            const Endpoint& endpoint):
         Connection(aRelay, connector, Type::CLIENT)
     {
+        stream = &aStream;
+
         addresses = endpoint.addresses;
         ipAddresses = endpoint.ipAddresses;
         connectionTimeout = endpoint.connectionTimeout;
@@ -51,7 +54,6 @@ namespace relay
         audioStream = endpoint.audioStream;
         dataStream = endpoint.dataStream;
         streamType = endpoint.streamType;
-        server = endpoint.server;
         applicationName = endpoint.applicationName;
         streamName = endpoint.streamName;
         overrideApplicationName = endpoint.overrideApplicationName;
@@ -235,7 +237,7 @@ namespace relay
                     case Stream::Type::OUTPUT: str += "OUTPUT"; break;
                 }
 
-                if (server) str += ", server: " + std::to_string(server->getId());
+                if (stream) str += ", server: " + std::to_string(stream->getServer().getId());
 
                 if (metaData.getType() == amf::Node::Type::Dictionary ||
                     metaData.getType() == amf::Node::Type::Object)
@@ -287,7 +289,7 @@ namespace relay
                     case Stream::Type::OUTPUT: str += "OUTPUT"; break;
                 }
 
-                str += "</td><td>" + (server ? std::to_string(server->getId()) : "") + "</td><td>";
+                str += "</td><td>" + (stream ? std::to_string(stream->getServer().getId()) : "") + "</td><td>";
 
                 if (metaData.getType() == amf::Node::Type::Dictionary ||
                     metaData.getType() == amf::Node::Type::Object)
@@ -340,7 +342,7 @@ namespace relay
                     case Stream::Type::OUTPUT: str += "\"OUTPUT\""; break;
                 }
 
-                if (server) str += ",\"serverId\":" + std::to_string(server->getId());
+                if (stream) str += ",\"serverId\":" + std::to_string(stream->getServer().getId());
 
                 if (metaData.getType() == amf::Node::Type::Dictionary ||
                     metaData.getType() == amf::Node::Type::Object)
@@ -1247,8 +1249,6 @@ namespace relay
                             stream->stopStreaming(*this);
                             stream = nullptr;
                         }
-
-                        server = nullptr;
                     }
                     else
                     {
@@ -1290,7 +1290,6 @@ namespace relay
                         if (type == Type::HOST)
                         {
                             stream = nullptr;
-                            server = nullptr;
                         }
 
                         sendOnFCUnpublish();
@@ -1370,9 +1369,9 @@ namespace relay
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPublishStatus(transactionId.asDouble());
 
-                            server = endpoint->server;
                             pingInterval = endpoint->pingInterval;
 
+                            Server* server = endpoint->server;
                             stream = server->findStream(streamType, applicationName, streamName);
                             if (!stream) stream = server->createStream(streamType, applicationName, streamName);
                             stream->startStreaming(*this);
@@ -1409,7 +1408,6 @@ namespace relay
 
                         if (type == Type::HOST)
                         {
-                            server = nullptr;
                             stream = nullptr;
                         }
 
@@ -1459,7 +1457,7 @@ namespace relay
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
 
-                            server = endpoint->server;
+                            Server* server = endpoint->server;
 
                             stream = server->findStream(streamType, applicationName, streamName);
                             //if (!stream) stream = server->createStream(streamType, applicationName, streamName);
@@ -1756,7 +1754,6 @@ namespace relay
 
         if (type == Type::HOST)
         {
-            server = nullptr;
             stream = nullptr;
         }
     }

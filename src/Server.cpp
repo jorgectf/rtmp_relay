@@ -77,6 +77,7 @@ namespace relay
 
                 std::unique_ptr<Connection> newConnection(new Connection(relay,
                                                                          socket,
+                                                                         *stream,
                                                                          endpoint));
 
                 newConnection->setStream(stream);
