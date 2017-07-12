@@ -212,15 +212,9 @@ namespace relay
                 }
             }
 
+            // start the server
             std::unique_ptr<Server> server(new Server(*this, network));
-
-            for (Endpoint& endpoint : endpoints)
-            {
-                endpoint.server = server.get();
-            }
-
             server->start(endpoints);
-
             servers.push_back(std::move(server));
         }
 
@@ -236,12 +230,12 @@ namespace relay
         return true;
     }
 
-    std::vector<const Endpoint*> Relay::getEndpoints(const std::pair<uint32_t, uint16_t>& address,
-                                                     Stream::Type type,
-                                                     const std::string& applicationName,
-                                                     const std::string& streamName) const
+    std::vector<std::pair<Server*, const Endpoint*>> Relay::getEndpoints(const std::pair<uint32_t, uint16_t>& address,
+                                                                         Stream::Type type,
+                                                                         const std::string& applicationName,
+                                                                         const std::string& streamName) const
     {
-        std::vector<const Endpoint*> result;
+        std::vector<std::pair<Server*, const Endpoint*>> result;
 
         for (const std::unique_ptr<Server>& server : servers)
         {
@@ -258,7 +252,7 @@ namespace relay
                                       endpoint.ipAddresses.end(),
                                       address) != endpoint.ipAddresses.end())
                         {
-                            result.push_back(&endpoint);
+                            result.push_back(std::make_pair(server.get(), &endpoint));
                         }
                     }
                 }

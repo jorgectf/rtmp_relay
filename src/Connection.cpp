@@ -1360,18 +1360,18 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        std::vector<const Endpoint*> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
                         if (!endpoints.empty())
                         {
-                            const Endpoint* endpoint = endpoints.front();
+                            Server* server = endpoints.front().first;
+                            const Endpoint* endpoint = endpoints.front().second;
 
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPublishStatus(transactionId.asDouble());
 
                             pingInterval = endpoint->pingInterval;
 
-                            Server* server = endpoint->server;
                             stream = server->findStream(streamType, applicationName, streamName);
                             if (!stream) stream = server->createStream(streamType, applicationName, streamName);
                             stream->startStreaming(*this);
@@ -1448,16 +1448,15 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        std::vector<const Endpoint*> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
 
                         if (!endpoints.empty())
                         {
-                            const Endpoint* endpoint = endpoints.front();
+                            Server* server = endpoints.front().first;
+                            const Endpoint* endpoint = endpoints.front().second;
 
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
-
-                            Server* server = endpoint->server;
 
                             stream = server->findStream(streamType, applicationName, streamName);
                             //if (!stream) stream = server->createStream(streamType, applicationName, streamName);
