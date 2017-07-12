@@ -75,16 +75,16 @@ namespace relay
                                               endpoint.applicationName,
                                               endpoint.streamName);
 
-                std::unique_ptr<Connection> newConnection(new Connection(relay,
-                                                                         socket,
-                                                                         *stream,
-                                                                         endpoint));
+                std::unique_ptr<Connection> connection(new Connection(relay,
+                                                                      socket,
+                                                                      *stream,
+                                                                      endpoint));
 
-                newConnection->setStream(stream);
+                connection->setStream(stream);
 
-                newConnection->connect();
+                connection->connect();
 
-                connections.push_back(std::move(newConnection));
+                connections.push_back(std::move(connection));
             }
         }
     }
