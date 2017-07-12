@@ -105,16 +105,15 @@ namespace relay
         {
             if (stream)
             {
+                stream->stopReceiving(*this);
+                stream->stopStreaming(*this);
+
                 if (streamType == Stream::Type::INPUT)
                 {
                     // input disconnected
                     stream->getServer().deleteStream(stream);
                 }
-                else
-                {
-                    stream->stopReceiving(*this);
-                    stream->stopStreaming(*this);
-                }
+
                 stream = nullptr;
             }
 
@@ -1247,6 +1246,13 @@ namespace relay
                         {
                             stream->stopReceiving(*this);
                             stream->stopStreaming(*this);
+
+                            if (streamType == Stream::Type::INPUT)
+                            {
+                                // input disconnected
+                                stream->getServer().deleteStream(stream);
+                            }
+
                             stream = nullptr;
                         }
                     }
@@ -1285,11 +1291,14 @@ namespace relay
                         {
                             stream->stopReceiving(*this);
                             stream->stopStreaming(*this);
-                        }
 
-                        if (type == Type::HOST)
-                        {
-                            stream = nullptr;
+                            if (type == Type::HOST)
+                            {
+                                // input disconnected
+                                stream->getServer().deleteStream(stream);
+
+                                stream = nullptr;
+                            }
                         }
 
                         sendOnFCUnpublish();
@@ -1404,11 +1413,14 @@ namespace relay
                         {
                             stream->stopReceiving(*this);
                             stream->stopStreaming(*this);
-                        }
 
-                        if (type == Type::HOST)
-                        {
-                            stream = nullptr;
+                            if (type == Type::HOST)
+                            {
+                                // input disconnected
+                                stream->getServer().deleteStream(stream);
+
+                                stream = nullptr;
+                            }
                         }
 
                         sendUnublishStatus(transactionId.asDouble());
@@ -1745,15 +1757,15 @@ namespace relay
 
     void Connection::removeStream()
     {
-        if (connected && stream)
+        if (stream)
         {
             stream->stopReceiving(*this);
             stream->stopStreaming(*this);
-        }
 
-        if (type == Type::HOST)
-        {
-            stream = nullptr;
+            if (type == Type::HOST)
+            {
+                stream = nullptr;
+            }
         }
     }
 
