@@ -71,7 +71,7 @@ namespace relay
         void connect();
 
         void setStream(Stream* aStream);
-        void deleteStream();
+        void removeStream();
         void unpublishStream();
 
         void sendAudioHeader(const std::vector<uint8_t>& headerData);

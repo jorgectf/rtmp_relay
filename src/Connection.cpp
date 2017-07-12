@@ -1734,7 +1734,7 @@ namespace relay
         }
     }
 
-    void Connection::deleteStream()
+    void Connection::removeStream()
     {
         if (connected && stream)
         {

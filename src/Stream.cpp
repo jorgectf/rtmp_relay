@@ -71,7 +71,7 @@ namespace relay
         {
             for (Connection* outputConnection : outputConnections)
             {
-                outputConnection->deleteStream();
+                outputConnection->removeStream();
                 outputConnection->unpublishStream();
             }
 
