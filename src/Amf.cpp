@@ -338,8 +338,6 @@ namespace relay
 
             std::string key;
 
-            uint32_t currentCount = 0;
-
             while (true)
             {
                 key.clear();
@@ -368,8 +366,6 @@ namespace relay
                 offset += ret;
 
                 result[key] = node;
-
-                ++currentCount;
             }
 
             return offset - originalOffset;
