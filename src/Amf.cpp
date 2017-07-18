@@ -1327,7 +1327,7 @@ namespace relay
                     }
                     case Type::XMLDocument:
                     {
-                        ret = writeStringAMF3(buffer, stringValue); break;
+                        ret = writeStringAMF3(buffer, stringValue);
                         break;
                     }
                     case Type::TypedObject:
