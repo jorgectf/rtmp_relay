@@ -1301,7 +1301,7 @@ namespace relay
                     case Type::Boolean: break;
                     case Type::String:
                     {
-                        ret = writeStringAMF3(buffer, stringValue); break;
+                        ret = writeStringAMF3(buffer, stringValue);
                         break;
                     }
                     case Type::Object:
