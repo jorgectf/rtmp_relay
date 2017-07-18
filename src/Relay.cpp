@@ -248,9 +248,21 @@ namespace relay
                 {
                     if (endpoint.streamType == type)
                     {
-                        if (std::find(endpoint.ipAddresses.begin(),
-                                      endpoint.ipAddresses.end(),
-                                      address) != endpoint.ipAddresses.end())
+                        bool found = false;
+
+                        for (auto endpointAddress : endpoint.ipAddresses)
+                        {
+                            if ((endpointAddress.first == ANY_ADDRESS ||
+                                 address.first == ANY_ADDRESS ||
+                                 endpointAddress.first == address.first) &&
+                                endpointAddress.second == address.second)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found)
                         {
                             result.push_back(std::make_pair(server.get(), &endpoint));
                         }
