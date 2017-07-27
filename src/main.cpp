@@ -4,7 +4,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <signal.h>
+#include <csignal>
 
 #include <sys/stat.h>
 #ifndef _WIN32
@@ -114,21 +114,21 @@ static bool daemonize(const char* lock_file)
     }
 
     // ignore child terminate signal
-    if (signal(SIGCHLD, SIG_IGN) == SIG_ERR)
+    if (std::signal(SIGCHLD, SIG_IGN) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to ignore SIGCHLD";
         return false;
     }
 
     // hangup signal
-    if (signal(SIGHUP, signalHandler) == SIG_ERR)
+    if (std::signal(SIGHUP, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGHUP";
         return false;
     }
 
     // software termination signal from kill
-    if (signal(SIGTERM, signalHandler) == SIG_ERR)
+    if (std::signal(SIGTERM, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGTERM";
         return false;
@@ -256,13 +256,13 @@ int main(int argc, const char* argv[])
     }
 
 #ifndef _WIN32
-    if (signal(SIGUSR1, signalHandler) == SIG_ERR)
+    if (std::signal(SIGUSR1, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGUSR1";
         return EXIT_FAILURE;
     }
 
-    if (signal(SIGPIPE, signalHandler) == SIG_ERR)
+    if (std::signal(SIGPIPE, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGPIPE";
         return EXIT_FAILURE;
