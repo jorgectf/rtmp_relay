@@ -3,10 +3,10 @@
 //
 
 #include <algorithm>
-#include "StatusSender.h"
-#include "Relay.h"
-#include "Utils.h"
-#include "Log.h"
+#include "StatusSender.hpp"
+#include "Relay.hpp"
+#include "Utils.hpp"
+#include "Log.hpp"
 
 using namespace cppsocket;
 

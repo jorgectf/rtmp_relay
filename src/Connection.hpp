@@ -6,13 +6,13 @@
 
 #include <map>
 #include <set>
-#include "Socket.h"
-#include "RTMP.h"
-#include "Amf.h"
-#include "MersanneTwister.h"
-#include "Status.h"
-#include "Stream.h"
-#include "Utils.h"
+#include "Socket.hpp"
+#include "RTMP.hpp"
+#include "Amf.hpp"
+#include "MersanneTwister.hpp"
+#include "Status.hpp"
+#include "Stream.hpp"
+#include "Utils.hpp"
 
 namespace relay
 {

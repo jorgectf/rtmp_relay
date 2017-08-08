@@ -5,7 +5,7 @@
 #pragma once
 
 #include <memory>
-#include "StatusSender.h"
+#include "StatusSender.hpp"
 
 namespace relay
 {

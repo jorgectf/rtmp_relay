@@ -3,8 +3,8 @@
 //
 
 #include <iostream>
-#include "Amf.h"
-#include "Utils.h"
+#include "Amf.hpp"
+#include "Utils.hpp"
 
 using namespace cppsocket;
 

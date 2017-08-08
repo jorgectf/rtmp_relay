@@ -6,9 +6,9 @@
 
 #include <cstdint>
 #include <vector>
-#include "Connection.h"
-#include "Stream.h"
-#include "Amf.h"
+#include "Connection.hpp"
+#include "Stream.hpp"
+#include "Amf.hpp"
 
 namespace relay
 {

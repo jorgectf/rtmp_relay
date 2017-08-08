@@ -2,8 +2,8 @@
 //  rtmp_relay
 //
 
-#include "Server.h"
-#include "Relay.h"
+#include "Server.hpp"
+#include "Relay.hpp"
 
 using namespace cppsocket;
 

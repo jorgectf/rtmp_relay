@@ -12,9 +12,9 @@
 #endif
 #include <fcntl.h>
 
-#include "Constants.h"
-#include "Relay.h"
-#include "Log.h"
+#include "Constants.hpp"
+#include "Relay.hpp"
+#include "Log.hpp"
 
 using namespace relay;
 using namespace cppsocket;

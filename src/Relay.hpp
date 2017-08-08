@@ -7,12 +7,12 @@
 #include <utility>
 #include <vector>
 #include <memory>
-#include "Network.h"
-#include "Socket.h"
-#include "Status.h"
-#include "Server.h"
-#include "Endpoint.h"
-#include "MersanneTwister.h"
+#include "Network.hpp"
+#include "Socket.hpp"
+#include "Status.hpp"
+#include "Server.hpp"
+#include "Endpoint.hpp"
+#include "MersanneTwister.hpp"
 
 #ifndef _WIN32
 #include <sys/syslog.h>

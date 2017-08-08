@@ -4,9 +4,9 @@
 
 #include <algorithm>
 #include "Stream.h"
-#include "Connection.h"
-#include "Relay.h"
-#include "Server.h"
+#include "Connection.hpp"
+#include "Relay.hpp"
+#include "Server.hpp"
 
 using namespace cppsocket;
 

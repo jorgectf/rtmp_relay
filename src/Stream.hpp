@@ -6,10 +6,10 @@
 
 #include <string>
 #include <vector>
-#include "Amf.h"
-#include "Socket.h"
-#include "Status.h"
-#include "Utils.h"
+#include "Amf.hpp"
+#include "Socket.hpp"
+#include "Status.hpp"
+#include "Utils.hpp"
 
 namespace relay
 {

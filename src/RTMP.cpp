@@ -5,9 +5,9 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-#include "Log.h"
-#include "RTMP.h"
-#include "Utils.h"
+#include "Log.hpp"
+#include "RTMP.hpp"
+#include "Utils.hpp"
 
 using namespace cppsocket;
 

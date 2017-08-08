@@ -10,10 +10,10 @@
 #include <chrono>
 #include <thread>
 #include "yaml-cpp/yaml.h"
-#include "Log.h"
-#include "Relay.h"
-#include "Status.h"
-#include "Connection.h"
+#include "Log.hpp"
+#include "Relay.hpp"
+#include "Status.hpp"
+#include "Connection.hpp"
 
 using namespace cppsocket;
 

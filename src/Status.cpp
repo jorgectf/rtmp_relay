@@ -2,9 +2,9 @@
 //  rtmp_relay
 //
 
-#include "Status.h"
-#include "Relay.h"
-#include "StatusSender.h"
+#include "Status.hpp"
+#include "Relay.hpp"
+#include "StatusSender.hpp"
 
 namespace relay
 {

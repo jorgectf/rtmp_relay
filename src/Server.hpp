@@ -5,9 +5,9 @@
 #pragma once
 
 #include <vector>
-#include "Connection.h"
-#include "Endpoint.h"
-#include "Stream.h"
+#include "Connection.hpp"
+#include "Endpoint.hpp"
+#include "Stream.hpp"
 
 namespace relay
 {
