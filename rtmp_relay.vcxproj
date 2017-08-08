@@ -61,9 +61,9 @@
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="external\cppsocket\Log.h" />
-    <ClInclude Include="external\cppsocket\Network.h" />
-    <ClInclude Include="external\cppsocket\Socket.h" />
+    <ClInclude Include="external\cppsocket\Log.hpp" />
+    <ClInclude Include="external\cppsocket\Network.hpp" />
+    <ClInclude Include="external\cppsocket\Socket.hpp" />
     <ClInclude Include="external\yaml-cpp\src\collectionstack.h" />
     <ClInclude Include="external\yaml-cpp\src\directives.h" />
     <ClInclude Include="external\yaml-cpp\src\emitterstate.h" />
@@ -85,18 +85,18 @@
     <ClInclude Include="external\yaml-cpp\src\stringsource.h" />
     <ClInclude Include="external\yaml-cpp\src\tag.h" />
     <ClInclude Include="external\yaml-cpp\src\token.h" />
-    <ClInclude Include="src\Amf.h" />
-    <ClInclude Include="src\Connection.h" />
-    <ClInclude Include="src\Constants.h" />
-    <ClInclude Include="src\Endpoint.h" />
-    <ClInclude Include="src\MersanneTwister.h" />
-    <ClInclude Include="src\Relay.h" />
-    <ClInclude Include="src\RTMP.h" />
-    <ClInclude Include="src\Server.h" />
-    <ClInclude Include="src\Status.h" />
-    <ClInclude Include="src\StatusSender.h" />
-    <ClInclude Include="src\Stream.h" />
-    <ClInclude Include="src\Utils.h" />
+    <ClInclude Include="src\Amf.hpp" />
+    <ClInclude Include="src\Connection.hpp" />
+    <ClInclude Include="src\Constants.hpp" />
+    <ClInclude Include="src\Endpoint.hpp" />
+    <ClInclude Include="src\MersanneTwister.hpp" />
+    <ClInclude Include="src\Relay.hpp" />
+    <ClInclude Include="src\RTMP.hpp" />
+    <ClInclude Include="src\Server.hpp" />
+    <ClInclude Include="src\Status.hpp" />
+    <ClInclude Include="src\StatusSender.hpp" />
+    <ClInclude Include="src\Stream.hpp" />
+    <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{614C7EC0-3262-40DF-B884-224B959A01F9}</ProjectGuid>
