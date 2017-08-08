@@ -3,7 +3,7 @@
 //
 
 #include <algorithm>
-#include "Stream.h"
+#include "Stream.hpp"
 #include "Connection.hpp"
 #include "Relay.hpp"
 #include "Server.hpp"
