@@ -75,12 +75,12 @@ namespace relay
         void removeStream();
         void unpublishStream();
 
-        void sendAudioHeader(const std::vector<uint8_t>& headerData);
-        void sendVideoHeader(const std::vector<uint8_t>& headerData);
-        void sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData);
-        void sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType);
-        void sendMetaData(const amf::Node& newMetaData);
-        void sendTextData(uint64_t timestamp, const amf::Node& textData);
+        bool sendAudioHeader(const std::vector<uint8_t>& headerData);
+        bool sendVideoHeader(const std::vector<uint8_t>& headerData);
+        bool sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData);
+        bool sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType);
+        bool sendMetaData(const amf::Node& newMetaData);
+        bool sendTextData(uint64_t timestamp, const amf::Node& textData);
 
     private:
         void reset();
@@ -92,47 +92,47 @@ namespace relay
 
         bool handlePacket(const rtmp::Packet& packet);
 
-        void sendServerBandwidth();
-        void sendClientBandwidth();
-        void sendUserControl(rtmp::UserControlType userControlType, uint64_t timestamp = 0, uint32_t parameter1 = 0, uint32_t parameter2 = 0);
-        void sendSetChunkSize();
+        bool sendServerBandwidth();
+        bool sendClientBandwidth();
+        bool sendUserControl(rtmp::UserControlType userControlType, uint64_t timestamp = 0, uint32_t parameter1 = 0, uint32_t parameter2 = 0);
+        bool sendSetChunkSize();
 
-        void sendOnBWDone();
-        void sendCheckBW();
-        void sendCheckBWResult(double transactionId);
+        bool sendOnBWDone();
+        bool sendCheckBW();
+        bool sendCheckBWResult(double transactionId);
 
-        void sendConnect();
-        void sendConnectResult(double transactionId);
+        bool sendConnect();
+        bool sendConnectResult(double transactionId);
 
-        void sendCreateStream();
-        void sendCreateStreamResult(double transactionId);
-        void sendReleaseStream();
-        void sendReleaseStreamResult(double transactionId);
-        void sendDeleteStream();
+        bool sendCreateStream();
+        bool sendCreateStreamResult(double transactionId);
+        bool sendReleaseStream();
+        bool sendReleaseStreamResult(double transactionId);
+        bool sendDeleteStream();
 
-        void sendFCPublish();
-        void sendOnFCPublish();
-        void sendFCUnpublish();
-        void sendOnFCUnpublish();
+        bool sendFCPublish();
+        bool sendOnFCPublish();
+        bool sendFCUnpublish();
+        bool sendOnFCUnpublish();
 
-        void sendFCSubscribe();
-        void sendOnFCSubscribe();
-        void sendFCUnsubscribe();
-        void sendOnFCUnubscribe();
+        bool sendFCSubscribe();
+        bool sendOnFCSubscribe();
+        bool sendFCUnsubscribe();
+        bool sendOnFCUnubscribe();
 
-        void sendPublish();
-        void sendPublishStatus(double transactionId);
-        void sendUnublishStatus(double transactionId);
+        bool sendPublish();
+        bool sendPublishStatus(double transactionId);
+        bool sendUnublishStatus(double transactionId);
 
-        void sendGetStreamLength();
-        void sendGetStreamLengthResult(double transactionId);
-        void sendPlay();
-        void sendPlayStatus(double transactionId);
-        void sendStop();
-        void sendStopStatus(double transactionId);
+        bool sendGetStreamLength();
+        bool sendGetStreamLengthResult(double transactionId);
+        bool sendPlay();
+        bool sendPlayStatus(double transactionId);
+        bool sendStop();
+        bool sendStopStatus(double transactionId);
 
-        void sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
-        void sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
+        bool sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData);
+        bool sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData);
 
         Relay& relay;
         const uint64_t id;

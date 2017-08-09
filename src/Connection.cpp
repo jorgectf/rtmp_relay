@@ -1777,7 +1777,7 @@ namespace relay
         }
     }
 
-    void Connection::sendServerBandwidth()
+    bool Connection::sendServerBandwidth()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
@@ -1791,10 +1791,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SERVER_BANDWIDTH";
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendClientBandwidth()
+    bool Connection::sendClientBandwidth()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
@@ -1809,10 +1809,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending CLIENT_BANDWIDTH";
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendUserControl(rtmp::UserControlType userControlType, uint64_t timestamp, uint32_t parameter1, uint32_t parameter2)
+    bool Connection::sendUserControl(rtmp::UserControlType userControlType, uint64_t timestamp, uint32_t parameter1, uint32_t parameter2)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::NETWORK;
@@ -1842,10 +1842,10 @@ namespace relay
         log << ", parameter 1: " << parameter1;
         if (parameter2 != 0) log << ", parameter 2: " << parameter2;
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendSetChunkSize()
+    bool Connection::sendSetChunkSize()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -1859,10 +1859,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SET_CHUNK_SIZE";
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendOnBWDone()
+    bool Connection::sendOnBWDone()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -1895,12 +1895,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendCheckBW()
+    bool Connection::sendCheckBW()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -1930,12 +1932,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendCheckBWResult(double transactionId)
+    bool Connection::sendCheckBWResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -1965,10 +1969,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendCreateStream()
+    bool Connection::sendCreateStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -1998,12 +2002,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendCreateStreamResult(double transactionId)
+    bool Connection::sendCreateStreamResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2042,10 +2048,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendReleaseStream()
+    bool Connection::sendReleaseStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2078,12 +2084,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendReleaseStreamResult(double transactionId)
+    bool Connection::sendReleaseStreamResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2113,10 +2121,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendDeleteStream()
+    bool Connection::sendDeleteStream()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2149,12 +2157,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
         
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
         
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendConnect()
+    bool Connection::sendConnect()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2190,12 +2200,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendConnectResult(double transactionId)
+    bool Connection::sendConnectResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2235,10 +2247,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendFCPublish()
+    bool Connection::sendFCPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2271,12 +2283,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendOnFCPublish()
+    bool Connection::sendOnFCPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2300,10 +2314,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendFCUnpublish()
+    bool Connection::sendFCUnpublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2336,12 +2350,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendOnFCUnpublish()
+    bool Connection::sendOnFCUnpublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2365,10 +2381,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendFCSubscribe()
+    bool Connection::sendFCSubscribe()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2401,12 +2417,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendOnFCSubscribe()
+    bool Connection::sendOnFCSubscribe()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2440,10 +2458,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendFCUnsubscribe()
+    bool Connection::sendFCUnsubscribe()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2476,12 +2494,14 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        return true;
     }
 
-    void Connection::sendOnFCUnubscribe()
+    bool Connection::sendOnFCUnubscribe()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2505,10 +2525,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendPublish()
+    bool Connection::sendPublish()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SOURCE;
@@ -2545,14 +2565,16 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
-        socket.send(buffer);
+        if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
 
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
+
+        return true;
     }
 
-    void Connection::sendPublishStatus(double transactionId)
+    bool Connection::sendPublishStatus(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2590,10 +2612,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendUnublishStatus(double transactionId)
+    bool Connection::sendUnublishStatus(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2631,37 +2653,39 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendAudioHeader(const std::vector<uint8_t>& headerData)
+    bool Connection::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
-        sendAudioData(0, headerData);
+        return sendAudioData(0, headerData);
     }
 
-    void Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
+    bool Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
-        sendVideoData(0, headerData);
+        return sendVideoData(0, headerData);
 
         // TODO: send video info
     }
 
-    void Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
+    bool Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
     {
-        sendAudioData(timestamp, frameData);
+        return sendAudioData(timestamp, frameData);
     }
 
-    void Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
+    bool Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
         if (videoStream &&
             (videoFrameSent || frameType == VideoFrameType::KEY))
         {
             videoFrameSent = true;
-            sendVideoData(timestamp, frameData);
+            return sendVideoData(timestamp, frameData);
         }
+
+        return true;
     }
 
-    void Connection::sendMetaData(const amf::Node& newMetaData)
+    bool Connection::sendMetaData(const amf::Node& newMetaData)
     {
         if (newMetaData.getType() == amf::Node::Type::Dictionary ||
             newMetaData.getType() == amf::Node::Type::Object)
@@ -2722,11 +2746,13 @@ namespace relay
                 argument2.dump(log);
             }
 
-            socket.send(buffer);
+            return socket.send(buffer);
         }
+
+        return true;
     }
 
-    void Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
+    bool Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
         if (dataStream)
         {
@@ -2760,11 +2786,13 @@ namespace relay
                 argument1.dump(log);
             }
             
-            socket.send(buffer);
+            return socket.send(buffer);
         }
+
+        return true;
     }
 
-    void Connection::sendGetStreamLength()
+    bool Connection::sendGetStreamLength()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2797,10 +2825,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendGetStreamLengthResult(double transactionId)
+    bool Connection::sendGetStreamLengthResult(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2833,10 +2861,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendPlay()
+    bool Connection::sendPlay()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2870,10 +2898,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendPlayStatus(double transactionId)
+    bool Connection::sendPlayStatus(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2911,10 +2939,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendStop()
+    bool Connection::sendStop()
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2947,10 +2975,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendStopStatus(double transactionId)
+    bool Connection::sendStopStatus(double transactionId)
     {
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
@@ -2988,10 +3016,10 @@ namespace relay
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
-        socket.send(buffer);
+        return socket.send(buffer);
     }
 
-    void Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
+    bool Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
         if (audioStream)
         {
@@ -3008,11 +3036,13 @@ namespace relay
 
             Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
 
-            socket.send(buffer);
+            return socket.send(buffer);
         }
+
+        return true;
     }
 
-    void Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
+    bool Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
         if (videoStream)
         {
@@ -3029,7 +3059,9 @@ namespace relay
 
             Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
             
-            socket.send(buffer);
+            return socket.send(buffer);
         }
+
+        return true;
     }
 }
