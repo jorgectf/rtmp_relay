@@ -54,10 +54,8 @@ namespace relay
         audioStream = endpoint.audioStream;
         dataStream = endpoint.dataStream;
         streamType = endpoint.streamType;
-        applicationName = endpoint.applicationName;
-        streamName = endpoint.streamName;
-        overrideApplicationName = endpoint.overrideApplicationName;
-        overrideStreamName = endpoint.overrideStreamName;
+        overrideApplicationName = endpoint.applicationName;
+        overrideStreamName = endpoint.streamName;
         amfVersion = endpoint.amfVersion;
         metaDataBlacklist = endpoint.metaDataBlacklist;
 
@@ -124,8 +122,6 @@ namespace relay
             streamType = Stream::Type::NONE;
             applicationName.clear();
             streamName.clear();
-            overrideApplicationName.clear();
-            overrideStreamName.clear();
             metaDataBlacklist.clear();
         }
     }
@@ -1714,10 +1710,7 @@ namespace relay
 
         if (overrideApplicationName.empty())
         {
-            if (applicationName.empty())
-            {
-                applicationName = stream->getApplicationName();
-            }
+            applicationName = stream->getApplicationName();
         }
         else
         {
@@ -1735,10 +1728,7 @@ namespace relay
 
         if (overrideStreamName.empty())
         {
-            if (streamName.empty())
-            {
-                streamName = stream->getStreamName();
-            }
+            streamName = stream->getStreamName();
         }
         else
         {

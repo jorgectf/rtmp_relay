@@ -28,8 +28,6 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * *endpoints* – array of endpoint descriptors
   * *applicationName* – for input stream this is the filter of incoming stream application names, for output stream this is the name of the application (optional)
   * *streamName* – for input stream this is the filter of incoming stream names, for output stream this is the name of the stream (optional)
-  * *overrideApplicationName* – name of the output application name
-  * *overrideStreamName* – string to override the stream name with
   * *type* – type of connection (client or host)
   * *stream* – type of stream (input or output)
   * *addresses* – list of addresses to connect to (for client connections) or listen to (for server connections)
@@ -44,7 +42,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
   * *bufferSize* – size of the client buffer for input streams (default value is 3000)
   * *amfVersion* – AMF version (for client connections) to use for communication (default value is 0)
 
-*overrideApplicationName* can have the following tokens:
+*applicationName* can have the following tokens:
 
 * ${id} – id of the application
 * ${applicationName} – name of the application
@@ -52,7 +50,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 * ${ipAddress} – IP address of the destination
 * ${port} – destination port
 
-*overrideStream* name can have the following tokens:
+*streamName* name can have the following tokens:
 
 * ${id} – id of the sender
 * ${applicationName} – name of the application

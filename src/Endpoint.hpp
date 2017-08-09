@@ -32,8 +32,6 @@ namespace relay
         bool dataStream = true;
         std::string applicationName;
         std::string streamName;
-        std::string overrideApplicationName;
-        std::string overrideStreamName;
         std::set<std::string> metaDataBlacklist;
     };
 }

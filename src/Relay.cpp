@@ -168,8 +168,6 @@ namespace relay
 
                     if (endpointObject["applicationName"]) endpoint.applicationName = endpointObject["applicationName"].as<std::string>();
                     if (endpointObject["streamName"]) endpoint.streamName = endpointObject["streamName"].as<std::string>();
-                    if (endpointObject["overrideApplicationName"]) endpoint.overrideApplicationName = endpointObject["overrideApplicationName"].as<std::string>();
-                    if (endpointObject["overrideStreamName"]) endpoint.overrideStreamName = endpointObject["overrideStreamName"].as<std::string>();
 
                     if (endpointObject["metaDataBlacklist"])
                     {
