@@ -97,7 +97,7 @@ namespace relay
 
             connection->update(delta);
 
-            if (connection->isClosed() && connection->getType() != Connection::Type::CLIENT)
+            if (connection->isClosed())
             {
                 i = connections.erase(i);
             }
