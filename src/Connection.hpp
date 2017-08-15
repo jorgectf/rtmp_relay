@@ -27,8 +27,8 @@ namespace relay
     public:
         enum class Type
         {
-            HOST,
-            CLIENT
+            HOST, // connection to RTMP relay
+            CLIENT // connection to different host
         };
 
         enum class State
