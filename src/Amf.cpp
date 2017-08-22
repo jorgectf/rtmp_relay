@@ -1179,6 +1179,7 @@ namespace relay
                     case Type::XMLDocument: marker = AMF0Marker::XMLDocument; break;
                     case Type::TypedObject: marker = AMF0Marker::TypedObject; break;
                     case Type::SwitchToAMF3: marker = AMF0Marker::SwitchToAMF3; break;
+                    default: return 0;
                 }
 
                 buffer.push_back(static_cast<uint8_t>(marker));
@@ -1273,6 +1274,7 @@ namespace relay
                     case Type::XMLDocument: marker = AMF3Marker::XMLDocument; break;
                     case Type::TypedObject: return 0; // typed objects are not supported
                     case Type::SwitchToAMF3: return 0; // switch to AMF3 not supported
+                    default: return 0;
                 }
 
                 buffer.push_back(static_cast<uint8_t>(marker));
