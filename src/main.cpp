@@ -206,6 +206,11 @@ int main(int argc, const char* argv[])
 #ifndef _WIN32
             if (int pid = getPid("/var/run/rtmp_relay.pid"))
             {
+                if (unlink("/var/run/rtmp_relay.pid") != 0)
+                {
+                    Log(Log::Level::WARN) << "Failed to delete pid file";
+                }
+
                 if (kill(pid, SIGTERM) != 0)
                 {
                     Log(Log::Level::ERR) << "Failed to kill daemon";
