@@ -106,6 +106,12 @@ namespace relay
                 ++i;
             }
         }
+
+        for (auto i = streams.begin(); i != streams.end(); ++i)
+        {
+            const std::unique_ptr<Stream>& stream = *i;
+            stream->update(delta);
+        }
     }
 
     void Server::getStats(std::string& str, ReportType reportType) const

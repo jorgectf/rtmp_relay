@@ -39,6 +39,25 @@ namespace relay
         }
     }
 
+    void Stream::update(float delta)
+    {
+        for (auto i = connections.begin(); i != connections.end();)
+        {
+            const std::unique_ptr<Connection>& connection = *i;
+
+            connection->update(delta);
+
+            if (connection->isClosed())
+            {
+                i = connections.erase(i);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
+
     void Stream::getStats(std::string& str, ReportType reportType) const
     {
         // TODO: implement

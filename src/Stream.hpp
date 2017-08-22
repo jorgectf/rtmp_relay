@@ -41,6 +41,8 @@ namespace relay
 
         virtual ~Stream();
 
+        void update(float delta);
+
         Server& getServer() { return server; }
         Type getType() const { return type; }
         const std::string& getApplicationName() const { return applicationName; }
