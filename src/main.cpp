@@ -157,7 +157,7 @@ static int getPid(const char* lockFile)
     }
 
     pid_t pid = atoi(str);
-    
+
     close(lfp);
 
     return pid;
@@ -216,7 +216,7 @@ int main(int argc, const char* argv[])
                     Log(Log::Level::ERR) << "Failed to kill daemon";
                     return EXIT_FAILURE;
                 }
-                
+
                 Log(Log::Level::INFO) << "Daemon killed";
 
                 return EXIT_SUCCESS;
