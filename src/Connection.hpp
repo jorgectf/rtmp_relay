@@ -187,6 +187,7 @@ namespace relay
         uint64_t audioRate = 0;
         uint64_t videoRate = 0;
 
+        bool streaming = false;
         Stream* stream = nullptr;
         amf::Node metaData;
         std::set<std::string> metaDataBlacklist;

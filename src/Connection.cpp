@@ -95,6 +95,7 @@ namespace relay
         streamId = 0;
 
         connected = false;
+        streaming = false;
         videoFrameSent = false;
         metaData = amf::Node::Type::Unknown;
 
@@ -1481,6 +1482,7 @@ namespace relay
                             audioStream = endpoint->audioStream;
                             dataStream = endpoint->dataStream;
                             metaDataBlacklist = endpoint->metaDataBlacklist;
+                            streaming = true;
                         }
                         else
                         {
@@ -1519,6 +1521,7 @@ namespace relay
                         streamType = Stream::Type::NONE;
                         videoFrameSent = false;
                         sendStopStatus(transactionId.asDouble());
+                        streaming = false;
                     }
                     else
                     {
@@ -1663,6 +1666,7 @@ namespace relay
                             else if (streamType == Stream::Type::OUTPUT)
                             {
                                 sendPublish();
+                                streaming = true;
                             }
 
                             Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Created stream " << streamId;
@@ -2648,14 +2652,14 @@ namespace relay
 
     bool Connection::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         return sendAudioData(0, headerData);
     }
 
     bool Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         return sendVideoData(0, headerData);
 
@@ -2664,14 +2668,14 @@ namespace relay
 
     bool Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         return sendAudioData(timestamp, frameData);
     }
 
     bool Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         if (videoStream &&
             (videoFrameSent || frameType == VideoFrameType::KEY))
@@ -2685,7 +2689,7 @@ namespace relay
 
     bool Connection::sendMetaData(const amf::Node& newMetaData)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         if (newMetaData.getType() == amf::Node::Type::Dictionary ||
             newMetaData.getType() == amf::Node::Type::Object)
@@ -2754,7 +2758,7 @@ namespace relay
 
     bool Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         if (dataStream)
         {
@@ -3023,7 +3027,7 @@ namespace relay
 
     bool Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         if (audioStream)
         {
@@ -3048,7 +3052,7 @@ namespace relay
 
     bool Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        if (streamType != Stream::Type::OUTPUT) return false;
+        if (streaming) return false;
 
         if (videoStream)
         {
