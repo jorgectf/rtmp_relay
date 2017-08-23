@@ -2652,14 +2652,14 @@ namespace relay
 
     bool Connection::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         return sendAudioData(0, headerData);
     }
 
     bool Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         return sendVideoData(0, headerData);
 
@@ -2668,14 +2668,14 @@ namespace relay
 
     bool Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         return sendAudioData(timestamp, frameData);
     }
 
     bool Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         if (videoStream &&
             (videoFrameSent || frameType == VideoFrameType::KEY))
@@ -2689,7 +2689,7 @@ namespace relay
 
     bool Connection::sendMetaData(const amf::Node& newMetaData)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         if (newMetaData.getType() == amf::Node::Type::Dictionary ||
             newMetaData.getType() == amf::Node::Type::Object)
@@ -2758,7 +2758,7 @@ namespace relay
 
     bool Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         if (dataStream)
         {
@@ -3027,7 +3027,7 @@ namespace relay
 
     bool Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         if (audioStream)
         {
@@ -3052,7 +3052,7 @@ namespace relay
 
     bool Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        if (streaming) return false;
+        if (!streaming) return false;
 
         if (videoStream)
         {
