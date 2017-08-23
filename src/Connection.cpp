@@ -465,7 +465,7 @@ namespace relay
 
                         if (version != 0x03)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unsuported version, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unsupported version(" << version << "), disconnecting";
                             close();
                             break;
                         }
@@ -572,7 +572,7 @@ namespace relay
 
                         if (version != 0x03)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unsuported version, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unsupported version (" << version << "), disconnecting";
                             close();
                             break;
                         }
