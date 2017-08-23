@@ -458,7 +458,7 @@ namespace relay
                     if (data.size() - offset >= sizeof(uint8_t))
                     {
                         // C0
-                        uint8_t version = static_cast<uint8_t>(*(data.data() + offset));
+                        uint8_t version = *(data.data() + offset);
                         offset += sizeof(version);
 
                         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got version " << static_cast<uint32_t>(version);
@@ -565,7 +565,7 @@ namespace relay
                     if (data.size() - offset >= sizeof(uint8_t))
                     {
                         // S0
-                        uint8_t version = static_cast<uint8_t>(*data.data() + offset);
+                        uint8_t version = *(data.data() + offset);
                         offset += sizeof(version);
 
                         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got reply version " << static_cast<uint32_t>(version);
@@ -652,7 +652,7 @@ namespace relay
             {
                 Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
             }
-            
+
             data.clear();
         }
         else
