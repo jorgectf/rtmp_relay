@@ -2648,11 +2648,15 @@ namespace relay
 
     bool Connection::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         return sendAudioData(0, headerData);
     }
 
     bool Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         return sendVideoData(0, headerData);
 
         // TODO: send video info
@@ -2660,11 +2664,15 @@ namespace relay
 
     bool Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         return sendAudioData(timestamp, frameData);
     }
 
     bool Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         if (videoStream &&
             (videoFrameSent || frameType == VideoFrameType::KEY))
         {
@@ -2677,6 +2685,8 @@ namespace relay
 
     bool Connection::sendMetaData(const amf::Node& newMetaData)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         if (newMetaData.getType() == amf::Node::Type::Dictionary ||
             newMetaData.getType() == amf::Node::Type::Object)
         {
@@ -2744,6 +2754,8 @@ namespace relay
 
     bool Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         if (dataStream)
         {
             rtmp::Packet packet;
@@ -3011,6 +3023,8 @@ namespace relay
 
     bool Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         if (audioStream)
         {
             rtmp::Packet packet;
@@ -3034,6 +3048,8 @@ namespace relay
 
     bool Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
+        if (streamType != Stream::Type::OUTPUT) return false;
+
         if (videoStream)
         {
             rtmp::Packet packet;
