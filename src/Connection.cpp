@@ -1667,7 +1667,6 @@ namespace relay
                             else if (streamType == Stream::Type::OUTPUT)
                             {
                                 sendPublish();
-                                stream->startReceiving(*this);
                             }
 
                             Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Created stream " << streamId;
