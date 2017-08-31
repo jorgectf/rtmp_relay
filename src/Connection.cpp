@@ -1556,7 +1556,7 @@ namespace relay
                             }
                             else
                             {
-                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not stream, disconnecting";
+                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
                                 close();
                                 return false;
                             }
@@ -1578,7 +1578,7 @@ namespace relay
                             }
                             else
                             {
-                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not stream, disconnecting";
+                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
                                 close();
                                 return false;
                             }
