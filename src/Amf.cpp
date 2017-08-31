@@ -520,11 +520,8 @@ namespace relay
         }
 
         // AMF0
-        static uint32_t readTypedObject(const std::vector<uint8_t>& buffer, uint32_t& offset)
+        static uint32_t readTypedObject(const std::vector<uint8_t>& /* buffer */, uint32_t& /* offset */)
         {
-            UNUSED(buffer);
-            UNUSED(offset);
-
             Log(Log::Level::ERR) << "Typed objects are not supported";
 
             return 0;
@@ -918,10 +915,8 @@ namespace relay
         }
 
         // AMF0
-        static uint32_t writeTypedObject(std::vector<uint8_t>& buffer)
+        static uint32_t writeTypedObject(std::vector<uint8_t>& /* buffer */)
         {
-            UNUSED(buffer);
-
             Log(Log::Level::ERR) << "Typed objects are not supported";
 
             return 0;

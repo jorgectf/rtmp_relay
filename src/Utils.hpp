@@ -9,8 +9,6 @@
 #include <vector>
 #include <map>
 
-#define UNUSED(x) (void)(x)
-
 union IntFloat64
 {
     uint64_t i;
