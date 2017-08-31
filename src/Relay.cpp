@@ -22,7 +22,7 @@ namespace relay
     uint64_t Relay::currentId = 0;
 
     Relay::Relay(Network& aNetwork):
-    network(aNetwork), mersanneTwister(static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count()))
+        network(aNetwork)
     {
         previousTime = std::chrono::steady_clock::now();
     }

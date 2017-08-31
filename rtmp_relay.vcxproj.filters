@@ -184,7 +184,6 @@
     <ClInclude Include="src\Connection.hpp" />
     <ClInclude Include="src\Server.hpp" />
     <ClInclude Include="src\Amf.hpp" />
-    <ClInclude Include="src\MersanneTwister.hpp" />
     <ClInclude Include="src\Stream.hpp" />
     <ClInclude Include="src\Endpoint.hpp" />
   </ItemGroup>

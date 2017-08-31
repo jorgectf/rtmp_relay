@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <random>
 #include <map>
 #include <set>
 #include "Socket.hpp"
 #include "RTMP.hpp"
 #include "Amf.hpp"
-#include "MersanneTwister.hpp"
 #include "Status.hpp"
 #include "Stream.hpp"
 #include "Utils.hpp"
@@ -137,8 +137,8 @@ namespace relay
         Relay& relay;
         const uint64_t id;
 
-        MersanneTwister& mersanneTwister;
-        
+        std::mt19937 generator;
+
         Type type;
         State state = State::UNINITIALIZED;
         std::vector<std::pair<uint32_t, uint16_t>> ipAddresses;

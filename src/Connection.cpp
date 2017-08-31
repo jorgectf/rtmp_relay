@@ -2,6 +2,7 @@
 //  rtmp_relay
 //
 
+#include <chrono>
 #include "Connection.hpp"
 #include "Relay.hpp"
 #include "Server.hpp"
@@ -16,7 +17,7 @@ namespace relay
     Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType):
         relay(aRelay),
         id(Relay::nextId()),
-        mersanneTwister(relay.getMersanneTwister()),
+        generator(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count())),
         type(aType),
         socket(std::move(aSocket))
     {
@@ -404,7 +405,7 @@ namespace relay
 
             for (size_t i = 0; i < sizeof(challenge.randomBytes); ++i)
             {
-                uint32_t randomValue = mersanneTwister.extractU32() % 255;
+                uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
 
                 challenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
             }
@@ -507,7 +508,7 @@ namespace relay
 
                         for (size_t i = 0; i < sizeof(replyChallenge.randomBytes); ++i)
                         {
-                            uint32_t randomValue = mersanneTwister.extractU32() % 255;
+                            uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
                             replyChallenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
                         }
 

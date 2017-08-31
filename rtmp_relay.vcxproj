@@ -89,7 +89,6 @@
     <ClInclude Include="src\Connection.hpp" />
     <ClInclude Include="src\Constants.hpp" />
     <ClInclude Include="src\Endpoint.hpp" />
-    <ClInclude Include="src\MersanneTwister.hpp" />
     <ClInclude Include="src\Relay.hpp" />
     <ClInclude Include="src\RTMP.hpp" />
     <ClInclude Include="src\Server.hpp" />

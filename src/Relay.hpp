@@ -12,7 +12,6 @@
 #include "Status.hpp"
 #include "Server.hpp"
 #include "Endpoint.hpp"
-#include "MersanneTwister.hpp"
 
 #ifndef _WIN32
 #include <sys/syslog.h>
@@ -49,8 +48,6 @@ namespace relay
                                                                       const std::string& applicationName,
                                                                       const std::string& streamName) const;
 
-        MersanneTwister& getMersanneTwister() { return mersanneTwister; }
-
     private:
         void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
 
@@ -65,8 +62,6 @@ namespace relay
         std::vector<std::unique_ptr<Connection>> connections;
 
         std::vector<cppsocket::Socket> acceptors;
-
-        MersanneTwister mersanneTwister;
 
 #ifndef _WIN32
         std::string syslogIdent;
