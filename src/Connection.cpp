@@ -895,8 +895,11 @@ namespace relay
                     {
                         metaData = argument2;
 
-                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
-                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
+                        if (metaData.hasElement("audiocodecid"))
+                            Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+
+                        if (metaData.hasElement("videocodecid"))
+                            Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
 
                         // forward notify packet
                         if (stream)
@@ -916,8 +919,11 @@ namespace relay
                     {
                         metaData = argument1;
 
-                        Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
-                        Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
+                        if (metaData.hasElement("audiocodecid"))
+                            Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+
+                        if (metaData.hasElement("videocodecid"))
+                            Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
 
                         // forward notify packet
                         if (stream)
