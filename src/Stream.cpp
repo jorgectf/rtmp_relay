@@ -96,10 +96,10 @@ namespace relay
 
     void Stream::stopStreaming(Connection& connection)
     {
-        streaming = false;
-
         if (&connection == inputConnection)
         {
+            streaming = false;
+
             for (Connection* outputConnection : outputConnections)
             {
                 outputConnection->removeStream();
