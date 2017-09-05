@@ -1395,7 +1395,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                            Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
                             close();
                             return false;
                         }
@@ -1480,7 +1480,7 @@ namespace relay
                             //if (!stream) stream = server->createStream(streamType, applicationName, streamName);
                             if (!stream)
                             {
-                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Stream not found \"" << applicationName << "/" << streamName << "\", disconnecting";
+                                Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream not found \"" << applicationName << "/" << streamName << "\", disconnecting";
                                 close();
                                 return false;
                             }
@@ -1494,7 +1494,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                            Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
                             close();
                             return false;
                         }
