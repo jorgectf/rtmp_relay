@@ -33,5 +33,10 @@ namespace relay
         std::string applicationName;
         std::string streamName;
         std::set<std::string> metaDataBlacklist;
+
+        bool isNameKnown() const
+        {
+            return !applicationName.empty() && !streamName.empty();
+        }
     };
 }
