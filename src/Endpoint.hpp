@@ -18,8 +18,12 @@ namespace relay
     {
         Connection::Type connectionType;
         Stream::Type streamType;
-        std::vector<std::pair<uint32_t, uint16_t>> ipAddresses;
-        std::vector<std::string> addresses;
+        struct Address
+        {
+            std::string url;
+            std::pair<uint32_t, uint16_t> ipAddresses;
+        };
+        std::vector<Address> addresses;
         float connectionTimeout = 5.0f;
         float reconnectInterval = 5.0f;
         uint32_t reconnectCount = 0;

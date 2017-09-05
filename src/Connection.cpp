@@ -47,10 +47,6 @@ namespace relay
 
         endpoint = &aEndpoint;
 
-        addresses = endpoint->addresses;
-        ipAddresses = endpoint->ipAddresses;
-        connectionTimeout = endpoint->connectionTimeout;
-        reconnectInterval = endpoint->reconnectInterval;
         reconnectCount = endpoint->reconnectCount;
         bufferSize = endpoint->bufferSize;
         streamType = endpoint->streamType;
@@ -58,7 +54,7 @@ namespace relay
         overrideStreamName = endpoint->streamName;
         amfVersion = endpoint->amfVersion;
 
-        socket.setConnectTimeout(connectionTimeout);
+        socket.setConnectTimeout(endpoint->connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
         socket.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));
     }
@@ -147,6 +143,8 @@ namespace relay
         }
         else if (type == Type::CLIENT)
         {
+            if (!endpoint) return;
+
             if (socket.isReady() && state == State::HANDSHAKE_DONE)
             {
                 timeSinceConnect = 0.0f;
@@ -155,7 +153,7 @@ namespace relay
             {
                 timeSinceConnect += delta;
 
-                if (timeSinceConnect >= reconnectInterval)
+                if (timeSinceConnect >= endpoint->reconnectInterval)
                 {
                     timeSinceConnect = 0.0f;
                     state = State::UNINITIALIZED;
@@ -166,14 +164,15 @@ namespace relay
                         ++addressIndex;
                     }
 
-                    if (addressIndex >= addresses.size())
+                    if (addressIndex >= endpoint->addresses.size())
                     {
                         addressIndex = 0;
                     }
 
-                    if (addressIndex < addresses.size())
+                    if (addressIndex < endpoint->addresses.size())
                     {
-                        socket.connect(ipAddresses[addressIndex].first, ipAddresses[addressIndex].second);
+                        socket.connect(endpoint->addresses[addressIndex].ipAddresses.first,
+                                       endpoint->addresses[addressIndex].ipAddresses.second);
                     }
                 }
             }
@@ -373,9 +372,12 @@ namespace relay
 
     void Connection::connect()
     {
-        if (addressIndex < addresses.size())
+        if (!endpoint) return;
+
+        if (addressIndex < endpoint->addresses.size())
         {
-            socket.connect(ipAddresses[addressIndex].first, ipAddresses[addressIndex].second);
+            socket.connect(endpoint->addresses[addressIndex].ipAddresses.first,
+                           endpoint->addresses[addressIndex].ipAddresses.second);
         }
     }
 
@@ -2157,6 +2159,8 @@ namespace relay
 
     bool Connection::sendConnect()
     {
+        if (!endpoint) return false;
+
         rtmp::Packet packet;
         packet.channel = rtmp::Channel::SYSTEM;
         packet.timestamp = 0;
@@ -2181,7 +2185,7 @@ namespace relay
         argument1["app"] = applicationName;
         argument1["type"] = std::string("nonprivate");
         argument1["flashVer"] = std::string("FMLE/3.0 (compatible; Lavf56.16.0)");
-        argument1["tcUrl"] = "rtmp://" + addresses[addressIndex] + "/" + applicationName;
+        argument1["tcUrl"] = "rtmp://" + endpoint->addresses[addressIndex].url + "/" + applicationName;
         argument1["objectEncoding"] = (amfVersion == amf::Version::AMF3) ? 3.0 : 0.0;
 
         argument1.encode(amf::Version::AMF0, packet.data);

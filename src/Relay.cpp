@@ -138,8 +138,10 @@ namespace relay
                                 return false;
                             }
 
-                            endpoint.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
-                            endpoint.addresses.push_back(address);
+                            Endpoint::Address endpointAddress;
+                            endpointAddress.url = address;
+                            endpointAddress.ipAddresses = std::make_pair(addr.first, addr.second);
+                            endpoint.addresses.push_back(endpointAddress);
 
                             if (endpoint.connectionType == Connection::Type::HOST)
                             {
@@ -156,8 +158,10 @@ namespace relay
                             return false;
                         }
 
-                        endpoint.ipAddresses.push_back(std::make_pair(addr.first, addr.second));
-                        endpoint.addresses.push_back(address);
+                        Endpoint::Address endpointAddress;
+                        endpointAddress.url = address;
+                        endpointAddress.ipAddresses = std::make_pair(addr.first, addr.second);
+                        endpoint.addresses.push_back(endpointAddress);
                     }
 
                     if (endpointObject["connectionTimeout"]) endpoint.connectionTimeout = endpointObject["connectionTimeout"].as<float>();
@@ -248,12 +252,12 @@ namespace relay
                     {
                         bool found = false;
 
-                        for (auto endpointAddress : endpoint.ipAddresses)
+                        for (auto endpointAddress : endpoint.addresses)
                         {
-                            if ((endpointAddress.first == ANY_ADDRESS ||
+                            if ((endpointAddress.ipAddresses.first == ANY_ADDRESS ||
                                  address.first == ANY_ADDRESS ||
-                                 endpointAddress.first == address.first) &&
-                                endpointAddress.second == address.second)
+                                 endpointAddress.ipAddresses.first == address.first) &&
+                                endpointAddress.ipAddresses.second == address.second)
                             {
                                 found = true;
                                 break;
