@@ -40,25 +40,23 @@ namespace relay
     Connection::Connection(Relay& aRelay,
                            cppsocket::Socket& connector,
                            Stream& aStream,
-                           const Endpoint& endpoint):
+                           const Endpoint& aEndpoint):
         Connection(aRelay, connector, Type::CLIENT)
     {
         stream = &aStream;
 
-        addresses = endpoint.addresses;
-        ipAddresses = endpoint.ipAddresses;
-        connectionTimeout = endpoint.connectionTimeout;
-        reconnectInterval = endpoint.reconnectInterval;
-        reconnectCount = endpoint.reconnectCount;
-        bufferSize = endpoint.bufferSize;
-        videoStream = endpoint.videoStream;
-        audioStream = endpoint.audioStream;
-        dataStream = endpoint.dataStream;
-        streamType = endpoint.streamType;
-        overrideApplicationName = endpoint.applicationName;
-        overrideStreamName = endpoint.streamName;
-        amfVersion = endpoint.amfVersion;
-        metaDataBlacklist = endpoint.metaDataBlacklist;
+        endpoint = &aEndpoint;
+
+        addresses = endpoint->addresses;
+        ipAddresses = endpoint->ipAddresses;
+        connectionTimeout = endpoint->connectionTimeout;
+        reconnectInterval = endpoint->reconnectInterval;
+        reconnectCount = endpoint->reconnectCount;
+        bufferSize = endpoint->bufferSize;
+        streamType = endpoint->streamType;
+        overrideApplicationName = endpoint->applicationName;
+        overrideStreamName = endpoint->streamName;
+        amfVersion = endpoint->amfVersion;
 
         socket.setConnectTimeout(connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
@@ -119,14 +117,11 @@ namespace relay
                 stream = nullptr;
             }
 
-            videoStream = true;
-            audioStream = true;
-            dataStream = true;
+            endpoint = nullptr;
 
             streamType = Stream::Type::NONE;
             applicationName.clear();
             streamName.clear();
-            metaDataBlacklist.clear();
         }
     }
 
@@ -1380,7 +1375,7 @@ namespace relay
                         if (!endpoints.empty())
                         {
                             Server* server = endpoints.front().first;
-                            const Endpoint* endpoint = endpoints.front().second;
+                            endpoint = endpoints.front().second;
 
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPublishStatus(transactionId.asDouble());
@@ -1471,7 +1466,7 @@ namespace relay
                         if (!endpoints.empty())
                         {
                             Server* server = endpoints.front().first;
-                            const Endpoint* endpoint = endpoints.front().second;
+                            endpoint = endpoints.front().second;
 
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
@@ -1486,11 +1481,6 @@ namespace relay
                             }
 
                             stream->startReceiving(*this);
-                            pingInterval = endpoint->pingInterval;
-                            videoStream = endpoint->videoStream;
-                            audioStream = endpoint->audioStream;
-                            dataStream = endpoint->dataStream;
-                            metaDataBlacklist = endpoint->metaDataBlacklist;
                         }
                         else
                         {
@@ -2676,7 +2666,9 @@ namespace relay
 
     bool Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
-        if (videoStream &&
+        if (!endpoint) return false;
+
+        if (endpoint->videoStream &&
             (videoFrameSent || frameType == VideoFrameType::KEY))
         {
             videoFrameSent = true;
@@ -2688,6 +2680,8 @@ namespace relay
 
     bool Connection::sendMetaData(const amf::Node& newMetaData)
     {
+        if (!endpoint) return false;
+
         if (newMetaData.getType() == amf::Node::Type::Dictionary ||
             newMetaData.getType() == amf::Node::Type::Object)
         {
@@ -2696,20 +2690,20 @@ namespace relay
             for (const std::pair<std::string, amf::Node>& value : newMetaData.asMap())
             {
                 // not in the blacklist
-                if (metaDataBlacklist.find(value.first) != metaDataBlacklist.end()) continue;
+                if (endpoint->metaDataBlacklist.find(value.first) != endpoint->metaDataBlacklist.end()) continue;
 
                 // don't send audio meta data if audio stream is disabled
-                if (!audioStream && (value.first == "audiocodecid" ||
-                                     value.first == "audiodatarate")) continue;
+                if (!endpoint->audioStream && (value.first == "audiocodecid" ||
+                                               value.first == "audiodatarate")) continue;
 
                 // don't send video meta data if video stream is disabled
-                if (!videoStream && (value.first == "fps" ||
-                                     value.first == "framerate" ||
-                                     value.first == "gopsize" ||
-                                     value.first == "level" ||
-                                     value.first == "profile" ||
-                                     value.first == "videocodecid" ||
-                                     value.first == "videodatarate")) continue;
+                if (!endpoint->videoStream && (value.first == "fps" ||
+                                               value.first == "framerate" ||
+                                               value.first == "gopsize" ||
+                                               value.first == "level" ||
+                                               value.first == "profile" ||
+                                               value.first == "videocodecid" ||
+                                               value.first == "videodatarate")) continue;
 
                 metaData[value.first] = value.second;
             }
@@ -2755,7 +2749,9 @@ namespace relay
 
     bool Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
-        if (dataStream)
+        if (!endpoint) return false;
+
+        if (endpoint->dataStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
@@ -3022,7 +3018,9 @@ namespace relay
 
     bool Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        if (audioStream)
+        if (!endpoint) return false;
+
+        if (endpoint->audioStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::AUDIO;
@@ -3045,7 +3043,9 @@ namespace relay
 
     bool Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        if (videoStream)
+        if (!endpoint) return false;
+
+        if (endpoint->videoStream)
         {
             rtmp::Packet packet;
             packet.channel = rtmp::Channel::VIDEO;

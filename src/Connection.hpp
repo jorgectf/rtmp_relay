@@ -46,7 +46,7 @@ namespace relay
         Connection(Relay& aRelay,
                    cppsocket::Socket& connector,
                    Stream& aStream,
-                   const Endpoint& endpoint);
+                   const Endpoint& aEndpoint);
 
         Connection(const Connection&) = delete;
         Connection(Connection&&) = delete;
@@ -176,10 +176,6 @@ namespace relay
         std::string overrideStreamName;
         bool connected = false;
 
-        bool videoStream = true;
-        bool audioStream = true;
-        bool dataStream = true;
-
         bool videoFrameSent = false;
         float timeSinceMeasure = 0.0f;
         uint64_t currentAudioBytes = 0;
@@ -187,9 +183,9 @@ namespace relay
         uint64_t audioRate = 0;
         uint64_t videoRate = 0;
 
+        const Endpoint* endpoint = nullptr;
         Stream* stream = nullptr;
         amf::Node metaData;
-        std::set<std::string> metaDataBlacklist;
 
         amf::Version amfVersion = amf::Version::AMF0;
     };
