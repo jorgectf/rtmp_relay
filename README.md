@@ -44,19 +44,19 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
 
 *applicationName* can have the following tokens:
 
-* ${id} – id of the application
-* ${applicationName} – name of the application
-* ${streamName} – name of the stream
-* ${ipAddress} – IP address of the destination
-* ${port} – destination port
+* {id} – id of the application
+* {applicationName} – name of the application
+* {streamName} – name of the stream
+* {ipAddress} – IP address of the destination
+* {port} – destination port
 
 *streamName* name can have the following tokens:
 
-* ${id} – id of the sender
-* ${applicationName} – name of the application
-* ${streamName} – name of the source stream
-* ${ipAddress} – IP address of the destination
-* ${port} – destination port
+* {id} – id of the sender
+* {applicationName} – name of the application
+* {streamName} – name of the source stream
+* {ipAddress} – IP address of the destination
+* {port} – destination port
 
 Optionally you can add a web status page with "statusPage" object, which has the following attribute:
 * *address* – the address of the web status page
@@ -102,7 +102,7 @@ Example configuration:
             stream: "output"
             applicationName: "app/name"
             streamName: "stream_name"
-            overrideStreamName: "test_${name}"
+            overrideStreamName: "test_{name}"
             video: true
             audio: true
             pingInterval: 60.0

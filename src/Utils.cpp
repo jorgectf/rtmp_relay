@@ -29,7 +29,7 @@ size_t replaceTokens(std::string& str, const std::map<std::string, std::string>&
 
     for (auto i : tokens)
     {
-        count += replaceAll(str, "${" + i.first + "}", i.second);
+        count += replaceAll(str, "{" + i.first + "}", i.second);
     }
 
     return count;
