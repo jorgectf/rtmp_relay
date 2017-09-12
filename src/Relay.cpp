@@ -205,7 +205,7 @@ namespace relay
                         if (endpoint.applicationName.empty() ||
                             endpoint.streamName.empty())
                         {
-                            Log(Log::Level::ERR) << "Client input streams can not have mepty application name or stream name";
+                            Log(Log::Level::ERR) << "Client input streams can not have empty application name or stream name";
                             return false;
                         }
                     }
