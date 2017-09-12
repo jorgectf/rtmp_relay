@@ -203,7 +203,8 @@ namespace relay
                     if (endpoint.connectionType == Connection::Type::CLIENT &&
                         endpoint.streamType == Stream::Type::INPUT)
                     {
-                        if (!endpoint.isNameKnown())
+                        if (endpoint.applicationName.empty() ||
+                            endpoint.streamName.empty()) // TODO: check if stream names contain regex
                         {
                             Log(Log::Level::ERR) << "Client input streams must have application name and stream name";
                             return false;

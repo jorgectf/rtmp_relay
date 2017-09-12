@@ -26,8 +26,8 @@ You can pass these arguments to rtmp_realy (located in the bin directory):
 RTMP relay configuration files are YAML-based. It must start with servers array. Each server has following attributes:
 
 * *endpoints* – array of endpoint descriptors
-  * *applicationName* – for input stream this is the filter of incoming stream application names, for output stream this is the name of the application (optional)
-  * *streamName* – for input stream this is the filter of incoming stream names, for output stream this is the name of the stream (optional)
+  * *applicationName* – for host streams this is the filter of incoming stream application names (can contain a regex), for client streams this is the name of the application (optional)
+  * *streamName* – for host streams this is the filter of incoming stream names (can contain a regex), for client streams this is the name of the stream (optional)
   * *type* – type of connection (client or host)
   * *stream* – type of stream (input or output)
   * *addresses* – list of addresses to connect to (for client connections) or listen to (for server connections)
