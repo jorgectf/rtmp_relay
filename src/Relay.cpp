@@ -8,6 +8,7 @@
 #include <functional>
 #include <iostream>
 #include <chrono>
+#include <regex>
 #include <thread>
 #include "yaml-cpp/yaml.h"
 #include "Log.hpp"
@@ -202,10 +203,9 @@ namespace relay
                     if (endpoint.connectionType == Connection::Type::CLIENT &&
                         endpoint.streamType == Stream::Type::INPUT)
                     {
-                        if (endpoint.applicationName.empty() ||
-                            endpoint.streamName.empty())
+                        if (!endpoint.isNameKnown())
                         {
-                            Log(Log::Level::ERR) << "Client input streams can not have empty application name or stream name";
+                            Log(Log::Level::ERR) << "Client input streams must have application name and stream name";
                             return false;
                         }
                     }
@@ -245,8 +245,8 @@ namespace relay
 
             for (const Endpoint& endpoint : endpoints)
             {
-                if ((endpoint.applicationName.empty() || endpoint.applicationName == applicationName) &&
-                    (endpoint.streamName.empty() || endpoint.streamName == streamName))
+                if ((endpoint.applicationName.empty() || std::regex_match(applicationName, std::regex(endpoint.applicationName))) &&
+                    (endpoint.streamName.empty() || std::regex_match(streamName, std::regex(endpoint.streamName))))
                 {
                     if (endpoint.streamType == type)
                     {

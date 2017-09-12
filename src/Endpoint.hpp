@@ -40,7 +40,8 @@ namespace relay
 
         bool isNameKnown() const
         {
-            return !applicationName.empty() && !streamName.empty();
+            return !applicationName.empty() && !streamName.empty() &&
+                isAlphaNumericUnderscore(applicationName) && isAlphaNumericUnderscore(streamName);
         }
     };
 }

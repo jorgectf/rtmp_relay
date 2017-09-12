@@ -310,3 +310,16 @@ inline bool isCodecHeader(const std::vector<uint8_t>& data)
 {
     return data.size() >= 2 && data[1] == 0;
 }
+
+inline bool isAlphaNumericUnderscore(const std::string& str)
+{
+    for (char c : str)
+    {
+        if (!isalnum(c) && c != '_')
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
