@@ -244,7 +244,8 @@ namespace relay
         {
             for (const Endpoint& endpoint : server->getEndpoints())
             {
-                if ((endpoint.applicationName.empty() || std::regex_match(applicationName, std::regex(endpoint.applicationName))) &&
+                if (endpoint.connectionType == Connection::Type::HOST &&
+                    (endpoint.applicationName.empty() || std::regex_match(applicationName, std::regex(endpoint.applicationName))) &&
                     (endpoint.streamName.empty() || std::regex_match(streamName, std::regex(endpoint.streamName))))
                 {
                     Log(Log::Level::ALL) << "Application \"" << applicationName << "\", stream \"" << streamName << "\" matched endpoint application \"" << endpoint.applicationName << "\", stream \"" << endpoint.streamName << "\"";
