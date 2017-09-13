@@ -242,9 +242,7 @@ namespace relay
 
         for (const std::unique_ptr<Server>& server : servers)
         {
-            const std::vector<Endpoint>& endpoints = server->getEndpoints();
-
-            for (const Endpoint& endpoint : endpoints)
+            for (const Endpoint& endpoint : server->getEndpoints())
             {
                 if ((endpoint.applicationName.empty() || std::regex_match(applicationName, std::regex(endpoint.applicationName))) &&
                     (endpoint.streamName.empty() || std::regex_match(streamName, std::regex(endpoint.streamName))))
