@@ -247,6 +247,8 @@ namespace relay
                 if ((endpoint.applicationName.empty() || std::regex_match(applicationName, std::regex(endpoint.applicationName))) &&
                     (endpoint.streamName.empty() || std::regex_match(streamName, std::regex(endpoint.streamName))))
                 {
+                    Log(Log::Level::ALL) << "Application \"" << applicationName << "\", stream \"" << streamName << "\" matched endpoint application \"" << endpoint.applicationName << "\", stream \"" << endpoint.streamName << "\"";
+
                     if (endpoint.streamType == type)
                     {
                         bool found = false;
@@ -258,8 +260,14 @@ namespace relay
                                  endpointAddress.ipAddresses.first == address.first) &&
                                 endpointAddress.ipAddresses.second == address.second)
                             {
+                                Log(Log::Level::ALL) << "Address " << ipToString(address.first) << ":" << address.second << " matched address " << ipToString(endpointAddress.ipAddresses.first) << ":" << endpointAddress.ipAddresses.second;
+
                                 found = true;
                                 break;
+                            }
+                            else
+                            {
+                                Log(Log::Level::ALL) << "Address " << ipToString(address.first) << ":" << address.second << " did not match address " << ipToString(endpointAddress.ipAddresses.first) << ":" << endpointAddress.ipAddresses.second;
                             }
                         }
 
@@ -268,6 +276,10 @@ namespace relay
                             result.push_back(std::make_pair(server.get(), &endpoint));
                         }
                     }
+                }
+                else
+                {
+                    Log(Log::Level::ALL) << "Application: \"" << applicationName << "\", stream: \"" << streamName << "\" did not match endpoint application: \"" << endpoint.applicationName << "\", stream: \"" << endpoint.streamName << "\"";
                 }
             }
         }
