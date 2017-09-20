@@ -20,8 +20,6 @@ namespace relay
         type(Type::HOST),
         socket(std::move(client))
     {
-        socket = std::move(client);
-
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
         socket.startRead();
