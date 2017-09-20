@@ -12,13 +12,11 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Stream::Stream(cppsocket::Network& aNetwork,
-                   Server& aServer,
+    Stream::Stream(Server& aServer,
                    Type aType,
                    const std::string& aApplicationName,
                    const std::string& aStreamName):
         id(Relay::nextId()),
-        network(aNetwork),
         server(aServer),
         type(aType),
         applicationName(aApplicationName),
@@ -62,9 +60,7 @@ namespace relay
             if (endpoint.connectionType == Connection::Type::CLIENT &&
                 endpoint.streamType == Type::OUTPUT)
             {
-                Socket socket(network);
-
-                Connection* newConnection = server.createConnection(socket, *this, endpoint);
+                Connection* newConnection = server.createConnection(*this, endpoint);
                 newConnection->setStream(this);
                 newConnection->connect();
 

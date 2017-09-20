@@ -34,11 +34,10 @@ namespace relay
         return nullptr;
     }
 
-    Connection* Server::createConnection(cppsocket::Socket& connector,
-                                         Stream& stream,
+    Connection* Server::createConnection(Stream& stream,
                                          const Endpoint& endpoint)
     {
-        std::unique_ptr<Connection> connection(new Connection(relay, connector, stream, endpoint));
+        std::unique_ptr<Connection> connection(new Connection(relay, stream, endpoint));
         Connection* connectionPtr = connection.get();
         connections.push_back(std::move(connection));
 
@@ -64,7 +63,7 @@ namespace relay
                                  const std::string& applicationName,
                                  const std::string& streamName)
     {
-        std::unique_ptr<Stream> stream(new Stream(network, *this, type, applicationName, streamName));
+        std::unique_ptr<Stream> stream(new Stream(*this, type, applicationName, streamName));
         Stream* streamPtr = stream.get();
         streams.push_back(std::move(stream));
 
@@ -102,7 +101,6 @@ namespace relay
                                               endpoint.streamName);
 
                 std::unique_ptr<Connection> connection(new Connection(relay,
-                                                                      socket,
                                                                       *stream,
                                                                       endpoint));
 

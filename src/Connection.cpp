@@ -14,38 +14,37 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Connection::Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType):
+    Connection::Connection(Relay& aRelay,
+                           cppsocket::Socket& client):
         relay(aRelay),
         id(Relay::nextId()),
         generator(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count())),
-        type(aType),
-        socket(std::move(aSocket))
+        type(Type::HOST),
+        socket(std::move(client))
     {
-        if (!socket.setBlocking(false))
-        {
-            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Failed to set socket non-blocking";
-        }
+        socket = std::move(client);
 
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
-    }
-
-    Connection::Connection(Relay& aRelay,
-                           cppsocket::Socket& client):
-        Connection(aRelay, client, Type::HOST)
-    {
         socket.startRead();
     }
 
     Connection::Connection(Relay& aRelay,
-                           cppsocket::Socket& connector,
                            Stream& aStream,
                            const Endpoint& aEndpoint):
-        Connection(aRelay, connector, Type::CLIENT)
+        relay(aRelay),
+        id(Relay::nextId()),
+        generator(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count())),
+        type(Type::CLIENT),
+        socket(relay.getNetwork()),
+        endpoint(&aEndpoint)
     {
         stream = &aStream;
 
-        endpoint = &aEndpoint;
+        if (!socket.setBlocking(false))
+        {
+            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Failed to set socket non-blocking";
+        }
 
         reconnectCount = endpoint->reconnectCount;
         bufferSize = endpoint->bufferSize;
@@ -54,6 +53,8 @@ namespace relay
         overrideStreamName = endpoint->streamName;
         amfVersion = endpoint->amfVersion;
 
+        socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
+        socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
         socket.setConnectTimeout(endpoint->connectionTimeout);
         socket.setConnectCallback(std::bind(&Connection::handleConnect, this, std::placeholders::_1));
         socket.setConnectErrorCallback(std::bind(&Connection::handleConnectError, this, std::placeholders::_1));

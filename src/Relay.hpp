@@ -33,6 +33,8 @@ namespace relay
         Relay& operator=(const Relay&) = delete;
         Relay& operator=(Relay&&) = delete;
 
+        cppsocket::Network& getNetwork() { return network; }
+
         bool init(const std::string& config);
         void close();
 

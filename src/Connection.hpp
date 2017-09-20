@@ -40,11 +40,9 @@ namespace relay
             HANDSHAKE_DONE = 4
         };
 
-        Connection(Relay& aRelay, cppsocket::Socket& aSocket, Type aType);
         Connection(Relay& aRelay,
                    cppsocket::Socket& client);
         Connection(Relay& aRelay,
-                   cppsocket::Socket& connector,
                    Stream& aStream,
                    const Endpoint& aEndpoint);
 

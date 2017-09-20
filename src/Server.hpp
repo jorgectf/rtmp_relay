@@ -23,8 +23,7 @@ namespace relay
 
         uint64_t getId() const { return id; }
 
-        Connection* createConnection(cppsocket::Socket& connector,
-                                     Stream& stream,
+        Connection* createConnection(Stream& stream,
                                      const Endpoint& endpoint);
         void deleteConnection(Connection* connection);
 

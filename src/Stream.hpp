@@ -27,8 +27,7 @@ namespace relay
             OUTPUT
         };
 
-        Stream(cppsocket::Network& aNetwork,
-               Server& aServer,
+        Stream(Server& aServer,
                Type aType,
                const std::string& aApplicationName,
                const std::string& aStreamName);
@@ -63,7 +62,6 @@ namespace relay
     private:
         const uint64_t id;
 
-        cppsocket::Network& network;
         Server& server;
 
         Type type;
