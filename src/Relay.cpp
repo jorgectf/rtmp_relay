@@ -23,6 +23,7 @@ namespace relay
     uint64_t Relay::currentId = 0;
 
     Relay::Relay(Network& aNetwork):
+        generator(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count())),
         network(aNetwork)
     {
         previousTime = std::chrono::steady_clock::now();

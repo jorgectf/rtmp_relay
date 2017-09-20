@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <random>
 #include <map>
 #include <set>
 #include "Socket.hpp"
@@ -134,8 +133,6 @@ namespace relay
 
         Relay& relay;
         const uint64_t id;
-
-        std::mt19937 generator;
 
         Type type;
         State state = State::UNINITIALIZED;

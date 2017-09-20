@@ -2,7 +2,6 @@
 //  rtmp_relay
 //
 
-#include <chrono>
 #include "Connection.hpp"
 #include "Relay.hpp"
 #include "Server.hpp"
@@ -18,7 +17,6 @@ namespace relay
                            cppsocket::Socket& client):
         relay(aRelay),
         id(Relay::nextId()),
-        generator(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count())),
         type(Type::HOST),
         socket(std::move(client))
     {
@@ -34,7 +32,6 @@ namespace relay
                            const Endpoint& aEndpoint):
         relay(aRelay),
         id(Relay::nextId()),
-        generator(static_cast<unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count())),
         type(Type::CLIENT),
         socket(relay.getNetwork()),
         endpoint(&aEndpoint)
@@ -403,7 +400,7 @@ namespace relay
 
             for (size_t i = 0; i < sizeof(challenge.randomBytes); ++i)
             {
-                uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
+                uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(relay.getGenerator());
 
                 challenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
             }
@@ -506,7 +503,7 @@ namespace relay
 
                         for (size_t i = 0; i < sizeof(replyChallenge.randomBytes); ++i)
                         {
-                            uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(generator);
+                            uint32_t randomValue = std::uniform_int_distribution<uint32_t>{0, 255}(relay.getGenerator());
                             replyChallenge.randomBytes[i] = static_cast<uint8_t>(randomValue);
                         }
 

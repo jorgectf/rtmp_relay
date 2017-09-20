@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <utility>
-#include <vector>
 #include <memory>
+#include <random>
+#include <vector>
+#include <utility>
 #include "Network.hpp"
 #include "Socket.hpp"
 #include "Status.hpp"
@@ -33,6 +34,7 @@ namespace relay
         Relay& operator=(const Relay&) = delete;
         Relay& operator=(Relay&&) = delete;
 
+        std::mt19937& getGenerator() { return generator; }
         cppsocket::Network& getNetwork() { return network; }
 
         bool init(const std::string& config);
@@ -54,6 +56,7 @@ namespace relay
         void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
 
         static uint64_t currentId;
+        std::mt19937 generator;
         bool active = true;
 
         cppsocket::Network& network;
