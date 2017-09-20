@@ -34,11 +34,37 @@ namespace relay
         return nullptr;
     }
 
+    Connection* Server::createConnection(cppsocket::Socket& connector,
+                                         Stream& stream,
+                                         const Endpoint& endpoint)
+    {
+        std::unique_ptr<Connection> connection(new Connection(relay, connector, stream, endpoint));
+        Connection* connectionPtr = connection.get();
+        connections.push_back(std::move(connection));
+
+        return connectionPtr;
+    }
+
+    void Server::deleteConnection(Connection* connection)
+    {
+        for (auto i = connections.begin(); i != connections.end();)
+        {
+            if (i->get() == connection)
+            {
+                i = connections.erase(i);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
+
     Stream* Server::createStream(Stream::Type type,
                                  const std::string& applicationName,
                                  const std::string& streamName)
     {
-        std::unique_ptr<Stream> stream(new Stream(relay, network, *this, type, applicationName, streamName));
+        std::unique_ptr<Stream> stream(new Stream(network, *this, type, applicationName, streamName));
         Stream* streamPtr = stream.get();
         streams.push_back(std::move(stream));
 
@@ -105,12 +131,6 @@ namespace relay
             {
                 ++i;
             }
-        }
-
-        for (auto i = streams.begin(); i != streams.end(); ++i)
-        {
-            const std::unique_ptr<Stream>& stream = *i;
-            stream->update(delta);
         }
     }
 

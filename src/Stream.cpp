@@ -12,14 +12,12 @@ using namespace cppsocket;
 
 namespace relay
 {
-    Stream::Stream(Relay& aRelay,
-                   cppsocket::Network& aNetwork,
+    Stream::Stream(cppsocket::Network& aNetwork,
                    Server& aServer,
                    Type aType,
                    const std::string& aApplicationName,
                    const std::string& aStreamName):
         id(Relay::nextId()),
-        relay(aRelay),
         network(aNetwork),
         server(aServer),
         type(aType),
@@ -37,24 +35,10 @@ namespace relay
             outputConnection->removeStream();
             outputConnection->unpublishStream();
         }
-    }
 
-    void Stream::update(float delta)
-    {
-        for (auto i = connections.begin(); i != connections.end();)
+        for (Connection* connection : connections)
         {
-            const std::unique_ptr<Connection>& connection = *i;
-
-            connection->update(delta);
-
-            if (connection->isClosed())
-            {
-                i = connections.erase(i);
-            }
-            else
-            {
-                ++i;
-            }
+            server.deleteConnection(connection);
         }
     }
 
@@ -80,16 +64,11 @@ namespace relay
             {
                 Socket socket(network);
 
-                std::unique_ptr<Connection> newConnection(new Connection(relay,
-                                                                         socket,
-                                                                         *this,
-                                                                         endpoint));
-
+                Connection* newConnection = server.createConnection(socket, *this, endpoint);
                 newConnection->setStream(this);
-
                 newConnection->connect();
 
-                connections.push_back(std::move(newConnection));
+                connections.push_back(newConnection);
             }
         }
     }

@@ -27,8 +27,7 @@ namespace relay
             OUTPUT
         };
 
-        Stream(Relay& aRelay,
-               cppsocket::Network& aNetwork,
+        Stream(cppsocket::Network& aNetwork,
                Server& aServer,
                Type aType,
                const std::string& aApplicationName,
@@ -40,8 +39,6 @@ namespace relay
         Stream& operator=(Stream&&) = delete;
 
         virtual ~Stream();
-
-        void update(float delta);
 
         Server& getServer() { return server; }
         Type getType() const { return type; }
@@ -66,7 +63,6 @@ namespace relay
     private:
         const uint64_t id;
 
-        Relay& relay;
         cppsocket::Network& network;
         Server& server;
 
@@ -82,6 +78,6 @@ namespace relay
         std::vector<uint8_t> videoHeader;
         amf::Node metaData;
 
-        std::vector<std::unique_ptr<Connection>> connections;
+        std::vector<Connection*> connections;
     };
 }
