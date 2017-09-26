@@ -101,7 +101,7 @@ Example configuration:
             type: "client"
             stream: "output"
             applicationName: "app/name"
-            streamName: "test_{name}"
+            streamName: "{streamName}_2"
             video: true
             audio: true
             pingInterval: 60.0
