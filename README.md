@@ -101,8 +101,7 @@ Example configuration:
             type: "client"
             stream: "output"
             applicationName: "app/name"
-            streamName: "stream_name"
-            overrideStreamName: "test_{name}"
+            streamName: "test_{name}"
             video: true
             audio: true
             pingInterval: 60.0
