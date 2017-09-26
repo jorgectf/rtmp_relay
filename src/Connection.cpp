@@ -1385,7 +1385,7 @@ namespace relay
                             {
                                 newStream = server->createStream(streamType, applicationName, streamName);
                             }
-                            else if (stream->getInputConnection())
+                            else if (newStream->getInputConnection())
                             {
                                 Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
                                 close();
