@@ -1381,7 +1381,16 @@ namespace relay
                             pingInterval = endpoint->pingInterval;
 
                             stream = server->findStream(streamType, applicationName, streamName);
-                            if (!stream) stream = server->createStream(streamType, applicationName, streamName);
+                            if (!stream)
+                            {
+                                stream = server->createStream(streamType, applicationName, streamName);
+                            }
+                            else if (stream->getInputConnection())
+                            {
+                                Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
+                                close();
+                                return false;
+                            }
                             stream->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
@@ -1568,6 +1577,13 @@ namespace relay
                         {
                             if (stream)
                             {
+                                if (stream->getInputConnection())
+                                {
+                                    Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
+                                    close();
+                                    return false;
+                                }
+
                                 stream->startStreaming(*this);
                             }
                             else

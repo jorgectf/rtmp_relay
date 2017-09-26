@@ -47,24 +47,27 @@ namespace relay
 
     void Stream::startStreaming(Connection& connection)
     {
-        inputConnection = &connection;
-        streaming = true;
-
-        for (Connection* outputConnection : outputConnections)
+        if (!inputConnection)
         {
-            outputConnection->setStream(this);
-        }
+            inputConnection = &connection;
+            streaming = true;
 
-        for (const Endpoint& endpoint : server.getEndpoints())
-        {
-            if (endpoint.connectionType == Connection::Type::CLIENT &&
-                endpoint.streamType == Type::OUTPUT)
+            for (Connection* outputConnection : outputConnections)
             {
-                Connection* newConnection = server.createConnection(*this, endpoint);
-                newConnection->setStream(this);
-                newConnection->connect();
+                outputConnection->setStream(this);
+            }
 
-                connections.push_back(newConnection);
+            for (const Endpoint& endpoint : server.getEndpoints())
+            {
+                if (endpoint.connectionType == Connection::Type::CLIENT &&
+                    endpoint.streamType == Type::OUTPUT)
+                {
+                    Connection* newConnection = server.createConnection(*this, endpoint);
+                    newConnection->setStream(this);
+                    newConnection->connect();
+
+                    connections.push_back(newConnection);
+                }
             }
         }
     }

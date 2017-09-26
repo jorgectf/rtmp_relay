@@ -52,6 +52,8 @@ namespace relay
         void startReceiving(Connection& connection);
         void stopReceiving(Connection& connection);
 
+        Connection* getInputConnection() const { return inputConnection; }
+
         void sendAudioHeader(const std::vector<uint8_t>& headerData);
         void sendVideoHeader(const std::vector<uint8_t>& headerData);
         void sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& audioData);
