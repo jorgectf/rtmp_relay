@@ -1380,10 +1380,10 @@ namespace relay
 
                             pingInterval = endpoint->pingInterval;
 
-                            stream = server->findStream(streamType, applicationName, streamName);
-                            if (!stream)
+                            Stream* newStream = server->findStream(streamType, applicationName, streamName);
+                            if (!newStream)
                             {
-                                stream = server->createStream(streamType, applicationName, streamName);
+                                newStream = server->createStream(streamType, applicationName, streamName);
                             }
                             else if (stream->getInputConnection())
                             {
@@ -1391,6 +1391,7 @@ namespace relay
                                 close();
                                 return false;
                             }
+                            stream = newStream;
                             stream->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
@@ -1478,15 +1479,16 @@ namespace relay
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
 
-                            stream = server->findStream(streamType, applicationName, streamName);
-                            //if (!stream) stream = server->createStream(streamType, applicationName, streamName);
-                            if (!stream)
+                            Stream* newStream = server->findStream(streamType, applicationName, streamName);
+                            //if (!newStream) newStream = server->createStream(streamType, applicationName, streamName);
+                            if (!newStream)
                             {
                                 Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream not found \"" << applicationName << "/" << streamName << "\", disconnecting";
                                 close();
                                 return false;
                             }
 
+                            stream = newStream;
                             stream->startReceiving(*this);
                         }
                         else
