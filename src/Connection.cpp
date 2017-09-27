@@ -1507,8 +1507,7 @@ namespace relay
                 }
                 else if (command.asString() == "getStreamLength")
                 {
-                    if (streamType == Stream::Type::NONE ||
-                        streamType == Stream::Type::INPUT)
+                    if (streamType == Stream::Type::OUTPUT)
                     {
                         sendGetStreamLengthResult(transactionId.asDouble());
                     }
