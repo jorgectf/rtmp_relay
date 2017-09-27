@@ -1480,13 +1480,14 @@ namespace relay
                             sendPlayStatus(transactionId.asDouble());
 
                             Stream* newStream = server->findStream(streamType, applicationName, streamName);
-                            //if (!newStream) newStream = server->createStream(streamType, applicationName, streamName);
-                            if (!newStream)
+                            if (!newStream) newStream = server->createStream(streamType, applicationName, streamName);
+
+                            /*if (!newStream)
                             {
                                 Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream not found \"" << applicationName << "/" << streamName << "\", disconnecting";
                                 close();
                                 return false;
-                            }
+                            }*/
 
                             stream = newStream;
                             stream->startReceiving(*this);
