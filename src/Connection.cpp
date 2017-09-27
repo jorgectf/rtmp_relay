@@ -36,6 +36,8 @@ namespace relay
     {
         stream = &aStream;
 
+        resolveStreamName();
+
         if (!socket.setBlocking(false))
         {
             Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Failed to set socket non-blocking";
@@ -1383,7 +1385,7 @@ namespace relay
                             {
                                 newStream = server->createStream(streamType, applicationName, streamName);
                             }
-                            else if (newStream->getInputConnection())
+                            else if (newStream->getInputConnection() && newStream->getInputConnection() != this)
                             {
                                 Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
                                 close();
@@ -1724,7 +1726,12 @@ namespace relay
     {
         stream = aStream;
 
-        if (endpoint)
+        resolveStreamName();
+    }
+
+    void Connection::resolveStreamName()
+    {
+        if (endpoint && stream)
         {
             if (endpoint->applicationName.empty())
             {

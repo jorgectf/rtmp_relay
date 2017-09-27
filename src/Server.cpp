@@ -92,7 +92,8 @@ namespace relay
         for (const Endpoint& endpoint : endpoints)
         {
             if (endpoint.connectionType == Connection::Type::CLIENT &&
-                endpoint.streamType == Stream::Type::INPUT)
+                endpoint.streamType == Stream::Type::INPUT &&
+                endpoint.isNameKnown())
             {
                 Socket socket(network);
 

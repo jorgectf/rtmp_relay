@@ -81,6 +81,7 @@ namespace relay
 
     private:
         void reset();
+        void resolveStreamName();
 
         void handleConnect(cppsocket::Socket&);
         void handleConnectError(cppsocket::Socket&);

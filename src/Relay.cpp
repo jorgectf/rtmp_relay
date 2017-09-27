@@ -201,17 +201,6 @@ namespace relay
 
                     }
 
-                    if (endpoint.connectionType == Connection::Type::CLIENT &&
-                        endpoint.streamType == Stream::Type::INPUT)
-                    {
-                        if (endpoint.applicationName.empty() ||
-                            endpoint.streamName.empty()) // TODO: check if stream names contain regex
-                        {
-                            Log(Log::Level::ERR) << "Client input streams must have application name and stream name";
-                            return false;
-                        }
-                    }
-
                     endpoints.push_back(endpoint);
                 }
             }
@@ -245,43 +234,51 @@ namespace relay
         {
             for (const Endpoint& endpoint : server->getEndpoints())
             {
-                if (endpoint.connectionType == Connection::Type::HOST &&
-                    (endpoint.applicationName.empty() || std::regex_match(applicationName, std::regex(endpoint.applicationName))) &&
-                    (endpoint.streamName.empty() || std::regex_match(streamName, std::regex(endpoint.streamName))))
+                try
                 {
-                    Log(Log::Level::ALL) << "Application \"" << applicationName << "\", stream \"" << streamName << "\" matched endpoint application \"" << endpoint.applicationName << "\", stream \"" << endpoint.streamName << "\"";
-
-                    if (endpoint.streamType == type)
+                    if (endpoint.connectionType == Connection::Type::HOST &&
+                        (endpoint.applicationName.empty() || std::regex_match(applicationName, std::regex(endpoint.applicationName))) &&
+                        (endpoint.streamName.empty() || std::regex_match(streamName, std::regex(endpoint.streamName))))
                     {
-                        bool found = false;
+                        Log(Log::Level::ALL) << "Application \"" << applicationName << "\", stream \"" << streamName << "\" matched endpoint application \"" << endpoint.applicationName << "\", stream \"" << endpoint.streamName << "\"";
 
-                        for (auto endpointAddress : endpoint.addresses)
+                        if (endpoint.streamType == type)
                         {
-                            if ((endpointAddress.ipAddresses.first == ANY_ADDRESS ||
-                                 address.first == ANY_ADDRESS ||
-                                 endpointAddress.ipAddresses.first == address.first) &&
-                                endpointAddress.ipAddresses.second == address.second)
-                            {
-                                Log(Log::Level::ALL) << "Address " << ipToString(address.first) << ":" << address.second << " matched address " << ipToString(endpointAddress.ipAddresses.first) << ":" << endpointAddress.ipAddresses.second;
+                            bool found = false;
 
-                                found = true;
-                                break;
-                            }
-                            else
+                            for (auto endpointAddress : endpoint.addresses)
                             {
-                                Log(Log::Level::ALL) << "Address " << ipToString(address.first) << ":" << address.second << " did not match address " << ipToString(endpointAddress.ipAddresses.first) << ":" << endpointAddress.ipAddresses.second;
-                            }
-                        }
+                                if ((endpointAddress.ipAddresses.first == ANY_ADDRESS ||
+                                     address.first == ANY_ADDRESS ||
+                                     endpointAddress.ipAddresses.first == address.first) &&
+                                    endpointAddress.ipAddresses.second == address.second)
+                                {
+                                    Log(Log::Level::ALL) << "Address " << ipToString(address.first) << ":" << address.second << " matched address " << ipToString(endpointAddress.ipAddresses.first) << ":" << endpointAddress.ipAddresses.second;
 
-                        if (found)
-                        {
-                            result.push_back(std::make_pair(server.get(), &endpoint));
+                                    found = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    Log(Log::Level::ALL) << "Address " << ipToString(address.first) << ":" << address.second << " did not match address " << ipToString(endpointAddress.ipAddresses.first) << ":" << endpointAddress.ipAddresses.second;
+                                }
+                            }
+
+                            if (found)
+                            {
+                                result.push_back(std::make_pair(server.get(), &endpoint));
+                            }
                         }
                     }
+                    else
+                    {
+                        Log(Log::Level::ALL) << "Application: \"" << applicationName << "\", stream: \"" << streamName << "\" did not match endpoint application: \"" << endpoint.applicationName << "\", stream: \"" << endpoint.streamName << "\"";
+                    }
                 }
-                else
+                catch (std::regex_error e)
                 {
-                    Log(Log::Level::ALL) << "Application: \"" << applicationName << "\", stream: \"" << streamName << "\" did not match endpoint application: \"" << endpoint.applicationName << "\", stream: \"" << endpoint.streamName << "\"";
+                    Log(Log::Level::ERR) << "Configuration error: Invalid regex for output connection";
+                    exit(1);
                 }
             }
         }

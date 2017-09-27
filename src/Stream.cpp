@@ -63,7 +63,6 @@ namespace relay
                     endpoint.streamType == Type::OUTPUT)
                 {
                     Connection* newConnection = server.createConnection(*this, endpoint);
-                    newConnection->setStream(this);
                     newConnection->connect();
 
                     connections.push_back(newConnection);
@@ -91,6 +90,19 @@ namespace relay
 
     void Stream::startReceiving(Connection& connection)
     {
+        if (!inputConnection)
+        {
+            for (const Endpoint& endpoint : server.getEndpoints())
+            {
+                if (endpoint.connectionType == Connection::Type::CLIENT &&
+                    endpoint.streamType == Type::INPUT)
+                {
+                    auto ic = server.createConnection(*this, endpoint);
+                    ic->connect();
+                }
+            }
+        }
+
         auto i = std::find(outputConnections.begin(), outputConnections.end(), &connection);
 
         if (i == outputConnections.end())
