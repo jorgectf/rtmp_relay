@@ -163,8 +163,6 @@ namespace relay
         Stream::Type streamType = Stream::Type::NONE;
         std::string applicationName;
         std::string streamName;
-        std::string overrideApplicationName;
-        std::string overrideStreamName;
         bool connected = false;
 
         bool videoFrameSent = false;
