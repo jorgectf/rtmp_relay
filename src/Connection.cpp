@@ -1378,10 +1378,10 @@ namespace relay
 
                             pingInterval = endpoint->pingInterval;
 
-                            Stream* newStream = server->findStream(streamType, applicationName, streamName);
+                            Stream* newStream = server->findStream(applicationName, streamName);
                             if (!newStream)
                             {
-                                newStream = server->createStream(streamType, applicationName, streamName);
+                                newStream = server->createStream(applicationName, streamName);
                             }
                             else if (newStream->getInputConnection())
                             {
@@ -1477,8 +1477,8 @@ namespace relay
                             sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
                             sendPlayStatus(transactionId.asDouble());
 
-                            Stream* newStream = server->findStream(streamType, applicationName, streamName);
-                            if (!newStream) newStream = server->createStream(streamType, applicationName, streamName);
+                            Stream* newStream = server->findStream(applicationName, streamName);
+                            if (!newStream) newStream = server->createStream(applicationName, streamName);
 
                             /*if (!newStream)
                             {

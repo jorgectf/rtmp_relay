@@ -17,14 +17,12 @@ namespace relay
     {
     }
 
-    Stream* Server::findStream(Stream::Type type,
-                               const std::string& applicationName,
+    Stream* Server::findStream(const std::string& applicationName,
                                const std::string& streamName) const
     {
         for (auto i = streams.begin(); i != streams.end(); ++i)
         {
-            if ((*i)->getType() == type &&
-                (*i)->getApplicationName() == applicationName &&
+            if ((*i)->getApplicationName() == applicationName &&
                 (*i)->getStreamName() == streamName)
             {
                 return i->get();
@@ -59,11 +57,10 @@ namespace relay
         }
     }
 
-    Stream* Server::createStream(Stream::Type type,
-                                 const std::string& applicationName,
+    Stream* Server::createStream(const std::string& applicationName,
                                  const std::string& streamName)
     {
-        std::unique_ptr<Stream> stream(new Stream(*this, type, applicationName, streamName));
+        std::unique_ptr<Stream> stream(new Stream(*this, applicationName, streamName));
         Stream* streamPtr = stream.get();
         streams.push_back(std::move(stream));
 
@@ -96,8 +93,7 @@ namespace relay
             {
                 Socket socket(network);
 
-                Stream* stream = createStream(endpoint.streamType,
-                                              endpoint.applicationName,
+                Stream* stream = createStream(endpoint.applicationName,
                                               endpoint.streamName);
 
                 std::unique_ptr<Connection> connection(new Connection(relay,

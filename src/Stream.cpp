@@ -13,12 +13,10 @@ using namespace cppsocket;
 namespace relay
 {
     Stream::Stream(Server& aServer,
-                   Type aType,
                    const std::string& aApplicationName,
                    const std::string& aStreamName):
         id(Relay::nextId()),
         server(aServer),
-        type(aType),
         applicationName(aApplicationName),
         streamName(aStreamName)
     {
