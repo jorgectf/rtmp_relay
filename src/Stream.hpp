@@ -28,7 +28,6 @@ namespace relay
         };
 
         Stream(Server& aServer,
-               Type aType,
                const std::string& aApplicationName,
                const std::string& aStreamName);
 
@@ -40,7 +39,6 @@ namespace relay
         virtual ~Stream();
 
         Server& getServer() { return server; }
-        Type getType() const { return type; }
         const std::string& getApplicationName() const { return applicationName; }
         const std::string& getStreamName() const { return streamName; }
 
@@ -66,7 +64,6 @@ namespace relay
 
         Server& server;
 
-        Type type;
         std::string applicationName;
         std::string streamName;
 

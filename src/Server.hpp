@@ -27,11 +27,9 @@ namespace relay
                                      const Endpoint& endpoint);
         void deleteConnection(Connection* connection);
 
-        Stream* findStream(Stream::Type type,
-                           const std::string& applicationName,
+        Stream* findStream(const std::string& applicationName,
                            const std::string& streamName) const;
-        Stream* createStream(Stream::Type type,
-                             const std::string& applicationName,
+        Stream* createStream(const std::string& applicationName,
                              const std::string& streamName);
         void deleteStream(Stream* stream);
 
