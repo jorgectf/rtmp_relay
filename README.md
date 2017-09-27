@@ -29,7 +29,7 @@ RTMP relay configuration files are YAML-based. It must start with servers array.
   * *applicationName* – for host streams this is the filter of incoming stream application names (can contain a regex), for client streams this is the name of the application (optional)
   * *streamName* – for host streams this is the filter of incoming stream names (can contain a regex), for client streams this is the name of the stream (optional)
   * *type* – type of connection (client or host)
-  * *stream* – type of stream (input or output)
+  * *direction* – direction of the stream (input or output)
   * *addresses* – list of addresses to connect to (for client connections) or listen to (for server connections)
   * *video* – flag that indicates whether to forward video stream (default value is true)
   * *audio* – flag that indicates whether to forward audio stream (default value is true)
@@ -85,13 +85,13 @@ Example configuration:
       - endpoints:
           - address: [ "0.0.0.0:13004" ]
             type: "host"
-            stream: "input"
+            direction: "input"
             applicationName: "app/name"
             video: true
             audio: true
           - address: [ "52.19.130.93:1935" ]
             type: "client"
-            stream: "output"
+            direction: "output"
             applicationName: "app/name"
             streamName: "stream_name"
             video: true
@@ -99,7 +99,7 @@ Example configuration:
             pingInterval: 60.0
           - address: [ "127.0.0.1:13005" ]
             type: "client"
-            stream: "output"
+            direction: "output"
             applicationName: "app/name"
             streamName: "{streamName}_2"
             video: true

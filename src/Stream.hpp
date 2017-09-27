@@ -20,12 +20,6 @@ namespace relay
     class Stream
     {
     public:
-        enum class Type
-        {
-            NONE,
-            INPUT,
-            OUTPUT
-        };
 
         Stream(Server& aServer,
                const std::string& aApplicationName,

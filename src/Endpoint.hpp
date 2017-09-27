@@ -17,7 +17,7 @@ namespace relay
     struct Endpoint
     {
         Connection::Type connectionType;
-        Stream::Type streamType;
+        Connection::Direction direction;
         struct Address
         {
             std::string url;

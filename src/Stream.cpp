@@ -58,7 +58,7 @@ namespace relay
             for (const Endpoint& endpoint : server.getEndpoints())
             {
                 if (endpoint.connectionType == Connection::Type::CLIENT &&
-                    endpoint.streamType == Type::OUTPUT)
+                    endpoint.direction == Connection::Direction::OUTPUT)
                 {
                     Connection* newConnection = server.createConnection(*this, endpoint);
                     newConnection->connect();
@@ -93,7 +93,7 @@ namespace relay
             for (const Endpoint& endpoint : server.getEndpoints())
             {
                 if (endpoint.connectionType == Connection::Type::CLIENT &&
-                    endpoint.streamType == Type::INPUT)
+                    endpoint.direction == Connection::Direction::INPUT)
                 {
                     auto ic = server.createConnection(*this, endpoint);
                     ic->connect();
@@ -134,7 +134,7 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Type::OUTPUT)
+            if (outputConnection->getDirection() == Connection::Direction::OUTPUT)
             {
                 outputConnection->sendAudioHeader(headerData);
             }
@@ -147,7 +147,7 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Type::OUTPUT)
+            if (outputConnection->getDirection() == Connection::Direction::OUTPUT)
             {
                 outputConnection->sendVideoHeader(headerData);
             }
@@ -158,7 +158,7 @@ namespace relay
     {
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Type::OUTPUT)
+            if (outputConnection->getDirection() == Connection::Direction::OUTPUT)
             {
                 outputConnection->sendAudioFrame(timestamp, audioData);
             }
@@ -169,7 +169,7 @@ namespace relay
     {
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Type::OUTPUT)
+            if (outputConnection->getDirection() == Connection::Direction::OUTPUT)
             {
                 outputConnection->sendVideoFrame(timestamp, videoData, frameType);
             }
@@ -182,7 +182,7 @@ namespace relay
 
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Type::OUTPUT)
+            if (outputConnection->getDirection() == Connection::Direction::OUTPUT)
             {
                 outputConnection->sendMetaData(metaData);
             }
@@ -193,7 +193,7 @@ namespace relay
     {
         for (Connection* outputConnection : outputConnections)
         {
-            if (outputConnection->getStreamType() == Type::OUTPUT)
+            if (outputConnection->getDirection() == Connection::Direction::OUTPUT)
             {
                 outputConnection->sendTextData(timestamp, textData);
             }

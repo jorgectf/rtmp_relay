@@ -45,7 +45,7 @@ namespace relay
 
         reconnectCount = endpoint->reconnectCount;
         bufferSize = endpoint->bufferSize;
-        streamType = endpoint->streamType;
+        direction = endpoint->direction;
         amfVersion = endpoint->amfVersion;
 
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
@@ -100,7 +100,7 @@ namespace relay
         {
             if (stream)
             {
-                if (streamType == Stream::Type::INPUT)
+                if (direction == Direction::INPUT)
                 {
                     // input disconnected
                     stream->getServer().deleteStream(stream);
@@ -111,7 +111,7 @@ namespace relay
 
             endpoint = nullptr;
 
-            streamType = Stream::Type::NONE;
+            direction = Direction::NONE;
             applicationName.clear();
             streamName.clear();
         }
@@ -219,11 +219,11 @@ namespace relay
 
                 str += ", stream: ";
 
-                switch (streamType)
+                switch (direction)
                 {
-                    case Stream::Type::NONE: str += "NONE"; break;
-                    case Stream::Type::INPUT: str += "INPUT"; break;
-                    case Stream::Type::OUTPUT: str += "OUTPUT"; break;
+                    case Direction::NONE: str += "NONE"; break;
+                    case Direction::INPUT: str += "INPUT"; break;
+                    case Direction::OUTPUT: str += "OUTPUT"; break;
                 }
 
                 if (stream) str += ", server: " + std::to_string(stream->getServer().getId());
@@ -271,11 +271,11 @@ namespace relay
 
                 str += "</td><td>";
 
-                switch (streamType)
+                switch (direction)
                 {
-                    case Stream::Type::NONE: str += "NONE"; break;
-                    case Stream::Type::INPUT: str += "INPUT"; break;
-                    case Stream::Type::OUTPUT: str += "OUTPUT"; break;
+                    case Direction::NONE: str += "NONE"; break;
+                    case Direction::INPUT: str += "INPUT"; break;
+                    case Direction::OUTPUT: str += "OUTPUT"; break;
                 }
 
                 str += "</td><td>" + (stream ? std::to_string(stream->getServer().getId()) : "") + "</td><td>";
@@ -324,11 +324,11 @@ namespace relay
 
                 str += ",\"stream\":";
 
-                switch (streamType)
+                switch (direction)
                 {
-                    case Stream::Type::NONE: str += "\"NONE\""; break;
-                    case Stream::Type::INPUT: str += "\"INPUT\""; break;
-                    case Stream::Type::OUTPUT: str += "\"OUTPUT\""; break;
+                    case Direction::NONE: str += "\"NONE\""; break;
+                    case Direction::INPUT: str += "\"INPUT\""; break;
+                    case Direction::OUTPUT: str += "\"OUTPUT\""; break;
                 }
 
                 if (stream) str += ",\"serverId\":" + std::to_string(stream->getServer().getId());
@@ -840,7 +840,7 @@ namespace relay
                 }
 
                 // only input can receive notify packets
-                if (streamType == Stream::Type::INPUT)
+                if (direction == Direction::INPUT)
                 {
                     amf::Node command;
 
@@ -956,7 +956,7 @@ namespace relay
             case rtmp::MessageType::AUDIO_PACKET:
             {
                 // only input can receive audio packets
-                if (streamType == Stream::Type::INPUT)
+                if (direction == Direction::INPUT)
                 {
                     {
                         Log log(Log::Level::ALL);
@@ -1012,7 +1012,7 @@ namespace relay
             case rtmp::MessageType::VIDEO_PACKET:
             {
                 // only input can receive video packets
-                if (streamType == Stream::Type::INPUT)
+                if (direction == Direction::INPUT)
                 {
                     VideoFrameType frameType = getVideoFrameType(packet.data);
 
@@ -1246,7 +1246,7 @@ namespace relay
                             stream->stopReceiving(*this);
                             stream->stopStreaming(*this);
 
-                            if (streamType == Stream::Type::INPUT)
+                            if (direction == Direction::INPUT)
                             {
                                 // input disconnected
                                 stream->getServer().deleteStream(stream);
@@ -1264,12 +1264,12 @@ namespace relay
                 }
                 else if (command.asString() == "FCPublish")
                 {
-                    if (streamType == Stream::Type::NONE ||
-                        streamType == Stream::Type::INPUT)
+                    if (direction == Direction::NONE ||
+                        direction == Direction::INPUT)
                     {
                         sendOnFCPublish();
                     }
-                    else if (streamType == Stream::Type::OUTPUT)
+                    else if (direction == Direction::OUTPUT)
                     {
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCPublish\") received, disconnecting";
                         close();
@@ -1281,9 +1281,9 @@ namespace relay
                 }
                 else if (command.asString() == "FCUnpublish")
                 {
-                    if (streamType == Stream::Type::INPUT)
+                    if (direction == Direction::INPUT)
                     {
-                        streamType = Stream::Type::NONE;
+                        direction = Direction::NONE;
                         videoFrameSent = false;
 
                         if (stream)
@@ -1319,7 +1319,7 @@ namespace relay
                 }
                 else if (command.asString() == "onFCUnpublish")
                 {
-                    if (streamType == Stream::Type::INPUT)
+                    if (direction == Direction::INPUT)
                     {
                         // Do nothing
                     }
@@ -1333,12 +1333,12 @@ namespace relay
                 }
                 else if (command.asString() == "FCSubscribe")
                 {
-                    if (streamType == Stream::Type::NONE ||
-                        streamType == Stream::Type::OUTPUT)
+                    if (direction == Direction::NONE ||
+                        direction == Direction::OUTPUT)
                     {
                         sendOnFCSubscribe();
                     }
-                    else if (streamType == Stream::Type::INPUT)
+                    else if (direction == Direction::INPUT)
                     {
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCSubscribe\") received, disconnecting";
                         close();
@@ -1350,10 +1350,10 @@ namespace relay
                 }
                 else if (command.asString() == "publish")
                 {
-                    if (streamType == Stream::Type::NONE ||
-                        streamType == Stream::Type::INPUT)
+                    if (direction == Direction::NONE ||
+                        direction == Direction::INPUT)
                     {
-                        streamType = Stream::Type::INPUT;
+                        direction = Direction::INPUT;
 
                         amf::Node argument2;
 
@@ -1368,7 +1368,7 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), direction, applicationName, streamName);
 
                         if (!endpoints.empty())
                         {
@@ -1403,7 +1403,7 @@ namespace relay
                             return false;
                         }
                     }
-                    else if (streamType == Stream::Type::OUTPUT)
+                    else if (direction == Direction::OUTPUT)
                     {
                         // this is not a receiver
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"publish\") received, disconnecting";
@@ -1413,9 +1413,9 @@ namespace relay
                 }
                 else if (command.asString() == "unpublish")
                 {
-                    if (streamType == Stream::Type::INPUT)
+                    if (direction == Direction::INPUT)
                     {
-                        streamType = Stream::Type::NONE;
+                        direction = Direction::NONE;
                         videoFrameSent = false;
 
                         if (stream)
@@ -1451,10 +1451,10 @@ namespace relay
                 }
                 else if (command.asString() == "play")
                 {
-                    if (streamType == Stream::Type::NONE ||
-                        streamType == Stream::Type::OUTPUT)
+                    if (direction == Direction::NONE ||
+                        direction == Direction::OUTPUT)
                     {
-                        streamType = Stream::Type::OUTPUT;
+                        direction = Direction::OUTPUT;
 
                         amf::Node argument2;
 
@@ -1469,7 +1469,7 @@ namespace relay
 
                         streamName = argument2.asString();
 
-                        std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), streamType, applicationName, streamName);
+                        std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), direction, applicationName, streamName);
 
                         if (!endpoints.empty())
                         {
@@ -1509,8 +1509,8 @@ namespace relay
                 }
                 else if (command.asString() == "getStreamLength")
                 {
-                    if (streamType == Stream::Type::NONE ||
-                        streamType == Stream::Type::OUTPUT)
+                    if (direction == Direction::NONE ||
+                        direction == Direction::OUTPUT)
                     {
                         sendGetStreamLengthResult(transactionId.asDouble());
                     }
@@ -1524,9 +1524,9 @@ namespace relay
                 }
                 else if (command.asString() == "stop")
                 {
-                    if (streamType == Stream::Type::OUTPUT)
+                    if (direction == Direction::OUTPUT)
                     {
-                        streamType = Stream::Type::NONE;
+                        direction = Direction::NONE;
                         videoFrameSent = false;
                         sendStopStatus(transactionId.asDouble());
                         if (stream) stream->stopReceiving(*this);
@@ -1554,7 +1554,7 @@ namespace relay
 
                     if (argument2["code"].asString() == "NetStream.Publish.Start")
                     {
-                        if (streamType == Stream::Type::OUTPUT)
+                        if (direction == Direction::OUTPUT)
                         {
                             if (stream)
                             {
@@ -1576,7 +1576,7 @@ namespace relay
                     }
                     else if (argument2["code"].asString() == "NetStream.Play.Start")
                     {
-                        if (streamType == Stream::Type::INPUT)
+                        if (direction == Direction::INPUT)
                         {
                             if (stream)
                             {
@@ -1634,14 +1634,14 @@ namespace relay
 
                             if (!streamName.empty())
                             {
-                                if (streamType == Stream::Type::OUTPUT)
+                                if (direction == Direction::OUTPUT)
                                 {
                                     Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Publishing stream " << streamName;
 
                                     sendReleaseStream();
                                     sendFCPublish();
                                 }
-                                else if (streamType == Stream::Type::INPUT)
+                                else if (direction == Direction::INPUT)
                                 {
                                     Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Subscribing to stream " << streamName;
 
@@ -1672,13 +1672,13 @@ namespace relay
 
                             streamId = static_cast<uint32_t>(argument2.asDouble());
 
-                            if (streamType == Stream::Type::INPUT)
+                            if (direction == Direction::INPUT)
                             {
                                 sendGetStreamLength();
                                 sendPlay();
                                 sendUserControl(rtmp::UserControlType::CLIENT_BUFFER_TIME, 0, streamId, bufferSize);
                             }
-                            else if (streamType == Stream::Type::OUTPUT)
+                            else if (direction == Direction::OUTPUT)
                             {
                                 sendPublish();
                             }

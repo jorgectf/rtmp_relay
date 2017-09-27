@@ -48,7 +48,7 @@ namespace relay
         void closeLog();
 
         std::vector<std::pair<Server*, const Endpoint*>> getEndpoints(const std::pair<uint32_t, uint16_t>& address,
-                                                                      Stream::Type type,
+                                                                      Connection::Direction type,
                                                                       const std::string& applicationName,
                                                                       const std::string& streamName) const;
 

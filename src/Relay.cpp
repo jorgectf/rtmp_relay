@@ -124,8 +124,8 @@ namespace relay
                     if (endpointObject["type"].as<std::string>() == "host") endpoint.connectionType = Connection::Type::HOST;
                     else if (endpointObject["type"].as<std::string>() == "client") endpoint.connectionType = Connection::Type::CLIENT;
 
-                    if (endpointObject["stream"].as<std::string>() == "input") endpoint.streamType = Stream::Type::INPUT;
-                    else if (endpointObject["stream"].as<std::string>() == "output") endpoint.streamType = Stream::Type::OUTPUT;
+                    if (endpointObject["direction"].as<std::string>() == "input") endpoint.direction = Connection::Direction::INPUT;
+                    else if (endpointObject["direction"].as<std::string>() == "output") endpoint.direction = Connection::Direction::OUTPUT;
 
                     if (endpointObject["address"].IsSequence())
                     {
@@ -224,7 +224,7 @@ namespace relay
     }
 
     std::vector<std::pair<Server*, const Endpoint*>> Relay::getEndpoints(const std::pair<uint32_t, uint16_t>& address,
-                                                                         Stream::Type type,
+                                                                         Connection::Direction direction,
                                                                          const std::string& applicationName,
                                                                          const std::string& streamName) const
     {
@@ -242,7 +242,7 @@ namespace relay
                     {
                         Log(Log::Level::ALL) << "Application \"" << applicationName << "\", stream \"" << streamName << "\" matched endpoint application \"" << endpoint.applicationName << "\", stream \"" << endpoint.streamName << "\"";
 
-                        if (endpoint.streamType == type)
+                        if (endpoint.direction == direction)
                         {
                             bool found = false;
 

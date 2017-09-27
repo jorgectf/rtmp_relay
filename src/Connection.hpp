@@ -24,6 +24,13 @@ namespace relay
     {
         const std::string name = "Connection";
     public:
+        enum class Direction
+        {
+            NONE,
+            INPUT,
+            OUTPUT
+        };
+
         enum class Type
         {
             HOST, // connection to RTMP relay
@@ -56,7 +63,7 @@ namespace relay
 
         uint64_t getId() const { return id; }
         Type getType() const { return type; }
-        Stream::Type getStreamType() const { return streamType; }
+        Connection::Direction getDirection() const { return direction; }
         const std::string& getApplicationName() const { return applicationName; }
         const std::string& getStreamName() const { return streamName; }
 
@@ -161,7 +168,7 @@ namespace relay
 
         uint32_t streamId = 0;
 
-        Stream::Type streamType = Stream::Type::NONE;
+        Connection::Direction direction = Connection::Direction::NONE;
         std::string applicationName;
         std::string streamName;
         bool connected = false;
