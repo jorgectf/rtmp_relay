@@ -43,6 +43,26 @@ namespace relay
         // TODO: implement
     }
 
+    bool Stream::hasDependableConnections()
+    {
+        bool hasDependables = (inputConnection ? inputConnection->isDependable() : false);
+        for (const auto& c : outputConnections)
+        {
+            hasDependables |= c->isDependable();
+        }
+
+        return hasDependables;
+    }
+
+    void Stream::deleteConnections()
+    {
+        server.deleteConnection(inputConnection);
+        for (auto o : outputConnections)
+        {
+            server.deleteConnection(o);
+        }
+    }
+
     void Stream::startStreaming(Connection& connection)
     {
         if (!inputConnection)
@@ -77,11 +97,22 @@ namespace relay
 
             for (Connection* outputConnection : outputConnections)
             {
-                outputConnection->removeStream();
-                outputConnection->unpublishStream();
+                if (!outputConnection->isDependable())
+                {
+                    outputConnection->removeStream();
+                    outputConnection->unpublishStream();
+                }
             }
 
-            outputConnections.clear();
+            outputConnections.erase(
+                  std::remove_if(outputConnections.begin(), outputConnections.end(), [](Connection* c){ return c->isClosed(); }),
+                  outputConnections.end());
+
+            if (inputConnection->getType() == Connection::Type::HOST)
+            {
+                getServer().deleteStream(this);
+            }
+
             inputConnection = nullptr;
         }
     }
@@ -125,6 +156,11 @@ namespace relay
         if (outputIterator != outputConnections.end())
         {
             outputConnections.erase(outputIterator);
+        }
+
+        if (!hasDependableConnections())
+        {
+            server.deleteStream(this);
         }
     }
 

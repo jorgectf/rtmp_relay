@@ -68,6 +68,7 @@ namespace relay
         const std::string& getStreamName() const { return streamName; }
 
         bool isClosed() const;
+        bool isConnected() { return connected; }
 
         void update(float delta);
 
@@ -85,6 +86,8 @@ namespace relay
         bool sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType);
         bool sendMetaData(const amf::Node& newMetaData);
         bool sendTextData(uint64_t timestamp, const amf::Node& textData);
+
+        bool isDependable();
 
     private:
         void reset();

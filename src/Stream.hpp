@@ -53,6 +53,9 @@ namespace relay
         void sendMetaData(const amf::Node& newMetaData);
         void sendTextData(uint64_t timestamp, const amf::Node& textData);
 
+        bool hasDependableConnections();
+        void deleteConnections();
+
     private:
         const uint64_t id;
 

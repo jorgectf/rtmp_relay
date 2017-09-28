@@ -59,8 +59,8 @@ namespace relay
     {
         if (stream)
         {
-            stream->stopReceiving(*this);
-            stream->stopStreaming(*this);
+            if (direction == Direction::INPUT) stream->stopStreaming(*this);
+            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
         }
     }
 
@@ -91,8 +91,8 @@ namespace relay
 
         if (stream)
         {
-            stream->stopReceiving(*this);
-            stream->stopStreaming(*this);
+            if (direction == Direction::INPUT) stream->stopStreaming(*this);
+            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
         }
 
         // disconnect all host connections
@@ -1243,8 +1243,8 @@ namespace relay
                     {
                         if (stream)
                         {
-                            stream->stopReceiving(*this);
-                            stream->stopStreaming(*this);
+                            if (direction == Direction::INPUT) stream->stopStreaming(*this);
+                            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
 
                             if (direction == Direction::INPUT)
                             {
@@ -1288,8 +1288,8 @@ namespace relay
 
                         if (stream)
                         {
-                            stream->stopReceiving(*this);
-                            stream->stopStreaming(*this);
+                            if (direction == Direction::INPUT) stream->stopStreaming(*this);
+                            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
 
                             if (type == Type::HOST)
                             {
@@ -1420,8 +1420,8 @@ namespace relay
 
                         if (stream)
                         {
-                            stream->stopReceiving(*this);
-                            stream->stopStreaming(*this);
+                            if (direction == Direction::INPUT) stream->stopStreaming(*this);
+                            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
 
                             if (type == Type::HOST)
                             {
@@ -1775,8 +1775,8 @@ namespace relay
     {
         if (stream)
         {
-            stream->stopReceiving(*this);
-            stream->stopStreaming(*this);
+            if (direction == Direction::INPUT) stream->stopStreaming(*this);
+            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
 
             if (type == Type::HOST)
             {
@@ -2371,6 +2371,8 @@ namespace relay
         if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+
+        close();
 
         return true;
     }
@@ -3091,5 +3093,10 @@ namespace relay
         }
 
         return true;
+    }
+
+    bool Connection::isDependable()
+    {
+        return (endpoint ? endpoint->isNameKnown() : false) || (type == Type::HOST);
     }
 }

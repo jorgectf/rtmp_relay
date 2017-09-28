@@ -73,6 +73,7 @@ namespace relay
         {
             if (i->get() == stream)
             {
+                stream->deleteConnections();
                 i = streams.erase(i);
             }
             else
