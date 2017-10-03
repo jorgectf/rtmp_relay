@@ -63,7 +63,7 @@ namespace relay
 
         uint64_t getId() const { return id; }
         Type getType() const { return type; }
-        Connection::Direction getDirection() const { return direction; }
+        Direction getDirection() const { return direction; }
         const std::string& getApplicationName() const { return applicationName; }
         const std::string& getStreamName() const { return streamName; }
 
