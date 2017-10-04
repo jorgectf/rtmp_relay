@@ -433,7 +433,7 @@ namespace relay
             {
                 rtmp::Packet packet;
 
-                uint32_t ret = rtmp::decodePacket(data, offset, inChunkSize, packet, receivedPackets);
+                uint32_t ret = packet.decode(data, offset, inChunkSize, receivedPackets);
 
                 if (ret > 0)
                 {
@@ -1798,7 +1798,7 @@ namespace relay
         encodeIntBE(packet.data, 4, serverBandwidth);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SERVER_BANDWIDTH";
 
@@ -1816,7 +1816,7 @@ namespace relay
         encodeIntBE(packet.data, 1, 2); // dynamic
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending CLIENT_BANDWIDTH";
 
@@ -1835,7 +1835,7 @@ namespace relay
         if (parameter2 != 0) encodeIntBE(packet.data, 4, parameter2); // parameter 2
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log log(Log::Level::ALL);
         log << "[" << id << ", " << name << "] " << "Sending USER_CONTROL of type: ";
@@ -1866,7 +1866,7 @@ namespace relay
         encodeIntBE(packet.data, 4, outChunkSize);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SET_CHUNK_SIZE";
         
@@ -1902,7 +1902,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -1939,7 +1939,7 @@ namespace relay
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -1976,7 +1976,7 @@ namespace relay
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
@@ -2009,7 +2009,7 @@ namespace relay
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2055,7 +2055,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2091,7 +2091,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2128,7 +2128,7 @@ namespace relay
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2164,7 +2164,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
         
@@ -2209,7 +2209,7 @@ namespace relay
         argument1.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2256,7 +2256,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
@@ -2292,7 +2292,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2323,7 +2323,7 @@ namespace relay
         commandName.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2359,7 +2359,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2392,7 +2392,7 @@ namespace relay
         commandName.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2428,7 +2428,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2469,7 +2469,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2505,7 +2505,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2536,7 +2536,7 @@ namespace relay
         commandName.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2576,7 +2576,7 @@ namespace relay
         argument3.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
@@ -2623,7 +2623,7 @@ namespace relay
         argument2.encode((amfVersion == amf::Version::AMF3) ? amf::Version::AMF3 : amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
@@ -2664,7 +2664,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
@@ -2757,7 +2757,7 @@ namespace relay
             argument2.encode(amf::Version::AMF0, packet.data);
 
             std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
+            packet.encode(buffer, outChunkSize, sentPackets);
 
             {
                 Log log(Log::Level::ALL);
@@ -2799,7 +2799,7 @@ namespace relay
             argument1.encode(amf::Version::AMF0, packet.data);
 
             std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
+            packet.encode(buffer, outChunkSize, sentPackets);
 
             {
                 Log log(Log::Level::ALL);
@@ -2842,7 +2842,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
@@ -2878,7 +2878,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
@@ -2915,7 +2915,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2956,7 +2956,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -2992,7 +2992,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
 
@@ -3033,7 +3033,7 @@ namespace relay
         argument2.encode(amf::Version::AMF0, packet.data);
 
         std::vector<uint8_t> buffer;
-        encodePacket(buffer, outChunkSize, packet, sentPackets);
+        packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
         
@@ -3055,7 +3055,7 @@ namespace relay
             packet.data = audioData;
 
             std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
+            packet.encode(buffer, outChunkSize, sentPackets);
 
             Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
 
@@ -3080,7 +3080,7 @@ namespace relay
             packet.data = videoData;
 
             std::vector<uint8_t> buffer;
-            encodePacket(buffer, outChunkSize, packet, sentPackets);
+            packet.encode(buffer, outChunkSize, sentPackets);
 
             Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
             

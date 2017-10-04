@@ -178,13 +178,13 @@ namespace relay
             return offset - originalOffset;
         }
 
-        uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets)
+        uint32_t Packet::decode(const std::vector<uint8_t>& buffer, uint32_t offset, uint32_t chunkSize, std::map<uint32_t, rtmp::Header>& previousPackets)
         {
             uint32_t originalOffset = offset;
 
             uint32_t remainingBytes = 0;
 
-            packet.data.clear();
+            data.clear();
 
             auto currentPreviousPackets = previousPackets;
 
@@ -193,7 +193,7 @@ namespace relay
             do
             {
                 Header header;
-                uint32_t ret = decodeHeader(data, offset, header, currentPreviousPackets);
+                uint32_t ret = decodeHeader(buffer, offset, header, currentPreviousPackets);
 
                 if (!ret)
                 {
@@ -212,10 +212,10 @@ namespace relay
                 // first header of packer
                 if (firstPacket)
                 {
-                    packet.channel = header.channel;
-                    packet.messageType = header.messageType;
-                    packet.messageStreamId = header.messageStreamId;
-                    packet.timestamp = header.timestamp;
+                    channel = header.channel;
+                    messageType = header.messageType;
+                    messageStreamId = header.messageStreamId;
+                    timestamp = header.timestamp;
 
                     remainingBytes = header.length;
 
@@ -227,14 +227,14 @@ namespace relay
 
                 uint32_t packetSize = std::min(remainingBytes, chunkSize);
 
-                if (packetSize + offset > data.size())
+                if (packetSize + offset > buffer.size())
                 {
                     Log(Log::Level::ALL) << "Not enough data to read";
 
                     return 0;
                 }
 
-                packet.data.insert(packet.data.end(), data.begin() + offset, data.begin() + offset + packetSize);
+                data.insert(data.end(), buffer.begin() + offset, buffer.begin() + offset + packetSize);
 
                 remainingBytes -= packetSize;
                 offset += packetSize;
@@ -391,23 +391,23 @@ namespace relay
             return static_cast<uint32_t>(data.size()) - originalSize;
         }
 
-        uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets)
+        uint32_t Packet::encode(std::vector<uint8_t>& buffer, uint32_t chunkSize, std::map<uint32_t, rtmp::Header>& previousPackets) const
         {
-            uint32_t originalSize = static_cast<uint32_t>(data.size());
+            uint32_t originalSize = static_cast<uint32_t>(buffer.size());
 
-            uint32_t remainingBytes = static_cast<uint32_t>(packet.data.size());
+            uint32_t remainingBytes = static_cast<uint32_t>(data.size());
             uint32_t start = 0;
 
             Header header;
-            header.channel = packet.channel;
-            header.messageType = packet.messageType;
-            header.messageStreamId = packet.messageStreamId;
-            header.timestamp = packet.timestamp;
-            header.length = static_cast<uint32_t>(packet.data.size());
+            header.channel = channel;
+            header.messageType = messageType;
+            header.messageStreamId = messageStreamId;
+            header.timestamp = timestamp;
+            header.length = static_cast<uint32_t>(data.size());
 
             while (remainingBytes > 0)
             {
-                if (!encodeHeader(data, header, previousPackets))
+                if (!encodeHeader(buffer, header, previousPackets))
                 {
                     return 0;
                 }
@@ -421,13 +421,13 @@ namespace relay
 
                 uint32_t size = std::min(remainingBytes, chunkSize);
 
-                data.insert(data.end(), packet.data.begin() + start, packet.data.begin() + start + size);
+                buffer.insert(buffer.end(), data.begin() + start, data.begin() + start + size);
 
                 start += size;
                 remainingBytes -= size;
             }
 
-            return static_cast<uint32_t>(data.size()) - originalSize;
+            return static_cast<uint32_t>(buffer.size()) - originalSize;
         }
     }
 }

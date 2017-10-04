@@ -84,6 +84,9 @@ namespace relay
             uint64_t timestamp = 0;
 
             std::vector<uint8_t> data;
+
+            uint32_t decode(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, std::map<uint32_t, rtmp::Header>& previousPackets);
+            uint32_t encode(std::vector<uint8_t>& data, uint32_t chunkSize, std::map<uint32_t, rtmp::Header>& previousPackets) const;
         };
 
         struct Challenge
@@ -99,8 +102,5 @@ namespace relay
             uint8_t version[4];
             uint8_t randomBytes[1528];
         };
-
-        uint32_t decodePacket(const std::vector<uint8_t>& data, uint32_t offset, uint32_t chunkSize, Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets);
-        uint32_t encodePacket(std::vector<uint8_t>& data, uint32_t chunkSize, const Packet& packet, std::map<uint32_t, rtmp::Header>& previousPackets);
     }
 }
