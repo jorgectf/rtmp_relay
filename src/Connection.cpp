@@ -1467,6 +1467,8 @@ namespace relay
                             argument2.dump(log);
                         }
 
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent play, stream: \"" << argument2.asString() << "\"";
+
                         streamName = argument2.asString();
 
                         std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), direction, applicationName, streamName);
@@ -1481,13 +1483,6 @@ namespace relay
 
                             Stream* newStream = server->findStream(applicationName, streamName);
                             if (!newStream) newStream = server->createStream(applicationName, streamName);
-
-                            /*if (!newStream)
-                            {
-                                Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream not found \"" << applicationName << "/" << streamName << "\", disconnecting";
-                                close();
-                                return false;
-                            }*/
 
                             stream = newStream;
                             stream->startReceiving(*this);
