@@ -21,6 +21,9 @@ You can pass these arguments to rtmp_realy (located in the bin directory):
 * *--realod-config* – reload the daemon's configuration
 * *--help* – print the documentation
 
+# Docker build
+Check out submodules the same way as for a normal build, then run `docker-compose build`. This will result in a local image named `evo-rtmp-relay:latest`.
+
 # Configuration
 
 RTMP relay configuration files are YAML-based. It must start with servers array. Each server has following attributes:
