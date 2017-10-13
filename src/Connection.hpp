@@ -77,7 +77,6 @@ namespace relay
         void connect();
 
         void setStream(Stream* aStream);
-        void removeStream();
         void unpublishStream();
 
         bool sendAudioHeader(const std::vector<uint8_t>& headerData);
@@ -90,7 +89,6 @@ namespace relay
         bool isDependable();
 
     private:
-        void reset();
         void resolveStreamName();
 
         void handleConnect(cppsocket::Socket&);

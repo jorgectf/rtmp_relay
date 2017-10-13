@@ -57,64 +57,14 @@ namespace relay
 
     Connection::~Connection()
     {
-        if (stream)
-        {
-            if (direction == Direction::INPUT) stream->stopStreaming(*this);
-            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
-        }
+        close();
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Delete connection";
     }
 
     void Connection::close()
     {
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Close called";
         socket.close();
-        reset();
-    }
-
-    void Connection::reset()
-    {
-        state = State::UNINITIALIZED;
-        data.clear();
-        timeSincePing = 0.0f;
-        timeSinceConnect = 0.0f;
-        inChunkSize = 128;
-        outChunkSize = 128;
-        serverBandwidth = 2500000;
-        receivedPackets.clear();
-        sentPackets.clear();
-        invokeId = 0;
-        invokes.clear();
-        streamId = 0;
-
-        connected = false;
-        videoFrameSent = false;
-        metaData = amf::Node::Type::Unknown;
-
-        if (stream)
-        {
-            if (direction == Direction::INPUT) stream->stopStreaming(*this);
-            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
-        }
-
-        // disconnect all host connections
-        if (type == Type::HOST)
-        {
-            if (stream)
-            {
-                if (direction == Direction::INPUT)
-                {
-                    // input disconnected
-                    stream->getServer().deleteStream(stream);
-                }
-
-                stream = nullptr;
-            }
-
-            endpoint = nullptr;
-
-            direction = Direction::NONE;
-            applicationName.clear();
-            streamName.clear();
-        }
     }
 
     bool Connection::isClosed() const
@@ -662,9 +612,43 @@ namespace relay
 
     void Connection::handleClose(cppsocket::Socket&)
     {
-        reset();
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Handle close connection at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
 
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Client at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
+        if (stream) stream->stop(*this);
+
+        state = State::UNINITIALIZED;
+        data.clear();
+        receivedPackets.clear();
+        sentPackets.clear();
+        timeSincePing = 0.0f;
+        timeSinceConnect = 0.0f;
+        inChunkSize = 128;
+        outChunkSize = 128;
+        serverBandwidth = 2500000;
+        receivedPackets.clear();
+        sentPackets.clear();
+        invokeId = 0;
+        invokes.clear();
+        timeSinceMeasure = 0.0f;
+
+        connected = false;
+        videoFrameSent = false;
+        metaData = amf::Node();
+
+        currentAudioBytes = 0;
+        currentVideoBytes = 0;
+        audioRate = 0;
+        videoRate = 0;
+        amfVersion = amf::Version::AMF0;
+
+        // disconnect all host connections
+        if (type == Type::HOST)
+        {
+            endpoint = nullptr;
+            direction = Direction::NONE;
+            applicationName.clear();
+            streamName.clear();
+        }
     }
 
     bool Connection::handlePacket(const rtmp::Packet& packet)
@@ -1243,16 +1227,7 @@ namespace relay
                     {
                         if (stream)
                         {
-                            if (direction == Direction::INPUT) stream->stopStreaming(*this);
-                            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
-
-                            if (direction == Direction::INPUT)
-                            {
-                                // input disconnected
-                                stream->getServer().deleteStream(stream);
-                            }
-
-                            stream = nullptr;
+                            close();
                         }
                     }
                     else
@@ -1283,31 +1258,11 @@ namespace relay
                 {
                     if (direction == Direction::INPUT)
                     {
-                        direction = Direction::NONE;
-                        videoFrameSent = false;
-
-                        if (stream)
-                        {
-                            if (direction == Direction::INPUT) stream->stopStreaming(*this);
-                            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
-
-                            if (type == Type::HOST)
-                            {
-                                // input disconnected
-                                stream->getServer().deleteStream(stream);
-
-                                stream = nullptr;
-                            }
-                        }
+                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
 
                         sendOnFCUnpublish();
 
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
-
-                        if (type != Type::CLIENT)
-                        {
-                            streamName.clear();
-                        }
+                        close();
                     }
                     else
                     {
@@ -1387,14 +1342,15 @@ namespace relay
                             }
                             else if (newStream->getInputConnection() && newStream->getInputConnection() != this)
                             {
-                                Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
+                                Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting " << newStream->getInputConnection()->getId();
                                 close();
                                 return false;
                             }
-                            stream = newStream;
-                            stream->startStreaming(*this);
 
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
+
+                            stream = newStream;
+                            stream->start(*this);
                         }
                         else
                         {
@@ -1413,126 +1369,91 @@ namespace relay
                 }
                 else if (command.asString() == "unpublish")
                 {
-                    if (direction == Direction::INPUT)
-                    {
-                        direction = Direction::NONE;
-                        videoFrameSent = false;
-
-                        if (stream)
-                        {
-                            if (direction == Direction::INPUT) stream->stopStreaming(*this);
-                            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
-
-                            if (type == Type::HOST)
-                            {
-                                // input disconnected
-                                stream->getServer().deleteStream(stream);
-
-                                stream = nullptr;
-                            }
-                        }
-
-                        sendUnublishStatus(transactionId.asDouble());
-
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
-
-                        if (type != Type::CLIENT)
-                        {
-                            streamName.clear();
-                        }
-                    }
-                    else
+                    if (direction != Direction::INPUT)
                     {
                         // this is not a receiver
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCUnpublish\") received, disconnecting";
                         close();
                         return false;
                     }
+
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
+
+                    sendUnublishStatus(transactionId.asDouble());
+                    close();
                 }
                 else if (command.asString() == "play")
                 {
-                    if (direction == Direction::NONE ||
-                        direction == Direction::OUTPUT)
-                    {
-                        direction = Direction::OUTPUT;
-
-                        amf::Node argument2;
-
-                        if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
-                        {
-                            offset += ret;
-
-                            Log log(Log::Level::ALL);
-                            log << "[" << id << ", " << name << "] " << "Argument 2: ";
-                            argument2.dump(log);
-                        }
-
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent play, stream: \"" << argument2.asString() << "\"";
-
-                        streamName = argument2.asString();
-
-                        std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), direction, applicationName, streamName);
-
-                        if (!endpoints.empty())
-                        {
-                            Server* server = endpoints.front().first;
-                            endpoint = endpoints.front().second;
-
-                            sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
-                            sendPlayStatus(transactionId.asDouble());
-
-                            Stream* newStream = server->findStream(applicationName, streamName);
-                            if (!newStream) newStream = server->createStream(applicationName, streamName);
-
-                            stream = newStream;
-                            stream->startReceiving(*this);
-                        }
-                        else
-                        {
-                            Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
-                            close();
-                            return false;
-                        }
-                    }
-                    else
+                    if (direction == Direction::INPUT)
                     {
                         // this is not a sender
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"play\") received, disconnecting";
                         close();
                         return false;
                     }
+
+                    direction = Direction::OUTPUT;
+
+                    amf::Node argument2;
+
+                    if ((ret = argument2.decode(amf::Version::AMF0, packet.data, offset)) > 0)
+                    {
+                        offset += ret;
+
+                        Log log(Log::Level::ALL);
+                        log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                        argument2.dump(log);
+                    }
+
+                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent play, stream: \"" << argument2.asString() << "\"";
+
+                    streamName = argument2.asString();
+
+                    std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), direction, applicationName, streamName);
+
+                    if (endpoints.empty())
+                    {
+                        Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                        close();
+                        return false;
+                    }
+
+
+                    Server* server = endpoints.front().first;
+                    endpoint = endpoints.front().second;
+
+                    sendUserControl(rtmp::UserControlType::CLEAR_STREAM);
+                    sendPlayStatus(transactionId.asDouble());
+
+                    Stream* newStream = server->findStream(applicationName, streamName);
+                    if (!newStream) newStream = server->createStream(applicationName, streamName);
+
+                    stream = newStream;
+                    stream->start(*this);
+
                 }
                 else if (command.asString() == "getStreamLength")
                 {
-                    if (direction == Direction::NONE ||
-                        direction == Direction::OUTPUT)
-                    {
-                        sendGetStreamLengthResult(transactionId.asDouble());
-                    }
-                    else
+                    if (direction == Direction::INPUT)
                     {
                         // this is not a sender
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"getStreamLength\") received, disconnecting";
                         close();
                         return false;
                     }
+
+                    sendGetStreamLengthResult(transactionId.asDouble());
                 }
                 else if (command.asString() == "stop")
                 {
-                    if (direction == Direction::OUTPUT)
+                    if (direction != Direction::OUTPUT)
                     {
-                        direction = Direction::NONE;
-                        videoFrameSent = false;
-                        sendStopStatus(transactionId.asDouble());
-                        if (stream) stream->stopReceiving(*this);
-                    }
-                    else
-                    {
-                        // this is not a sender
                         Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"stop\") received, disconnecting";
                         close();
                         return false;
                     }
+
+                    close();
                 }
                 else if (command.asString() == "onStatus")
                 {
@@ -1547,56 +1468,51 @@ namespace relay
                         argument2.dump(log);
                     }
 
+                    // TODO: paarbaudiit - izskataas nepareizi
                     if (argument2["code"].asString() == "NetStream.Publish.Start")
                     {
-                        if (direction == Direction::OUTPUT)
-                        {
-                            if (stream)
-                            {
-                                stream->startReceiving(*this);
-                            }
-                            else
-                            {
-                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
-                                close();
-                                return false;
-                            }
-                        }
-                        else
+                        if (direction != Direction::OUTPUT)
                         {
                             Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status (\"NetStream.Publish.Start\") received, disconnecting";
                             close();
                             return false;
                         }
+
+                        if (!stream)
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
+                            close();
+                            return false;
+                        }
+
+                        stream->start(*this);
+
                     }
                     else if (argument2["code"].asString() == "NetStream.Play.Start")
                     {
-                        if (direction == Direction::INPUT)
-                        {
-                            if (stream)
-                            {
-                                if (stream->getInputConnection())
-                                {
-                                    Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
-                                    close();
-                                    return false;
-                                }
-
-                                stream->startStreaming(*this);
-                            }
-                            else
-                            {
-                                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
-                                close();
-                                return false;
-                            }
-                        }
-                        else
+                        if (direction != Direction::INPUT)
                         {
                             Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status (\"NetStream.Play.Start\") received, disconnecting";
                             close();
                             return false;
                         }
+
+                        if (!stream)
+                        {
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
+                            close();
+                            return false;
+                        }
+
+
+                        if (stream->getInputConnection() && stream->getInputConnection() != this)
+                        {
+                            Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
+                            close();
+                            return false;
+                        }
+
+                        stream->start(*this);
                     }
 
                 }
@@ -1762,20 +1678,6 @@ namespace relay
 
                 streamName = endpoint->streamName;
                 replaceTokens(streamName, tokens);
-            }
-        }
-    }
-
-    void Connection::removeStream()
-    {
-        if (stream)
-        {
-            if (direction == Direction::INPUT) stream->stopStreaming(*this);
-            else if (direction == Direction::OUTPUT) stream->stopReceiving(*this);
-
-            if (type == Type::HOST)
-            {
-                stream = nullptr;
             }
         }
     }
@@ -2673,11 +2575,15 @@ namespace relay
 
     bool Connection::sendAudioHeader(const std::vector<uint8_t>& headerData)
     {
+        if (state != State::HANDSHAKE_DONE) return false;
+
         return sendAudioData(0, headerData);
     }
 
     bool Connection::sendVideoHeader(const std::vector<uint8_t>& headerData)
     {
+        if (state != State::HANDSHAKE_DONE) return false;
+
         return sendVideoData(0, headerData);
 
         // TODO: send video info
@@ -2685,11 +2591,15 @@ namespace relay
 
     bool Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
     {
+        if (state != State::HANDSHAKE_DONE) return false;
+
         return sendAudioData(timestamp, frameData);
     }
 
     bool Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
+        if (state != State::HANDSHAKE_DONE) return false;
+
         if (!endpoint) return false;
 
         if (endpoint->videoStream &&
@@ -2704,6 +2614,8 @@ namespace relay
 
     bool Connection::sendMetaData(const amf::Node& newMetaData)
     {
+        if (state != State::HANDSHAKE_DONE) return false;
+
         if (!endpoint) return false;
 
         if (newMetaData.getType() == amf::Node::Type::Dictionary ||
@@ -3092,6 +3004,6 @@ namespace relay
 
     bool Connection::isDependable()
     {
-        return (endpoint ? endpoint->isNameKnown() : false) || (type == Type::HOST);
+        return (type == Type::HOST) || (direction == Direction::INPUT && (endpoint ? endpoint->isNameKnown() : false));
     }
 }

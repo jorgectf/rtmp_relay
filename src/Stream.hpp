@@ -38,11 +38,8 @@ namespace relay
 
         void getStats(std::string& str, ReportType reportType) const;
 
-        void startStreaming(Connection& connection);
-        void stopStreaming(Connection& connection);
-
-        void startReceiving(Connection& connection);
-        void stopReceiving(Connection& connection);
+        void start(Connection& connection);
+        void stop(Connection& connection);
 
         Connection* getInputConnection() const { return inputConnection; }
 

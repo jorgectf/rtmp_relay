@@ -20,15 +20,21 @@ namespace relay
         applicationName(aApplicationName),
         streamName(aStreamName)
     {
+        Log(Log::Level::INFO) << "[" << id << ", Stream] " << " Create " << applicationName << "/" << streamName;
     }
 
     Stream::~Stream()
     {
-        if (inputConnection) inputConnection->removeStream();
+        Log(Log::Level::INFO) << "[" << id << ", Stream] " << " Delete " << applicationName << "/" << streamName;
+
+        if (inputConnection)
+        {
+            inputConnection->close();
+            server.deleteConnection(inputConnection);
+        }
 
         for (Connection* outputConnection : outputConnections)
         {
-            outputConnection->removeStream();
             outputConnection->unpublishStream();
         }
 
@@ -63,99 +69,89 @@ namespace relay
         }
     }
 
-    void Stream::startStreaming(Connection& connection)
+    void Stream::start(relay::Connection &connection)
     {
-        if (!inputConnection)
+        Log() << "Stream start";
+        if (connection.getDirection() == Connection::Direction::INPUT)
         {
-            inputConnection = &connection;
-            streaming = true;
-
-            for (Connection* outputConnection : outputConnections)
+            if (!inputConnection)
             {
-                outputConnection->setStream(this);
-            }
+                inputConnection = &connection;
+                streaming = true;
 
-            for (const Endpoint& endpoint : server.getEndpoints())
-            {
-                if (endpoint.connectionType == Connection::Type::CLIENT &&
-                    endpoint.direction == Connection::Direction::OUTPUT)
+                for (const Endpoint& endpoint : server.getEndpoints())
                 {
-                    Connection* newConnection = server.createConnection(*this, endpoint);
-                    newConnection->connect();
+                    if (endpoint.connectionType == Connection::Type::CLIENT &&
+                        endpoint.direction == Connection::Direction::OUTPUT)
+                    {
+                        Connection* newConnection = server.createConnection(*this, endpoint);
+                        newConnection->connect();
 
-                    connections.push_back(newConnection);
+                        connections.push_back(newConnection);
+                    }
                 }
             }
         }
+        else if (connection.getDirection() == Connection::Direction::OUTPUT)
+        {
+            if (!inputConnection)
+            {
+                for (const Endpoint& endpoint : server.getEndpoints())
+                {
+                    if (endpoint.connectionType == Connection::Type::CLIENT &&
+                        endpoint.direction == Connection::Direction::INPUT &&
+                        !endpoint.isNameKnown())
+                    {
+                        auto ic = server.createConnection(*this, endpoint);
+                        ic->connect();
+                    }
+                }
+            }
+    
+            auto i = std::find(outputConnections.begin(), outputConnections.end(), &connection);
+    
+            if (i == outputConnections.end())
+            {
+                outputConnections.push_back(&connection);
+    
+                if (streaming)
+                {
+                    connection.setStream(this);
+    
+                    if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
+                    if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
+                    if (metaData.getType() != amf::Node::Type::Unknown) connection.sendMetaData(metaData);
+                }
+            }
+        }
+        else
+        {
+            Log(Log::Level::ERR) << "Stream start direction not set";
+        }
     }
 
-    void Stream::stopStreaming(Connection& connection)
+    void Stream::stop(relay::Connection &connection)
     {
         if (&connection == inputConnection)
         {
             streaming = false;
-
-            for (Connection* outputConnection : outputConnections)
-            {
-                if (!outputConnection->isDependable())
-                {
-                    outputConnection->removeStream();
-                    outputConnection->unpublishStream();
-                }
-            }
-
-            outputConnections.erase(
-                  std::remove_if(outputConnections.begin(), outputConnections.end(), [](Connection* c){ return c->isClosed(); }),
-                  outputConnections.end());
-
             if (inputConnection->getType() == Connection::Type::HOST)
             {
-                getServer().deleteStream(this);
+                getServer().deleteConnection(inputConnection);
+                inputConnection = nullptr;
             }
-
-            inputConnection = nullptr;
         }
-    }
-
-    void Stream::startReceiving(Connection& connection)
-    {
-        if (!inputConnection)
+        else
         {
-            for (const Endpoint& endpoint : server.getEndpoints())
+            if (connection.getType() == Connection::Type::HOST)
             {
-                if (endpoint.connectionType == Connection::Type::CLIENT &&
-                    endpoint.direction == Connection::Direction::INPUT)
+                auto outputIterator = std::find(outputConnections.begin(), outputConnections.end(), &connection);
+
+                if (outputIterator != outputConnections.end())
                 {
-                    auto ic = server.createConnection(*this, endpoint);
-                    ic->connect();
+                    outputConnections.erase(outputIterator);
                 }
             }
-        }
-
-        auto i = std::find(outputConnections.begin(), outputConnections.end(), &connection);
-
-        if (i == outputConnections.end())
-        {
-            outputConnections.push_back(&connection);
-
-            if (streaming)
-            {
-                connection.setStream(this);
-
-                if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
-                if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
-                if (metaData.getType() != amf::Node::Type::Unknown) connection.sendMetaData(metaData);
-            }
-        }
-    }
-
-    void Stream::stopReceiving(Connection& connection)
-    {
-        auto outputIterator = std::find(outputConnections.begin(), outputConnections.end(), &connection);
-
-        if (outputIterator != outputConnections.end())
-        {
-            outputConnections.erase(outputIterator);
         }
 
         if (!hasDependableConnections())
