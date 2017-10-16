@@ -46,7 +46,55 @@ namespace relay
 
     void Stream::getStats(std::string& str, ReportType reportType) const
     {
-        // TODO: implement
+        switch (reportType)
+        {
+            case ReportType::TEXT:
+            {
+                str += "    Stream[" + std::to_string(id) + "]: " + applicationName + " / " + streamName + "\n";
+
+                if (inputConnection) inputConnection->getStats(str, reportType);
+                for (const auto& c : outputConnections)
+                {
+                    c->getStats(str, reportType);
+                }
+                break;
+            }
+            case ReportType::HTML:
+            {
+                str += "Stream[" + std::to_string(id) + "]: " + applicationName + " / " + streamName + "<br>";
+
+                str += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Direction</th><th>Server ID</th><th>Meta data</th></tr>";
+                
+                if (inputConnection) inputConnection->getStats(str, reportType);
+                for (const auto& c : outputConnections)
+                {
+                    c->getStats(str, reportType);
+                }
+
+                str += "</table>";
+                break;
+            }
+            case ReportType::JSON:
+            {
+                str += "{\"id\": " + std::to_string(id) + ", \"applicationName\":\"" + applicationName + "\", \"streamName\":\"" + streamName + "\", \"connections\": [";
+
+                bool first = true;
+
+                if (inputConnection)
+                {
+                    inputConnection->getStats(str, reportType);
+                    first = false;
+                }
+                for (const auto& c : outputConnections)
+                {
+                    if (!first) str += ",";
+                    first = false;
+                    c->getStats(str, reportType);
+                }
+
+                str += "]}";
+            }
+        }
     }
 
     bool Stream::hasDependableConnections()

@@ -136,30 +136,35 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                for (const auto& connection : connections)
+                str += "  Server[" + std::to_string(id) + "]: \n";
+                for (const auto& stream : streams)
                 {
-                    connection->getStats(str, reportType);
+                    stream->getStats(str, reportType);
                 }
                 break;
             }
             case ReportType::HTML:
             {
-                for (const auto& connection : connections)
+                str += "Server[" + std::to_string(id) + "]:<br>";
+                for (const auto& stream : streams)
                 {
-                    connection->getStats(str, reportType);
+                    stream->getStats(str, reportType);
                 }
                 break;
             }
             case ReportType::JSON:
             {
-                bool first = true;
+                str += "{\"id\": " + std::to_string(id) + ", \"streams\": [";
 
-                for (const auto& connection : connections)
+                bool first = true;
+                for (const auto& stream : streams)
                 {
                     if (!first) str += ",";
                     first = false;
-                    connection->getStats(str, reportType);
+                    stream->getStats(str, reportType);
                 }
+
+                str += "]}";
                 break;
             }
         }

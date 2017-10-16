@@ -338,12 +338,22 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str = "Connections:\n";
+                str = "Pending Connections:\n";
+                bool has = false;
                 for (const auto& connection : connections)
                 {
-                    connection->getStats(str, reportType);
+                    if (!connection.get()->getStream())
+                    {
+                        connection->getStats(str, reportType);
+                        has = true;
+                    }
+                }
+                if (!has)
+                {
+                    str += "NONE\n";
                 }
 
+                str += "\nServers: \n";
                 for (const auto& server : servers)
                 {
                     server->getStats(str, reportType);
@@ -353,35 +363,48 @@ namespace relay
             case ReportType::HTML:
             {
                 str = "<html><title>Status</title><body>";
-                str += "<table border=\"1\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Stream</th><th>Server ID</th><th>Meta data</th></tr>";
+                str += "Pending:<br>";
+                str += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Direction</th><th>Server ID</th><th>Meta data</th></tr>";
 
                 for (const auto& connection : connections)
                 {
-                    connection->getStats(str, reportType);
-                }
-
-                for (const auto& server : servers)
-                {
-                    server->getStats(str, reportType);
+                    if (!connection.get()->getStream())
+                    {
+                        connection->getStats(str, reportType);
+                    }
                 }
 
                 str += "</table>";
+                str += "Servers:<br>";
+
+                for (const auto& server : servers)
+                {
+                    
+                    server->getStats(str, reportType);
+                    str += "</table>";
+                }
+
                 str += "</body></html>";
 
                 break;
             }
             case ReportType::JSON:
             {
-                str = "{\"connections\":[";
+                str = "{\"pending\":[";
 
                 bool first = true;
 
                 for (const auto& connection : connections)
                 {
-                    if (!first) str += ",";
-                    first = false;
-                    connection->getStats(str, reportType);
+                    if (!connection.get()->getStream())
+                    {
+                        if (!first) str += ",";
+                        first = false;
+                        connection->getStats(str, reportType);
+                    }
                 }
+
+                str += "], \"servers\":[";
 
                 for (const auto& server : servers)
                 {

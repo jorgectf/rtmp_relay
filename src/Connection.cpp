@@ -143,12 +143,13 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "\t[" + std::to_string(id) + ", " + name + "], " +
-                    "name: " + streamName + ", " +
+                str += "        [" + std::to_string(id) + ", " + name + "], " +
                     "application: " + applicationName + ", " +
+                    "stream: " + streamName + ", " +
+
                     "status: " + (socket.isReady() ? "connected" : "not connected") + ", " +
                     "address: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + ", " +
-                    "connection: ";
+                    "type: ";
 
                 switch (type)
                 {
@@ -167,7 +168,7 @@ namespace relay
                     case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
                 }
 
-                str += ", stream: ";
+                str += ", direction: ";
 
                 switch (direction)
                 {
@@ -272,7 +273,7 @@ namespace relay
                     case State::HANDSHAKE_DONE: str += "\"HANDSHAKE_DONE\""; break;
                 }
 
-                str += ",\"stream\":";
+                str += ",\"direction\":";
 
                 switch (direction)
                 {

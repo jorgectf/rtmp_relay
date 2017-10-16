@@ -52,6 +52,7 @@ namespace relay
 
         bool hasDependableConnections();
         void deleteConnections();
+        uint64_t getId() { return id; }
 
     private:
         const uint64_t id;
