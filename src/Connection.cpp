@@ -61,15 +61,17 @@ namespace relay
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Delete connection";
     }
 
-    void Connection::close()
+    void Connection::close(bool forceClose)
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Close called";
+        closed |= forceClose;
         socket.close();
     }
 
     bool Connection::isClosed() const
     {
-        return type == Type::HOST && !socket.isReady(); // host connections are closed if the client disconnected
+        // host connections are closed if the client disconnected
+        return (type == Type::HOST && !socket.isReady()) || closed;
     }
 
     void Connection::update(float delta)

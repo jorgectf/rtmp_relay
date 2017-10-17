@@ -29,18 +29,13 @@ namespace relay
 
         if (inputConnection)
         {
-            inputConnection->close();
-            server.deleteConnection(inputConnection);
+            inputConnection->close(true);
         }
 
         for (Connection* outputConnection : outputConnections)
         {
             outputConnection->unpublishStream();
-        }
-
-        for (Connection* connection : connections)
-        {
-            server.deleteConnection(connection);
+            outputConnection->close(true);
         }
     }
 
@@ -108,12 +103,12 @@ namespace relay
         return hasDependables;
     }
 
-    void Stream::deleteConnections()
+    void Stream::closeConnections()
     {
-        server.deleteConnection(inputConnection);
+        inputConnection->close(true);
         for (auto o : outputConnections)
         {
-            server.deleteConnection(o);
+            o->close(true);
         }
     }
 
@@ -185,7 +180,7 @@ namespace relay
             streaming = false;
             if (inputConnection->getType() == Connection::Type::HOST)
             {
-                getServer().deleteConnection(inputConnection);
+                inputConnection->close();
                 inputConnection = nullptr;
             }
         }

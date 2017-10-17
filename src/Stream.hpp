@@ -51,7 +51,7 @@ namespace relay
         void sendTextData(uint64_t timestamp, const amf::Node& textData);
 
         bool hasDependableConnections();
-        void deleteConnections();
+        void closeConnections();
         uint64_t getId() { return id; }
 
     private:

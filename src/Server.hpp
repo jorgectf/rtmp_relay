@@ -25,7 +25,6 @@ namespace relay
 
         Connection* createConnection(Stream& stream,
                                      const Endpoint& endpoint);
-        void deleteConnection(Connection* connection);
 
         Stream* findStream(const std::string& applicationName,
                            const std::string& streamName) const;
@@ -49,5 +48,7 @@ namespace relay
 
         std::vector<std::unique_ptr<Stream>> streams;
         std::vector<std::unique_ptr<Connection>> connections;
+
+        void deleteConnection(Connection* connection);
     };
 }

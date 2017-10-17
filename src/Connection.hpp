@@ -59,7 +59,7 @@ namespace relay
 
         ~Connection();
 
-        void close();
+        void close(bool forceClose = false);
 
         uint64_t getId() const { return id; }
         Type getType() const { return type; }
@@ -174,6 +174,7 @@ namespace relay
         std::string applicationName;
         std::string streamName;
         bool connected = false;
+        bool closed = false;
 
         bool videoFrameSent = false;
         float timeSinceMeasure = 0.0f;

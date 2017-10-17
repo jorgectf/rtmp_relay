@@ -73,7 +73,6 @@ namespace relay
         {
             if (i->get() == stream)
             {
-                stream->deleteConnections();
                 i = streams.erase(i);
             }
             else
@@ -113,6 +112,13 @@ namespace relay
 
     void Server::update(float delta)
     {
+        // delete old connections
+        for (auto i = connections.begin(); i != connections.end();)
+        {
+            i = ((*i)->isClosed() ? connections.erase(i) : i + 1);
+        }
+
+        // update connections
         for (auto i = connections.begin(); i != connections.end();)
         {
             const std::unique_ptr<Connection>& connection = *i;
