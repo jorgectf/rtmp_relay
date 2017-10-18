@@ -26,17 +26,6 @@ namespace relay
     Stream::~Stream()
     {
         Log(Log::Level::INFO) << "[" << id << ", Stream] " << " Delete " << applicationName << "/" << streamName;
-
-        if (inputConnection)
-        {
-            inputConnection->close(true);
-        }
-
-        for (Connection* outputConnection : outputConnections)
-        {
-            outputConnection->unpublishStream();
-            outputConnection->close(true);
-        }
     }
 
     void Stream::getStats(std::string& str, ReportType reportType) const
@@ -177,7 +166,6 @@ namespace relay
             streaming = false;
             if (inputConnection->getType() == Connection::Type::HOST)
             {
-                inputConnection->close();
                 inputConnection = nullptr;
             }
         }

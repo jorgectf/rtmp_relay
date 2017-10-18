@@ -307,25 +307,26 @@ namespace relay
 
             if (status) status->update(delta);
 
-            for (const auto& server : servers)
-            {
-                server->update(delta);
-            }
-
             for (auto i = connections.begin(); i != connections.end();)
             {
                 const std::unique_ptr<Connection>& connection = *i;
 
-                connection->update(delta);
-
                 if (connection->isClosed())
                 {
                     i = connections.erase(i);
+                    continue;
                 }
                 else
                 {
                     ++i;
                 }
+
+                connection->update(delta);
+            }
+
+            for (const auto& server : servers)
+            {
+                server->update(delta);
             }
 
             std::this_thread::sleep_for(sleepTime);

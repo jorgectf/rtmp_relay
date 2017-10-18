@@ -60,6 +60,7 @@ namespace relay
         ~Connection();
 
         void close(bool forceClose = false);
+        void reset();
 
         uint64_t getId() const { return id; }
         Type getType() const { return type; }

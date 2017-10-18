@@ -68,6 +68,43 @@ namespace relay
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Close called";
         closed |= forceClose;
         socket.close();
+
+        reset();
+    }
+
+    void Connection::reset()
+    {
+        if (stream) stream->stop(*this);
+
+        state = State::UNINITIALIZED;
+        data.clear();
+        receivedPackets.clear();
+        sentPackets.clear();
+        inChunkSize = 128;
+        outChunkSize = 128;
+        serverBandwidth = 2500000;
+        receivedPackets.clear();
+        sentPackets.clear();
+        invokeId = 0;
+        invokes.clear();
+        timeSinceMeasure = 0.0f;
+        connected = false;
+        videoFrameSent = false;
+        metaData = amf::Node();
+        currentAudioBytes = 0;
+        currentVideoBytes = 0;
+        audioRate = 0;
+        videoRate = 0;
+        amfVersion = amf::Version::AMF0;
+
+        // disconnect all host connections
+        if (type == Type::HOST)
+        {
+            endpoint = nullptr;
+            direction = Direction::NONE;
+            applicationName.clear();
+            streamName.clear();
+        }
     }
 
     bool Connection::isClosed() const
@@ -619,41 +656,10 @@ namespace relay
     {
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Handle close connection at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
 
-        if (stream) stream->stop(*this);
+        reset();
 
-        state = State::UNINITIALIZED;
-        data.clear();
-        receivedPackets.clear();
-        sentPackets.clear();
         timeSincePing = 0.0f;
         timeSinceConnect = 0.0f;
-        inChunkSize = 128;
-        outChunkSize = 128;
-        serverBandwidth = 2500000;
-        receivedPackets.clear();
-        sentPackets.clear();
-        invokeId = 0;
-        invokes.clear();
-        timeSinceMeasure = 0.0f;
-
-        connected = false;
-        videoFrameSent = false;
-        metaData = amf::Node();
-
-        currentAudioBytes = 0;
-        currentVideoBytes = 0;
-        audioRate = 0;
-        videoRate = 0;
-        amfVersion = amf::Version::AMF0;
-
-        // disconnect all host connections
-        if (type == Type::HOST)
-        {
-            endpoint = nullptr;
-            direction = Direction::NONE;
-            applicationName.clear();
-            streamName.clear();
-        }
     }
 
     bool Connection::handlePacket(const rtmp::Packet& packet)
