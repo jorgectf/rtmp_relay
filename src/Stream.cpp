@@ -47,11 +47,11 @@ namespace relay
             {
                 str += "    Stream[" + std::to_string(id) + "]: " + applicationName + " / " + streamName + "\n";
 
-                if (inputConnection) inputConnection->getStats(str, reportType);
-                for (const auto& c : outputConnections)
-                {
-                    c->getStats(str, reportType);
-                }
+//                if (inputConnection) inputConnection->getStats(str, reportType);
+//                for (const auto& c : outputConnections)
+//                {
+//                    c->getStats(str, reportType);
+//                }
                 break;
             }
             case ReportType::HTML:
@@ -98,13 +98,15 @@ namespace relay
         return hasDependables;
     }
 
-    void Stream::closeConnections()
+    void Stream::close()
     {
-        inputConnection->close(true);
+        closed = true;
+        if (inputConnection) inputConnection->close(true);
         for (auto o : outputConnections)
         {
             o->close(true);
         }
+        server.cleanup();
     }
 
     void Stream::start(relay::Connection &connection)
@@ -194,7 +196,7 @@ namespace relay
 
         if (!hasDependableConnections())
         {
-            server.deleteStream(this);
+            close();
         }
     }
 

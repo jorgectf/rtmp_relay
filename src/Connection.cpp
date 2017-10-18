@@ -63,6 +63,8 @@ namespace relay
 
     void Connection::close(bool forceClose)
     {
+        if (closed) return;
+
         Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Close called";
         closed |= forceClose;
         socket.close();

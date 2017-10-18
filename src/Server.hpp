@@ -38,6 +38,7 @@ namespace relay
         void getStats(std::string& str, ReportType reportType) const;
 
         const std::vector<Endpoint>& getEndpoints() const { return endpoints; }
+        void cleanup() { needsCleanup = true; }
 
     private:
         Relay& relay;
@@ -48,6 +49,8 @@ namespace relay
 
         std::vector<std::unique_ptr<Stream>> streams;
         std::vector<std::unique_ptr<Connection>> connections;
+
+        bool needsCleanup = false;
 
         void deleteConnection(Connection* connection);
     };

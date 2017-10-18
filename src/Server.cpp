@@ -112,27 +112,31 @@ namespace relay
 
     void Server::update(float delta)
     {
-        // delete old connections
-        for (auto i = connections.begin(); i != connections.end();)
-        {
-            i = ((*i)->isClosed() ? connections.erase(i) : i + 1);
-        }
-
         // update connections
         for (auto i = connections.begin(); i != connections.end();)
         {
-            const std::unique_ptr<Connection>& connection = *i;
+            if (needsCleanup)
+            {
+                for (auto si = streams.begin(); si != streams.end();)
+                {
+                    si = ((*si)->isClosed() ? streams.erase(si) : si + 1);
+                }
+                needsCleanup = false;
+            }
 
-            connection->update(delta);
+            const std::unique_ptr<Connection>& connection = *i;
 
             if (connection->isClosed())
             {
                 i = connections.erase(i);
+                continue;
             }
             else
             {
                 ++i;
             }
+
+            connection->update(delta);
         }
     }
 
@@ -145,6 +149,11 @@ namespace relay
                 for (const auto& c : connections)
                 {
                     c->getStats(str, reportType);
+                }
+
+                for (const auto& s : streams)
+                {
+                    s->getStats(str, reportType);
                 }
                 break;
             }
