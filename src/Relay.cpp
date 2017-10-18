@@ -353,7 +353,7 @@ namespace relay
             case ReportType::HTML:
             {
                 str = "<html><title>Status</title><body>";
-                str += "<table border=\"1\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Stream</th><th>Server ID</th><th>Meta data</th></tr>";
+                str += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Direction</th><th>Server ID</th><th>Meta data</th></tr>";
 
                 for (const auto& connection : connections)
                 {

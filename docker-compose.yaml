@@ -1,0 +1,12 @@
+version: '2'
+services:
+  evo-rtmp-relay:
+    # This compose file is mainly for building the image to be used in autotests/docker-wowza,
+    # but it can be used to do test-run too.
+    # If used for running, it will by default read rtmp-relay.yaml in current dir, through the ./ volume mount.
+    build:
+      context: .
+    image: evo-rtmp-relay:latest
+
+    volumes:
+       - ./:/app/config/

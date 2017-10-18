@@ -59,7 +59,7 @@ namespace relay
 
         ~Connection();
 
-        void close();
+        void close(bool forceClose = false);
 
         uint64_t getId() const { return id; }
         Type getType() const { return type; }
@@ -77,7 +77,7 @@ namespace relay
         void connect();
 
         void setStream(Stream* aStream);
-        void removeStream();
+        Stream* getStream() { return stream; }
         void unpublishStream();
 
         bool sendAudioHeader(const std::vector<uint8_t>& headerData);
@@ -90,7 +90,6 @@ namespace relay
         bool isDependable();
 
     private:
-        void reset();
         void resolveStreamName();
 
         void handleConnect(cppsocket::Socket&);
@@ -175,6 +174,7 @@ namespace relay
         std::string applicationName;
         std::string streamName;
         bool connected = false;
+        bool closed = false;
 
         bool videoFrameSent = false;
         float timeSinceMeasure = 0.0f;

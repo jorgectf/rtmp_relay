@@ -73,7 +73,6 @@ namespace relay
         {
             if (i->get() == stream)
             {
-                stream->deleteConnections();
                 i = streams.erase(i);
             }
             else
@@ -113,20 +112,31 @@ namespace relay
 
     void Server::update(float delta)
     {
+        // update connections
         for (auto i = connections.begin(); i != connections.end();)
         {
-            const std::unique_ptr<Connection>& connection = *i;
+            if (needsCleanup)
+            {
+                for (auto si = streams.begin(); si != streams.end();)
+                {
+                    si = ((*si)->isClosed() ? streams.erase(si) : si + 1);
+                }
+                needsCleanup = false;
+            }
 
-            connection->update(delta);
+            const std::unique_ptr<Connection>& connection = *i;
 
             if (connection->isClosed())
             {
                 i = connections.erase(i);
+                continue;
             }
             else
             {
                 ++i;
             }
+
+            connection->update(delta);
         }
     }
 
@@ -136,29 +146,33 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                for (const auto& connection : connections)
+                for (const auto& c : connections)
                 {
-                    connection->getStats(str, reportType);
+                    c->getStats(str, reportType);
+                }
+
+                for (const auto& s : streams)
+                {
+                    s->getStats(str, reportType);
                 }
                 break;
             }
             case ReportType::HTML:
             {
-                for (const auto& connection : connections)
+                for (const auto& c : connections)
                 {
-                    connection->getStats(str, reportType);
+                    c->getStats(str, reportType);
                 }
                 break;
             }
             case ReportType::JSON:
             {
                 bool first = true;
-
-                for (const auto& connection : connections)
+                for (const auto& c : connections)
                 {
                     if (!first) str += ",";
                     first = false;
-                    connection->getStats(str, reportType);
+                    c->getStats(str, reportType);
                 }
                 break;
             }

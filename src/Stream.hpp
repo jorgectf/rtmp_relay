@@ -38,11 +38,8 @@ namespace relay
 
         void getStats(std::string& str, ReportType reportType) const;
 
-        void startStreaming(Connection& connection);
-        void stopStreaming(Connection& connection);
-
-        void startReceiving(Connection& connection);
-        void stopReceiving(Connection& connection);
+        void start(Connection& connection);
+        void stop(Connection& connection);
 
         Connection* getInputConnection() const { return inputConnection; }
 
@@ -54,10 +51,13 @@ namespace relay
         void sendTextData(uint64_t timestamp, const amf::Node& textData);
 
         bool hasDependableConnections();
-        void deleteConnections();
+        void close();
+        bool isClosed() { return closed; }
+        uint64_t getId() { return id; }
 
     private:
         const uint64_t id;
+        bool closed = false;
 
         Server& server;
 
