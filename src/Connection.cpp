@@ -888,7 +888,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - setDataFrame > onMetaData";
                             close();
                             return false;
                         }
@@ -912,7 +912,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - onMetaData";
                             close();
                             return false;
                         }
@@ -925,7 +925,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - onTextData";
                             close();
                             return false;
                         }
@@ -967,7 +967,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - audio codec header";
                             close();
                             return false;
                         }
@@ -981,7 +981,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - audio packet";
                             close();
                             return false;
                         }
@@ -1038,7 +1038,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - video header";
                             close();
                             return false;
                         }
@@ -1052,7 +1052,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting";
+                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - video packet";
                             close();
                             return false;
                         }
@@ -1346,7 +1346,7 @@ namespace relay
                             else if (newStream->getInputConnection() && newStream->getInputConnection() != this)
                             {
                                 Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting " << newStream->getInputConnection()->getId();
-                                close();
+                                close(true);
                                 return false;
                             }
 
@@ -1511,7 +1511,7 @@ namespace relay
                         if (stream->getInputConnection() && stream->getInputConnection() != this)
                         {
                             Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
-                            close();
+                            close(true);
                             return false;
                         }
 

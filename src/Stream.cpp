@@ -56,17 +56,12 @@ namespace relay
             }
             case ReportType::HTML:
             {
-                str += "Stream[" + std::to_string(id) + "]: " + applicationName + " / " + streamName + "<br>";
-
-                str += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Direction</th><th>Server ID</th><th>Meta data</th></tr>";
-                
                 if (inputConnection) inputConnection->getStats(str, reportType);
                 for (const auto& c : outputConnections)
                 {
                     c->getStats(str, reportType);
                 }
 
-                str += "</table>";
                 break;
             }
             case ReportType::JSON:
