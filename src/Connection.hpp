@@ -176,6 +176,7 @@ namespace relay
         std::string streamName;
         bool connected = false;
         bool closed = false;
+        bool streaming = false;
 
         bool videoFrameSent = false;
         float timeSinceMeasure = 0.0f;

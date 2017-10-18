@@ -76,6 +76,7 @@ namespace relay
     {
         if (stream) stream->stop(*this);
 
+        streaming = false;
         state = State::UNINITIALIZED;
         data.clear();
         receivedPackets.clear();
@@ -1362,6 +1363,7 @@ namespace relay
 
                             stream = newStream;
                             stream->start(*this);
+                            streaming = true;
                         }
                         else
                         {
@@ -1441,6 +1443,7 @@ namespace relay
 
                     stream = newStream;
                     stream->start(*this);
+                    streaming = true;
 
                 }
                 else if (command.asString() == "getStreamLength")
@@ -1497,7 +1500,7 @@ namespace relay
                         }
 
                         stream->start(*this);
-
+                        streaming = true;
                     }
                     else if (argument2["code"].asString() == "NetStream.Play.Start")
                     {
@@ -1524,6 +1527,7 @@ namespace relay
                         }
 
                         stream->start(*this);
+                        streaming = true;
                     }
 
                 }
@@ -2602,14 +2606,14 @@ namespace relay
 
     bool Connection::sendAudioFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData)
     {
-        if (state != State::HANDSHAKE_DONE) return false;
+        if (!streaming) return false;
 
         return sendAudioData(timestamp, frameData);
     }
 
     bool Connection::sendVideoFrame(uint64_t timestamp, const std::vector<uint8_t>& frameData, VideoFrameType frameType)
     {
-        if (state != State::HANDSHAKE_DONE) return false;
+        if (!streaming) return false;
 
         if (!endpoint) return false;
 
@@ -2696,7 +2700,7 @@ namespace relay
 
     bool Connection::sendTextData(uint64_t timestamp, const amf::Node& textData)
     {
-        if (!endpoint) return false;
+        if (!endpoint || !streaming) return false;
 
         if (endpoint->dataStream)
         {
@@ -2965,7 +2969,7 @@ namespace relay
 
     bool Connection::sendAudioData(uint64_t timestamp, const std::vector<uint8_t>& audioData)
     {
-        if (!endpoint) return false;
+        if (!endpoint || !streaming) return false;
 
         if (endpoint->audioStream)
         {
@@ -2990,7 +2994,7 @@ namespace relay
 
     bool Connection::sendVideoData(uint64_t timestamp, const std::vector<uint8_t>& videoData)
     {
-        if (!endpoint) return false;
+        if (!endpoint || !streaming) return false;
 
         if (endpoint->videoStream)
         {
