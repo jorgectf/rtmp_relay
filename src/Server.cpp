@@ -122,8 +122,6 @@ namespace relay
             si = ((*si)->isClosed() ? streams.erase(si) : si + 1);
         }
 
-
-
         // update connections
         for (auto i = connections.begin(); i != connections.end();)
         {

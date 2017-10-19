@@ -74,9 +74,9 @@ namespace relay
 
     void Connection::reset()
     {
-        if (stream) stream->stop(*this);
-
+        if (stream && streaming) stream->stop(*this);
         streaming = false;
+
         state = State::UNINITIALIZED;
         data.clear();
         receivedPackets.clear();
@@ -1362,8 +1362,8 @@ namespace relay
                             Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
 
                             stream = newStream;
-                            stream->start(*this);
                             streaming = true;
+                            stream->start(*this);
                         }
                         else
                         {
@@ -1442,9 +1442,8 @@ namespace relay
                     if (!newStream) newStream = server->createStream(applicationName, streamName);
 
                     stream = newStream;
-                    stream->start(*this);
                     streaming = true;
-
+                    stream->start(*this);
                 }
                 else if (command.asString() == "getStreamLength")
                 {
@@ -1499,8 +1498,8 @@ namespace relay
                             return false;
                         }
 
-                        stream->start(*this);
                         streaming = true;
+                        stream->start(*this);
                     }
                     else if (argument2["code"].asString() == "NetStream.Play.Start")
                     {
@@ -1526,8 +1525,8 @@ namespace relay
                             return false;
                         }
 
-                        stream->start(*this);
                         streaming = true;
+                        stream->start(*this);
                     }
 
                 }

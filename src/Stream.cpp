@@ -142,15 +142,15 @@ namespace relay
             if (i == outputConnections.end())
             {
                 outputConnections.push_back(&connection);
-    
-                if (streaming)
-                {
-                    connection.setStream(this);
-    
-                    if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
-                    if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
-                    if (metaData.getType() != amf::Node::Type::Unknown) connection.sendMetaData(metaData);
-                }
+            }
+
+            if (streaming)
+            {
+                connection.setStream(this);
+
+                if (!videoHeader.empty()) connection.sendVideoHeader(videoHeader);
+                if (!audioHeader.empty()) connection.sendAudioHeader(audioHeader);
+                if (metaData.getType() != amf::Node::Type::Unknown) connection.sendMetaData(metaData);
             }
         }
         else
