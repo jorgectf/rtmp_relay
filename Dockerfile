@@ -5,6 +5,9 @@ RUN yum update -y && \
 	yum clean all && \
 	mkdir /app
 
+# This can be overriden to use a custom file. Must be mounted into /app/config though.
+ENV RTMP_RELAY_CFGFILE=rtmp-relay.yaml
+
 WORKDIR /build
 COPY external /build/external
 COPY src /build/src
@@ -21,5 +24,5 @@ RUN cp bin/rtmp_relay /app/rtmp_relay
 VOLUME [ "/app/config" ]
 
 WORKDIR /app
-ENTRYPOINT ["./rtmp_relay", "--config", "/app/config/rtmp-relay.yaml"]
+ENTRYPOINT ./rtmp_relay --config /app/config/${RTMP_RELAY_CFGFILE}
 
