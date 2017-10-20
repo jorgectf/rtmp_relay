@@ -54,6 +54,7 @@ namespace relay
         void close();
         bool isClosed() { return closed; }
         uint64_t getId() { return id; }
+        void getConnections(std::map<Connection*, Stream*>& cons);
 
     private:
         const uint64_t id;

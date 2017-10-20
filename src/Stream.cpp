@@ -34,44 +34,17 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "    Stream[" + std::to_string(id) + "]: " + applicationName + " / " + streamName + "\n";
-
-//                if (inputConnection) inputConnection->getStats(str, reportType);
-//                for (const auto& c : outputConnections)
-//                {
-//                    c->getStats(str, reportType);
-//                }
+                str += "    Stream[" + std::to_string(id) + "]: " + applicationName + "/" + streamName + "\n";
                 break;
             }
             case ReportType::HTML:
             {
-                if (inputConnection) inputConnection->getStats(str, reportType);
-                for (const auto& c : outputConnections)
-                {
-                    c->getStats(str, reportType);
-                }
-
+                str += "<b>Stream[" + std::to_string(id) + "]: " + applicationName + "/" + streamName + "</b>";
                 break;
             }
             case ReportType::JSON:
             {
                 str += "{\"id\": " + std::to_string(id) + ", \"applicationName\":\"" + applicationName + "\", \"streamName\":\"" + streamName + "\", \"connections\": [";
-
-                bool first = true;
-
-                if (inputConnection)
-                {
-                    inputConnection->getStats(str, reportType);
-                    first = false;
-                }
-                for (const auto& c : outputConnections)
-                {
-                    if (!first) str += ",";
-                    first = false;
-                    c->getStats(str, reportType);
-                }
-
-                str += "]}";
             }
         }
     }
@@ -257,6 +230,20 @@ namespace relay
             {
                 outputConnection->sendTextData(timestamp, textData);
             }
+        }
+    }
+
+    void Stream::getConnections(std::map<Connection*, Stream*>& cons)
+    {
+        if (inputConnection) cons[inputConnection] = this;
+
+        for (const auto& c : outputConnections)
+        {
+            cons[c] = this;
+        }
+        for (const auto& c : connections)
+        {
+            cons[c] = this;
         }
     }
 }

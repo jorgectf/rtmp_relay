@@ -141,6 +141,19 @@ namespace relay
         }
     }
 
+    void Server::getConnections(std::map<Connection*, Stream*>& cons)
+    {
+        for (auto& c : connections)
+        {
+            cons[c.get()] = c->getStream();
+        }
+
+        for (auto& s : streams)
+        {
+            s->getConnections(cons);
+        }
+    }
+
     void Server::getStats(std::string& str, ReportType reportType) const
     {
         switch (reportType)

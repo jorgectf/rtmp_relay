@@ -2,6 +2,10 @@
 //  rtmp_relay
 //
 
+#include <sstream>
+#include <iostream>
+#include <iomanip>
+
 #include "Connection.hpp"
 #include "Relay.hpp"
 #include "Server.hpp"
@@ -185,58 +189,51 @@ namespace relay
         {
             case ReportType::TEXT:
             {
-                str += "        [" + std::to_string(id) + ", " + name + "], " +
-                    "application: " + applicationName + ", " +
-                    "stream: " + streamName + ", " +
+                std::stringstream ss;
 
-                    "status: " + (socket.isReady() ? "connected" : "not connected") + ", " +
-                    "address: " + ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) + ", " +
-                    "type: ";
-
-                switch (type)
-                {
-                    case Type::HOST: str += "HOST"; break;
-                    case Type::CLIENT: str += "CLIENT"; break;
-                }
-
-                str += ", state: ";
-
+                ss
+                << std::setw(8) << " "
+                << std::setw(5) << id << " "
+                << std::setw(20) << applicationName << " "
+                << std::setw(20) << streamName << " "
+                << std::setw(15) << (socket.isReady() ? "connected" : "not connected") << " "
+                << std::setw(22) << ipToString(socket.getRemoteIPAddress()) + ":" + std::to_string(socket.getRemotePort()) << " "
+                << std::setw(7) << (type == Type::HOST ? "HOST" : "CLIENT") << " "
+                << std::setw(20);
                 switch (state)
                 {
-                    case State::UNINITIALIZED: str += "UNINITIALIZED"; break;
-                    case State::VERSION_RECEIVED: str += "VERSION_RECEIVED"; break;
-                    case State::VERSION_SENT: str += "VERSION_SENT"; break;
-                    case State::ACK_SENT: str += "ACK_SENT"; break;
-                    case State::HANDSHAKE_DONE: str += "HANDSHAKE_DONE"; break;
+                    case State::UNINITIALIZED: ss << "UNINITIALIZED"; break;
+                    case State::VERSION_RECEIVED: ss << "VERSION_RECEIVED"; break;
+                    case State::VERSION_SENT: ss << "VERSION_SENT"; break;
+                    case State::ACK_SENT: ss << "ACK_SENT"; break;
+                    case State::HANDSHAKE_DONE: ss << "HANDSHAKE_DONE"; break;
                 }
 
-                str += ", direction: ";
-
+                ss << " " << std::setw(10);
                 switch (direction)
                 {
-                    case Direction::NONE: str += "NONE"; break;
-                    case Direction::INPUT: str += "INPUT"; break;
-                    case Direction::OUTPUT: str += "OUTPUT"; break;
+                    case Direction::NONE: ss << "NONE"; break;
+                    case Direction::INPUT: ss << "INPUT"; break;
+                    case Direction::OUTPUT: ss << "OUTPUT"; break;
                 }
 
-                if (stream) str += ", server: " + std::to_string(stream->getServer().getId());
+                ss << " " << std::setw(6) << (stream ? std::to_string(stream->getServer().getId()) : "") << " ";
 
                 if (metaData.getType() == amf::Node::Type::Dictionary ||
                     metaData.getType() == amf::Node::Type::Object)
                 {
-                    str += ", metadata: ";
                     bool first = true;
 
                     for (const std::pair<std::string, amf::Node>& value : metaData.asMap())
                     {
-                        if (!first) str += ", ";
+                        if (!first) ss << ", ";
                         first = false;
-                        str += value.first + " = " + value.second.toString();
+                        ss << value.first + " = " + value.second.toString();
                     }
                 }
 
+                str += ss.str();
                 str += "\n";
-
                 break;
             }
             case ReportType::HTML:

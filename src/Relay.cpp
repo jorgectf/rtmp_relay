@@ -10,6 +10,9 @@
 #include <chrono>
 #include <regex>
 #include <thread>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 #include "yaml-cpp/yaml.h"
 #include "Log.hpp"
 #include "Relay.hpp"
@@ -335,62 +338,171 @@ namespace relay
 
     void Relay::getStats(std::string& str, ReportType reportType) const
     {
+        std::map<Connection*, Stream*> cons;
+        std::map<Stream*, Connection*> streams;
+
+        for (auto& c : connections)
+        {
+            cons[c.get()] = c->getStream();
+        }
+
+        for (auto& s : servers)
+        {
+            s->getConnections(cons);
+        }
+
         switch (reportType)
         {
             case ReportType::TEXT:
             {
-                str = "Connections:\n";
-                for (const auto& connection : connections)
+                std::stringstream ss;
+
+                ss
+                << std::setw(8) << " "
+                << std::setw(5) << "ID" << " "
+                << std::setw(20) << "Application" << " "
+                << std::setw(20) << "Stream name" << " "
+
+                << std::setw(15) << "Status" << " "
+                << std::setw(22) << "Address" << " "
+                << std::setw(7) << "Type" << " "
+                << std::setw(20) << "State" << " "
+                << std::setw(10) << "Direction" << " "
+
+                << std::setw(6) << "Server" << " " << " Metadata\n";
+
+                auto header = ss.str();
+
+
+                str = "Pending connections:\n";
+                for (const auto& c : cons)
                 {
-                    connection->getStats(str, reportType);
+                    if (c.second == nullptr)
+                    {
+                        c.first->getStats(str, reportType);
+                    }
                 }
 
-                for (const auto& server : servers)
+                str += "\nStreams:\n";
+                for (auto it = cons.begin(); it != cons.end(); ++it)
                 {
-                    server->getStats(str, reportType);
+                    if (it->second != nullptr)
+                    {
+                        Stream* stream = it->second;
+                        stream->getStats(str, reportType);
+                        str += header;
+
+                        if (stream->getInputConnection())
+                        {
+                            stream->getInputConnection()->getStats(str, reportType);
+                            cons[stream->getInputConnection()] = nullptr;
+                        }
+                        for (auto cit = it; cit != cons.end(); ++cit)
+                        {
+                            if (cons[cit->first] == stream && cit->first != stream->getInputConnection())
+                            {
+                                cons[cit->first] = nullptr;
+                                cit->first->getStats(str, reportType);
+                            }
+                        }
+                    }
                 }
+
                 break;
             }
             case ReportType::HTML:
             {
+                auto header = "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Direction</th><th>Server ID</th><th>Meta data</th></tr>";
+
                 str = "<html><title>Status</title><body>";
-                str += "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><th>ID</th><th>Name</th><th>Application</th><th>Status</th><th>Address</th><th>Connection</th><th>State</th><th>Direction</th><th>Server ID</th><th>Meta data</th></tr>";
 
-                for (const auto& connection : connections)
+                str = "<b>Pending connections</b>";
+                str += header;
+                for (const auto& c : cons)
                 {
-                    connection->getStats(str, reportType);
+                    if (c.second == nullptr)
+                    {
+                        c.first->getStats(str, reportType);
+                    }
                 }
-
-                for (const auto& server : servers)
-                {
-                    server->getStats(str, reportType);
-                }
-
                 str += "</table>";
+
+                str = "<b>Streams</b><br>";
+                for (auto it = cons.begin(); it != cons.end(); ++it)
+                {
+                    if (it->second)
+                    {
+                        Stream* stream = it->second;
+                        stream->getStats(str, reportType);
+
+                        str += header;
+                        if (stream->getInputConnection())
+                        {
+                            stream->getInputConnection()->getStats(str, reportType);
+                            cons[stream->getInputConnection()] = nullptr;
+                        }
+                        for (auto cit = it; cit != cons.end(); ++cit)
+                        {
+                            if (cons[cit->first] == stream && cit->first != stream->getInputConnection())
+                            {
+                                cons[cit->first] = nullptr;
+                                cit->first->getStats(str, reportType);
+                            }
+                        }
+                        str += "</table>";
+                    }
+                }
+
                 str += "</body></html>";
 
                 break;
             }
             case ReportType::JSON:
             {
-                str = "{\"connections\":[";
-
                 bool first = true;
-
-                for (const auto& connection : connections)
+                str = "{\"pending_connections\":[";
+                for (const auto& c : cons)
                 {
-                    if (!first) str += ",";
-                    first = false;
-                    connection->getStats(str, reportType);
+                    if (c.second == nullptr)
+                    {
+                        if (!first) str += ",";
+                        first = false;
+                        c.first->getStats(str, reportType);
+                    }
                 }
-
-                for (const auto& server : servers)
+                str += "], \"streams\":[";
+                bool firstStream = true;
+                for (auto it = cons.begin(); it != cons.end(); ++it)
                 {
-                    if (!first) str += ",";
-                    first = false;
-                    server->getStats(str, reportType);
-                }
+                    if (it->second != nullptr)
+                    {
+                        Stream* stream = it->second;
+                        if (!firstStream) str += ",";
+                        firstStream = false;
+                        stream->getStats(str, reportType);
 
+                        first = true;
+                        if (stream->getInputConnection())
+                        {
+                            first = false;
+                            stream->getInputConnection()->getStats(str, reportType);
+                            cons[stream->getInputConnection()] = nullptr;
+                        }
+                        for (auto cit = it; cit != cons.end(); ++cit)
+                        {
+                            if (cons[cit->first] == stream && cit->first != stream->getInputConnection())
+                            {
+                                if (!first) str += ",";
+                                first = false;
+                                
+                                cons[cit->first] = nullptr;
+                                cit->first->getStats(str, reportType);
+                            }
+                        }
+
+                        str += "]}";
+                    }
+                }
                 str += "]}";
                 
                 break;

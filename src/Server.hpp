@@ -39,6 +39,7 @@ namespace relay
 
         const std::vector<Endpoint>& getEndpoints() const { return endpoints; }
         void cleanup() { needsCleanup = true; }
+        void getConnections(std::map<Connection*, Stream*>& cons);
 
     private:
         Relay& relay;
