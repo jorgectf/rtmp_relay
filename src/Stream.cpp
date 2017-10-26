@@ -110,6 +110,9 @@ namespace relay
                     {
                         auto ic = server.createConnection(*this, endpoint);
                         ic->connect();
+                        inputConnection = ic;
+
+                        connections.push_back(ic);
                     }
                 }
             }
