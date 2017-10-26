@@ -8,6 +8,7 @@
 #include <random>
 #include <vector>
 #include <utility>
+#include <chrono>
 #include "Network.hpp"
 #include "Socket.hpp"
 #include "Status.hpp"
@@ -28,6 +29,7 @@ namespace relay
         static uint64_t nextId() { return ++currentId; }
 
         Relay(cppsocket::Network& aNetwork);
+        ~Relay();
 
         Relay(const Relay&) = delete;
         Relay(Relay&&) = delete;
@@ -49,7 +51,7 @@ namespace relay
 
         std::vector<std::pair<Server*, const Endpoint*>> getEndpoints(const std::pair<uint32_t, uint16_t>& address,
                                                                       Connection::Direction type,
-                                                                      const std::string& applicationName,
+                                                                      const std::string& apyplicationName,
                                                                       const std::string& streamName) const;
 
     private:
@@ -62,6 +64,8 @@ namespace relay
         cppsocket::Network& network;
         std::unique_ptr<Status> status;
         std::chrono::steady_clock::time_point previousTime;
+        std::chrono::steady_clock::time_point timeout;
+        bool hasTimeout = false;
 
         std::vector<std::unique_ptr<Server>> servers;
         std::vector<std::unique_ptr<Connection>> connections;

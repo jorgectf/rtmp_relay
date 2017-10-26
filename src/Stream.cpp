@@ -68,6 +68,10 @@ namespace relay
         {
             o->close(true);
         }
+        for (auto o : connections)
+        {
+            o->close(true);
+        }
         server.cleanup();
     }
 

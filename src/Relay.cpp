@@ -32,6 +32,19 @@ namespace relay
         previousTime = std::chrono::steady_clock::now();
     }
 
+    Relay::~Relay()
+    {
+        for (auto& a : servers)
+        {
+            a->stop();
+        }
+
+        for (auto& c : connections)
+        {
+            c->close(true);
+        }
+    }
+
     bool Relay::init(const std::string& config)
     {
         servers.clear();
@@ -93,6 +106,13 @@ namespace relay
         }
 
         openLog();
+
+        if (document["timeout"])
+        {
+            float ts = document["timeout"].as<float>();
+            timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(static_cast<int>(ts * 1000));
+            hasTimeout = true;
+        }
 
         if (document["statusPage"])
         {
@@ -303,6 +323,11 @@ namespace relay
         while (active)
         {
             auto currentTime = std::chrono::steady_clock::now();
+            if (hasTimeout && currentTime > timeout)
+            {
+                break;
+            }
+
             float delta = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - previousTime).count() / 1000.0f;
             previousTime = currentTime;
 

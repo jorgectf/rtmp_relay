@@ -41,6 +41,8 @@ namespace relay
         void cleanup() { needsCleanup = true; }
         void getConnections(std::map<Connection*, Stream*>& cons);
 
+        void stop();
+
     private:
         Relay& relay;
         const uint64_t id;

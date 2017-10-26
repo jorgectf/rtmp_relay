@@ -17,6 +17,19 @@ namespace relay
     {
     }
 
+    void Server::stop()
+    {
+        for (auto& s : streams)
+        {
+            s->close();
+        }
+
+        for (auto& c : connections)
+        {
+            c->close(true);
+        }
+    }
+
     Stream* Server::findStream(const std::string& applicationName,
                                const std::string& streamName) const
     {

@@ -24,6 +24,8 @@ namespace relay
         type(Type::HOST),
         socket(std::move(client))
     {
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Create connection";
+
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
         socket.startRead();
@@ -38,6 +40,8 @@ namespace relay
         socket(relay.getNetwork()),
         endpoint(&aEndpoint)
     {
+        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Create connection";
+        
         stream = &aStream;
 
         resolveStreamName();
