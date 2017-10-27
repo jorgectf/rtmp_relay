@@ -66,6 +66,7 @@ namespace relay
         std::string streamName;
 
         Connection* inputConnection = nullptr;
+        bool inputConnectionCreated = false;
         std::vector<Connection*> outputConnections;
 
         bool streaming = false;

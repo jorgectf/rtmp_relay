@@ -100,7 +100,7 @@ namespace relay
         }
         else if (connection.getDirection() == Connection::Direction::OUTPUT)
         {
-            if (!inputConnection)
+            if (!inputConnection && !inputConnectionCreated)
             {
                 for (const Endpoint& endpoint : server.getEndpoints())
                 {
@@ -110,7 +110,7 @@ namespace relay
                     {
                         auto ic = server.createConnection(*this, endpoint);
                         ic->connect();
-                        inputConnection = ic;
+                        inputConnectionCreated = true;
 
                         connections.push_back(ic);
                     }
