@@ -49,9 +49,12 @@ EXECUTABLE=rtmp_relay
 all: CXXFLAGS+=-Os
 all: directories $(SOURCES) $(EXECUTABLE)
 
-debug: CXXFLAGS+=-DDEBUG -g -O0 -fsanitize=address
-debug: LDFLAGS=-fsanitize=address
+debug: CXXFLAGS+=-DDEBUG -g -O0
 debug: directories $(SOURCES) $(EXECUTABLE)
+
+sanitize: CXXFLAGS+=-DDEBUG -g -O0 -fsanitize=address
+sanitize: LDFLAGS=-fsanitize=address
+sanitize: directories $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(OBJECTS) $(LDFLAGS) -o $(BINDIR)/$@
