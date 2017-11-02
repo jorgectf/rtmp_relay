@@ -1659,40 +1659,46 @@ namespace relay
     {
         if (endpoint && stream)
         {
-            if (endpoint->applicationName.empty())
+            if (applicationName.empty())
             {
-                applicationName = stream->getApplicationName();
-            }
-            else
-            {
-                std::map<std::string, std::string> tokens = {
-                    {"id", std::to_string(id)},
-                    {"streamName", stream->getStreamName()},
-                    {"applicationName", stream->getApplicationName()},
-                    {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
-                    {"port", std::to_string(socket.getRemotePort())}
-                };
+                if (endpoint->applicationName.empty())
+                {
+                    applicationName = stream->getApplicationName();
+                }
+                else
+                {
+                    std::map<std::string, std::string> tokens = {
+                        {"id", std::to_string(id)},
+                        {"streamName", stream->getStreamName()},
+                        {"applicationName", stream->getApplicationName()},
+                        {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                        {"port", std::to_string(socket.getRemotePort())}
+                    };
 
-                applicationName = endpoint->applicationName;
-                replaceTokens(applicationName, tokens);
+                    applicationName = endpoint->applicationName;
+                    replaceTokens(applicationName, tokens);
+                }
             }
 
-            if (endpoint->streamName.empty())
+            if (streamName.empty())
             {
-                streamName = stream->getStreamName();
-            }
-            else
-            {
-                std::map<std::string, std::string> tokens = {
-                    {"id", std::to_string(id)},
-                    {"streamName", stream->getStreamName()},
-                    {"applicationName", stream->getApplicationName()},
-                    {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
-                    {"port", std::to_string(socket.getRemotePort())}
-                };
+                if (endpoint->streamName.empty())
+                {
+                    streamName = stream->getStreamName();
+                }
+                else
+                {
+                    std::map<std::string, std::string> tokens = {
+                        {"id", std::to_string(id)},
+                        {"streamName", stream->getStreamName()},
+                        {"applicationName", stream->getApplicationName()},
+                        {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                        {"port", std::to_string(socket.getRemotePort())}
+                    };
 
-                streamName = endpoint->streamName;
-                replaceTokens(streamName, tokens);
+                    streamName = endpoint->streamName;
+                    replaceTokens(streamName, tokens);
+                }
             }
         }
     }
