@@ -144,6 +144,12 @@ namespace relay
 
                     Endpoint endpoint;
 
+                    if (!endpointObject["type"] || !endpointObject["direction"] || !endpointObject["address"])
+                    {
+                        Log(Log::Level::ERR) << "Endpoint configuration is missing field";
+                        exit(1);
+                    }
+
                     if (endpointObject["type"].as<std::string>() == "host") endpoint.connectionType = Connection::Type::HOST;
                     else if (endpointObject["type"].as<std::string>() == "client") endpoint.connectionType = Connection::Type::CLIENT;
 
@@ -225,6 +231,23 @@ namespace relay
                     }
 
                     endpoints.push_back(endpoint);
+                }
+            }
+
+            // check if configuration is valid
+            {
+                bool hasName = false;
+                for (const auto& e : endpoints)
+                {
+                    hasName |= (e.direction == Connection::Direction::INPUT &&
+                                ((e.connectionType == Connection::Type::CLIENT && e.isNameKnown()) || e.connectionType == Connection::Type::HOST))
+                                || (e.direction == Connection::Direction::OUTPUT && e.connectionType == Connection::Type::HOST);
+                }
+
+                if (!hasName)
+                {
+                    Log(Log::Level::ERR) << "Server configuration is invalid";
+                    exit(1);
                 }
             }
 
