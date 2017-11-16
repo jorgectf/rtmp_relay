@@ -92,6 +92,7 @@ namespace relay
 
     private:
         void resolveStreamName();
+        void updateIdString();
 
         void handleConnect(cppsocket::Socket&);
         void handleConnectError(cppsocket::Socket&);
@@ -190,5 +191,7 @@ namespace relay
         amf::Node metaData;
 
         amf::Version amfVersion = amf::Version::AMF0;
+
+        std::string idString;
     };
 }

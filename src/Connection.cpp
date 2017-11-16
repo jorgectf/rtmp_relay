@@ -24,7 +24,8 @@ namespace relay
         type(Type::HOST),
         socket(std::move(client))
     {
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Create connection";
+        updateIdString();
+        Log(Log::Level::INFO) << idString << "Create connection";
 
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
@@ -40,7 +41,8 @@ namespace relay
         socket(relay.getNetwork()),
         endpoint(&aEndpoint)
     {
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Create connection";
+        updateIdString();
+        Log(Log::Level::INFO) << idString << "Create connection";
         
         stream = &aStream;
 
@@ -48,7 +50,7 @@ namespace relay
 
         if (!socket.setBlocking(false))
         {
-            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Failed to set socket non-blocking";
+            Log(Log::Level::ERR) << idString << "Failed to set socket non-blocking";
         }
 
         reconnectCount = endpoint->reconnectCount;
@@ -66,14 +68,27 @@ namespace relay
     Connection::~Connection()
     {
         close();
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Delete connection";
+        Log(Log::Level::INFO) << idString << "Delete connection";
+    }
+
+    void Connection::updateIdString()
+    {
+        if (stream)
+        {
+            idString = "[" + name + " " + std::to_string(id) + " " + stream->getApplicationName() + "\\" + stream->getStreamName() + "] ";
+        }
+        else
+        {
+            idString = "[" + name + " " + std::to_string(id) + " " + applicationName + "\\" + streamName + "] ";
+        }
+
     }
 
     void Connection::close(bool forceClose)
     {
         if (closed) return;
 
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Close called";
+        Log(Log::Level::INFO) << idString << "Close called";
         closed |= forceClose;
         socket.close();
 
@@ -124,6 +139,8 @@ namespace relay
 
     void Connection::update(float delta)
     {
+        if (closed) return;
+
         if (type == Type::HOST)
         {
             if (connected && pingInterval > 0.0f)
@@ -373,17 +390,23 @@ namespace relay
 
     void Connection::handleConnect(cppsocket::Socket&)
     {
+        if (closed)
+        {
+            close(true);
+            return;
+        }
+
         // handshake
         if (type == Type::CLIENT)
         {
-            Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Connected to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
+            Log(Log::Level::INFO) << idString << "Connected to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
 
             // C0
             std::vector<uint8_t> version;
             version.push_back(RTMP_VERSION);
             socket.send(version);
 
-            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending version message " << RTMP_VERSION;
+            Log(Log::Level::ALL) << idString << "Sending version message " << RTMP_VERSION;
 
             // C1
             rtmp::Challenge challenge;
@@ -403,7 +426,7 @@ namespace relay
                                     reinterpret_cast<uint8_t*>(&challenge) + sizeof(challenge));
             socket.send(challengeMessage);
 
-            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending challenge message";
+            Log(Log::Level::ALL) << idString << "Sending challenge message";
 
             state = State::VERSION_SENT;
         }
@@ -417,7 +440,7 @@ namespace relay
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got " << std::to_string(newData.size()) << " bytes";
+        Log(Log::Level::ALL) << idString << "Got " << std::to_string(newData.size()) << " bytes";
 
         uint32_t offset = 0;
 
@@ -431,7 +454,7 @@ namespace relay
 
                 if (ret > 0)
                 {
-                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Total packet size: " << ret;
+                    Log(Log::Level::ALL) << idString << "Total packet size: " << ret;
 
                     offset += ret;
 
@@ -452,11 +475,11 @@ namespace relay
                         uint8_t version = *(data.data() + offset);
                         offset += sizeof(version);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got version " << static_cast<uint32_t>(version);
+                        Log(Log::Level::ALL) << idString << "Got version " << static_cast<uint32_t>(version);
 
                         if (version != 0x03)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unsupported version(" << version << "), disconnecting";
+                            Log(Log::Level::ERR) << idString << "Unsupported version(" << version << "), disconnecting";
                             close();
                             break;
                         }
@@ -465,7 +488,7 @@ namespace relay
                         std::vector<uint8_t> reply;
                         reply.push_back(RTMP_VERSION);
                         socket.send(reply);
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending reply version " << RTMP_VERSION;
+                        Log(Log::Level::ALL) << idString << "Sending reply version " << RTMP_VERSION;
 
                         state = State::VERSION_SENT;
                     }
@@ -482,7 +505,7 @@ namespace relay
                         rtmp::Challenge* challenge = reinterpret_cast<rtmp::Challenge*>(data.data() + offset);
                         offset += sizeof(*challenge);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got challenge message, time: " << challenge->time <<
+                        Log(Log::Level::ALL) << idString << "Got challenge message, time: " << challenge->time <<
                         ", version: " << static_cast<uint32_t>(challenge->version[0]) << "." <<
                         static_cast<uint32_t>(challenge->version[1]) << "." <<
                         static_cast<uint32_t>(challenge->version[2]) << "." <<
@@ -505,7 +528,7 @@ namespace relay
                                      reinterpret_cast<uint8_t*>(&replyChallenge) + sizeof(replyChallenge));
                         socket.send(reply);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending challange reply message";
+                        Log(Log::Level::ALL) << idString << "Sending challange reply message";
 
                         // S2
                         rtmp::Ack ack;
@@ -517,7 +540,7 @@ namespace relay
                                                      reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                         socket.send(ackData);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending Ack message";
+                        Log(Log::Level::ALL) << idString << "Sending Ack message";
 
                         state = State::ACK_SENT;
                     }
@@ -534,12 +557,12 @@ namespace relay
                         rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                         offset += sizeof(*ack);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got Ack reply message, time: " << ack->time <<
+                        Log(Log::Level::ALL) << idString << "Got Ack reply message, time: " << ack->time <<
                             ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
                         static_cast<uint32_t>(ack->version[1]) << "." <<
                         static_cast<uint32_t>(ack->version[2]) << "." <<
                         static_cast<uint32_t>(ack->version[3]);
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Handshake done";
+                        Log(Log::Level::ALL) << idString << "Handshake done";
 
                         state = State::HANDSHAKE_DONE;
                     }
@@ -559,11 +582,11 @@ namespace relay
                         uint8_t version = *(data.data() + offset);
                         offset += sizeof(version);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got reply version " << static_cast<uint32_t>(version);
+                        Log(Log::Level::ALL) << idString << "Got reply version " << static_cast<uint32_t>(version);
 
                         if (version != 0x03)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unsupported version (" << version << "), disconnecting";
+                            Log(Log::Level::ERR) << idString << "Unsupported version (" << version << "), disconnecting";
                             close();
                             break;
                         }
@@ -583,7 +606,7 @@ namespace relay
                         rtmp::Challenge* challenge = reinterpret_cast<rtmp::Challenge*>(data.data() + offset);
                         offset += sizeof(*challenge);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got challenge reply message, time: " << challenge->time <<
+                        Log(Log::Level::ALL) << idString << "Got challenge reply message, time: " << challenge->time <<
                             ", version: " << static_cast<uint32_t>(challenge->version[0]) << "." <<
                         static_cast<uint32_t>(challenge->version[1]) << "." <<
                         static_cast<uint32_t>(challenge->version[2]) << "." <<
@@ -599,7 +622,7 @@ namespace relay
                                                      reinterpret_cast<uint8_t*>(&ack) + sizeof(ack));
                         socket.send(ackData);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending Ack message";
+                        Log(Log::Level::ALL) << "[" << id << ", " << name << " " << applicationName << "/" << streamName << "] " << "Sending Ack message";
 
                         state = State::ACK_SENT;
                     }
@@ -616,16 +639,16 @@ namespace relay
                         rtmp::Ack* ack = reinterpret_cast<rtmp::Ack*>(data.data() + offset);
                         offset += sizeof(*ack);
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Got Ack reply message, time: " << ack->time <<
+                        Log(Log::Level::ALL) << idString << "Got Ack reply message, time: " << ack->time <<
                             ", version: " << static_cast<uint32_t>(ack->version[0]) << "." <<
                             static_cast<uint32_t>(ack->version[1]) << "." <<
                             static_cast<uint32_t>(ack->version[2]) << "." <<
                             static_cast<uint32_t>(ack->version[3]);
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Handshake done";
+                        Log(Log::Level::ALL) << idString << "Handshake done";
                         
                         state = State::HANDSHAKE_DONE;
 
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Connecting to application " << applicationName;
+                        Log(Log::Level::ALL) << idString << "Connecting to application " << applicationName;
 
                         sendConnect();
                     }
@@ -641,7 +664,7 @@ namespace relay
         {
             if (socket.isReady())
             {
-                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
+                Log(Log::Level::ERR) << idString << "Reading outside of the buffer, buffer size: " << static_cast<uint32_t>(data.size()) << ", data size: " << offset;
             }
 
             data.clear();
@@ -650,13 +673,13 @@ namespace relay
         {
             data.erase(data.begin(), data.begin() + offset);
             
-            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Remaining data " << data.size();
+            Log(Log::Level::ALL) << idString << "Remaining data " << data.size();
         }
     }
 
     void Connection::handleClose(cppsocket::Socket&)
     {
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Handle close connection at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
+        Log(Log::Level::INFO) << idString << "Handle close connection at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
 
         reset();
 
@@ -679,7 +702,7 @@ namespace relay
                     return false;
                 }
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received SET_CHUNK_SIZE, parameter: " << inChunkSize;
+                Log(Log::Level::ALL) << idString << "Received SET_CHUNK_SIZE, parameter: " << inChunkSize;
 
                 if (type == Type::CLIENT)
                 {
@@ -691,7 +714,7 @@ namespace relay
 
             case rtmp::MessageType::ABORT:
             {
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received ABORT";
+                Log(Log::Level::ALL) << idString << "Received ABORT";
                 break;
             }
 
@@ -707,7 +730,7 @@ namespace relay
                     return false;
                 }
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received BYTES_READ, parameter: " << bytesRead;
+                Log(Log::Level::ALL) << idString << "Received BYTES_READ, parameter: " << bytesRead;
 
                 break;
             }
@@ -740,7 +763,7 @@ namespace relay
 
                 {
                     Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "Received PING, type: ";
+                    log << idString << "Received PING, type: ";
 
                     switch (userControlType)
                     {
@@ -777,7 +800,7 @@ namespace relay
 
                 offset += ret;
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received SERVER_BANDWIDTH, parameter: " << bandwidth;
+                Log(Log::Level::ALL) << idString << "Received SERVER_BANDWIDTH, parameter: " << bandwidth;
 
                 break;
             }
@@ -806,7 +829,7 @@ namespace relay
 
                 offset += ret;
 
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received CLIENT_BANDWIDTH, parameter: " << bandwidth << ", type: " << bandwidthType;
+                Log(Log::Level::ALL) << idString << "Received CLIENT_BANDWIDTH, parameter: " << bandwidth << ", type: " << bandwidthType;
 
                 break;
             }
@@ -852,7 +875,7 @@ namespace relay
 
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Received NOTIFY, command: ";
+                        log << idString << "Received NOTIFY, command: ";
                         command.dump(log);
                     }
 
@@ -863,7 +886,7 @@ namespace relay
                         offset += ret;
 
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Argument 1: ";
+                        log << idString << "Argument 1: ";
                         argument1.dump(log);
                     }
 
@@ -874,7 +897,7 @@ namespace relay
                         offset += ret;
 
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                        log << idString << "Argument 2: ";
                         argument2.dump(log);
                     }
 
@@ -898,7 +921,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - setDataFrame > onMetaData";
+                            Log(Log::Level::ERR) << idString << "Not server, disconnecting - setDataFrame > onMetaData";
                             close();
                             return false;
                         }
@@ -922,7 +945,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - onMetaData";
+                            Log(Log::Level::ERR) << idString << "Not server, disconnecting - onMetaData";
                             close();
                             return false;
                         }
@@ -935,7 +958,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - onTextData";
+                            Log(Log::Level::ERR) << idString << "Not server, disconnecting - onTextData";
                             close();
                             return false;
                         }
@@ -943,7 +966,7 @@ namespace relay
                 }
                 else
                 {
-                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent notify packet to sender, disconnecting";
+                    Log(Log::Level::ERR) << idString << "Client sent notify packet to sender, disconnecting";
                     close();
                     return false;
                 }
@@ -957,7 +980,7 @@ namespace relay
                 {
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Received AUDIO_PACKET";
+                        log << idString << "Received AUDIO_PACKET";
                         if (isCodecHeader(packet.data)) log << "(header)";
                     }
 
@@ -977,7 +1000,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - audio codec header";
+                            Log(Log::Level::ERR) << idString << "Not server, disconnecting - audio codec header";
                             close();
                             return false;
                         }
@@ -991,7 +1014,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - audio packet";
+                            Log(Log::Level::ERR) << idString << "Not server, disconnecting - audio packet";
                             close();
                             return false;
                         }
@@ -999,7 +1022,7 @@ namespace relay
                 }
                 else
                 {
-                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent audio packet to sender, disconnecting";
+                    Log(Log::Level::ERR) << idString << "Client sent audio packet to sender, disconnecting";
                     close();
                     return false;
                 }
@@ -1015,7 +1038,7 @@ namespace relay
 
                     {
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Received VIDEO_PACKET";
+                        log << idString << "Received VIDEO_PACKET";
 
                         if (isCodecHeader(packet.data))
                         {
@@ -1048,7 +1071,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - video header";
+                            Log(Log::Level::ERR) << idString << "Not server, disconnecting - video header";
                             close();
                             return false;
                         }
@@ -1062,7 +1085,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not server, disconnecting - video packet";
+                            Log(Log::Level::ERR) << idString << "Not server, disconnecting - video packet";
                             close();
                             return false;
                         }
@@ -1070,7 +1093,7 @@ namespace relay
                 }
                 else
                 {
-                    Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Client sent video packet to sender, disconnecting";
+                    Log(Log::Level::ERR) << idString << "Client sent video packet to sender, disconnecting";
                     close();
                     return false;
                 }
@@ -1115,7 +1138,7 @@ namespace relay
 
                 {
                     Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "Received INVOKE, command: ";
+                    log << idString << "Received INVOKE, command: ";
                     command.dump(log);
                 }
 
@@ -1132,7 +1155,7 @@ namespace relay
 
                 {
                     Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "Transaction ID: ";
+                    log << idString << "Transaction ID: ";
                     transactionId.dump(log);
                 }
 
@@ -1143,7 +1166,7 @@ namespace relay
                     offset += ret;
 
                     Log log(Log::Level::ALL);
-                    log << "[" << id << ", " << name << "] " << "Argument 1: ";
+                    log << idString << "Argument 1: ";
                     argument1.dump(log);
                 }
 
@@ -1167,7 +1190,7 @@ namespace relay
 
                         connected = true;
 
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
+                        Log(Log::Level::INFO) << idString << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
 
 #ifdef DEBUG
                         Log log(Log::Level::ALL);
@@ -1177,7 +1200,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"connect\") received, disconnecting";
+                        Log(Log::Level::INFO) << idString << "Invalid message (\"connect\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1190,7 +1213,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"onBWDone\"), disconnecting";
+                        Log(Log::Level::INFO) << idString << "Invalid message (\"onBWDone\"), disconnecting";
                         close();
                         return false;
                     }
@@ -1203,7 +1226,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"_checkbw\"), disconnecting";
+                        Log(Log::Level::INFO) << idString << "Invalid message (\"_checkbw\"), disconnecting";
                         close();
                         return false;
                     }
@@ -1216,7 +1239,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"createStream\"), disconnecting";
+                        Log(Log::Level::INFO) << idString << "Invalid message (\"createStream\"), disconnecting";
                         close();
                         return false;
                     }
@@ -1229,7 +1252,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"releaseStream\"), disconnecting";
+                        Log(Log::Level::INFO) << idString << "Invalid message (\"releaseStream\"), disconnecting";
                         close();
                         return false;
                     }
@@ -1245,7 +1268,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Invalid message (\"deleteStream\"), disconnecting";
+                        Log(Log::Level::INFO) << idString << "Invalid message (\"deleteStream\"), disconnecting";
                         close();
                         return false;
                     }
@@ -1259,7 +1282,7 @@ namespace relay
                     }
                     else if (direction == Direction::OUTPUT)
                     {
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCPublish\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"FCPublish\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1271,7 +1294,7 @@ namespace relay
                 {
                     if (direction == Direction::INPUT)
                     {
-                        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
+                        Log(Log::Level::INFO) << idString << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
 
                         sendOnFCUnpublish();
 
@@ -1280,7 +1303,7 @@ namespace relay
                     else
                     {
                         // this is not a receiver
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCUnpublish\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"FCUnpublish\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1294,7 +1317,7 @@ namespace relay
                     else
                     {
                         // this is not a receiver
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"onFCUnpublish\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"onFCUnpublish\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1308,7 +1331,7 @@ namespace relay
                     }
                     else if (direction == Direction::INPUT)
                     {
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCSubscribe\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"FCSubscribe\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1330,7 +1353,7 @@ namespace relay
                             offset += ret;
 
                             Log log(Log::Level::ALL);
-                            log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                            log << idString << "Argument 2: ";
                             argument2.dump(log);
                         }
 
@@ -1355,12 +1378,12 @@ namespace relay
                             }
                             else if (newStream->getInputConnection() && newStream->getInputConnection() != this)
                             {
-                                Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting " << newStream->getInputConnection()->getId();
+                                Log(Log::Level::WARN) << idString << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting " << newStream->getInputConnection()->getId();
                                 close(true);
                                 return false;
                             }
 
-                            Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
+                            Log(Log::Level::INFO) << idString << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " published stream \"" << streamName << "\"";
 
                             stream = newStream;
                             streaming = true;
@@ -1368,7 +1391,7 @@ namespace relay
                         }
                         else
                         {
-                            Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                            Log(Log::Level::WARN) << idString << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
                             close();
                             return false;
                         }
@@ -1376,7 +1399,7 @@ namespace relay
                     else if (direction == Direction::OUTPUT)
                     {
                         // this is not a receiver
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"publish\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"publish\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1386,12 +1409,12 @@ namespace relay
                     if (direction != Direction::INPUT)
                     {
                         // this is not a receiver
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"FCUnpublish\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"FCUnpublish\") received, disconnecting";
                         close();
                         return false;
                     }
 
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
+                    Log(Log::Level::INFO) << idString << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " unpublished stream \"" << streamName << "\"";
 
                     sendUnublishStatus(transactionId.asDouble());
                     close();
@@ -1401,7 +1424,7 @@ namespace relay
                     if (direction == Direction::INPUT)
                     {
                         // this is not a sender
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"play\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"play\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1415,11 +1438,11 @@ namespace relay
                         offset += ret;
 
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                        log << idString << "Argument 2: ";
                         argument2.dump(log);
                     }
 
-                    Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent play, stream: \"" << argument2.asString() << "\"";
+                    Log(Log::Level::INFO) << idString << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent play, stream: \"" << argument2.asString() << "\"";
 
                     streamName = argument2.asString();
 
@@ -1427,7 +1450,7 @@ namespace relay
 
                     if (endpoints.empty())
                     {
-                        Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
+                        Log(Log::Level::WARN) << idString << "Invalid stream \"" << applicationName << "/" << streamName << "\", disconnecting";
                         close();
                         return false;
                     }
@@ -1451,7 +1474,7 @@ namespace relay
                     if (direction == Direction::INPUT)
                     {
                         // this is not a sender
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"getStreamLength\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"getStreamLength\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1462,7 +1485,7 @@ namespace relay
                 {
                     if (direction != Direction::OUTPUT)
                     {
-                        Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Invalid message (\"stop\") received, disconnecting";
+                        Log(Log::Level::ERR) << idString << "Invalid message (\"stop\") received, disconnecting";
                         close();
                         return false;
                     }
@@ -1478,7 +1501,7 @@ namespace relay
                         offset += ret;
 
                         Log log(Log::Level::ALL);
-                        log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                        log << idString << "Argument 2: ";
                         argument2.dump(log);
                     }
 
@@ -1487,14 +1510,14 @@ namespace relay
                     {
                         if (direction != Direction::OUTPUT)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status (\"NetStream.Publish.Start\") received, disconnecting";
+                            Log(Log::Level::ERR) << idString << "Wrong status (\"NetStream.Publish.Start\") received, disconnecting";
                             close();
                             return false;
                         }
 
                         if (!stream)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
+                            Log(Log::Level::ERR) << idString << "Not streaming, disconnecting";
                             close();
                             return false;
                         }
@@ -1506,14 +1529,14 @@ namespace relay
                     {
                         if (direction != Direction::INPUT)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Wrong status (\"NetStream.Play.Start\") received, disconnecting";
+                            Log(Log::Level::ERR) << idString << "Wrong status (\"NetStream.Play.Start\") received, disconnecting";
                             close();
                             return false;
                         }
 
                         if (!stream)
                         {
-                            Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Not streaming, disconnecting";
+                            Log(Log::Level::ERR) << idString << "Not streaming, disconnecting";
                             close();
                             return false;
                         }
@@ -1521,7 +1544,7 @@ namespace relay
 
                         if (stream->getInputConnection() && stream->getInputConnection() != this)
                         {
-                            Log(Log::Level::WARN) << "[" << id << ", " << name << "] " << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
+                            Log(Log::Level::WARN) << idString << "Stream \"" << applicationName << "/" << streamName << "\" already has input, disconnecting";
                             close(true);
                             return false;
                         }
@@ -1537,13 +1560,13 @@ namespace relay
 
                     if (i != invokes.end())
                     {
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << " error";
+                        Log(Log::Level::ALL) << idString << i->second << " error";
 
                         invokes.erase(i);
                     }
                     else
                     {
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << "Invalid _error received";
+                        Log(Log::Level::ALL) << idString << i->second << "Invalid _error received";
                     }
                 }
                 else if (command.asString() == "_result")
@@ -1552,7 +1575,7 @@ namespace relay
 
                     if (i != invokes.end())
                     {
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << i->second << " result";
+                        Log(Log::Level::ALL) << idString << i->second << " result";
 
                         if (i->second == "connect")
                         {
@@ -1562,14 +1585,14 @@ namespace relay
                             {
                                 if (direction == Direction::OUTPUT)
                                 {
-                                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Publishing stream " << streamName;
+                                    Log(Log::Level::ALL) << idString << "Publishing stream " << streamName;
 
                                     sendReleaseStream();
                                     sendFCPublish();
                                 }
                                 else if (direction == Direction::INPUT)
                                 {
-                                    Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Subscribing to stream " << streamName;
+                                    Log(Log::Level::ALL) << idString << "Subscribing to stream " << streamName;
 
                                     sendFCSubscribe();
                                 }
@@ -1592,7 +1615,7 @@ namespace relay
                                 offset += ret;
 
                                 Log log(Log::Level::ALL);
-                                log << "[" << id << ", " << name << "] " << "Argument 2: ";
+                                log << idString << "Argument 2: ";
                                 argument2.dump(log);
                             }
 
@@ -1609,7 +1632,7 @@ namespace relay
                                 sendPublish();
                             }
 
-                            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Created stream " << streamId;
+                            Log(Log::Level::ALL) << idString << "Created stream " << streamId;
                         }
                         else if (i->second == "deleteStream")
                         {
@@ -1619,7 +1642,7 @@ namespace relay
                     }
                     else
                     {
-                        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Invalid _result received, transaction ID: " << static_cast<uint32_t>(transactionId.asDouble());
+                        Log(Log::Level::ALL) << idString << "Invalid _result received, transaction ID: " << static_cast<uint32_t>(transactionId.asDouble());
                     }
                 }
                 break;
@@ -1628,19 +1651,19 @@ namespace relay
             case rtmp::MessageType::AMF0_SHARED_OBJECT:
             case rtmp::MessageType::AMF3_SHARED_OBJECT:
             {
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received shared object";
+                Log(Log::Level::ALL) << idString << "Received shared object";
                 break;
             }
 
             case rtmp::MessageType::AGGREGATE:
             {
-                Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Received aggregated messages";
+                Log(Log::Level::ALL) << idString << "Received aggregated messages";
                 break;
             }
 
             default:
             {
-                Log(Log::Level::ERR) << "[" << id << ", " << name << "] " << "Unhandled message: " << static_cast<uint32_t>(packet.messageType);
+                Log(Log::Level::ERR) << idString << "Unhandled message: " << static_cast<uint32_t>(packet.messageType);
                 break;
             }
         }
@@ -1701,6 +1724,8 @@ namespace relay
                 }
             }
         }
+
+        updateIdString();
     }
 
     void Connection::unpublishStream()
@@ -1723,7 +1748,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SERVER_BANDWIDTH";
+        Log(Log::Level::ALL) << idString << "Sending SERVER_BANDWIDTH";
 
         return socket.send(buffer);
     }
@@ -1741,7 +1766,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending CLIENT_BANDWIDTH";
+        Log(Log::Level::ALL) << idString << "Sending CLIENT_BANDWIDTH";
 
         return socket.send(buffer);
     }
@@ -1761,7 +1786,7 @@ namespace relay
         packet.encode(buffer, outChunkSize, sentPackets);
 
         Log log(Log::Level::ALL);
-        log << "[" << id << ", " << name << "] " << "Sending USER_CONTROL of type: ";
+        log << idString << "Sending USER_CONTROL of type: ";
 
         switch (userControlType)
         {
@@ -1791,7 +1816,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending SET_CHUNK_SIZE";
+        Log(Log::Level::ALL) << idString << "Sending SET_CHUNK_SIZE";
         
         return socket.send(buffer);
     }
@@ -1827,7 +1852,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -1864,7 +1889,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -1901,7 +1926,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
         
         return socket.send(buffer);
     }
@@ -1934,7 +1959,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -1980,7 +2005,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2016,7 +2041,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -2053,7 +2078,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2089,7 +2114,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
         
         if (!socket.send(buffer)) return false;
         
@@ -2134,7 +2159,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -2181,7 +2206,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
         
         return socket.send(buffer);
     }
@@ -2217,7 +2242,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -2248,7 +2273,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2284,7 +2309,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -2317,7 +2342,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2353,7 +2378,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -2394,7 +2419,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2430,7 +2455,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
@@ -2461,7 +2486,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2501,13 +2526,13 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString() << ", transaction ID: " << invokeId;
 
         if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
 
-        Log(Log::Level::INFO) << "[" << id << ", " << name << "] " << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
+        Log(Log::Level::INFO) << idString << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
 
         return true;
     }
@@ -2548,7 +2573,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
         
         return socket.send(buffer);
     }
@@ -2589,7 +2614,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
         
         return socket.send(buffer);
     }
@@ -2694,7 +2719,7 @@ namespace relay
 
             {
                 Log log(Log::Level::ALL);
-                log << "[" << id << ", " << name << "] " << "Sending meta data " << commandName.asString() << ": ";
+                log << idString << "Sending meta data " << commandName.asString() << ": ";
                 argument2.dump(log);
             }
 
@@ -2736,7 +2761,7 @@ namespace relay
 
             {
                 Log log(Log::Level::ALL);
-                log << "[" << id << ", " << name << "] " << "Sending text data: ";
+                log << idString << "Sending text data: ";
                 argument1.dump(log);
             }
             
@@ -2777,7 +2802,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
         
         return socket.send(buffer);
     }
@@ -2813,7 +2838,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
         
         return socket.send(buffer);
     }
@@ -2850,7 +2875,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2891,7 +2916,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2927,7 +2952,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
         return socket.send(buffer);
     }
@@ -2968,7 +2993,7 @@ namespace relay
         std::vector<uint8_t> buffer;
         packet.encode(buffer, outChunkSize, sentPackets);
 
-        Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending INVOKE " << commandName.asString();
+        Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
         
         return socket.send(buffer);
     }
@@ -2990,7 +3015,7 @@ namespace relay
             std::vector<uint8_t> buffer;
             packet.encode(buffer, outChunkSize, sentPackets);
 
-            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending audio packet";
+            Log(Log::Level::ALL) << idString << "Sending audio packet";
 
             return socket.send(buffer);
         }
@@ -3015,7 +3040,7 @@ namespace relay
             std::vector<uint8_t> buffer;
             packet.encode(buffer, outChunkSize, sentPackets);
 
-            Log(Log::Level::ALL) << "[" << id << ", " << name << "] " << "Sending video packet";
+            Log(Log::Level::ALL) << idString << "Sending video packet";
             
             return socket.send(buffer);
         }
