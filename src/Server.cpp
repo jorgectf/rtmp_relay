@@ -36,7 +36,8 @@ namespace relay
         for (auto i = streams.begin(); i != streams.end(); ++i)
         {
             if ((*i)->getApplicationName() == applicationName &&
-                (*i)->getStreamName() == streamName)
+                (*i)->getStreamName() == streamName &&
+                !(*i)->isClosed())
             {
                 return i->get();
             }

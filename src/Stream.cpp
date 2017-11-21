@@ -77,6 +77,8 @@ namespace relay
 
     void Stream::start(relay::Connection &connection)
     {
+        if (closed) return;
+
         Log() << id << " " << streamName << " Stream start " << connection.getId();
         if (connection.getDirection() == Connection::Direction::INPUT)
         {
@@ -141,6 +143,8 @@ namespace relay
 
     void Stream::stop(relay::Connection &connection)
     {
+        if (closed) return;
+
         Log() << id << " " << streamName << " Stream stop " << connection.getId();
         if (&connection == inputConnection)
         {
