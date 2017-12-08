@@ -141,16 +141,33 @@ namespace relay
     {
         if (closed) return;
 
+        if (direction == Direction::INPUT)
+        {
+            timeSinceLastData += delta;
+            if (timeSinceLastData > 5.0f)
+            {
+                Log(Log::Level::INFO) << idString << "Disconnecting as no data for 5s";
+                close(true);
+            }
+        }
+
         if (type == Type::HOST)
         {
             if (connected && pingInterval > 0.0f)
             {
                 timeSincePing += delta;
+                timeSincePong += delta;
 
                 if (timeSincePing >= pingInterval)
                 {
                     timeSincePing = 0.0f;
                     sendUserControl(rtmp::UserControlType::PING);
+                }
+
+                if (timeSincePong >= 2 * pingInterval)
+                {
+                    Log(Log::Level::INFO) << idString << "Disconnecting as no pong";
+                    close(true);
                 }
             }
         }
@@ -772,7 +789,9 @@ namespace relay
                         case rtmp::UserControlType::CLIENT_BUFFER_TIME: log << "CLIENT_BUFFER_TIME"; break;
                         case rtmp::UserControlType::RESET_STREAM: log << "RESET_STREAM"; break;
                         case rtmp::UserControlType::PING: log << "PING"; break;
-                        case rtmp::UserControlType::PONG: log << "PONG"; break;
+                        case rtmp::UserControlType::PONG: log << "PONG";
+                            timeSincePong = 0;
+                            break;
                     }
 
                     log << ", param: " << param;
@@ -918,6 +937,7 @@ namespace relay
                         if (stream)
                         {
                             stream->sendMetaData(metaData);
+                            timeSinceLastData = 0;
                         }
                         else
                         {
@@ -942,6 +962,7 @@ namespace relay
                         if (stream)
                         {
                             stream->sendMetaData(metaData);
+                            timeSinceLastData = 0;
                         }
                         else
                         {
@@ -955,6 +976,7 @@ namespace relay
                         if (stream)
                         {
                             stream->sendTextData(packet.timestamp, argument1);
+                            timeSinceLastData = 0;
                         }
                         else
                         {
@@ -985,6 +1007,7 @@ namespace relay
                     }
 
                     currentAudioBytes += packet.data.size();
+                    timeSinceLastData = 0;
 
                     if (isCodecHeader(packet.data))
                     {
@@ -1057,6 +1080,7 @@ namespace relay
                     }
 
                     currentVideoBytes += packet.data.size();
+                    timeSinceLastData = 0;
 
                     if (isCodecHeader(packet.data))
                     {

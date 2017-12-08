@@ -154,7 +154,9 @@ namespace relay
         cppsocket::Socket socket;
 
         float timeSincePing = 0.0f;
+        float timeSincePong = 0.0f;
         float timeSinceConnect = 0.0f;
+        float timeSinceLastData = 0.0f;
         uint32_t connectCount = 0;
         uint32_t addressIndex = 0;
 
