@@ -63,6 +63,7 @@ namespace relay
         void reset();
 
         uint64_t getId() const { return id; }
+        std::string getIdString() const { return idString; }
         Type getType() const { return type; }
         Direction getDirection() const { return direction; }
         const std::string& getApplicationName() const { return applicationName; }

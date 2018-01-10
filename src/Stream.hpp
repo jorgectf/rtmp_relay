@@ -59,6 +59,7 @@ namespace relay
     private:
         const uint64_t id;
         bool closed = false;
+        std::string idString;
 
         Server& server;
 

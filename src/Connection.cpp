@@ -42,11 +42,10 @@ namespace relay
         endpoint(&aEndpoint)
     {
         updateIdString();
-        Log(Log::Level::INFO) << idString << "Create connection";
-        
         stream = &aStream;
 
         resolveStreamName();
+        Log(Log::Level::INFO) << idString << "Create connection";
 
         if (!socket.setBlocking(false))
         {
@@ -73,15 +72,7 @@ namespace relay
 
     void Connection::updateIdString()
     {
-        if (stream)
-        {
-            idString = "[" + name + " " + std::to_string(id) + " " + stream->getApplicationName() + "\\" + stream->getStreamName() + "] ";
-        }
-        else
-        {
-            idString = "[" + name + " " + std::to_string(id) + " " + applicationName + "\\" + streamName + "] ";
-        }
-
+        idString = "[CON:" + std::to_string(id) + " " + applicationName + "/" + streamName + "] ";
     }
 
     void Connection::close(bool forceClose)
@@ -1214,6 +1205,7 @@ namespace relay
 
                         connected = true;
 
+                        updateIdString();
                         Log(Log::Level::INFO) << idString << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent connect, application: \"" << argument1["app"].asString() << "\"";
 
 #ifdef DEBUG
@@ -1382,6 +1374,7 @@ namespace relay
                         }
 
                         streamName = argument2.asString();
+                        updateIdString();
 
                         std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), direction, applicationName, streamName);
 
@@ -1469,6 +1462,7 @@ namespace relay
                     Log(Log::Level::INFO) << idString << "Input from " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " sent play, stream: \"" << argument2.asString() << "\"";
 
                     streamName = argument2.asString();
+                    updateIdString();
 
                     std::vector<std::pair<Server*, const Endpoint*>> endpoints = relay.getEndpoints(std::make_pair(socket.getLocalIPAddress(), socket.getLocalPort()), direction, applicationName, streamName);
 
@@ -1746,6 +1740,7 @@ namespace relay
                     streamName = endpoint->streamName;
                     replaceTokens(streamName, tokens);
                 }
+                updateIdString();
             }
         }
 

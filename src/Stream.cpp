@@ -20,12 +20,14 @@ namespace relay
         applicationName(aApplicationName),
         streamName(aStreamName)
     {
-        Log(Log::Level::INFO) << "[" << id << ", Stream] " << " Create " << applicationName << "/" << streamName;
+        idString = "[ST:" + std::to_string(id) + " " + applicationName + "/" + streamName + "] ";
+
+        Log(Log::Level::INFO) << idString << "Create";
     }
 
     Stream::~Stream()
     {
-        Log(Log::Level::INFO) << "[" << id << ", Stream] " << " Delete " << applicationName << "/" << streamName;
+        Log(Log::Level::INFO) << idString << "Delete";
     }
 
     void Stream::getStats(std::string& str, ReportType reportType) const
@@ -79,7 +81,7 @@ namespace relay
     {
         if (closed) return;
 
-        Log() << id << " " << streamName << " Stream start " << connection.getId();
+        Log() << idString << "Stream start " << connection.getIdString();
         if (connection.getDirection() == Connection::Direction::INPUT)
         {
             if (!inputConnection)
@@ -149,7 +151,7 @@ namespace relay
     {
         if (closed) return;
 
-        Log() << id << " " << streamName << " Stream stop " << connection.getId();
+        Log() << idString << "Stream stop " << connection.getIdString();
         if (&connection == inputConnection)
         {
             streaming = false;
