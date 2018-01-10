@@ -70,6 +70,7 @@ namespace relay
         std::vector<Connection*> outputConnections;
 
         bool streaming = false;
+        bool dependableOutputsCreated = false;
         std::vector<uint8_t> audioHeader;
         std::vector<uint8_t> videoHeader;
         amf::Node metaData;

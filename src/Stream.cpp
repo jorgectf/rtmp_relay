@@ -87,15 +87,19 @@ namespace relay
                 inputConnection = &connection;
                 streaming = true;
 
-                for (const Endpoint& endpoint : server.getEndpoints())
+                if (!dependableOutputsCreated)
                 {
-                    if (endpoint.connectionType == Connection::Type::CLIENT &&
-                        endpoint.direction == Connection::Direction::OUTPUT)
+                    dependableOutputsCreated = true;
+                    for (const Endpoint& endpoint : server.getEndpoints())
                     {
-                        Connection* newConnection = server.createConnection(*this, endpoint);
-                        newConnection->connect();
+                        if (endpoint.connectionType == Connection::Type::CLIENT &&
+                            endpoint.direction == Connection::Direction::OUTPUT)
+                        {
+                            Connection* newConnection = server.createConnection(*this, endpoint);
+                            newConnection->connect();
 
-                        connections.push_back(newConnection);
+                            connections.push_back(newConnection);
+                        }
                     }
                 }
             }

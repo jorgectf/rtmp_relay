@@ -89,7 +89,7 @@ namespace relay
         if (closed) return;
 
         Log(Log::Level::INFO) << idString << "Close called";
-        closed |= forceClose;
+        closed = closed || forceClose;
         socket.close();
 
         reset();

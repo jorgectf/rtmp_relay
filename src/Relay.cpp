@@ -341,7 +341,7 @@ namespace relay
 
     void Relay::run()
     {
-        const std::chrono::microseconds sleepTime(10000);
+        const std::chrono::microseconds sleepTime(5000);
 
         while (active)
         {
