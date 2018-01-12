@@ -127,13 +127,6 @@ static bool daemonize(const char* lock_file)
         return false;
     }
 
-    // software termination signal from kill
-    if (std::signal(SIGTERM, signalHandler) == SIG_ERR)
-    {
-        Log(Log::Level::ERR) << "Failed to capure SIGTERM";
-        return false;
-    }
-
     Log(Log::Level::INFO) << "Daemon started, pid: " << getpid();
 
     return true;
@@ -185,7 +178,7 @@ int main(int argc, const char* argv[])
                     Log(Log::Level::ERR) << "Failed to send SIGHUP to the daemon";
                     return EXIT_FAILURE;
                 }
-                
+
                 return EXIT_SUCCESS;
             }
             else
@@ -272,6 +265,13 @@ int main(int argc, const char* argv[])
     {
         Log(Log::Level::ERR) << "Failed to capure SIGPIPE";
         return EXIT_FAILURE;
+    }
+
+    // software termination signal from kill
+    if (std::signal(SIGTERM, signalHandler) == SIG_ERR)
+    {
+        Log(Log::Level::ERR) << "Failed to capure SIGTERM";
+        return false;
     }
 #endif
 
