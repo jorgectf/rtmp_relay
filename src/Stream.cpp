@@ -88,21 +88,17 @@ namespace relay
             {
                 inputConnection = &connection;
                 streaming = true;
+            }
 
-                if (!dependableOutputsCreated)
+            for (const Endpoint& endpoint : server.getEndpoints())
+            {
+                if (endpoint.connectionType == Connection::Type::CLIENT &&
+                    endpoint.direction == Connection::Direction::OUTPUT)
                 {
-                    dependableOutputsCreated = true;
-                    for (const Endpoint& endpoint : server.getEndpoints())
-                    {
-                        if (endpoint.connectionType == Connection::Type::CLIENT &&
-                            endpoint.direction == Connection::Direction::OUTPUT)
-                        {
-                            Connection* newConnection = server.createConnection(*this, endpoint);
-                            newConnection->connect();
+                    Connection* newConnection = server.createConnection(*this, endpoint);
+                    newConnection->connect();
 
-                            connections.push_back(newConnection);
-                        }
-                    }
+                    connections.push_back(newConnection);
                 }
             }
         }
@@ -158,6 +154,25 @@ namespace relay
             if (inputConnection->getType() == Connection::Type::HOST)
             {
                 inputConnection = nullptr;
+            }
+
+            // close all output client connections
+            for (auto it = connections.begin(); it != connections.end();)
+            {
+                auto con = *it;
+                if (con->getType() == Connection::Type::CLIENT && con->getDirection() == Connection::Direction::OUTPUT)
+                {
+                    it = connections.erase(it);
+
+                    auto ci = std::find(outputConnections.begin(), outputConnections.end(), con);
+                    if (ci != outputConnections.end()) outputConnections.erase(ci);
+
+                    con->close(true);
+                }
+                else
+                {
+                    it++;
+                }
             }
         }
         else

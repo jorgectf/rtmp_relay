@@ -166,7 +166,6 @@ static int getPid(const char* lockFile)
 
 int main(int argc, const char* argv[])
 {
-    Log(Log::Level::INFO) << "-----------------  RTMP Relay  -----------------";
     bool daemon = false;
 
     for (int i = 1; i < argc; ++i)
@@ -274,6 +273,8 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 #endif
+
+    Log(Log::Level::INFO) << "-----------------  RTMP Relay  -----------------";
 
     if (!rel.init(config))
     {
