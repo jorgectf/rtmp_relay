@@ -270,7 +270,7 @@ int main(int argc, const char* argv[])
     if (std::signal(SIGTERM, signalHandler) == SIG_ERR)
     {
         Log(Log::Level::ERR) << "Failed to capure SIGTERM";
-        return false;
+        return EXIT_FAILURE;
     }
 #endif
 
