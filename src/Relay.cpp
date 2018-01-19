@@ -147,7 +147,7 @@ namespace relay
                     if (!endpointObject["type"] || !endpointObject["direction"] || !endpointObject["address"])
                     {
                         Log(Log::Level::ERR) << "Endpoint configuration is missing field";
-                        exit(1);
+                        return false;
                     }
 
                     if (endpointObject["type"].as<std::string>() == "host") endpoint.connectionType = Connection::Type::HOST;
@@ -247,7 +247,7 @@ namespace relay
                 if (!hasName)
                 {
                     Log(Log::Level::ERR) << "Server configuration is invalid";
-                    exit(1);
+                    return false;
                 }
             }
 
