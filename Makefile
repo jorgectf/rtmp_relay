@@ -56,6 +56,8 @@ sanitize: CXXFLAGS+=-DDEBUG -g -O0 -fsanitize=address
 sanitize: LDFLAGS=-fsanitize=address
 sanitize: directories $(SOURCES) $(EXECUTABLE)
 
+$(shell sh gen_version.sh)
+
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(OBJECTS) $(LDFLAGS) -o $(BINDIR)/$@
 
