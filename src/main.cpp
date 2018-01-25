@@ -15,6 +15,7 @@
 #include "Constants.hpp"
 #include "Relay.hpp"
 #include "Log.hpp"
+#include "version.hpp"
 
 using namespace relay;
 using namespace cppsocket;
@@ -274,7 +275,7 @@ int main(int argc, const char* argv[])
     }
 #endif
 
-    Log(Log::Level::INFO) << "-----------------  RTMP Relay  -----------------";
+    Log(Log::Level::INFO) << "-----------------  RTMP Relay " << VERSION << " -----------------";
 
     if (!rel.init(config))
     {
