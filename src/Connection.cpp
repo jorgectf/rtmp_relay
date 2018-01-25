@@ -138,7 +138,7 @@ namespace relay
             if (timeSinceLastData > 5.0f)
             {
                 Log(Log::Level::INFO) << idString << "Disconnecting as no data for 5s";
-                close(true);
+                close(!isDependable());
             }
         }
 

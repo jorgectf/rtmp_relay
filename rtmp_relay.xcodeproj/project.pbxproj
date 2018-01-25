@@ -62,6 +62,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		040DC2782019F81B005AA756 /* version.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = version.hpp; sourceTree = "<group>"; };
+		040DC279201A2644005AA756 /* gen_version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = gen_version.sh; sourceTree = "<group>"; };
 		300569DA1E4E364B005F9950 /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cpp; sourceTree = "<group>"; };
 		300569DB1E4E364B005F9950 /* Server.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Server.hpp; sourceTree = "<group>"; };
 		300934091C873DF200CC50D3 /* rtmp_relay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rtmp_relay; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,6 +156,7 @@
 		300934001C873DF200CC50D3 = {
 			isa = PBXGroup;
 			children = (
+				040DC279201A2644005AA756 /* gen_version.sh */,
 				30513E281D37C61100F9B4BA /* cppsocket */,
 				3009340A1C873DF200CC50D3 /* Products */,
 				3009340B1C873DF200CC50D3 /* rtmp_relay */,
@@ -193,6 +196,7 @@
 				305598E81F03F4C6004D5BFB /* Stream.hpp */,
 				30FA80F61C8F588500F2695E /* Utils.cpp */,
 				30FA80F71C8F588500F2695E /* Utils.hpp */,
+				040DC2782019F81B005AA756 /* version.hpp */,
 			);
 			name = rtmp_relay;
 			path = src;
@@ -275,6 +279,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 300934101C873DF200CC50D3 /* Build configuration list for PBXNativeTarget "rtmp_relay" */;
 			buildPhases = (
+				040DC27A201A27B9005AA756 /* ShellScript */,
 				300934051C873DF200CC50D3 /* Sources */,
 				300934061C873DF200CC50D3 /* Frameworks */,
 				300934071C873DF200CC50D3 /* CopyFiles */,
@@ -294,7 +299,7 @@
 		300934011C873DF200CC50D3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "Bool Games";
 				TargetAttributes = {
 					300934081C873DF200CC50D3 = {
@@ -318,6 +323,22 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		040DC27A201A27B9005AA756 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh ./gen_version.sh";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		300934051C873DF200CC50D3 /* Sources */ = {
@@ -379,7 +400,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -389,6 +412,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -440,7 +465,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -450,6 +477,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
