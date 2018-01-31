@@ -2184,6 +2184,7 @@ namespace relay
         if (!socket.send(buffer)) return false;
 
         invokes[invokeId] = commandName.asString();
+        timeSinceLastData = 0;
 
         return true;
     }
@@ -2227,7 +2228,8 @@ namespace relay
         packet.encode(buffer, outChunkSize, sentPackets);
 
         Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
-        
+
+        timeSinceLastData = 0;
         return socket.send(buffer);
     }
 
@@ -2554,6 +2556,7 @@ namespace relay
 
         Log(Log::Level::INFO) << idString << "Published stream \"" << streamName << "\" (ID: " << streamId << ") to " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort();
 
+        timeSinceLastData = 0;
         return true;
     }
 
@@ -2650,6 +2653,7 @@ namespace relay
     {
         if (state != State::HANDSHAKE_DONE) return false;
 
+        timeSinceLastData = 0;
         return sendVideoData(0, headerData);
 
         // TODO: send video info
@@ -2659,6 +2663,7 @@ namespace relay
     {
         if (!streaming) return false;
 
+        timeSinceLastData = 0;
         return sendAudioData(timestamp, frameData);
     }
 
@@ -2672,6 +2677,7 @@ namespace relay
             (videoFrameSent || frameType == VideoFrameType::KEY))
         {
             videoFrameSent = true;
+            timeSinceLastData = 0;
             return sendVideoData(timestamp, frameData);
         }
 
@@ -2743,6 +2749,7 @@ namespace relay
                 argument2.dump(log);
             }
 
+            timeSinceLastData = 0;
             return socket.send(buffer);
         }
 
@@ -2784,7 +2791,8 @@ namespace relay
                 log << idString << "Sending text data: ";
                 argument1.dump(log);
             }
-            
+
+            timeSinceLastData = 0;
             return socket.send(buffer);
         }
 
@@ -2897,6 +2905,7 @@ namespace relay
 
         Log(Log::Level::ALL) << idString << "Sending INVOKE " << commandName.asString();
 
+        timeSinceLastData = 0;
         return socket.send(buffer);
     }
 

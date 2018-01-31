@@ -275,7 +275,7 @@ int main(int argc, const char* argv[])
     }
 #endif
 
-    Log(Log::Level::INFO) << "-----------------  RTMP Relay " << VERSION << " -----------------";
+    Log(Log::Level::ERR) << "-----------------  RTMP Relay " << VERSION << " -----------------";
 
     if (!rel.init(config))
     {
