@@ -132,13 +132,14 @@ namespace relay
     {
         if (closed) return;
 
-        if (direction == Direction::INPUT)
+        if (socket.isReady())
         {
             timeSinceLastData += delta;
             if (timeSinceLastData > 5.0f)
             {
                 Log(Log::Level::INFO) << idString << "Disconnecting as no data for 5s";
-                close(!isDependable());
+                timeSinceLastData = 0;
+                close(type == Connection::Type::HOST);
             }
         }
 
