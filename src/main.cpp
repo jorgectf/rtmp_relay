@@ -275,13 +275,14 @@ int main(int argc, const char* argv[])
     }
 #endif
 
-    Log(Log::Level::ERR) << "-----------------  RTMP Relay " << VERSION << " -----------------";
-
     if (!rel.init(config))
     {
+        Log(Log::Level::ERR) << "-----------------  RTMP Relay " << VERSION << " -----------------";
         Log(Log::Level::ERR) << "Failed to init relay";
         return EXIT_FAILURE;
     }
+
+    Log(Log::Level::ERR) << "-----------------  RTMP Relay " << VERSION << " -----------------";
 
     rel.run();
 
