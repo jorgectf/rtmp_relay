@@ -198,11 +198,6 @@ namespace cppsocket
 
         if (socketFd != INVALID_SOCKET)
         {
-            if (ready)
-            {
-                writeData();
-            }
-
             if (!closeSocketFd())
             {
                 result = false;
