@@ -1,4 +1,4 @@
-CXXFLAGS=-c -std=c++11 -Wall -DLOG_SYSLOG -I external/cppsocket -I external/yaml-cpp/include
+CXXFLAGS=-c -std=c++11 -Wall -DLOG_SYSLOG -I external/yaml-cpp/include
 LDFLAGS=
 
 SOURCES=src/Amf.cpp \
@@ -11,9 +11,9 @@ SOURCES=src/Amf.cpp \
 	src/StatusSender.cpp \
 	src/Stream.cpp \
 	src/Utils.cpp \
-	external/cppsocket/Log.cpp \
-	external/cppsocket/Network.cpp \
-	external/cppsocket/Socket.cpp \
+	src/Log.cpp \
+	src/Network.cpp \
+	src/Socket.cpp \
 	external/yaml-cpp/src/binary.cpp \
 	external/yaml-cpp/src/convert.cpp \
 	external/yaml-cpp/src/directives.cpp \
@@ -78,7 +78,7 @@ uninstall:
 .PHONY: uninstall
 
 clean:
-	rm -rf src/*.o external/cppsocket/*.o external/yaml-cpp/src/*.o $(BINDIR)/$(EXECUTABLE) $(BINDIR)
+	rm -rf src/*.o external/yaml-cpp/src/*.o $(BINDIR)/$(EXECUTABLE) $(BINDIR)
 
 .PHONY: clean
 
