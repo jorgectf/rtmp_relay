@@ -87,8 +87,8 @@ namespace relay
             if (!inputConnection)
             {
                 inputConnection = &connection;
-                streaming = true;
             }
+            streaming = true;
 
             for (const Endpoint& endpoint : server.getEndpoints())
             {
