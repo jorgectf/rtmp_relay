@@ -60,7 +60,7 @@ namespace cppsocket
         Socket(Socket&& other);
         Socket& operator=(Socket&& other);
 
-        virtual bool close();
+        virtual bool close(bool forceClose = false);
         virtual void update(float delta);
 
         bool startRead();

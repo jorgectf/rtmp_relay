@@ -81,7 +81,7 @@ namespace relay
 
         Log(Log::Level::INFO) << idString << "Close called";
         closed = closed || forceClose;
-        socket.close();
+        socket.close(forceClose);
 
         reset();
     }

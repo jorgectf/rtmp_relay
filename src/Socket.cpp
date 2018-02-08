@@ -192,12 +192,17 @@ namespace cppsocket
         return *this;
     }
 
-    bool Socket::close()
+    bool Socket::close(bool forceClose)
     {
         bool result = true;
 
         if (socketFd != INVALID_SOCKET)
         {
+            if (ready && !forceClose)
+            {
+                writeData();
+            }
+
             if (!closeSocketFd())
             {
                 result = false;
