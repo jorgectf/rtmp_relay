@@ -2,9 +2,7 @@
 //  rtmp_relay
 //
 
-#include <ctime>
 #include <chrono>
-#include <iomanip>
 #include <iostream>
 #include <string>
 #ifdef _WIN32
@@ -37,13 +35,15 @@ namespace relay
         {
             auto n = std::chrono::system_clock::now();
             auto t = std::chrono::system_clock::to_time_t(n);
-            tm* buffer = localtime(&t);
+            tm* time = localtime(&t);
+            char buffer[32];
+            strftime(buffer, sizeof(buffer), "%Y.%m.%d %H:%M:%S", time);
 
             if (level == Level::ERR ||
                 level == Level::WARN)
-                std::cerr << std::put_time(buffer, "%Y.%m.%d %H:%M:%S") << ": " << s << std::endl;
+                std::cerr << buffer << ": " << s << std::endl;
             else
-                std::cout << std::put_time(buffer, "%Y.%m.%d %H:%M:%S") << ": " << s << std::endl;
+                std::cout << buffer << ": " << s << std::endl;
 
 #ifdef _WIN32
             wchar_t szBuffer[MAX_PATH];
