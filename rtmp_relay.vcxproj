@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="external\cppsocket\Log.cpp" />
-    <ClCompile Include="external\cppsocket\Network.cpp" />
-    <ClCompile Include="external\cppsocket\Socket.cpp" />
     <ClCompile Include="external\yaml-cpp\src\binary.cpp" />
     <ClCompile Include="external\yaml-cpp\src\convert.cpp" />
     <ClCompile Include="external\yaml-cpp\src\directives.cpp" />
@@ -51,19 +48,19 @@
     <ClCompile Include="external\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="src\Amf.cpp" />
     <ClCompile Include="src\Connection.cpp" />
+    <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Network.cpp" />
     <ClCompile Include="src\Relay.cpp" />
     <ClCompile Include="src\RTMP.cpp" />
     <ClCompile Include="src\Server.cpp" />
+    <ClCompile Include="src\Socket.cpp" />
     <ClCompile Include="src\Status.cpp" />
     <ClCompile Include="src\StatusSender.cpp" />
     <ClCompile Include="src\Stream.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="external\cppsocket\Log.hpp" />
-    <ClInclude Include="external\cppsocket\Network.hpp" />
-    <ClInclude Include="external\cppsocket\Socket.hpp" />
     <ClInclude Include="external\yaml-cpp\src\collectionstack.h" />
     <ClInclude Include="external\yaml-cpp\src\directives.h" />
     <ClInclude Include="external\yaml-cpp\src\emitterstate.h" />
@@ -89,9 +86,12 @@
     <ClInclude Include="src\Connection.hpp" />
     <ClInclude Include="src\Constants.hpp" />
     <ClInclude Include="src\Endpoint.hpp" />
+    <ClInclude Include="src\Log.hpp" />
+    <ClInclude Include="src\Network.hpp" />
     <ClInclude Include="src\Relay.hpp" />
     <ClInclude Include="src\RTMP.hpp" />
     <ClInclude Include="src\Server.hpp" />
+    <ClInclude Include="src\Socket.hpp" />
     <ClInclude Include="src\Status.hpp" />
     <ClInclude Include="src\StatusSender.hpp" />
     <ClInclude Include="src\Stream.hpp" />
@@ -177,6 +177,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>@echo off
+@echo #define VERSION "1.0" &gt; src/Version.hpp</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -191,6 +195,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>@echo off
+@echo #define VERSION "1.0" &gt; src/Version.hpp</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -209,6 +217,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>@echo off
+@echo #define VERSION "1.0" &gt; src/Version.hpp</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -227,6 +239,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>@echo off
+@echo #define VERSION "1.0" &gt; src/Version.hpp</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,13 +2,10 @@
 //  rtmp_relay
 //
 
+#include <iomanip>
 #include <iostream>
 #include <string>
-#include <ctime>
-#include <stdio.h>
-#include <sys/time.h>
-#include <time.h>
-#include <math.h>
+#include <chrono>
 #ifdef _WIN32
 #include <windows.h>
 #include <strsafe.h>
@@ -37,33 +34,16 @@ namespace relay
     {
         if (!s.empty())
         {
-            char timeBuffer[26];
-            int millisec;
-            struct tm* tm_info;
-            struct timeval tv;
-
-            gettimeofday(&tv, NULL);
-
-            millisec = lrint(tv.tv_usec / 1000.0); // Round to nearest millisec
-            if (millisec >= 1000) { // Allow for rounding up to nearest second
-                millisec -=1000;
-                tv.tv_sec++;
-            }
-
-            tm_info = localtime(&tv.tv_sec);
-
-            strftime(timeBuffer, 26, "%Y:%m:%d %H:%M:%S", tm_info);
-            sprintf(&timeBuffer[19], ".%03d", millisec);
+            auto n = std::chrono::system_clock::now();
+            auto t = std::chrono::system_clock::to_time_t(n);
+            std::tm buffer;
+            localtime_s(&buffer, &t);
 
             if (level == Level::ERR ||
                 level == Level::WARN)
-            {
-                std::cerr << timeBuffer << ": " << s << std::endl;
-            }
+                std::cerr << std::put_time(&buffer, "%Y.%m.%d %H:%M:%S") << ": " << s << std::endl;
             else
-            {
-                std::cout << timeBuffer << ": " << s << std::endl;
-            }
+                std::cout << std::put_time(&buffer, "%Y.%m.%d %H:%M:%S") << ": " << s << std::endl;
 
 #ifdef _WIN32
             wchar_t szBuffer[MAX_PATH];
