@@ -1,5 +1,5 @@
 //
-//  cppsocket
+//  rtmp_relay
 //
 
 #include <iostream>
@@ -19,7 +19,7 @@
 #endif
 #include "Log.hpp"
 
-namespace cppsocket
+namespace relay
 {
 #ifndef DEBUG
     Log::Level Log::threshold = Log::Level::INFO;
@@ -44,8 +44,8 @@ namespace cppsocket
 
             gettimeofday(&tv, NULL);
 
-            millisec = lrint(tv.tv_usec/1000.0); // Round to nearest millisec
-            if (millisec>=1000) { // Allow for rounding up to nearest second
+            millisec = lrint(tv.tv_usec / 1000.0); // Round to nearest millisec
+            if (millisec >= 1000) { // Allow for rounding up to nearest second
                 millisec -=1000;
                 tv.tv_sec++;
             }

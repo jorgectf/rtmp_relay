@@ -371,7 +371,7 @@ namespace relay
                 vectorValue.push_back(node);
             }
 
-            void dump(cppsocket::Log& log, const std::string& indent = "");
+            void dump(Log& log, const std::string& indent = "");
 
         private:
             Type type = Type::Unknown;

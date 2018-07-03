@@ -1,5 +1,5 @@
 //
-//  cppsocket
+//  rtmp_relay
 //
 
 #pragma once
@@ -19,7 +19,7 @@ typedef int socket_t;
 #define INVALID_SOCKET -1
 #endif
 
-namespace cppsocket
+namespace relay
 {
     const uint32_t ANY_ADDRESS = 0;
     const uint16_t ANY_PORT = 0;

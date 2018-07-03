@@ -13,8 +13,8 @@ namespace relay
     class StatusSender
     {
     public:
-        StatusSender(cppsocket::Network& aNetwork,
-                     cppsocket::Socket& aSocket,
+        StatusSender(Network& aNetwork,
+                     Socket& aSocket,
                      Relay& aRelay);
 
         StatusSender(const StatusSender&) = delete;
@@ -25,14 +25,14 @@ namespace relay
         bool isConnected() const { return socket.isReady(); }
         
     private:
-        void handleRead(cppsocket::Socket& clientSocket, const std::vector<uint8_t>& newData);
-        void handleClose(cppsocket::Socket& clientSocket);
+        void handleRead(Socket& clientSocket, const std::vector<uint8_t>& newData);
+        void handleClose(Socket& clientSocket);
 
         void sendReport();
         void sendError();
 
-        cppsocket::Network& network;
-        cppsocket::Socket socket;
+        Network& network;
+        Socket socket;
         Relay& relay;
 
         std::vector<uint8_t> data;

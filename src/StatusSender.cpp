@@ -8,12 +8,10 @@
 #include "Utils.hpp"
 #include "Log.hpp"
 
-using namespace cppsocket;
-
 namespace relay
 {
-    StatusSender::StatusSender(cppsocket::Network& aNetwork,
-                               cppsocket::Socket& aSocket,
+    StatusSender::StatusSender(Network& aNetwork,
+                               Socket& aSocket,
                                Relay& aRelay):
         network(aNetwork),
         socket(std::move(aSocket)),
@@ -23,7 +21,7 @@ namespace relay
         socket.setCloseCallback(std::bind(&StatusSender::handleClose, this, std::placeholders::_1));
     }
 
-    void StatusSender::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
+    void StatusSender::handleRead(Socket&, const std::vector<uint8_t>& newData)
     {
         const std::vector<uint8_t> clrf = {'\r', '\n'};
 
@@ -65,7 +63,7 @@ namespace relay
         }
     }
 
-    void StatusSender::handleClose(cppsocket::Socket&)
+    void StatusSender::handleClose(Socket&)
     {
     }
 

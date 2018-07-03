@@ -28,7 +28,7 @@ namespace relay
     public:
         static uint64_t nextId() { return ++currentId; }
 
-        Relay(cppsocket::Network& aNetwork);
+        Relay(Network& aNetwork);
         ~Relay();
 
         Relay(const Relay&) = delete;
@@ -37,7 +37,7 @@ namespace relay
         Relay& operator=(Relay&&) = delete;
 
         std::mt19937& getGenerator() { return generator; }
-        cppsocket::Network& getNetwork() { return network; }
+        Network& getNetwork() { return network; }
 
         bool init(const std::string& config);
         void close();
@@ -55,13 +55,13 @@ namespace relay
                                                                       const std::string& streamName) const;
 
     private:
-        void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
+        void handleAccept(Socket& acceptor, Socket& clientSocket);
 
         static uint64_t currentId;
         std::mt19937 generator;
         bool active = true;
 
-        cppsocket::Network& network;
+        Network& network;
         std::unique_ptr<Status> status;
         std::chrono::steady_clock::time_point previousTime;
         std::chrono::steady_clock::time_point timeout;
@@ -70,7 +70,7 @@ namespace relay
         std::vector<std::unique_ptr<Server>> servers;
         std::vector<std::unique_ptr<Connection>> connections;
 
-        std::vector<cppsocket::Socket> acceptors;
+        std::vector<Socket> acceptors;
 
 #ifndef _WIN32
         std::string syslogIdent;

@@ -1,5 +1,5 @@
 //
-//  cppsocket
+//  rtmp_relay
 //
 
 #include <algorithm>
@@ -16,7 +16,7 @@
 #include "Socket.hpp"
 #include "Log.hpp"
 
-namespace cppsocket
+namespace relay
 {
     Network::Network()
     {

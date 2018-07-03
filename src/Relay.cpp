@@ -19,8 +19,6 @@
 #include "Status.hpp"
 #include "Connection.hpp"
 
-using namespace cppsocket;
-
 namespace relay
 {
     uint64_t Relay::currentId = 0;
@@ -259,7 +257,7 @@ namespace relay
 
         for (const std::string& address : listenAddresses)
         {
-            cppsocket::Socket acceptor(network);
+            Socket acceptor(network);
             acceptor.setBlocking(false);
             acceptor.setAcceptCallback(std::bind(&Relay::handleAccept, this, std::placeholders::_1, std::placeholders::_2));
             acceptor.startAccept(address);
@@ -572,7 +570,7 @@ namespace relay
 #endif
     }
 
-    void Relay::handleAccept(cppsocket::Socket&, cppsocket::Socket& clientSocket)
+    void Relay::handleAccept(Socket&, Socket& clientSocket)
     {
         std::unique_ptr<Connection> connection(new Connection(*this, clientSocket));
 

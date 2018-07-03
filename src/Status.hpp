@@ -21,7 +21,7 @@ namespace relay
     class Status
     {
     public:
-        Status(cppsocket::Network& aNetwork, Relay& aRelay, const std::string& address);
+        Status(Network& aNetwork, Relay& aRelay, const std::string& address);
 
         Status(const Status&) = delete;
         Status& operator=(const Status&) = delete;
@@ -31,10 +31,10 @@ namespace relay
         void update(float delta);
 
     private:
-        void handleAccept(cppsocket::Socket& acceptor, cppsocket::Socket& clientSocket);
+        void handleAccept(Socket& acceptor, Socket& clientSocket);
 
-        cppsocket::Network& network;
-        cppsocket::Socket socket;
+        Network& network;
+        Socket socket;
         Relay& relay;
 
         std::vector<std::unique_ptr<StatusSender>> statusSenders;

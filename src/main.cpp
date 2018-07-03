@@ -18,10 +18,9 @@
 #include "version.hpp"
 
 using namespace relay;
-using namespace cppsocket;
 
 static std::string config;
-cppsocket::Network network;
+Network network;
 Relay rel(network);
 
 #ifndef _WIN32

@@ -14,7 +14,7 @@ namespace relay
     class Server
     {
     public:
-        Server(Relay& aRelay, cppsocket::Network& aNetwork);
+        Server(Relay& aRelay, Network& aNetwork);
 
         Server(const Server&) = delete;
         Server(Server&&) = delete;
@@ -47,7 +47,7 @@ namespace relay
         Relay& relay;
         const uint64_t id;
 
-        cppsocket::Network& network;
+        Network& network;
         std::vector<Endpoint> endpoints;
 
         std::vector<std::unique_ptr<Stream>> streams;

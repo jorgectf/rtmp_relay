@@ -8,7 +8,7 @@
 
 namespace relay
 {
-    Status::Status(cppsocket::Network& aNetwork, Relay& aRelay, const std::string& address):
+    Status::Status(Network& aNetwork, Relay& aRelay, const std::string& address):
         network(aNetwork), socket(aNetwork), relay(aRelay)
     {
         //socket.setConnectTimeout(connectionTimeout);
@@ -32,7 +32,7 @@ namespace relay
         }
     }
 
-    void Status::handleAccept(cppsocket::Socket&, cppsocket::Socket& clientSocket)
+    void Status::handleAccept(Socket&, Socket& clientSocket)
     {
         std::unique_ptr<StatusSender> statusSender(new StatusSender(network, clientSocket, relay));
         

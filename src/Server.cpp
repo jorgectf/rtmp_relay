@@ -5,12 +5,10 @@
 #include "Server.hpp"
 #include "Relay.hpp"
 
-using namespace cppsocket;
-
 namespace relay
 {
     Server::Server(Relay& aRelay,
-                   cppsocket::Network& aNetwork):
+                   Network& aNetwork):
         relay(aRelay),
         id(Relay::nextId()),
         network(aNetwork)

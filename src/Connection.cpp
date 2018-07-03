@@ -13,12 +13,10 @@
 #include "Constants.hpp"
 #include "Log.hpp"
 
-using namespace cppsocket;
-
 namespace relay
 {
     Connection::Connection(Relay& aRelay,
-                           cppsocket::Socket& client):
+                           Socket& client):
         relay(aRelay),
         id(Relay::nextId()),
         type(Type::HOST),
@@ -397,7 +395,7 @@ namespace relay
         }
     }
 
-    void Connection::handleConnect(cppsocket::Socket&)
+    void Connection::handleConnect(Socket&)
     {
         if (closed)
         {
@@ -441,11 +439,11 @@ namespace relay
         }
     }
 
-    void Connection::handleConnectError(cppsocket::Socket&)
+    void Connection::handleConnectError(Socket&)
     {
     }
 
-    void Connection::handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData)
+    void Connection::handleRead(Socket&, const std::vector<uint8_t>& newData)
     {
         data.insert(data.end(), newData.begin(), newData.end());
 
@@ -686,7 +684,7 @@ namespace relay
         }
     }
 
-    void Connection::handleClose(cppsocket::Socket&)
+    void Connection::handleClose(Socket&)
     {
         Log(Log::Level::INFO) << idString << "Handle close connection at " << ipToString(socket.getRemoteIPAddress()) << ":" << socket.getRemotePort() << " disconnected";
 
@@ -1713,7 +1711,7 @@ namespace relay
                         {"id", std::to_string(id)},
                         {"streamName", stream->getStreamName()},
                         {"applicationName", stream->getApplicationName()},
-                        {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                        {"ipAddress", ipToString(socket.getRemoteIPAddress())},
                         {"port", std::to_string(socket.getRemotePort())}
                     };
 
@@ -1734,7 +1732,7 @@ namespace relay
                         {"id", std::to_string(id)},
                         {"streamName", stream->getStreamName()},
                         {"applicationName", stream->getApplicationName()},
-                        {"ipAddress", cppsocket::ipToString(socket.getRemoteIPAddress())},
+                        {"ipAddress", ipToString(socket.getRemoteIPAddress())},
                         {"port", std::to_string(socket.getRemotePort())}
                     };
 

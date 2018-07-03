@@ -1,12 +1,12 @@
 //
-//  cppsocket
+//  rtmp_relay
 //
 
 #pragma once
 
 #include <string>
 
-namespace cppsocket
+namespace relay
 {
     class Log
     {

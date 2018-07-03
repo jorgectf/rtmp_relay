@@ -1,5 +1,5 @@
 //
-//  cppsocket
+//  rtmp_relay
 //
 
 #ifdef _WIN32
@@ -17,7 +17,7 @@
 #include "Network.hpp"
 #include "Log.hpp"
 
-namespace cppsocket
+namespace relay
 {
     static const int WAITING_QUEUE_SIZE = 5;
     static uint8_t TEMP_BUFFER[65536];

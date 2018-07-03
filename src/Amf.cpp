@@ -6,8 +6,6 @@
 #include "Amf.hpp"
 #include "Utils.hpp"
 
-using namespace cppsocket;
-
 namespace relay
 {
     namespace amf
@@ -1339,7 +1337,7 @@ namespace relay
             return size;
         }
 
-        void Node::dump(cppsocket::Log& log, const std::string& indent)
+        void Node::dump(Log& log, const std::string& indent)
         {
             log << "Type: " << typeToString(type) << "(" << static_cast<uint32_t>(type) << ")";
 

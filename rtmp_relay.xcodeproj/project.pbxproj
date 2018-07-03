@@ -174,25 +174,25 @@
 		3009340B1C873DF200CC50D3 /* rtmp_relay */ = {
 			isa = PBXGroup;
 			children = (
-				0452B68D202C5A8F00CC1945 /* Log.cpp */,
-				0452B68F202C5A8F00CC1945 /* Log.hpp */,
-				0452B68E202C5A8F00CC1945 /* Network.cpp */,
-				0452B691202C5A8F00CC1945 /* Network.hpp */,
-				0452B692202C5A8F00CC1945 /* Socket.cpp */,
-				0452B690202C5A8F00CC1945 /* Socket.hpp */,
 				304B28701C9C6AC800BA162D /* Amf.cpp */,
 				304B28711C9C6AC800BA162D /* Amf.hpp */,
 				301457001E3FA0E500BA75DB /* Connection.cpp */,
 				301457011E3FA0E500BA75DB /* Connection.hpp */,
 				307A9A261C92311B00B4984A /* Constants.hpp */,
 				3022B9481F14FEF5006EB235 /* Endpoint.hpp */,
+				0452B68D202C5A8F00CC1945 /* Log.cpp */,
+				0452B68F202C5A8F00CC1945 /* Log.hpp */,
 				3009340C1C873DF200CC50D3 /* main.cpp */,
+				0452B68E202C5A8F00CC1945 /* Network.cpp */,
+				0452B691202C5A8F00CC1945 /* Network.hpp */,
 				300934131C874CBA00CC50D3 /* Relay.cpp */,
 				300934141C874CBA00CC50D3 /* Relay.hpp */,
 				304B286B1C9C3ED900BA162D /* RTMP.cpp */,
 				304B27821C96DDB700BA162D /* RTMP.hpp */,
 				300569DA1E4E364B005F9950 /* Server.cpp */,
 				300569DB1E4E364B005F9950 /* Server.hpp */,
+				0452B692202C5A8F00CC1945 /* Socket.cpp */,
+				0452B690202C5A8F00CC1945 /* Socket.hpp */,
 				3030D6E71DB7AADE007CC8EB /* Status.cpp */,
 				3030D6E81DB7AADE007CC8EB /* Status.hpp */,
 				309B48311DE4A0D700A718C5 /* StatusSender.cpp */,
@@ -509,10 +509,7 @@
 		300934111C873DF200CC50D3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					external/cppsocket,
-					"external/yaml-cpp/include",
-				);
+				HEADER_SEARCH_PATHS = "external/yaml-cpp/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = "-Wold-style-cast";
 			};
@@ -521,10 +518,7 @@
 		300934121C873DF200CC50D3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					external/cppsocket,
-					"external/yaml-cpp/include",
-				);
+				HEADER_SEARCH_PATHS = "external/yaml-cpp/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = "-Wold-style-cast";
 			};

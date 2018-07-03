@@ -1,5 +1,5 @@
 //
-//  cppsocket
+//  rtmp_relay
 //
 
 #pragma once
@@ -13,7 +13,7 @@
 #include <chrono>
 #include "Socket.hpp"
 
-namespace cppsocket
+namespace relay
 {
     class Network
     {

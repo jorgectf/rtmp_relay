@@ -8,8 +8,6 @@
 #include "Relay.hpp"
 #include "Server.hpp"
 
-using namespace cppsocket;
-
 namespace relay
 {
     Stream::Stream(Server& aServer,

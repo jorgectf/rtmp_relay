@@ -6,7 +6,7 @@ Relays RTMP streams to multiple endpoints.
 
 # Usage
 
-RTMP relay uses cppsocket and yaml-cpp submodules. The following command has to be run after cloning the RTMP relay:
+RTMP relay uses yaml-cpp submodule. The following command has to be run after cloning the RTMP relay:
 
 ```
 $ git submodule update --init

@@ -47,7 +47,7 @@ namespace relay
         };
 
         Connection(Relay& aRelay,
-                   cppsocket::Socket& client);
+                   Socket& client);
         Connection(Relay& aRelay,
                    Stream& aStream,
                    const Endpoint& aEndpoint);
@@ -95,10 +95,10 @@ namespace relay
         void resolveStreamName();
         void updateIdString();
 
-        void handleConnect(cppsocket::Socket&);
-        void handleConnectError(cppsocket::Socket&);
-        void handleRead(cppsocket::Socket&, const std::vector<uint8_t>& newData);
-        void handleClose(cppsocket::Socket&);
+        void handleConnect(Socket&);
+        void handleConnectError(Socket&);
+        void handleRead(Socket&, const std::vector<uint8_t>& newData);
+        void handleClose(Socket&);
 
         bool handlePacket(const rtmp::Packet& packet);
 
@@ -152,7 +152,7 @@ namespace relay
         uint32_t reconnectCount = 0;
         float pingInterval = 60.0f;
         uint32_t bufferSize = 3000;
-        cppsocket::Socket socket;
+        Socket socket;
 
         float timeSincePing = 0.0f;
         float timeSincePong = 0.0f;
