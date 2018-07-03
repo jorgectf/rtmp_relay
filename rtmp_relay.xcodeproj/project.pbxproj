@@ -62,7 +62,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		040DC2782019F81B005AA756 /* version.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = version.hpp; sourceTree = "<group>"; };
 		040DC279201A2644005AA756 /* gen_version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = gen_version.sh; sourceTree = "<group>"; };
 		0452B68D202C5A8F00CC1945 /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		0452B68E202C5A8F00CC1945 /* Network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Network.cpp; sourceTree = "<group>"; };
@@ -201,7 +200,6 @@
 				305598E81F03F4C6004D5BFB /* Stream.hpp */,
 				30FA80F61C8F588500F2695E /* Utils.cpp */,
 				30FA80F71C8F588500F2695E /* Utils.hpp */,
-				040DC2782019F81B005AA756 /* version.hpp */,
 			);
 			name = rtmp_relay;
 			path = src;
