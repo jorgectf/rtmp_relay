@@ -60,8 +60,8 @@ namespace relay
         Socket(Socket&& other);
         Socket& operator=(Socket&& other);
 
-        virtual bool close(bool forceClose = false);
-        virtual void update(float delta);
+        bool close(bool forceClose = false);
+        void update(float delta);
 
         bool startRead();
 
@@ -100,13 +100,13 @@ namespace relay
                uint32_t aLocalIPAddress, uint16_t aLocalPort,
                uint32_t aRemoteIPAddress, uint16_t aRemotePort);
 
-        virtual bool read();
-        virtual bool write();
+        bool read();
+        bool write();
 
         bool readData();
         bool writeData();
 
-        virtual bool disconnected();
+        bool disconnected();
 
         bool createSocketFd();
         bool closeSocketFd();
