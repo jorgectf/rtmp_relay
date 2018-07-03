@@ -56,7 +56,7 @@ sanitize: CXXFLAGS+=-DDEBUG -g -O0 -fsanitize=address
 sanitize: LDFLAGS=-fsanitize=address
 sanitize: directories $(SOURCES) $(EXECUTABLE)
 
-$(shell sh gen_version.sh)
+$(shell vsn=$(git describe) && echo "#define VERSION \"$vsn\"" > src/Version.hpp)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(OBJECTS) $(LDFLAGS) -o $(BINDIR)/$@

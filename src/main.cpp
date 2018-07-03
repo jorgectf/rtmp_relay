@@ -15,7 +15,7 @@
 #include "Constants.hpp"
 #include "Relay.hpp"
 #include "Log.hpp"
-#include "version.hpp"
+#include "Version.hpp"
 
 using namespace relay;
 

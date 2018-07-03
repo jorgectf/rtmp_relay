@@ -62,7 +62,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		040DC279201A2644005AA756 /* gen_version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = gen_version.sh; sourceTree = "<group>"; };
 		0452B68D202C5A8F00CC1945 /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		0452B68E202C5A8F00CC1945 /* Network.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Network.cpp; sourceTree = "<group>"; };
 		0452B68F202C5A8F00CC1945 /* Log.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Log.hpp; sourceTree = "<group>"; };
@@ -155,7 +154,6 @@
 		300934001C873DF200CC50D3 = {
 			isa = PBXGroup;
 			children = (
-				040DC279201A2644005AA756 /* gen_version.sh */,
 				3009340A1C873DF200CC50D3 /* Products */,
 				3009340B1C873DF200CC50D3 /* rtmp_relay */,
 				30BB18C11D47A41100102062 /* yaml-cpp */,
@@ -325,7 +323,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh ./gen_version.sh";
+			shellScript = "vsn=$(git describe) && echo \"#define VERSION \\\"$vsn\\\"\" > src/Version.hpp";
 		};
 /* End PBXShellScriptBuildPhase section */
 
