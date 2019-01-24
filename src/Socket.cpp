@@ -3,13 +3,16 @@
 //
 
 #ifdef _WIN32
-#define NOMINMAX
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define NOMINMAX
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#  undef NOMINMAX
+#  undef WIN32_LEAN_AND_MEAN
 #else
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
+#  include <sys/socket.h>
+#  include <netdb.h>
+#  include <unistd.h>
 #endif
 #include <cstring>
 #include <fcntl.h>

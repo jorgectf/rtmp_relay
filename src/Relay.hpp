@@ -16,7 +16,7 @@
 #include "Endpoint.hpp"
 
 #ifndef _WIN32
-#include <sys/syslog.h>
+#  include <sys/syslog.h>
 #endif
 
 namespace relay
