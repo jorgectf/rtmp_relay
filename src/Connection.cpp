@@ -918,10 +918,20 @@ namespace relay
                         metaData = argument2;
 
                         if (metaData.hasElement("audiocodecid"))
-                            Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+                        {
+                            if (metaData["audiocodecid"].isNumber())
+                                Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+                            else if (metaData["audiocodecid"].isString())
+                                Log(Log::Level::ALL) << "Audio codec: " << metaData["audiocodecid"].asString();
+                        }
 
                         if (metaData.hasElement("videocodecid"))
-                            Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
+                        {
+                            if (metaData["videocodecid"].isNumber())
+                                Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
+                            else if (metaData["videocodecid"].isString())
+                                Log(Log::Level::ALL) << "Video codec: " << metaData["videocodecid"].asString();
+                        }
 
                         // forward notify packet
                         if (stream)
@@ -943,10 +953,20 @@ namespace relay
                         metaData = argument1;
 
                         if (metaData.hasElement("audiocodecid"))
-                            Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+                        {
+                            if (metaData["audiocodecid"].isNumber())
+                                Log(Log::Level::ALL) << "Audio codec: " << getAudioCodec(static_cast<AudioCodec>(metaData["audiocodecid"].asUInt32()));
+                            else if (metaData["audiocodecid"].isString())
+                                Log(Log::Level::ALL) << "Audio codec: " << metaData["audiocodecid"].asString();
+                        }
 
                         if (metaData.hasElement("videocodecid"))
-                            Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
+                        {
+                            if (metaData["videocodecid"].isNumber())
+                                Log(Log::Level::ALL) << "Video codec: " << getVideoCodec(static_cast<VideoCodec>(metaData["videocodecid"].asUInt32()));
+                            else if (metaData["videocodecid"].isString())
+                                Log(Log::Level::ALL) << "Video codec: " << metaData["videocodecid"].asString();
+                        }
 
                         // forward notify packet
                         if (stream)

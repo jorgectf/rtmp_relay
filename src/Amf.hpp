@@ -253,6 +253,11 @@ namespace relay
                     type == Type::Double;
             }
 
+            bool isString() const
+            {
+                return type == Type::String;
+            }
+
             const std::vector<Node>& asVector() const
             {
                 assert(type == Type::Array);
