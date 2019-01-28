@@ -5,12 +5,15 @@
 #include <algorithm>
 #include <chrono>
 #ifdef _WIN32
-#define NOMINMAX
-#include <winsock2.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define NOMINMAX
+#  include <winsock2.h>
+#  undef NOMINMAX
+#  undef WIN32_LEAN_AND_MEAN
 #else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <poll.h>
+#  include <sys/socket.h>
+#  include <netinet/in.h>
+#  include <poll.h>
 #endif
 #include "Network.hpp"
 #include "Socket.hpp"

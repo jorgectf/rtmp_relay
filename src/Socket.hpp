@@ -10,11 +10,14 @@
 #include <string>
 
 #ifdef _WIN32
-#define NOMINMAX
-#include <winsock2.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define NOMINMAX
+#  include <winsock2.h>
+#  undef NOMINMAX
+#  undef WIN32_LEAN_AND_MEAN
 typedef SOCKET socket_t;
 #else
-#include <errno.h>
+#  include <errno.h>
 typedef int socket_t;
 #define INVALID_SOCKET -1
 #endif

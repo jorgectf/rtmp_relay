@@ -6,12 +6,10 @@
 #include <iostream>
 #include <string>
 #ifdef _WIN32
-#include <windows.h>
-#include <strsafe.h>
-#else
-    #if defined(LOG_SYSLOG)
-    #include <sys/syslog.h>
-    #endif
+#  include <windows.h>
+#  include <strsafe.h>
+#elif defined(LOG_SYSLOG)
+#  include <sys/syslog.h>
 #endif
 #include "Log.hpp"
 
