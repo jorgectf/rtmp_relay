@@ -25,7 +25,6 @@ namespace relay
         updateIdString();
         Log(Log::Level::INFO) << idString << "Create connection";
 
-        socket.setBlocking(false);
         socket.setReadCallback(std::bind(&Connection::handleRead, this, std::placeholders::_1, std::placeholders::_2));
         socket.setCloseCallback(std::bind(&Connection::handleClose, this, std::placeholders::_1));
         socket.startRead();
@@ -45,11 +44,6 @@ namespace relay
 
         resolveStreamName();
         Log(Log::Level::INFO) << idString << "Create connection";
-
-        if (!socket.setBlocking(false))
-        {
-            Log(Log::Level::ERR) << idString << "Failed to set socket non-blocking";
-        }
 
         reconnectCount = endpoint->reconnectCount;
         bufferSize = endpoint->bufferSize;

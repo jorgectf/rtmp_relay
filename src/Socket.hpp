@@ -91,9 +91,6 @@ namespace relay
         uint32_t getRemoteIPAddress() const { return remoteIPAddress; }
         uint16_t getRemotePort() const { return remotePort; }
 
-        bool isBlocking() const { return blocking; }
-        bool setBlocking(bool newBlocking);
-
         bool isReady() const { return ready; }
 
         bool hasOutData() const { return !outData.empty(); }
@@ -113,14 +110,12 @@ namespace relay
 
         bool createSocketFd();
         bool closeSocketFd();
-        bool setFdBlocking(bool block);
 
         Network& network;
 
         socket_t socketFd = INVALID_SOCKET;
 
         bool ready = false;
-        bool blocking = true;
 
         uint32_t localIPAddress = 0;
         uint16_t localPort = 0;

@@ -124,7 +124,6 @@ namespace relay
         network(other.network),
         socketFd(other.socketFd),
         ready(other.ready),
-        blocking(other.blocking),
         localIPAddress(other.localIPAddress),
         localPort(other.localPort),
         remoteIPAddress(other.remoteIPAddress),
@@ -146,7 +145,6 @@ namespace relay
 
         other.socketFd = INVALID_SOCKET;
         other.ready = false;
-        other.blocking = true;
         other.localIPAddress = 0;
         other.localPort = 0;
         other.remoteIPAddress = 0;
@@ -162,7 +160,6 @@ namespace relay
 
         socketFd = other.socketFd;
         ready = other.ready;
-        blocking = other.blocking;
         localIPAddress = other.localIPAddress;
         localPort = other.localPort;
         remoteIPAddress = other.remoteIPAddress;
@@ -182,7 +179,6 @@ namespace relay
 
         other.socketFd = INVALID_SOCKET;
         other.ready = false;
-        other.blocking = true;
         other.localIPAddress = 0;
         other.localPort = 0;
         other.remoteIPAddress = 0;
@@ -454,18 +450,6 @@ namespace relay
         connectErrorCallback = newConnectErrorCallback;
     }
 
-    bool Socket::setBlocking(bool newBlocking)
-    {
-        blocking = newBlocking;
-
-        if (socketFd != INVALID_SOCKET)
-        {
-            return setFdBlocking(newBlocking);
-        }
-
-        return true;
-    }
-
     bool Socket::createSocketFd()
     {
         socketFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -486,13 +470,19 @@ namespace relay
             return false;
         }
 
-        if (!blocking)
-        {
-            if (!setFdBlocking(false))
-            {
-                return false;
-            }
-        }
+        // set socket to non-blocking
+#ifdef _WIN32
+        unsigned long mode = 1;
+        if (ioctlsocket(socketFd, FIONBIO, &mode) != 0)
+            return false;
+#else
+        int flags = fcntl(socketFd, F_GETFL, 0);
+        if (flags < 0) return false;
+        flags |= O_NONBLOCK;
+
+        if (fcntl(socketFd, F_SETFL, flags) != 0)
+            return false;
+#endif
 
 #ifdef __APPLE__
         int set = 1;
@@ -529,33 +519,6 @@ namespace relay
                 Log(Log::Level::INFO) << "Socket " << ipToString(localIPAddress) << ":" << localPort << " closed";
             }
         }
-
-        return true;
-    }
-
-    bool Socket::setFdBlocking(bool block)
-    {
-        if (socketFd == INVALID_SOCKET)
-        {
-            return false;
-        }
-
-#ifdef _WIN32
-        unsigned long mode = block ? 0 : 1;
-        if (ioctlsocket(socketFd, FIONBIO, &mode) != 0)
-        {
-            return false;
-        }
-#else
-        int flags = fcntl(socketFd, F_GETFL, 0);
-        if (flags < 0) return false;
-        flags = block ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
-
-        if (fcntl(socketFd, F_SETFL, flags) != 0)
-        {
-            return false;
-        }
-#endif
 
         return true;
     }
