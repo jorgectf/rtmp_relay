@@ -18,7 +18,7 @@ You can pass these arguments to rtmp_realy (located in the bin directory):
 * *--config <config_file>* – path to config file
 * *--daemon* – run RTMP relay as daemon
 * *--kill-daemon* – kill the daemon
-* *--realod-config* – reload the daemon's configuration
+* *--reload-config* – reload the daemon's configuration
 * *--help* – print the documentation
 
 # Docker build
