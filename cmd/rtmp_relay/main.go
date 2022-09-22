@@ -54,11 +54,6 @@ func main() {
 		log.Println("Failed to parse config", configError)
 	}
 
-	log.Println(config.Log.Level)
-	log.Println(config.Log.SyslogIdent)
-	log.Println(config.StatusPage.Address)
-	log.Println(config.Servers[0].Endpoints[0].ApplicationName)
-	log.Println(config.Servers[0].Endpoints[0].StreamName)
-	log.Println(config.Servers[0].Endpoints[0].Video)
-	log.Println(config.Servers[0].Endpoints[0].BufferSize)
+	relay := server.NewRelay(config)
+	relay.Run()
 }
