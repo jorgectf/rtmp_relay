@@ -6,14 +6,7 @@ Relays RTMP streams to multiple endpoints.
 
 # Usage
 
-RTMP relay uses yaml-cpp submodule. The following command has to be run after cloning the RTMP relay:
-
-```
-$ git submodule update --init
-```
-
-To compile the RTMP relay, just run "make" in the root directory.
-You can pass these arguments to rtmp_realy (located in the bin directory):
+You can pass these arguments to rtmp_relay (located in the bin directory):
 
 * *--config <config_file>* – path to config file
 * *--daemon* – run RTMP relay as daemon
@@ -26,7 +19,7 @@ Check out submodules the same way as for a normal build, then run `docker-compos
 
 # Configuration
 
-RTMP relay configuration files are YAML-based. It must start with servers array. Each server has following attributes:
+RTMP relay configuration files are YAML-based. It must start with servers array. Each server has the following attributes:
 
 * *endpoints* – array of endpoint descriptors
   * *applicationName* – for host streams this is the filter of incoming stream application names (can contain a regex), for client streams this is the name of the application (optional)
