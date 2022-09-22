@@ -13,7 +13,7 @@ $ git submodule update --init
 ```
 
 To compile the RTMP relay, just run "make" in the root directory.
-You can pass these arguments to rtmp_realy (located in the bin directory):
+You can pass these arguments to rtmp_relay (located in the bin directory):
 
 * *--config <config_file>* – path to config file
 * *--daemon* – run RTMP relay as daemon
