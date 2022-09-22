@@ -45,19 +45,17 @@ func main() {
 	}
 
 	configFile, err := ioutil.ReadFile(*configPath)
-
 	if err != nil {
 		log.Println("Failed to open config file,", err)
 	}
 
 	var config server.Config
-
-	configError := yaml.Unmarshal(configFile, &config)
-	if configError != nil {
+	if configError := yaml.Unmarshal(configFile, &config); configError != nil {
 		log.Println("Failed to parse config", configError)
 	}
 
 	log.Println(config.Log.Level)
+	log.Println(config.Log.SyslogIdent)
 	log.Println(config.StatusPage.Address)
 	log.Println(config.Servers[0].Endpoints[0].ApplicationName)
 	log.Println(config.Servers[0].Endpoints[0].StreamName)
