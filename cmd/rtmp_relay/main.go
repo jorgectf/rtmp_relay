@@ -2,6 +2,9 @@ package main
 
 import (
 	"flag"
+	"github.com/elnormous/rtmp_relay/internal/server"
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
 	"log"
 )
 
@@ -10,7 +13,7 @@ func main() {
 	defer log.Println("RTMP relay stopped")
 
 	help := flag.Bool("help", false, "Show help")
-	configFile := flag.String("config", "", "Path to config file")
+	configPath := flag.String("config", "", "Path to config file")
 	daemon := flag.Bool("daemon", false, "Run RTMP relay as daemon")
 	killDaemon := flag.Bool("kill-daemon", false, "Kill the daemon")
 	reloadConfig := flag.Bool("realod-config", false, "Print the documentation")
@@ -30,7 +33,7 @@ func main() {
 		log.Println("Not implemented")
 		// TODO: reload the config
 		return
-	} else if len(*configFile) == 0 {
+	} else if len(*configPath) == 0 {
 		log.Println("No config file given")
 		return
 	}
@@ -41,5 +44,23 @@ func main() {
 		return
 	}
 
-	log.Println(*configFile)
+	configFile, err := ioutil.ReadFile(*configPath)
+
+	if err != nil {
+		log.Println("Failed to open config file,", err)
+	}
+
+	var config server.Config
+
+	configError := yaml.Unmarshal(configFile, &config)
+	if configError != nil {
+		log.Println("Failed to parse config", configError)
+	}
+
+	log.Println(config.Log.Level)
+	log.Println(config.StatusPage.Address)
+	log.Println(config.Servers[0].Endpoints[0].ApplicationName)
+	log.Println(config.Servers[0].Endpoints[0].StreamName)
+	log.Println(config.Servers[0].Endpoints[0].Video)
+	log.Println(config.Servers[0].Endpoints[0].BufferSize)
 }
