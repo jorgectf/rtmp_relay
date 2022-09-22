@@ -55,5 +55,7 @@ func main() {
 	}
 
 	relay := server.NewRelay(config)
+	defer relay.Close()
+
 	relay.Run()
 }

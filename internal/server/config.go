@@ -3,31 +3,31 @@ package server
 import "gopkg.in/yaml.v3"
 
 type LogConfig struct {
-	Level          uint32
-	SyslogIdent    string
-	SyslogFacility string
+	Level          uint32 `yaml:"applicationName"`
+	SyslogIdent    string `yaml:"syslogIdent"`
+	SyslogFacility string `yaml:"syslogFacility"`
 }
 
 type StatusPageConfig struct {
-	Address string
+	Address string `yaml:"address"`
 }
 
 type EndpointConfig struct {
-	ApplicationName   string
-	StreamName        string
-	Type              string
-	Direction         string
-	Addresses         []string
-	Video             bool
-	Audio             bool
-	Data              bool
-	MetaDataBlacklist []string
-	ConnectionTimeout float32
-	ReconnectInterval float32
-	ReconnectCount    uint32
-	PingInterval      float32
-	BufferSize        uint32
-	AmfVersion        uint32
+	ApplicationName   string   `yaml:"applicationName"`
+	StreamName        string   `yaml:"streamName"`
+	Type              string   `yaml:"type"`
+	Direction         string   `yaml:"direction"`
+	Addresses         []string `yaml:"addresses"`
+	Video             bool     `yaml:"video"`
+	Audio             bool     `yaml:"audio"`
+	Data              bool     `yaml:"data"`
+	MetaDataBlacklist []string `yaml:"metaDataBlacklist"`
+	ConnectionTimeout float32  `yaml:"connectionTimeout"`
+	ReconnectInterval float32  `yaml:"reconnectInterval"`
+	ReconnectCount    uint32   `yaml:"reconnectCount"`
+	PingInterval      float32  `yaml:"pingInterval"`
+	BufferSize        uint32   `yaml:"bufferSize"`
+	AmfVersion        uint32   `yaml:"amfVersion"`
 }
 
 func (endpointConfig *EndpointConfig) UnmarshalYAML(value *yaml.Node) error {
@@ -44,11 +44,11 @@ func (endpointConfig *EndpointConfig) UnmarshalYAML(value *yaml.Node) error {
 }
 
 type ServersConfig struct {
-	Endpoints []EndpointConfig
+	Endpoints []EndpointConfig `yaml:"endpoints"`
 }
 
 type Config struct {
-	Log        LogConfig
-	StatusPage StatusPageConfig
-	Servers    []ServersConfig
+	Log        LogConfig        `yaml:"log"`
+	StatusPage StatusPageConfig `yaml:"statusPage"`
+	Servers    []ServersConfig  `yaml:"servers"`
 }
