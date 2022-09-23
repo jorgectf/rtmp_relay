@@ -1,4 +1,4 @@
-# RTMP relay v1.0
+# Stream relay v1.1
 
 [![Build Status](https://api.travis-ci.org/elnormous/rtmp_relay.svg?branch=master)](https://travis-ci.org/elnormous/rtmp_relay) [![Build Status](https://ci.appveyor.com/api/projects/status/9axwxwyf99dcr11d?svg=true)](https://ci.appveyor.com/project/elnormous/rtmp_relay)
 
@@ -6,20 +6,20 @@ Relays RTMP streams to multiple endpoints.
 
 # Usage
 
-You can pass these arguments to rtmp_relay (located in the bin directory):
+You can pass these arguments to stream_relay (located in the bin directory):
 
 * *--config <config_file>* – path to config file
-* *--daemon* – run RTMP relay as daemon
+* *--daemon* – run Stream relay as daemon
 * *--kill-daemon* – kill the daemon
 * *--reload-config* – reload the daemon's configuration
 * *--help* – print the documentation
 
 # Docker build
-Check out submodules the same way as for a normal build, then run `docker-compose build`. This will result in a local image named `evo-rtmp-relay:latest`.
+Check out submodules the same way as for a normal build, then run `docker-compose build`. This will result in a local image named `stream-relay:latest`.
 
 # Configuration
 
-RTMP relay configuration files are YAML-based. It must start with servers array. Each server has the following attributes:
+Stream relay configuration files are YAML-based. It must start with servers array. Each server has the following attributes:
 
 * *endpoints* – array of endpoint descriptors
   * *applicationName* – for host streams this is the filter of incoming stream application names (can contain a regex), for client streams this is the name of the application (optional)
