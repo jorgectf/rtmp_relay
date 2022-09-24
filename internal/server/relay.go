@@ -1,16 +1,18 @@
 package server
 
+import "context"
+
 type Relay struct {
 	servers []*Server
 }
 
-func NewRelay(config Config) *Relay {
+func NewRelay(ctx context.Context, config Config) *Relay {
 	relay := &Relay{
 		servers: make([]*Server, len(config.Servers)),
 	}
 
 	for i, serverConfig := range config.Servers {
-		server := NewServer(serverConfig)
+		server := NewServer(ctx, serverConfig)
 		relay.servers[i] = server
 	}
 

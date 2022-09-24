@@ -1,11 +1,16 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"github.com/elnormous/rtmp_relay/internal/server"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -54,8 +59,18 @@ func main() {
 		log.Println("Failed to parse config", configError)
 	}
 
-	relay := server.NewRelay(config)
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+
+	relay := server.NewRelay(ctx, config)
 	defer relay.Close()
 
-	relay.Run()
+	go relay.Run()
+
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	//<-signalChannel
+
+	cancel()
+	time.Sleep(1 * time.Second)
 }

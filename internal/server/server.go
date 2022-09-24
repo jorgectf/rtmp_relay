@@ -1,16 +1,18 @@
 package server
 
+import "context"
+
 type Server struct {
 	endpoints []*Endpoint
 }
 
-func NewServer(config ServersConfig) *Server {
+func NewServer(ctx context.Context, config ServersConfig) *Server {
 	server := &Server{
 		endpoints: make([]*Endpoint, len(config.Endpoints)),
 	}
 
 	for i, endpointConfig := range config.Endpoints {
-		endpoint := NewEndpoint(endpointConfig)
+		endpoint := NewEndpoint(ctx, endpointConfig)
 		server.endpoints[i] = endpoint
 	}
 
