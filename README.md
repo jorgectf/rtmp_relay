@@ -86,13 +86,13 @@ Example configuration:
         address: "0.0.0.0:80"
     servers:
       - endpoints:
-          - address: [ "0.0.0.0:13004" ]
+          - addresses: [ "0.0.0.0:13004" ]
             type: "host"
             direction: "input"
             applicationName: "app/name"
             video: true
             audio: true
-          - address: [ "52.19.130.93:1935" ]
+          - addresses: [ "52.19.130.93:1935" ]
             type: "client"
             direction: "output"
             applicationName: "app/name"
@@ -100,7 +100,7 @@ Example configuration:
             video: true
             audio: true
             pingInterval: 60.0
-          - address: [ "127.0.0.1:13005" ]
+          - addresses: [ "127.0.0.1:13005" ]
             type: "client"
             direction: "output"
             applicationName: "app/name"
