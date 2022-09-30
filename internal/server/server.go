@@ -1,6 +1,9 @@
 package server
 
-import "context"
+import (
+	"context"
+	"sync"
+)
 
 type Server struct {
 	endpoints []*Endpoint
@@ -26,7 +29,16 @@ func (server *Server) Close() {
 }
 
 func (server *Server) Run() {
+	var wg sync.WaitGroup
+
 	for _, endpoint := range server.endpoints {
-		endpoint.Run()
+		wg.Add(1)
+
+		go func(endpoint *Endpoint) {
+			defer wg.Done()
+			endpoint.Run()
+		}(endpoint)
 	}
+
+	wg.Wait()
 }

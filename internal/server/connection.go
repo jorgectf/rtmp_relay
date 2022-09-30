@@ -61,6 +61,4 @@ func (connection *Connection) Run() {
 
 		connection.conn = conn
 	}
-
-	log.Println("Done")
 }
