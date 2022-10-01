@@ -23,7 +23,8 @@ func NewEndpoint(ctx context.Context, config EndpointConfig) *Endpoint {
 			address,
 			config.ConnectionTimeout,
 			config.ReconnectInterval,
-			config.ReconnectCount)
+			config.ReconnectCount,
+			config.BufferSize)
 	}
 
 	return endpoint

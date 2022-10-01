@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net"
 )
@@ -14,9 +15,7 @@ type Connection struct {
 	connectionTimeout float32
 	reconnectInterval float32
 	reconnectCount    uint32
-
-	listener net.Listener
-	conn     net.Conn
+	buffer            []byte
 }
 
 func NewConnection(
@@ -25,7 +24,8 @@ func NewConnection(
 	address string,
 	connectionTimeout float32,
 	reconnectInterval float32,
-	reconnectCount uint32) *Connection {
+	reconnectCount uint32,
+	bufferSize uint32) *Connection {
 	connection := &Connection{
 		ctx:               ctx,
 		connectionType:    connectionType,
@@ -33,6 +33,7 @@ func NewConnection(
 		connectionTimeout: connectionTimeout,
 		reconnectInterval: reconnectInterval,
 		reconnectCount:    reconnectCount,
+		buffer:            make([]byte, bufferSize),
 	}
 
 	return connection
@@ -43,22 +44,104 @@ func (connection *Connection) Close() {
 }
 
 func (connection *Connection) Run() {
+
 	if connection.connectionType == "host" {
-		listenConfig := net.ListenConfig{}
-
-		listener, err := listenConfig.Listen(connection.ctx, "tcp", connection.address)
-		if err != nil {
-			log.Println("Failed to create server", err)
-		}
-
-		connection.listener = listener
+		connection.listen()
 	} else if connection.connectionType == "client" {
-		var dialer net.Dialer
-		conn, err := dialer.DialContext(connection.ctx, "tcp", connection.address)
-		if err != nil {
+		connection.connect()
+	}
+}
+
+func (connection *Connection) listen() {
+	go func() {
+		select {
+		case <-connection.ctx.Done():
+			log.Println("Context done")
+		}
+	}()
+
+	var listenConfig net.ListenConfig
+
+	listener, err := listenConfig.Listen(connection.ctx, "tcp", connection.address)
+	if err != nil {
+		log.Println("Failed to create server", err)
+		// TODO: reconnect
+		return
+	}
+
+	go func() {
+		select {
+		case <-connection.ctx.Done():
+			log.Println("Context done")
+			if err := listener.Close(); err != nil {
+				log.Println("Failed to close listener", err)
+			}
+		}
+	}()
+
+	conn, err := listener.Accept()
+	if err != nil {
+		if errors.Is(err, net.ErrClosed) {
+			log.Println("Listener closed")
+		} else {
+			log.Println("Failed to accept client", err)
+		}
+		return
+	}
+
+	go func() {
+		select {
+		case <-connection.ctx.Done():
+			log.Println("Context done")
+			if err := conn.Close(); err != nil {
+				log.Println("Failed to close connection", err)
+			}
+		}
+	}()
+
+	connection.handleConnection(conn)
+}
+
+func (connection *Connection) connect() {
+	var dialer net.Dialer
+	conn, err := dialer.DialContext(connection.ctx, "tcp", connection.address)
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			log.Println("Context canceled")
+			return
+		} else {
 			log.Println("Failed to connect to server", err)
+			// TODO: reconnect
+			return
+		}
+	}
+
+	go func() {
+		select {
+		case <-connection.ctx.Done():
+			log.Println("Context done")
+			if err := conn.Close(); err != nil {
+				log.Println("Failed to close connection", err)
+			}
+		}
+	}()
+
+	connection.handleConnection(conn)
+}
+
+func (connection *Connection) handleConnection(conn net.Conn) {
+	for {
+		n, err := conn.Read(connection.buffer)
+		if err != nil {
+			if errors.Is(err, net.ErrClosed) {
+				log.Println("Connection closed")
+			} else {
+				log.Println("Failed read data", err)
+			}
+			// TODO: reconnect
+			return
 		}
 
-		connection.conn = conn
+		log.Println("Received", n, "bytes")
 	}
 }
