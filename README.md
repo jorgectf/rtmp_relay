@@ -31,8 +31,8 @@ Stream relay configuration files are YAML-based. It must start with servers arra
   * *audio* – flag that indicates whether to forward audio stream (default value is true)
   * *data* – flag that indicates whether to forward data stream (default value is true)
   * *metaDataBlacklist* – list of metadata fields that should not be forwarded
-  * *connectionTimeout* – how long should the attempt to connect last (default value is 5.0)
-  * *reconnectInterval* – the interval of reconnection (default value is 5.0)
+  * *connectionTimeout* – how long should the attempt to connect last in seconds (default value is 5.0)
+  * *reconnectInterval* – the interval of reconnection in seconds (default value is 5.0)
   * *reconnectCount* – amount of connect attempts (0 to reconnect forever)
   * *pingInterval* – client ping interval in seconds (default value is 60.0)
   * *bufferSize* – size of the client buffer for input streams (default value is 3000)

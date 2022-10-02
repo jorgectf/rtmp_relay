@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net"
+	"time"
 )
 
 type Connection struct {
@@ -103,10 +104,16 @@ func (connection *Connection) listen() {
 }
 
 func (connection *Connection) connect() {
+	ctx, _ := context.WithTimeout(connection.ctx, time.Duration(connection.connectionTimeout*float32(time.Second)))
+
 	var dialer net.Dialer
-	conn, err := dialer.DialContext(connection.ctx, "tcp", connection.address)
+	conn, err := dialer.DialContext(ctx, "tcp", connection.address)
 	if err != nil {
-		if errors.Is(err, context.Canceled) {
+		if errors.Is(err, context.DeadlineExceeded) {
+			log.Println("Context deadline exceeded")
+			// TODO: reconnect
+			return
+		} else if errors.Is(err, context.Canceled) {
 			log.Println("Context canceled")
 			return
 		} else {
