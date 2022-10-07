@@ -5,7 +5,6 @@ import (
 	"flag"
 	"github.com/elnormous/rtmp_relay/internal/server"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -48,7 +47,7 @@ func main() {
 		return
 	}
 
-	configFile, err := ioutil.ReadFile(*configPath)
+	configFile, err := os.ReadFile(*configPath)
 	if err != nil {
 		log.Println("Failed to open config file,", err)
 	}
