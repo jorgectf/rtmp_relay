@@ -7,19 +7,15 @@ import (
 
 type Relay struct {
 	servers []*Server
-	cancel  context.CancelFunc
 }
 
 func NewRelay(config Config) *Relay {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	relay := &Relay{
 		servers: make([]*Server, len(config.Servers)),
-		cancel:  cancel,
 	}
 
 	for i, serverConfig := range config.Servers {
-		server := NewServer(ctx, serverConfig)
+		server := NewServer(serverConfig)
 		relay.servers[i] = server
 	}
 
@@ -32,7 +28,7 @@ func (relay *Relay) Close() {
 	}
 }
 
-func (relay *Relay) Run() {
+func (relay *Relay) Run(ctx context.Context) {
 	var wg sync.WaitGroup
 
 	for _, server := range relay.servers {
@@ -40,13 +36,9 @@ func (relay *Relay) Run() {
 
 		go func(server *Server) {
 			defer wg.Done()
-			server.Run()
+			server.Run(ctx)
 		}(server)
 	}
 
 	wg.Wait()
-}
-
-func (relay *Relay) Stop() {
-	relay.cancel()
 }

@@ -10,7 +10,7 @@ type Endpoint struct {
 	connections     []*Connection
 }
 
-func NewEndpoint(ctx context.Context, config EndpointConfig) *Endpoint {
+func NewEndpoint(config EndpointConfig) *Endpoint {
 	endpoint := &Endpoint{
 		applicationName: config.ApplicationName,
 		connections:     make([]*Connection, len(config.Addresses)),
@@ -18,7 +18,6 @@ func NewEndpoint(ctx context.Context, config EndpointConfig) *Endpoint {
 
 	for i, address := range config.Addresses {
 		endpoint.connections[i] = NewConnection(
-			ctx,
 			config.Type,
 			address,
 			config.ConnectionTimeout,
@@ -36,7 +35,7 @@ func (endpoint *Endpoint) Close() {
 	}
 }
 
-func (endpoint *Endpoint) Run() {
+func (endpoint *Endpoint) Run(ctx context.Context) {
 	var wg sync.WaitGroup
 
 	for _, connection := range endpoint.connections {
@@ -44,7 +43,7 @@ func (endpoint *Endpoint) Run() {
 
 		go func(connection *Connection) {
 			defer wg.Done()
-			connection.Run()
+			connection.Run(ctx)
 		}(connection)
 	}
 

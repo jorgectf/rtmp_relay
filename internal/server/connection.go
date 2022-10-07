@@ -9,8 +9,6 @@ import (
 )
 
 type Connection struct {
-	ctx context.Context
-
 	connectionType    string
 	address           string
 	connectionTimeout float32
@@ -20,7 +18,6 @@ type Connection struct {
 }
 
 func NewConnection(
-	ctx context.Context,
 	connectionType string,
 	address string,
 	connectionTimeout float32,
@@ -28,7 +25,6 @@ func NewConnection(
 	reconnectCount uint32,
 	bufferSize uint32) *Connection {
 	connection := &Connection{
-		ctx:               ctx,
 		connectionType:    connectionType,
 		address:           address,
 		connectionTimeout: connectionTimeout,
@@ -44,35 +40,37 @@ func (connection *Connection) Close() {
 
 }
 
-func (connection *Connection) Run() {
+func (connection *Connection) Run(ctx context.Context) {
 
 	if connection.connectionType == "host" {
-		connection.listen()
+		connection.listen(ctx)
 	} else if connection.connectionType == "client" {
-		connection.connect()
+		connection.connect(ctx)
 	}
 }
 
-func (connection *Connection) listen() {
+func (connection *Connection) listen(ctx context.Context) {
 	go func() {
 		select {
-		case <-connection.ctx.Done():
+		case <-ctx.Done():
 			log.Println("Context done")
 		}
 	}()
 
 	var listenConfig net.ListenConfig
 
-	listener, err := listenConfig.Listen(connection.ctx, "tcp", connection.address)
+	listener, err := listenConfig.Listen(ctx, "tcp", connection.address)
 	if err != nil {
 		log.Println("Failed to create server", err)
 		// TODO: reconnect
 		return
 	}
 
+	defer listener.Close()
+
 	go func() {
 		select {
-		case <-connection.ctx.Done():
+		case <-ctx.Done():
 			log.Println("Context done")
 			if err := listener.Close(); err != nil {
 				log.Println("Failed to close listener", err)
@@ -92,7 +90,7 @@ func (connection *Connection) listen() {
 
 	go func() {
 		select {
-		case <-connection.ctx.Done():
+		case <-ctx.Done():
 			log.Println("Context done")
 			if err := conn.Close(); err != nil {
 				log.Println("Failed to close connection", err)
@@ -103,8 +101,8 @@ func (connection *Connection) listen() {
 	connection.handleConnection(conn)
 }
 
-func (connection *Connection) connect() {
-	ctx, _ := context.WithTimeout(connection.ctx, time.Duration(connection.connectionTimeout*float32(time.Second)))
+func (connection *Connection) connect(ctx context.Context) {
+	ctx, _ = context.WithTimeout(ctx, time.Duration(connection.connectionTimeout*float32(time.Second)))
 
 	var dialer net.Dialer
 	conn, err := dialer.DialContext(ctx, "tcp", connection.address)
@@ -123,9 +121,11 @@ func (connection *Connection) connect() {
 		}
 	}
 
+	defer conn.Close()
+
 	go func() {
 		select {
-		case <-connection.ctx.Done():
+		case <-ctx.Done():
 			log.Println("Context done")
 			if err := conn.Close(); err != nil {
 				log.Println("Failed to close connection", err)

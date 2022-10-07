@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"github.com/elnormous/rtmp_relay/internal/server"
 	"gopkg.in/yaml.v3"
@@ -60,13 +61,15 @@ func main() {
 	relay := server.NewRelay(config)
 	defer relay.Close()
 
-	go func(relay *server.Relay) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go func(cancel context.CancelFunc) {
 		signalChannel := make(chan os.Signal, 1)
 		signal.Notify(signalChannel, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 		s := <-signalChannel
 		log.Println("Received a signal", s)
-		relay.Stop()
-	}(relay)
+		cancel()
+	}(cancel)
 
-	relay.Run()
+	relay.Run(ctx)
 }

@@ -9,13 +9,13 @@ type Server struct {
 	endpoints []*Endpoint
 }
 
-func NewServer(ctx context.Context, config ServersConfig) *Server {
+func NewServer(config ServersConfig) *Server {
 	server := &Server{
 		endpoints: make([]*Endpoint, len(config.Endpoints)),
 	}
 
 	for i, endpointConfig := range config.Endpoints {
-		endpoint := NewEndpoint(ctx, endpointConfig)
+		endpoint := NewEndpoint(endpointConfig)
 		server.endpoints[i] = endpoint
 	}
 
@@ -28,7 +28,7 @@ func (server *Server) Close() {
 	}
 }
 
-func (server *Server) Run() {
+func (server *Server) Run(ctx context.Context) {
 	var wg sync.WaitGroup
 
 	for _, endpoint := range server.endpoints {
@@ -36,7 +36,7 @@ func (server *Server) Run() {
 
 		go func(endpoint *Endpoint) {
 			defer wg.Done()
-			endpoint.Run()
+			endpoint.Run(ctx)
 		}(endpoint)
 	}
 
