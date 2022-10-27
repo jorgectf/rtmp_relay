@@ -62,13 +62,18 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	go func(cancel context.CancelFunc) {
+	go func(ctx context.Context, cancel context.CancelFunc) {
 		signalChannel := make(chan os.Signal, 1)
 		signal.Notify(signalChannel, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-		s := <-signalChannel
-		log.Println("Received a signal", s)
-		cancel()
-	}(cancel)
+		select {
+		case s := <-signalChannel:
+			log.Println("Received a signal", s)
+			cancel()
+		case <-ctx.Done():
+			log.Println("Context done")
+		}
+		signal.Stop(signalChannel)
+	}(ctx, cancel)
 
 	relay.Run(ctx)
 }
